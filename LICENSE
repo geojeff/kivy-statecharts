@@ -1,0 +1,24 @@
+# ================================================================================
+# Project:   Kivy.Statechart - A Statechart Framework for Kivy
+# Copyright: ©2010, 2011 Michael Cohen, and contributors.
+# Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
+# ================================================================================
+#
+# Work-in-progress Port
+#
+# Being ported to python/Kivy from https://github.com/sproutcore/sproutcore/tree/master/frameworks/statechart
+#
+# =================================================================================
+# Project:   Kivy/SC/Ki.Statechart - A Statechart Framework used in Kivy and
+#                                    SproutCore, and existing also as
+#                                    the standalone framework called Ki.
+#
+# Copyright: (c) 2010, 2011 Michael Cohen, and contributors.
+#            Portions @2011 Apple Inc. All rights reserved.
+# License:   Licensed under MIT license
+# =================================================================================
+#
+# Note: The similarity between the original name of Michael Cohen's Ki Statechart framework, 
+#       which was later ported to SproutCore, and the name Kivy, is purely coincidental.
+#
+
