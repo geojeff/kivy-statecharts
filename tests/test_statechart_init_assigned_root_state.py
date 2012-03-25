@@ -8,8 +8,8 @@ import unittest
 counter = 0
 
 from kivy.app import App
-from kivy.statechart.system.state import State
-from kivy.statechart.system.statechart import StatechartManager
+from kivy_statechart.system.state import State
+from kivy_statechart.system.statechart import StatechartManager
 
 import os, inspect
 

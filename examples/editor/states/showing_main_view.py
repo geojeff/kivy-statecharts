@@ -2,7 +2,7 @@
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
-from kivy.statechart.system.state import State
+from kivy_statechart.system.state import State
 
 ###############################
 # MainView and the main state

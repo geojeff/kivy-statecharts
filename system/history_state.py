@@ -5,7 +5,7 @@
 # ================================================================================
 
 from kivy.properties import AliasProperty, StringProperty
-from kivy.statechart.system.state import State
+from kivy_statechart.system.state import State
 
 """
   @class

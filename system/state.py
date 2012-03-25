@@ -5,7 +5,7 @@
 # ================================================================================
 
 from kivy.event import EventDispatcher
-from kivy.statechart.private.state_path_matcher import StatePathMatcher
+from kivy_statechart.private.state_path_matcher import StatePathMatcher
 from kivy.properties import BooleanProperty, ListProperty, ObjectProperty, StringProperty
 from collections import deque
 
@@ -330,7 +330,7 @@ class State(EventDispatcher):
     
         self.substates = substates
     
-        from kivy.statechart.system.history_state import HistoryState
+        from kivy_statechart.system.history_state import HistoryState
 
         if inspect.isclass(initialSubstate) and isinstance(initialSubstate, HistoryState):
             historyState = self.createSubstate(initialSubstate)
