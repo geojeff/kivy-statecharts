@@ -10,13 +10,13 @@ Installation
 kivy-statechart is a standalone Python module that you may wish to put alongside your local clone of Kivy if you are doing development. I have the
 following setup for development:
 
-~/Development/kivy/kivy, where I cloned Kivy, and ~/Development/kivy/kivy_statechart, where I cloned kivy-statechart. I added both of these to my
-~/.profile file's PYTHONPATH.
+~/Development/kivy/kivy, for a Kivy clone, and ~/Development/kivy/kivy_statechart, for a kivy-statechart clone. Both were added to PYTHONPATH in
+~/.profile so imports would work during development.
 
-Then in a separate work area, I copied kivy_statechart/examples/editor/* and used that as the basis of a new Kivy app.
+In a separate work area, kivy_statechart/examples/editor/* was copied and used as the basis of a new Kivy app.
 
 kivy-statechart requires no changes to Kivy proper, but Kivy needs to be installed properly.  I used homebrew to make a python 2.7.2 and to use its
-easy_install to install Kivy and python dependencies of Kivy that were not installed by bre directly.
+easy_install to install Kivy and python dependencies of Kivy that were not installed by brew directly.
 
 Tests
 -----
