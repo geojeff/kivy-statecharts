@@ -1,0 +1,11 @@
+.noseids
+*.so
+*.pyc
+*.pyo
+*~
+*.swp
+*.DS_Store
+*.kpf
+tests/results
+.last_known_portable_deps_hash
+deps.zip  
