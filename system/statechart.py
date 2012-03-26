@@ -530,10 +530,8 @@ class StatechartManager(EventDispatcher):
     """
     def getState(self, state):
         if isinstance(state, basestring):
-            if self.rootState.name == state:
             return self.rootState if self.rootState.name == state else self.rootState.getSubstate(state)
         else:
-            if self.rootState is state:
             return self.rootState if self.rootState is state else self.rootState.getSubstate(state)
       
     """
