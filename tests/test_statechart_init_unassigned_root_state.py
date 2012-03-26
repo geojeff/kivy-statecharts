@@ -60,6 +60,6 @@ class StatechartTestCase(unittest.TestCase):
 
         self.assertEqual(s1.initialState, stateA.__name__) # [PORT] See comments in statechart.py about this not being an actual class object comparison.
         self.assertEqual(rootState1.initialSubstate, 'A')
-        self.assertEqual(stateA, rootState1.getSubstate('A'))
-        self.assertEqual(stateB, rootState1.getSubstate('B'))
+        self.assertEqual(stateA, type(rootState1.getSubstate('A')))
+        self.assertEqual(stateB, type(rootState1.getSubstate('B')))
         

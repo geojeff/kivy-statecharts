@@ -128,7 +128,7 @@ class State(EventDispatcher):
       
       @property {String|State}
     """
-    initialSubstate = ObjectProperty(None)
+    initialSubstate = StringProperty(None) # [PORT] In python version, make this always a string.
 
     """
       Used to indicates if this state's immediate substates are to be
@@ -240,10 +240,9 @@ class State(EventDispatcher):
         for k,v in kwargs.items():
             if k == 'initialSubstate':
                 if isinstance(v, basestring):
-                    self.initialSubstateName = v
-                else:
-                    self.initialSubstateName = k
                     self.initialSubstate = v
+                else:
+                    self.initialSubstate = v.__name__ # [PORT] Force initialSubstate to always be string.
             else:
                 setattr(self, k, v)
 
@@ -292,7 +291,6 @@ class State(EventDispatcher):
         self.parentState = None
         self.historyState = None
         self.initialSubstate = None
-        self.initialSubstateName = None
         self.statechart = None
     
         #self.notifyPropertyChange("trace")
@@ -335,7 +333,7 @@ class State(EventDispatcher):
         if inspect.isclass(initialSubstate) and isinstance(initialSubstate, HistoryState):
             historyState = self.createSubstate(initialSubstate)
       
-            self.initialSubstate = historyState
+            self.initialSubstate = historyState.__name__ # [PORT] Always make this a string.
       
             if historyState.defaultState is None:
                 self.stateLogError("Initial substate is invalid. History state requires the name of a default state to be set")
@@ -368,7 +366,7 @@ class State(EventDispatcher):
             if inspect.isclass(value) and issubclass(value, State) and key != '__class__': # [PORT] using inspect. Check the __class__ hack.
                 state = self._addSubstate(key, value, None)
                 if key == self.initialSubstate:
-                    self.initialSubstate = state
+                    self.initialSubstate = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
                     matchedInitialSubstate = True
                 elif historyState and historyState.defaultState == key:
                     historyState.defaultState = state
@@ -496,7 +494,7 @@ class State(EventDispatcher):
 
         state = self.createSubstate(EmptyState)
 
-        self.initialSubstate = state
+        self.initialSubstate = state.__name__
         self.substates.append(state)
 
         setattr(self, state.name, state)
@@ -740,7 +738,7 @@ class State(EventDispatcher):
 
         # If the value is an object then just check if the value is 
         # a registered substate of this state, and if so return it. 
-        if inspect.isclass(value) and issubclass(value, State): # [PORT] Changed from check for object. OK that states must be State subclasses?
+        if not isinstance(value, basestring): # [PORT] if not a string, is an object
             return value if value in self._registeredSubstates else None
 
         if not isinstance(value, basestring):
@@ -762,6 +760,7 @@ class State(EventDispatcher):
                 matches.append(paths[key])
 
         if len(matches) == 1:
+            print 'returning matches[0]', matches[0]
             return matches[0]
 
         keys = []

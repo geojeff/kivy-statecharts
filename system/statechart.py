@@ -525,11 +525,16 @@ class StatechartManager(EventDispatcher):
     """
       Gets a state from the statechart that matches the given value
       
-      @param value {State|String} either a state object of the name of a state
+      @param value {State|String} either a state object or the name of a state
       @returns {State} if a match then the matching state is returned, otherwise None is returned 
     """
     def getState(self, state):
-        return self.rootState if self.rootState is state else self.rootState.getSubstate(state)
+        if isinstance(state, basestring):
+            if self.rootState.name == state:
+            return self.rootState if self.rootState.name == state else self.rootState.getSubstate(state)
+        else:
+            if self.rootState is state:
+            return self.rootState if self.rootState is state else self.rootState.getSubstate(state)
       
     """
       When called, the statechart will proceed with making state transitions in the statechart starting from 
@@ -801,6 +806,7 @@ class StatechartManager(EventDispatcher):
         
     """ @private """
     def _enterState(self, state, current, context):
+        state = self.getState(state) # [PORT] Insure this is an obj and not a string.
         parentState = state.parentState
         if parentState and not state.isConcurrentState:
             parentState.historyState = state
@@ -1115,20 +1121,23 @@ class StatechartManager(EventDispatcher):
             historySubstate = state.historySubstate if hasattr(state, 'historySubstate') else None
             
             # State has concurrent substates. Need to enter all of the substates
-            if state.substatesAreConcurrent:
-                self._traverseConcurrentStatesToEnter(state.substates, None, useHistory, gotoStateActions)
+            stateObj = self.getState(state)
+            if stateObj.substatesAreConcurrent:
+                self._traverseConcurrentStatesToEnter(stateObj.substates, None, useHistory, gotoStateActions)
             
             # State has substates and we are instructed to recursively follow the state's
             # history state if it has one.
-            elif state.hasSubstates and historyState and useHistory:
+            elif stateObj.hasSubstates and historyState and useHistory:
                 self._traverseStatesToEnter(historyState, None, None, useHistory, gotoStateActions)
             
             # State has an initial substate to enter
             elif initialSubstate is not None:
-                if inspect.isclass(initialSubstate) and issubclass(initialSubstate, HistoryState): # [PORT] OK if initialSubstate is str here? (class or object at this point?)
+                initialSubstateObj = self.getState(initialSubstate)
+                if inspect.isclass(initialSubstateObj) and issubclass(initialSubstateObj, HistoryState):
                     if not useHistory:
-                        useHistory = initialSubstate.isRecursive
-                    initialSubstate = initialSubstate.state
+                        useHistory = initialSubstateObj.isRecursive
+                    #initialSubstate = initialSubstate.state # [PORT] Is the line below what it should be?
+                    initialSubstate = initialSubstate.initialSubstate
                 self._traverseStatesToEnter(initialSubstate, None, None, useHistory, gotoStateActions)
             
             # Looks like we hit the end of the road. Therefore the state has now become
@@ -1346,7 +1355,6 @@ class StatechartManager(EventDispatcher):
         elif statesAreConcurrent:
             attrs['substatesAreConcurrent'] = True
         elif isinstance(initialState, basestring):
-            print 'initialState', initialState
             attrs['initialSubstate'] = initialState
         else:
             self._logStatechartCreationError("Must either define initial state or assign states as concurrent")
