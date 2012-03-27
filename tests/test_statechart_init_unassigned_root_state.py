@@ -66,6 +66,19 @@ class Statechart_3(StatechartManager):
             }
         super(Statechart_3, self).__init__(**attrs) 
 
+class F(State):
+    pass
+
+class Statechart_4(StatechartManager):
+    def __init__(self):
+        attrs = { 
+            'autoInitStatechart': False,
+            'rootStateExample': RootStateExample,
+            'initialState': 'F',
+            'F': F
+            }
+        super(Statechart_4, self).__init__(**attrs) 
+
 #Statechart_1 = StatechartManager(**{
 #    'initialState': 'A',
 #    'A': State(**{ 'foo': lambda self,*l: self.gotoState('B')}),
@@ -80,6 +93,7 @@ class StatechartTestCase(unittest.TestCase):
         global statechart_1
         global statechart_2
         global statechart_3
+        global statechart_4
         global rootState_1
         global rootState_2
         global rootState_3
@@ -102,6 +116,8 @@ class StatechartTestCase(unittest.TestCase):
         statechart_3 = Statechart_3()
         rootState_3 = statechart_3.rootState
         state_E = statechart_3.getState('E')
+
+        statechart_4 = Statechart_4()
 
     def test_statechart_1(self):
         self.assertTrue(statechart_1.isStatechart)
@@ -158,4 +174,13 @@ class StatechartTestCase(unittest.TestCase):
         self.assertEqual(state_E, rootState_3.getSubstate('E'))
         self.assertTrue(state_E.isCurrentState)
 
+    def test_statechart_4(self):
+        self.assertTrue(statechart_4.isStatechart)
+        self.assertFalse(statechart_4.statechartIsInitialized)
+        self.assertEqual(statechart_4.rootState, None)
         
+        statechart_4.initStatechart()
+
+        self.assertTrue(statechart_4.statechartIsInitialized)
+        self.assertFalse(statechart_4.rootState is None)
+        self.assertEqual(statechart_4.rootState.getSubstate('F'), statechart_4.getState('F'))
