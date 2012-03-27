@@ -62,18 +62,19 @@ class StatechartTestCase(unittest.TestCase):
         global statechart_1
         global statechart_2
         global rootState_1
+        global rootState_2
         global state_A
         global state_B
-        global stateC
-        global stateD
+        global state_C
+        global state_D
         statechart_1 = Statechart_1()
         rootState_1 = statechart_1.rootState
         state_A = statechart_1.getState('A')
         state_B = statechart_1.getState('B')
         statechart_2 = Statechart_2()
-        rootState2 = statechart_2.rootState
-        stateC = statechart_2.C
-        stateD = statechart_2.D
+        rootState_2 = statechart_2.rootState
+        state_C = statechart_2.getState('C')
+        state_D = statechart_2.getState('D')
 
     def test_statechart_1(self):
         self.assertTrue(statechart_1.isStatechart)
@@ -106,8 +107,8 @@ class StatechartTestCase(unittest.TestCase):
 
         self.assertEqual(statechart_2.initialState, None)
         self.assertEqual(rootState_2.initialSubstate, None)
-        self.assertEqual(state_C, rootState_2.getSubstate('A'))
-        self.assertEqual(state_D, rootState_2.getSubstate('B'))
+        self.assertEqual(state_C, rootState_2.getSubstate('C'))
+        self.assertEqual(state_D, rootState_2.getSubstate('D'))
         
         self.assertEqual(rootState_2.owner, statechart_2)
         self.assertEqual(state_C.owner, statechart_2)
@@ -115,3 +116,4 @@ class StatechartTestCase(unittest.TestCase):
 
         self.assertTrue(state_C.isCurrentState)
         self.assertTrue(state_D.isCurrentState)
+
