@@ -757,7 +757,8 @@ class StatechartManager(EventDispatcher):
         self._gotoStateSuspendedPoint = None
         self._gotoStateActions = None
         self._gotoStateLocked = False
-        self._flushPendingStateTransition()
+        if self._pendingStateTransitions: # [PORT] There is an error check in the function that this if now skips. But isn't it ok to be empty?
+            self._flushPendingStateTransition()
         
     """ @private """
     def _exitState(self, state, context):
@@ -1301,7 +1302,7 @@ class StatechartManager(EventDispatcher):
     """
     def _flushPendingStateTransition(self):
         if not self._pendingStateTransitions:
-            self.statechartLogError("Unable to flush pending state transition. _pendingStateTransitions is invalid")
+            self.statechartLogError("Unable to flush pending state transition. _pendingStateTransitions is invalid.")
             return
         pending = self._pendingStateTransitions.popleft() if self._pendingStateTransitions else None
         if not pending:

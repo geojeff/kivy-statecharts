@@ -294,7 +294,7 @@ class State(EventDispatcher):
         self.initialSubstate = None
         self.statechart = None
     
-        #self.notifyPropertyChange("trace")
+        #self.notifyPropertyChange("trace") # [PORT] Use kivy's dispatch?
         #self.notifyPropertyChange("owner")
     
         self._registeredEventHandlers = None
@@ -689,11 +689,11 @@ class State(EventDispatcher):
         path = self.name
         parent = self.parentState
 
-        while parent is not None and parent is not state:
+        while parent is not None and parent is not state and state != type(self):
             path = "{0}{1}".format(parent.name, path)
             parent = parent.parentState
 
-        if parent is not state and state is not self:
+        if parent is not state and state is not type(self):
             self.stateLogError("Can not generate relative path from {0} since it not a parent state of {1}".format(state, self))
             return None
 
