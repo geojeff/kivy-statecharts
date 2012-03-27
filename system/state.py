@@ -225,24 +225,25 @@ class State(EventDispatcher):
         # Setting up observes this way is faster then using .observes,
         # which adds a noticable increase in initialization time.
     
-        #sc = self.statechart
+        sc = self.statechart
     
-        #self.ownerKey = sc.statechartOwnerKey if sc else None
-        #self.traceKey = sc.statechartOwnerKey if sc else None
+        self.ownerKey = sc.statechartOwnerKey if sc else None
+        self.traceKey = sc.statechartOwnerKey if sc else None
     
-        #if sc is not None:
-            #sc.bind(self.ownerKey=self._statechartOwnerDidChange)
-            #sc.bind(self.traceKey=self._statechartTraceDidChange)
-
-        #for key in kwargs:
-            #self.__dict__[key] = kwargs.pop(key) # [PORT] Should the kes be popped off?
+        if sc is not None:
+            self.bind(ownerKey=self._statechartOwnerDidChange) # [PORT] Changed to bind to self, to try to do it from here...
+            self.bind(traceKey=self._statechartTraceDidChange)
 
         for k,v in kwargs.items():
             if k == 'initialSubstate':
+                # [PORT] Force initialSubstate to always be string.
                 if isinstance(v, basestring):
                     self.initialSubstate = v
                 else:
-                    self.initialSubstate = v.__name__ # [PORT] Force initialSubstate to always be string.
+                    name = v.name if hasattr(v, 'name') else None
+                    if not name:
+                        name = v.__name__ if hasattr(v, '__name__') else None
+                    self.initialSubstate = name if name else None
             else:
                 setattr(self, k, v)
 
@@ -255,8 +256,8 @@ class State(EventDispatcher):
     def _owner(self, instance, value, *l):
         sc = self.statechart
         key = sc.statechartOwnerKey if sc else None
-        owner = key if sc else None
-        self.owner = owner if sc else sc
+        owner = getattr(sc, key) if sc else None
+        self.owner = owner if owner else sc
 
     def _statechartDelegate(self, *l):
         self.statechartDelegate = self.statechart.statechartDelegate
@@ -268,14 +269,14 @@ class State(EventDispatcher):
         self.location = delegate.statechartAcquireLocationForState(sc, self)
         
     def destroy(self):
-        #sc = self.statechart
+        sc = self.statechart
 
-        #self.ownerKey = sc.statechartOwnerKey if sc else None
-        #self.traceKey = sc.statechartOwnerKey if sc else None
+        self.ownerKey = sc.statechartOwnerKey if sc else None
+        self.traceKey = sc.statechartOwnerKey if sc else None
     
-        #if sc is not None:
-            #sc.unbind(self.ownerKey=self._statechartOwnerDidChange)
-            #sc.unbind(self.traceKey=self._statechartTraceDidChange)
+        if sc is not None:
+            self.unbind(ownerKey=self._statechartOwnerDidChange)
+            self.unbind(traceKey=self._statechartTraceDidChange)
 
         substates = self.substates
     

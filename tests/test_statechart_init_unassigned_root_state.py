@@ -32,6 +32,22 @@ class Statechart1(StatechartManager):
     A = A
     B = B
 
+class C(State):
+    def foo(self, *l):
+        print 'foo called, trying to goto D'
+        self.statechart.gotoState('D') # [PORT] self.gotoState should work...
+
+class D(State):
+    def bar(self, *l):
+        print 'bar called, trying to goto C'
+        self.statechart.gotoState('C')
+
+class Statechart2(StatechartManager):
+    statesAreConcurrent = True
+
+    C = C
+    D = D
+
 #Statechart1 = StatechartManager(**{
 #    'initialState': 'A',
 #    'A': State(**{ 'foo': lambda self,*l: self.gotoState('B')}),
@@ -44,13 +60,20 @@ class TestApp(App):
 class StatechartTestCase(unittest.TestCase):
     def setUp(self):
         global s1
+        global s2
         global rootState1
         global stateA
         global stateB
+        global stateC
+        global stateD
         s1 = Statechart1()
         rootState1 = s1.rootState
         stateA = s1.A
         stateB = s1.B
+        s2 = Statechart2()
+        rootState2 = s2.rootState
+        stateC = s2.C
+        stateD = s2.D
 
     def test_init_with_unassigned_root_state(self):
         self.assertTrue(s1.isStatechart)
@@ -63,3 +86,4 @@ class StatechartTestCase(unittest.TestCase):
         self.assertEqual(stateA, type(rootState1.getSubstate('A')))
         self.assertEqual(stateB, type(rootState1.getSubstate('B')))
         
+        self.assertEqual(rootState1.owner, s1)
