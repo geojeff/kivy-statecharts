@@ -382,8 +382,6 @@ class StatechartManager(EventDispatcher):
         self.statechartDelegate = self.delegateFor('isStatechartDelegate', self.delegate);
         
     def destroyMixin(self):
-        # self.removeObserver(self.statechartTraceKey, self, '_statechartTraceDidChange'); 
-        #del self.statechartTraceDidChange # [PORT] is this the equivalent of unbind?
         self.unbind(statechartTraceKey=_statechartTraceDidChange)
         self.rootState.destroy();
         self.rootState = None
