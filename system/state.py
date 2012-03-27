@@ -761,7 +761,6 @@ class State(EventDispatcher):
                 matches.append(paths[key])
 
         if len(matches) == 1:
-            print 'returning matches[0]', matches[0]
             return matches[0]
 
         keys = []
