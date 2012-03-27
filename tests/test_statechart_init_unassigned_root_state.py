@@ -81,7 +81,7 @@ class StatechartTestCase(unittest.TestCase):
         self.assertTrue(isinstance(rootState_1, State))
         self.assertFalse(rootState_1.substatesAreConcurrent)
 
-        self.assertEqual(statechart_1.initialState, state_A.name) # [PORT] See comments in statechart.py about this not being an actual class object comparison.
+        self.assertEqual(statechart_1.initialState, state_A.name)
         self.assertEqual(rootState_1.initialSubstate, 'A')
         self.assertEqual(state_A, rootState_1.getSubstate('A'))
         self.assertEqual(state_B, rootState_1.getSubstate('B'))
@@ -97,3 +97,21 @@ class StatechartTestCase(unittest.TestCase):
 
         self.assertFalse(state_A.isCurrentState)
         self.assertTrue(state_B.isCurrentState)
+
+    def test_statechart_2(self):
+        self.assertTrue(statechart_2.isStatechart)
+        self.assertTrue(statechart_2.statechartIsInitialized)
+        self.assertTrue(isinstance(rootState_2, State))
+        self.assertTrue(rootState_2.substatesAreConcurrent)
+
+        self.assertEqual(statechart_2.initialState, None)
+        self.assertEqual(rootState_2.initialSubstate, None)
+        self.assertEqual(state_C, rootState_2.getSubstate('A'))
+        self.assertEqual(state_D, rootState_2.getSubstate('B'))
+        
+        self.assertEqual(rootState_2.owner, statechart_2)
+        self.assertEqual(state_C.owner, statechart_2)
+        self.assertEqual(state_D.owner, statechart_2)
+
+        self.assertTrue(state_C.isCurrentState)
+        self.assertTrue(state_D.isCurrentState)
