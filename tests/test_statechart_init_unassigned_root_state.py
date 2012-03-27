@@ -26,7 +26,7 @@ class B(State):
         print 'bar called, trying to goto A'
         self.statechart.gotoState('A')
 
-class Statechart1(StatechartManager):
+class Statechart_1(StatechartManager):
     initialState = 'A'
 
     A = A
@@ -42,13 +42,13 @@ class D(State):
         print 'bar called, trying to goto C'
         self.statechart.gotoState('C')
 
-class Statechart2(StatechartManager):
+class Statechart_2(StatechartManager):
     statesAreConcurrent = True
 
     C = C
     D = D
 
-#Statechart1 = StatechartManager(**{
+#Statechart_1 = StatechartManager(**{
 #    'initialState': 'A',
 #    'A': State(**{ 'foo': lambda self,*l: self.gotoState('B')}),
 #    'B': State(**{ 'bar': lambda self,*l: self.gotoState('A')})
@@ -59,41 +59,41 @@ class TestApp(App):
 
 class StatechartTestCase(unittest.TestCase):
     def setUp(self):
-        global s1
-        global s2
-        global rootState1
-        global stateA
-        global stateB
+        global statechart_1
+        global statechart_2
+        global rootState_1
+        global state_A
+        global state_B
         global stateC
         global stateD
-        s1 = Statechart1()
-        rootState1 = s1.rootState
-        stateA = s1.getState('A')
-        stateB = s1.getState('B')
-        s2 = Statechart2()
-        rootState2 = s2.rootState
-        stateC = s2.C
-        stateD = s2.D
+        statechart_1 = Statechart_1()
+        rootState_1 = statechart_1.rootState
+        state_A = statechart_1.getState('A')
+        state_B = statechart_1.getState('B')
+        statechart_2 = Statechart_2()
+        rootState2 = statechart_2.rootState
+        stateC = statechart_2.C
+        stateD = statechart_2.D
 
-    def test_init_with_unassigned_root_state(self):
-        self.assertTrue(s1.isStatechart)
-        self.assertTrue(s1.statechartIsInitialized)
-        self.assertTrue(isinstance(rootState1, State))
-        self.assertFalse(rootState1.substatesAreConcurrent)
+    def test_statechart_1(self):
+        self.assertTrue(statechart_1.isStatechart)
+        self.assertTrue(statechart_1.statechartIsInitialized)
+        self.assertTrue(isinstance(rootState_1, State))
+        self.assertFalse(rootState_1.substatesAreConcurrent)
 
-        self.assertEqual(s1.initialState, stateA.name) # [PORT] See comments in statechart.py about this not being an actual class object comparison.
-        self.assertEqual(rootState1.initialSubstate, 'A')
-        self.assertEqual(stateA, rootState1.getSubstate('A'))
-        self.assertEqual(stateB, rootState1.getSubstate('B'))
+        self.assertEqual(statechart_1.initialState, state_A.name) # [PORT] See comments in statechart.py about this not being an actual class object comparison.
+        self.assertEqual(rootState_1.initialSubstate, 'A')
+        self.assertEqual(state_A, rootState_1.getSubstate('A'))
+        self.assertEqual(state_B, rootState_1.getSubstate('B'))
         
-        self.assertEqual(rootState1.owner, s1)
-        self.assertEqual(stateA.owner, s1)
-        self.assertEqual(stateB.owner, s1)
+        self.assertEqual(rootState_1.owner, statechart_1)
+        self.assertEqual(state_A.owner, statechart_1)
+        self.assertEqual(state_B.owner, statechart_1)
 
-        self.assertTrue(stateA.isCurrentState)
-        self.assertFalse(stateB.isCurrentState)
+        self.assertTrue(state_A.isCurrentState)
+        self.assertFalse(state_B.isCurrentState)
 
-        s1.sendEvent('foo')
+        statechart_1.sendEvent('foo')
 
-        self.assertFalse(stateA.isCurrentState)
-        self.assertTrue(stateB.isCurrentState)
+        self.assertFalse(state_A.isCurrentState)
+        self.assertTrue(state_B.isCurrentState)
