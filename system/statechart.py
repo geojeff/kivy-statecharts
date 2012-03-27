@@ -1342,9 +1342,9 @@ class StatechartManager(EventDispatcher):
         stateCount = 0
         attrs = {}
           
-        # [PORT] Check for rsExample.plugin removed here.
+        # [PORT] Check for rsExample.plugin removed here, because in Kivy, rsExample will be a class.
 
-        if inspect.isclass(rsExample) and not isinstance(rsExample, State): # [PORT] or issubclass?
+        if inspect.isclass(rsExample) and not issubclass(rsExample, State): # [PORT] or issubclass?
             self._logStatechartCreationError("Invalid root state example")
             return None
           
@@ -1391,11 +1391,12 @@ class StatechartManager(EventDispatcher):
         if rsExample is None:
             return type("RootState", (State,), attrs)
         else:
-            return type("RootState", (State, rsExample,), attrs)
+            return type("RootState", (rsExample, ), attrs)
 
     """ @private """
     def _logStatechartCreationError(self, msg):
-        Logger.debug("Unable to create statechart for {0}: {1}.".format(self, msg))
+        #Logger.debug("Unable to create statechart for {0}: {1}.".format(self, msg)) # [PORT] Where does debug go in Kivy?
+        Logger.info("Unable to create statechart for {0}: {1}.".format(self, msg))
         
     """ 
       Used to log a statechart trace message
@@ -1407,7 +1408,7 @@ class StatechartManager(EventDispatcher):
       Used to log a statechart error message
     """
     def statechartLogError(self, msg):
-        Logger.debug("ERROR {0}: {1}".format(self.statechartLogPrefix, msg))
+        Logger.info("ERROR {0}: {1}".format(self.statechartLogPrefix, msg)) # [PORT] ditto?
         
     """ 
       Used to log a statechart warning message
