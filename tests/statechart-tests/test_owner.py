@@ -196,7 +196,7 @@ class StatechartOwnerTestCase(unittest.TestCase):
         self.assertEqual(state_Y.owner, statechart_1) 
         self.assertEqual(state_Z.owner, statechart_1) 
 
-    # access owner via invokeStateMethod"
+    # access owner via invokeStateMethod
     def test_state_A(self):
         self.assertTrue(state_A.isCurrentState)
         self.assertIsNone(state_A.accessedOwner)
@@ -210,4 +210,20 @@ class StatechartOwnerTestCase(unittest.TestCase):
         statechart_1.render()
 
         self.assertEqual(state_A.accessedOwner, owner_1)
+
+    # access owner via invokeStateMethod
+    def test_state_Z(self):
+        statechart_1.gotoState('Z')
+        self.assertTrue(state_Z.isCurrentState)
+        self.assertIsNone(state_Z.accessedOwner)
+  
+        statechart_1.render()
+
+        self.assertEqual(state_Z.accessedOwner, statechart_1)
+
+        state_Z.reset()
+        setattr(statechart_1, 'owner', owner_1)
+        statechart_1.render()
+
+        self.assertEqual(state_Z.accessedOwner, owner_1)
 

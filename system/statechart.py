@@ -1149,7 +1149,7 @@ class StatechartManager(EventDispatcher):
           
         # Still have an explicit enter path to follow, so keep moving through the path.
         elif len(enterStatePath) > 0:
-            gotoStateActions.append({ 'action': ENTER_STATE, 'state': state })
+            gotoStateActions.append({ 'action': ENTER_STATE, 'state': state, 'currentState': False })
             nextState = enterStatePath.pop() # [PORT] pop, now on deque
             self._traverseStatesToEnter(nextState, enterStatePath, None, useHistory, gotoStateActions)
             
