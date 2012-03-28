@@ -116,9 +116,6 @@ class F(TestState):
 
 class Statechart_3(TestStatechart):
     def __init__(self, **kwargs):
-        self.initialState = 'E'
-        self.statechartOwnerKey ='fooOwner'
-        self.fooOwner = Owner_3
         super(Statechart_3, self).__init__(**kwargs)
 
     E = E
@@ -161,9 +158,9 @@ class StatechartOwnerTestCase(unittest.TestCase):
         state_C = statechart_2.getState('C')
         state_D = statechart_2.getState('D')
 
-        statechart_3 = Statechart_3()
-        rootState_3 = statechart_3.rootState
         owner_3 = Owner_3()
+        statechart_3 = Statechart_3(initialState='E', statechartOwnerKey='fooOwner', fooOwner=owner_3)
+        rootState_3 = statechart_3.rootState
         state_E = statechart_3.getState('E')
         state_F = statechart_3.getState('F')
 
@@ -225,6 +222,7 @@ class StatechartOwnerTestCase(unittest.TestCase):
 
         self.assertEqual(state_Z.accessedOwner, owner_1)
 
+    # [PORT] This actually sets owner.
     # statechartOwnerKey
     def test_statechart_2(self):
         self.assertEqual(rootState_2.owner, owner_2)
@@ -237,3 +235,40 @@ class StatechartOwnerTestCase(unittest.TestCase):
         self.assertEqual(state_C.owner, statechart_2)
         self.assertEqual(state_D.owner, statechart_2)
 
+    # basic owner get and set
+    def test_statechart_3(self):
+        self.assertEqual(statechart_3.statechartOwnerKey, 'fooOwner')
+        self.assertEqual(statechart_3.fooOwner, owner_3)
+  
+        self.assertEqual(rootState_3.owner, owner_3)
+        self.assertEqual(state_E.owner, owner_3)
+        self.assertEqual(state_F.owner, owner_3)
+  
+        # [PORT] The javascript version had a dynamic system of observing the property with the
+        #        name given by the value of statechartOwnerKey. However, in kivy-statechart, as of now,
+        #        you can't just change fooOwner (it isn't being observed), you have to rest the
+        #        statechartOwnerKey to trigger an update.
+        #
+        setattr(statechart_3, 'fooOwner', None)
+        setattr(statechart_3, 'statechartOwnerKey', 'owner')
+  
+        self.assertEqual(rootState_3.owner, statechart_3)
+        self.assertEqual(state_E.owner, statechart_3)
+        self.assertEqual(state_F.owner, statechart_3)
+  
+        setattr(statechart_3, 'fooOwner', owner_3)
+        setattr(statechart_3, 'statechartOwnerKey', 'fooOwner')
+  
+        self.assertEqual(rootState_3.owner, owner_3)
+        self.assertEqual(state_E.owner, owner_3)
+        self.assertEqual(state_F.owner, owner_3)
+  
+        # [PORT] How to do destroy in kivy? applicable?
+
+        #ok(obj3.hasObserverFor('fooOwner'));
+        #equals(rootState3.get('owner'), owner2);
+  
+        #obj3.destroy();
+  
+        #ok(!obj3.hasObserverFor('fooOwner'));
+        #equals(rootState3.get('owner'), null);
