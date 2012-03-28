@@ -82,7 +82,10 @@ class D(TestState):
         self.gotoState('C')
 
 class Statechart_2(TestStatechart):
-    owner = Owner_2
+    def __init__(self):
+        self.owner = Owner_2
+        super(Statechart_2, self).__init__()
+
     initialState = 'C'
       
     C = C
@@ -97,7 +100,10 @@ class F(TestState):
         self.gotoState('E')
 
 class Statechart_3(TestStatechart):
-    statechartOwnerKey ='fooOwner'
+    def __init__(self):
+        self.statechartOwnerKey ='fooOwner'
+        super(Statechart_3, self).__init__()
+
     fooOwner = Owner_3
     initialState = 'E'
       

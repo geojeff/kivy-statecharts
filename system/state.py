@@ -253,7 +253,7 @@ class State(EventDispatcher):
         key = self.statechart.statechartTraceKey
         self.trace = getattr(self.statechart, key) if hasattr(self.statechart, key) else None
 
-    def _owner(self, instance, value, *l):
+    def _owner(self, *l):
         sc = self.statechart
         key = sc.statechartOwnerKey if sc else None
         owner = getattr(sc, key) if sc else None
