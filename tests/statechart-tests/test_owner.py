@@ -101,8 +101,6 @@ class D(TestState):
 
 class Statechart_2(TestStatechart):
     def __init__(self, **kwargs):
-        self.owner = Owner_2
-        self.initialState = 'C'
         super(Statechart_2, self).__init__(**kwargs)
       
     C = C
@@ -157,15 +155,15 @@ class StatechartOwnerTestCase(unittest.TestCase):
         state_X = statechart_1.getState('X')
         state_Z = statechart_1.getState('Z')
         
-        statechart_2 = Statechart_2()
+        owner_2 = Owner_2()
+        statechart_2 = Statechart_2(owner=owner_2, initialState='C')
         rootState_2 = statechart_2.rootState
-        owner_2 = Owner_1()
         state_C = statechart_2.getState('C')
         state_D = statechart_2.getState('D')
 
         statechart_3 = Statechart_3()
         rootState_3 = statechart_3.rootState
-        owner_3 = Owner_1()
+        owner_3 = Owner_3()
         state_E = statechart_3.getState('E')
         state_F = statechart_3.getState('F')
 
@@ -226,4 +224,16 @@ class StatechartOwnerTestCase(unittest.TestCase):
         statechart_1.render()
 
         self.assertEqual(state_Z.accessedOwner, owner_1)
+
+    # statechartOwnerKey
+    def test_statechart_2(self):
+        self.assertEqual(rootState_2.owner, owner_2)
+        self.assertEqual(state_C.owner, owner_2)
+        self.assertEqual(state_D.owner, owner_2)
+
+        setattr(statechart_2, 'owner', None)
+
+        self.assertEqual(rootState_2.owner, statechart_2)
+        self.assertEqual(state_C.owner, statechart_2)
+        self.assertEqual(state_D.owner, statechart_2)
 
