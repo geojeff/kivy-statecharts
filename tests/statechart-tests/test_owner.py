@@ -36,33 +36,33 @@ class TestState(State):
     def __init__(self, **kwargs):
         super(TestState, self).__init__(**kwargs)
 
-    accessedOwner = ObjectProperty(None)
+    accessedOwner = ObjectProperty(None, allownone=True)
       
-    def reset(self):
+    def reset(self, *l):
         setattr(self, 'accessedOwner', None)
       
-    def render(self):
+    def render(self, *l):
         setattr(self, 'accessedOwner', self.owner)
       
 class TestStatechart(StatechartManager):
     def __init__(self, **kwargs):
         super(TestStatechart, self).__init__(**kwargs)
 
-    def render(self):
+    def render(self, *l):
         self.invokeStateMethod('render')
 
 class A(TestState):
     def __init__(self, **kwargs):
         super(A, self).__init__(**kwargs)
 
-    def foo(self):
+    def foo(self, *l):
         self.gotoState('B')
 
 class B(TestState):
     def __init__(self, **kwargs):
         super(B, self).__init__(**kwargs)
 
-    def bar(self):
+    def bar(self, *l):
         self.gotoState('A')
 
 class Z(TestState):
@@ -92,11 +92,11 @@ class Statechart_1(TestStatechart):
     X = X
 
 class C(TestState):
-    def foo(self):
+    def foo(self, *l):
         self.gotoState('D')
 
 class D(TestState):
-    def bar(self):
+    def bar(self, *l):
         self.gotoState('C')
 
 class Statechart_2(TestStatechart):
@@ -109,11 +109,11 @@ class Statechart_2(TestStatechart):
     D = D
 
 class E(TestState):
-    def foo(self):
+    def foo(self, *l):
         self.gotoState('F')
 
 class F(TestState):
-    def bar(self):
+    def bar(self, *l):
         self.gotoState('E')
 
 class Statechart_3(TestStatechart):
@@ -195,4 +195,19 @@ class StatechartOwnerTestCase(unittest.TestCase):
         self.assertEqual(state_X.owner, statechart_1) 
         self.assertEqual(state_Y.owner, statechart_1) 
         self.assertEqual(state_Z.owner, statechart_1) 
+
+    # access owner via invokeStateMethod"
+    def test_state_A(self):
+        self.assertTrue(state_A.isCurrentState)
+        self.assertIsNone(state_A.accessedOwner)
+
+        statechart_1.render()
+
+        self.assertEqual(state_A.accessedOwner, statechart_1)
+
+        state_A.reset()
+        setattr(statechart_1, 'owner', owner_1)
+        statechart_1.render()
+
+        self.assertEqual(state_A.accessedOwner, owner_1)
 

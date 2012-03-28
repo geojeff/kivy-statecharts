@@ -1258,7 +1258,7 @@ class StatechartManager(EventDispatcher):
             self.statechartLogError("can not invoke method unkownEvent")
             return
           
-        args = collection.deque(args) # [PORT] was .A and shift, now is collection.deque and popleft
+        args = deque(args) # [PORT] was .A and shift, now is deque and popleft
         if args:
             args.popleft()
           
@@ -1274,11 +1274,11 @@ class StatechartManager(EventDispatcher):
         for i in range(len(self.currentStates)):
             state = self.currentStates[i] # [PORT] was objectAt i
             while state is not None:
-                if (checkedStates[state.fullPath]):
+                if state.fullPath in checkedStates:
                     break
                 checkedStates[state.fullPath] = True
-                method = state[methodName]
-                if inspect.isfunction(method) and not method.isEventHandler:
+                method = getattr(state, methodName)
+                if inspect.ismethod(method) and not (hasattr(method, 'isEventHandler') and not method.isEventHandler): # [PORT] ismethod, not isfunction
                     result = method(state, args)
                     if callback is not None:
                         callback(self, state, result)
