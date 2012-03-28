@@ -27,7 +27,9 @@ class B(State):
         self.statechart.gotoState('A')
 
 class Statechart_1(StatechartManager):
-    initialState = 'A'
+    def __init__(self):
+        self.initialState = 'A'
+        super(Statechart_1, self).__init__()
 
     A = A
     B = B
@@ -43,7 +45,9 @@ class D(State):
         self.statechart.gotoState('C')
 
 class Statechart_2(StatechartManager):
-    statesAreConcurrent = True
+    def __init__(self):
+        self.statesAreConcurrent = True
+        super(Statechart_2, self).__init__()
 
     C = C
     D = D

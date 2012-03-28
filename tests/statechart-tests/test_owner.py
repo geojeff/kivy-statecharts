@@ -33,6 +33,9 @@ class Owner_3(object):
     __metaclass__ = Owner_3_MC
 
 class TestState(State):
+    def __init__(self, **kwargs):
+        super(TestState, self).__init__(**kwargs)
+
     accessedOwner = ObjectProperty(None)
       
     def reset(self):
@@ -42,14 +45,23 @@ class TestState(State):
         setattr(self, 'accessedOwner', self.owner)
       
 class TestStatechart(StatechartManager):
+    def __init__(self, **kwargs):
+        super(TestStatechart, self).__init__(**kwargs)
+
     def render(self):
         self.invokeStateMethod('render')
 
 class A(TestState):
+    def __init__(self, **kwargs):
+        super(A, self).__init__(**kwargs)
+
     def foo(self):
         self.gotoState('B')
 
 class B(TestState):
+    def __init__(self, **kwargs):
+        super(B, self).__init__(**kwargs)
+
     def bar(self):
         self.gotoState('A')
 
@@ -57,17 +69,23 @@ class Z(TestState):
     pass 
 
 class Y(TestState):
-    initialSubstate = 'Z'
+    def __init__(self, **kwargs):
+        self.initialSubstate = 'Z'
+        super(Y, self).__init__(**kwargs)
 
     Z = Z
 
 class X(TestState):
-    initialSubstate = 'Y'
+    def __init__(self, **kwargs):
+        self.initialSubstate = 'Y'
+        super(X, self).__init__(**kwargs)
 
     Y = Y
 
 class Statechart_1(TestStatechart):
-    initialState = 'A'
+    def __init__(self, **kwargs):
+        self.initialState = 'A'
+        super(Statechart_1, self).__init__(**kwargs)
       
     A = A
     B = B
@@ -82,11 +100,10 @@ class D(TestState):
         self.gotoState('C')
 
 class Statechart_2(TestStatechart):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.owner = Owner_2
-        super(Statechart_2, self).__init__()
-
-    initialState = 'C'
+        self.initialState = 'C'
+        super(Statechart_2, self).__init__(**kwargs)
       
     C = C
     D = D
@@ -100,13 +117,12 @@ class F(TestState):
         self.gotoState('E')
 
 class Statechart_3(TestStatechart):
-    def __init__(self):
+    def __init__(self, **kwargs):
+        self.initialState = 'E'
         self.statechartOwnerKey ='fooOwner'
-        super(Statechart_3, self).__init__()
+        self.fooOwner = Owner_3
+        super(Statechart_3, self).__init__(**kwargs)
 
-    fooOwner = Owner_3
-    initialState = 'E'
-      
     E = E
     F = F
 

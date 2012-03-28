@@ -413,14 +413,13 @@ class StatechartManager(EventDispatcher):
         self._statechartTraceDidChange() # [PORT] this call needed for kivy?
       
         trace = self.allowStatechartTracing
-        rootState = self.rootState # [PORT] Clarify in docs that rootState is None or is a func that returns class def RootState(State).
+        rootState = self.rootState # [PORT] Clarify in docs that rootState is None or is a func that returns class def RootState(State). Or is it?
         msg = ''
           
         if trace:
             self.statechartLogTrace("BEGIN initialize statechart")
           
-        # If no root state was explicitly defined then try to construct
-        # a root state class
+        # If no root state was explicitly defined then try to construct a root state class
         if not rootState:
             rootState = self._constructRootStateClass()
           
@@ -1348,6 +1347,8 @@ class StatechartManager(EventDispatcher):
         attrs = {}
           
         # [PORT] Check for rsExample.plugin removed here, because in Kivy, rsExample will be a class.
+
+        print '_construct..., rsExample', rsExample
 
         if inspect.isclass(rsExample) and not issubclass(rsExample, State): # [PORT] or issubclass?
             self._logStatechartCreationError("Invalid root state example")

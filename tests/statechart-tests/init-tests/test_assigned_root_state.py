@@ -34,8 +34,7 @@ class B(State):
 class RootState(State):
     def __init__(self, **kwargs):
         super(RootState, self).__init__(**kwargs)
-    
-    initialSubstate = 'A'
+        self.initialSubstate = 'A'
     
     A = A
     B = B

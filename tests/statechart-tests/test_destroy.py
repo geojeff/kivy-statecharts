@@ -23,7 +23,9 @@ class B(State):
     pass
 
 class Statechart_1(StatechartManager):
-    initialState = 'A'
+    def __init__(self):
+        self.initialState = 'A'
+        super(Statechart_1, self).__init__()
 
     A = A
     B = B
