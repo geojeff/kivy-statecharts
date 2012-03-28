@@ -187,3 +187,12 @@ class StatechartOwnerTestCase(unittest.TestCase):
         self.assertEqual(state_Y.owner, owner_1) 
         self.assertEqual(state_Z.owner, owner_1) 
 
+        statechart_1.owner = None
+
+        self.assertEqual(rootState_1.owner, statechart_1) 
+        self.assertEqual(state_A.owner, statechart_1) 
+        self.assertEqual(state_B.owner, statechart_1) 
+        self.assertEqual(state_X.owner, statechart_1) 
+        self.assertEqual(state_Y.owner, statechart_1) 
+        self.assertEqual(state_Z.owner, statechart_1) 
+

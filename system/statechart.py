@@ -324,7 +324,7 @@ class StatechartManager(EventDispatcher):
   
       @property {Object}
     """
-    owner = ObjectProperty(None)
+    owner = ObjectProperty(None, allownone=True)
   
     """ 
       Indicates if the statechart should be automatically initialized by this
