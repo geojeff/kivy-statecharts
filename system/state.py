@@ -259,6 +259,12 @@ class State(EventDispatcher):
         owner = getattr(sc, key) if sc else None
         self.owner = owner if owner else sc
 
+    def statechartOwnerDidChange(self):
+        self._owner()
+
+        for substate in self.substates:
+            substate.statechartOwnerDidChange()
+
     def _statechartDelegate(self, *l):
         self.statechartDelegate = self.statechart.statechartDelegate
 
@@ -316,30 +322,27 @@ class State(EventDispatcher):
         self._registerWithParentStates()
         self._setupRouteHandling()
     
-        key = None
-        value = None
-        state = None
         substates = []
         matchedInitialSubstate = False
-        initialSubstate = self.initialSubstate # [PORT] Can come in as str or class.
-        substatesAreConcurrent = self.substatesAreConcurrent
-        statechart = self.statechart
+        initialSubstateName = self.initialSubstate # [PORT] Can come in as str or class in javascript version. Here, only as str.
         valueIsFunc = False
         historyState = None
     
         self.substates = substates
     
-        from kivy_statechart.system.history_state import HistoryState
+        if initialSubstateName is not None:
+            initialSubstate = getattr(self, initialSubstateName) if hasattr(self, initialSubstateName) else None
 
-        if inspect.isclass(initialSubstate) and isinstance(initialSubstate, HistoryState):
-            historyState = self.createSubstate(initialSubstate)
-      
-            self.initialSubstate = historyState.__name__ # [PORT] Always make this a string.
-      
-            if historyState.defaultState is None:
-                self.stateLogError("Initial substate is invalid. History state requires the name of a default state to be set")
-                self.initialSubstate = None
-                historyState = None
+            from kivy_statechart.system.history_state import HistoryState
+            if initialSubstate and inspect.isclass(initialSubstate) and isinstance(initialSubstate, HistoryState):
+                historyState = self.createSubstate(initialSubstateName)
+          
+                #self.initialSubstate = historyState.__name__ # [PORT] No need, after treating initialState as string.
+          
+                if historyState.defaultState is None:
+                    self.stateLogError("Initial substate is invalid. History state requires the name of a default state to be set")
+                    self.initialSubstate = None
+                    historyState = None
     
         # Iterate through all this state's substates, if any, create them, and then initialize
         # them. This causes a recursive process.
@@ -361,29 +364,32 @@ class State(EventDispatcher):
                 self._registerStateObserveHandler(key, value)
                 continue
 
-            # [PORT] Removed statePlugin system in python.
+            # [PORT] Removed statePlugin system. Use import in python.
 
             #if inspect.isclass(value) and issubclass(value, State) and getattr(self, key) is not self.__init__: # [PORT] using inspect
-            if inspect.isclass(value) and issubclass(value, State) and key != '__class__': # [PORT] using inspect. Check the __class__ hack.
+            if inspect.isclass(value) and issubclass(value, State):
                 state = self._addSubstate(key, value, None)
                 if key == self.initialSubstate:
                     self.initialSubstate = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
                     matchedInitialSubstate = True
                 elif historyState and historyState.defaultState == key:
-                    historyState.defaultState = state
+                    historyState.defaultState = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
                     matchedInitialSubstate = True
 
             if self.initialSubstate is not None and not matchedInitialSubstate:
-                self.stateLogError("Unable to set initial substate {0} since it did not match any of state's {1} substates".format(self.initialSubstate, self))
+                msg = "Unable to set initial substate {0} since it did not match any of state's {1} substates"
+                self.stateLogError(msg.format(self.initialSubstate, self))
 
             if len(self.substates) == 0:
-                if self.initialSubstate is None:
-                    self.stateLogWarning("Unable to make {0} an initial substate since state {1} has no substates".format(self.initialSubstate, self))
+                if self.initialSubstate is not None:
+                    msg = "Unable to make {0} an initial substate since state {1} has no substates"
+                    self.stateLogWarning(msg.format(self.initialSubstate, self))
             elif len(self.substates) > 0:
                   state = self._addEmptyInitialSubstateIfNeeded()
-                  if state is None and initialSubstate is not None and substatesAreConcurrent:
+                  if state is None and self.initialSubstate is not None and self.substatesAreConcurrent:
                         self.initialSubstate = None
-                        self.stateLogWarning("Can not use {0} as initial substate since substates are all concurrent for state {1}".format(initialSubstate, self))
+                        msg = "Can not use {0} as initial substate since substates are all concurrent for state {1}"
+                        self.stateLogWarning(msg.format(self.initialSubstate, self))
 
             #self.notifyPropertyChange("substates")
 
@@ -663,8 +669,11 @@ class State(EventDispatcher):
       Will register a given state as a substate of this state
     """
     def _registerSubstate(self, state):
+        print '_registerSubstate, state', state
+
         path = state.pathRelativeTo(self)
 
+        print '_registerSubstate, path', path
         if path is None:
             return
 
@@ -690,7 +699,7 @@ class State(EventDispatcher):
         parent = self.parentState
 
         while parent is not None and parent is not state and state != type(self):
-            path = "{0}{1}".format(parent.name, path)
+            path = "{0}.{1}".format(parent.name, path)
             parent = parent.parentState
 
         if parent is not state and state is not type(self):
@@ -1349,8 +1358,9 @@ class State(EventDispatcher):
     def _fullPath(self, *l): # [PORT] Added *l
         root = self.statechart.rootState if self.statechart else None
         if root is None:
-            return self.name
-        self.fullPath = self.pathRelativeTo(root)
+            self.fullPath = self.name
+        else:
+            self.fullPath = self.pathRelativeTo(root)
 
     def toString(self):
         return self.fullPath

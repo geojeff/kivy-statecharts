@@ -367,6 +367,8 @@ class StatechartManager(EventDispatcher):
         self.bind(delegate=self._statechartDelegate)
         self.bind(rootState=self._currentStates) # [PORT] Added enteredStates property
         self.bind(rootState=self._enteredStates) # [PORT] Added enteredStates property
+        self.bind(statechartOwnerKey=self._ownerDidChange) # [PORT] Added, to use top-down updating approach in kivy.
+        self.bind(owner=self._ownerDidChange) # [PORT] Added, to use top-down updating approach in kivy.
 
         for k,v in kw.items():
             if k == 'allowStatechartTracing': # [PORT] hack to set self.trace -- why is there also allowStatechartTracing? limit to one or other.
@@ -378,6 +380,10 @@ class StatechartManager(EventDispatcher):
         if self.autoInitStatechart == True:
             self.initStatechart()
         
+    def _ownerDidChange(self, *l):
+        if self.rootState: # [PORT] rootState can be None
+            self.rootState.statechartOwnerDidChange()
+
     def _statechartDelegate(self):
         self.statechartDelegate = self.delegateFor('isStatechartDelegate', self.delegate);
         
