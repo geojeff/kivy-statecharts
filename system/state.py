@@ -9,7 +9,9 @@ from kivy_statechart.private.state_path_matcher import StatePathMatcher
 from kivy.properties import BooleanProperty, ListProperty, ObjectProperty, StringProperty
 from collections import deque
 
-import inspect
+import inspect, re
+
+REGEX_TYPE = type(re.compile(''))
 
 """
   @class
@@ -325,7 +327,7 @@ class State(EventDispatcher):
         substates = []
         matchedInitialSubstate = False
         initialSubstateName = self.initialSubstate # [PORT] Can come in as str or class in javascript version. Here, only as str.
-        valueIsFunc = False
+        valueIsMethod = False
         historyState = None
     
         self.substates = substates
@@ -351,16 +353,16 @@ class State(EventDispatcher):
                 continue
 
             value = getattr(self, key)
-            if not inspect.isfunction(value) and not inspect.isclass(value):
+            if not inspect.ismethod(value) and not inspect.isclass(value):
                 continue
 
-            valueIsFunc = inspect.isfunction(value)
+            valueIsMethod = inspect.ismethod(value)
       
-            if valueIsFunc and value.isEventHandler:
+            if valueIsMethod and hasattr(value, 'isEventHandler') and value.isEventHandler == True:
                 self._registerEventHandler(key, value)
                 continue
 
-            if valueIsFunc and value.isStateObserveHandler:
+            if valueIsMethod and hasattr(value, 'isStateObserveHandler') and value.isStateObserveHandler == True:
                 self._registerStateObserveHandler(key, value)
                 continue
 
@@ -607,27 +609,18 @@ class State(EventDispatcher):
       the name of the method.
     """
     def _registerEventHandler(self, name, handler):
-        events = handler.events
-        numberOfEvents = len(events)
-        event = None
-        i = 0
-
         self._registeredEventHandlers[name] = handler
 
-        while i < numberOfEvents:
-            event = events[i]
-
+        for event in handler.events:
             if isinstance(event, basestring): # [PORT] checking for string and unicode -- need unicode? otherwise just str?
                 self._registeredStringEventHandlers[event] = { 'name': name, 'handler': handler }
                 continue
 
-            if isinstance(event, RegExp):
+            if isinstance(event, REGEX_TYPE):
                 self._registeredRegExpEventHandlers.append({ 'name': name, 'handler': handler, 'regexp': event })
                 continue
 
             self.stateLogError("Invalid event {0} for event handler {1} in state {1}".format(event, name, self))
-
-            i += 1
 
     """ @private 
     
@@ -1088,7 +1081,7 @@ class State(EventDispatcher):
             return False
 
         # Now begin by trying a basic method on the state to respond to the event
-        if inspect.ismethod(getattr(self, event)):
+        if hasattr(self, event) and inspect.ismethod(getattr(self, event)):
             if trace:
                 self.stateLogTrace("will handle event '{0}'".format(event))
 
@@ -1101,11 +1094,11 @@ class State(EventDispatcher):
         handler = self._registeredStringEventHandlers[event] if event in self._registeredStringEventHandlers else None
         if handler is not None:
             if trace:
-                self.stateLogTrace("{0} will handle event '{1}'".format(handler.name, event))
+                self.stateLogTrace("{0} will handle event '{1}'".format(handler['name'], event))
 
-            sc.stateWillTryToHandleEvent(self, event, handler.name)
-            ret = handler.handler(self, event, arg1, arg2) != False
-            sc.stateDidTryToHandleEvent(self, event, handler.name, ret)
+            sc.stateWillTryToHandleEvent(self, event, handler['name'])
+            ret = handler['handler'](event, arg1, arg2) != False
+            sc.stateDidTryToHandleEvent(self, event, handler['name'], ret)
             return ret
 
         # Try an event handler that is associated with events matching a regular expression
@@ -1113,19 +1106,19 @@ class State(EventDispatcher):
         i = 0
         while i < numberOfHandlers:
             handler = self._registeredRegExpEventHandlers[i]
-            if event.match(handler.regexp):
+            if handler['regexp'].match(event):
                 if trace:
-                    self.stateLogTrace("{0} will handle event '{1}'".format(handler.name, event))
+                    self.stateLogTrace("{0} will handle event '{1}'".format(handler['name'], event))
 
-                sc.stateWillTryToHandleEvent(self, event, handler.name)
-                ret = handler.handler(self, event, arg1, arg2) != False
-                sc.stateDidTryToHandleEvent(self, event, handler.name, ret)
+                sc.stateWillTryToHandleEvent(self, event, handler['name'])
+                ret = handler['handler'](event, arg1, arg2) != False
+                sc.stateDidTryToHandleEvent(self, event, handler['name'], ret)
                 return ret
             i += 1
 
         # Final attempt. If the state has an unknownEvent function then invoke it to 
         # handle the event
-        if hasattr(self, 'unknownEvent') and inspect.isfunction(getattr(self, 'unknownEvent')):
+        if hasattr(self, 'unknownEvent') and inspect.ismethod(getattr(self, 'unknownEvent')):
             if trace:
                 self.stateLogTrace("unknownEvent will handle event '{0}'".format(event))
 
@@ -1323,25 +1316,20 @@ class State(EventDispatcher):
       @returns {Boolean}
     """
     def respondsToEvent(self, event):
-        if self._registeredEventHandlers[event]:
+        if event in self._registeredEventHandlers:
             return False
-        if inspect.isfunction(getattr(self, event)):
+        if hasattr(self, event) and inspect.ismethod(getattr(self, event)):
             return True
-        if self._registeredStringEventHandlers[event]:
+        if event in self._registeredStringEventHandlers:
             return True
-        if self._registeredStateObserveHandlers[event]:
+        if event in self._registeredStateObserveHandlers:
             return False
 
-        numberOfHandlers = len(self._registeredRegExpEventHandlers)
-        i = 0
-        handler = None
-        while i < numberOfHandlers:
-            handler = self._registeredRegExpEventHandlers[i]
-            if event.match(handler.regexp):
+        for handler in self._registeredRegExpEventHandlers:
+            if handler['regexp'].match(event):
                 return True
-            i += 1
 
-        return inspect.isfunction(getattr(self, 'unknownEvent'))
+        return hasattr(self, 'unknownEvent') and inspect.ismethod(getattr(self, 'unknownEvent'))
 
     """
       Returns the path for this state relative to the statechart's

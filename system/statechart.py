@@ -1167,8 +1167,7 @@ class StatechartManager(EventDispatcher):
       @returns {Boolean}
     """
     def respondsTo(self, event):
-        for i in range(len(self.currentStates)):
-            state = currentStates[i] # [PORT] was objectAt i
+        for state in self.currentStates:
             while state is not None:
                 if (state.respondsToEvent(event)):
                     return True
@@ -1178,7 +1177,7 @@ class StatechartManager(EventDispatcher):
         if not hasattr(self, event):
             return False
 
-        return inspect.isfunction(getattr(self, event))
+        return inspect.ismethod(getattr(self, event))
         
     """ @override
         
@@ -1195,12 +1194,12 @@ class StatechartManager(EventDispatcher):
         if not self.respondsTo(event):
             return False
       
-        if inspect.isfunction(getattr(self, event)):
+        if hasattr(self, event) and inspect.ismethod(getattr(self, event)):
             result = getattr(self, event)(arg1, arg2)
-            if result != False:
+            if result != None:
                 return True
           
-        return self.sendEvent(event, arg1, arg2) == True # [PORT] was !!
+        return self.sendEvent(event, arg1, arg2) is not None
         
     """
       Used to invoke a method on current states. If the method can not be executed
