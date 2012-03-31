@@ -92,7 +92,7 @@ class StatePathMatcher(EventDispatcher):
   
     """ @private 
   
-    Will parse the matcher's given expession by creating tokens and chaining them
+      Will parse the matcher's given expession by creating tokens and chaining them
       together.
       
       Note: Because the DSL for state path expressions is tiny, a simple hand-crafted 
@@ -122,7 +122,7 @@ class StatePathMatcher(EventDispatcher):
             else:
                 token = _BasicToken(value=part)
             
-            token.owner = self
+            token.owningMatcher = self
             tokens.append(token)
       
         self.tokens = tokens
@@ -133,11 +133,17 @@ class StatePathMatcher(EventDispatcher):
         while chain:
             chain.nextToken = stack.pop() if stack else None
             chain = chain.nextToken
+
+        # If the path expression is A.B.C, self.tokens is [ A, B, C ], and self._chain is C -> B -> A
+        print self.expression
+        c = self._chain
+        while c:
+            c = c.nextToken
   
     """
       Returns the last part of the expression. So if the
       expression is 'foo.bar' or 'foo~bar' then 'bar' is returned
-      in both cases. If the expression is 'self' then 'self is
+      in both cases. If the expression is 'self' then 'self' is
       returned. 
     """
     def _lastPart(self, *l):
@@ -153,9 +159,20 @@ class StatePathMatcher(EventDispatcher):
       @return {Boolean} true if there is a match, otherwise false
     """
     def match(self, path):
+        # When this matcher starts a match run, set self._stack. For example,
+        # for path A.B.C, the stack witll be [ A, B, C ]. The related _pop method
+        # will pop them off as C, then B, then A, during match operations.
+        #
+        # Set self._stack to None if path is None.
+        #
         self._stack = path.split('.') if path else None
+
+        # Bug out is path is None or if path is not a string.
         if path is None or not isinstance(path, basestring):
             return False
+
+        # self._chain is the head of a linked-list of chained tokens. Kick off a
+        # traversal of the tokens by firing on the head.
         return self._chain.match()
   
     """ @private """
@@ -179,7 +196,7 @@ class _Token(EventDispatcher):
         self.tokenType = None
   
         """ The state path matcher that owns this token """
-        self.owner = None
+        self.owningMatcher = None
   
         """ The next token in the matching chain """
         self.nextToken = None
@@ -187,7 +204,7 @@ class _Token(EventDispatcher):
         super(_Token, self).__init__() 
   
     """ 
-      Used to match against what is currently on the owner's
+      Used to match against what is currently on the owningMatcher's
       current path stack
     """
     def match(self):
@@ -215,13 +232,18 @@ class _BasicToken(_Token):
         self.lastPart = self.value
     
     def match(self):
-        part = self.owner._pop() if self.owner else None
-        token = self.nextToken
+        # Pop the next available part of the owningMatcher's expression part stack.
+        # So that if we start with path A.B.C, we will first pop C, then B, then A.
+        part = self.owningMatcher._pop() if self.owningMatcher else None
 
+        # This is a bottom-up procedure, working from leaf toward root, such that
+        # if value of this token doesn't match the last popped expression part, we 
+        # return back up the chain with False.
         if self.value != part:
             return False
     
-        return token.match() if token else True
+        # self.value matches part, but if there are other parts, try to match them.
+        return self.nextToken.match() if self.nextToken else True
   
 """ @private @class
 
@@ -253,23 +275,23 @@ class _ExpandToken(_Token):
         part = ''
         token = self.nextToken
           
-        part = self.owner._pop() if self.owner else None
+        part = self.owningMatcher._pop() if self.owningMatcher else None
         if part != end:
             return False
       
         while part:
             if part == start:
                 return token.match() if token else True
-            part = self.owner._pop() if self.owner else None
+            part = self.owningMatcher._pop() if self.owningMatcher else None
       
         return False
 
 """ @private @class
   
-  Represents a this token, which is used to represent the owner's
+  Represents a this token, which is used to represent the owningMatcher's
   `state` property.
   
-  A match is true if the last path part popped from the owner's
+  A match is true if the last path part popped from the owningMatcher's
   current path stack is an immediate substate of the state this
   token represents.
 """
@@ -281,12 +303,12 @@ class _ThisToken(_Token):
         super(_ThisToken, self).__init__() 
   
     def match(self):
-        state = self.owner.state
+        state = self.owningMatcher.state
         substates = state.substates
         
-        part = self.owner._lastPopped
+        part = self.owningMatcher._lastPopped
 
-        if part is None or len(self.owner._stack) != 0:
+        if part is None or len(self.owningMatcher._stack) != 0:
             return False
     
         for i in range(len(self.substates)):

@@ -495,6 +495,7 @@ class State(EventDispatcher):
 
     """ @private """
     def _addEmptyInitialSubstateIfNeeded(self):
+        from kivy_statechart.system.empty_state import EmptyState
         initialSubstate = self.initialSubstate
         substatesAreConcurrent = self.substatesAreConcurrent
 
@@ -503,7 +504,8 @@ class State(EventDispatcher):
 
         state = self.createSubstate(EmptyState)
 
-        self.initialSubstate = state.__name__
+        self.initialSubstate = state.name
+
         self.substates.append(state)
 
         setattr(self, state.name, state)
@@ -588,6 +590,8 @@ class State(EventDispatcher):
         state = self._addSubstate(name, state, attr)
 
         self._addEmptyInitialSubstateIfNeeded()
+
+        self.dispatch('substates')
         #self.notifyPropertyChange("substates")
 
         return state
@@ -595,7 +599,7 @@ class State(EventDispatcher):
     """
       creates a substate for this state
     """
-    def createSubstate(self, state, attr):
+    def createSubstate(self, state, attr=None):
         attr = dict.copy(attr) if attr else {}
         attr['parentState'] = self
         attr['statechart'] = self.statechart
@@ -653,7 +657,7 @@ class State(EventDispatcher):
     """
     def _registerWithParentStates(self):
         parent = self.parentState
-
+        
         while parent is not None:
             parent._registerSubstate(self)
             parent = parent.parentState
@@ -662,18 +666,14 @@ class State(EventDispatcher):
       Will register a given state as a substate of this state
     """
     def _registerSubstate(self, state):
-        print '_registerSubstate, state', state
-
         path = state.pathRelativeTo(self)
 
-        print '_registerSubstate, path', path
         if path is None:
             return
 
         self._registeredSubstates.append(state)
 
-        # Keep track of states based on their relative path
-        # to this state. 
+        # Keep track of states based on their relative path to this state. 
         if not state.name in self._registeredSubstatePaths:
             self._registeredSubstatePaths[state.name] = {}
         
@@ -748,33 +748,46 @@ class State(EventDispatcher):
             self.stateLogError("Can not find matching subtype. value must be a State class or string: {0}".format(value))
             return None
 
+        # [PORT] value is a string. First try to find a substate with a matching name. [PORT] Added this, since in python version, value is always a str.
+        matchingSubstates = [state for state in self._registeredSubstates if state.name == value]
+        if len(matchingSubstates) > 0:
+            return matchingSubstates[0]
+
+        # [PORT] The matchingSubstate search above assumes that the order of sets to self._registeredSubstates is in root-first order, such that
+        # the first item matched will be the highest level substate with name matching value.
+
+        # [PORT] In testing, it appears that the following search algorithm will match the last, lowest-level ("leaf") matching state, which is
+        # probably not working correctly, hence the need for the matchingSubstates block above.
+
+        # Not found yet, so look deeper for a nested substate.
         matcher = StatePathMatcher(state=self, expression=value)
         matches = []
         if len(matcher.tokens) == 0:
             return None
 
+        # Grab the paths associated with this state name.
         paths = self._registeredSubstatePaths[matcher.lastPart] if matcher.lastPart in self._registeredSubstatePaths else None
 
         if paths is None:
             return self._notifySubstateNotFound(callback, target, value)
 
-        for key in paths:
-            if matcher.match(key):
-                matches.append(paths[key])
+        for path in paths:
+            if matcher.match(path):
+                matches.append(paths[path])
 
         if len(matches) == 1:
             return matches[0]
 
-        keys = []
         if len(matches) > 1:
-            for key in paths:
-                keys.append(key)
+            matchedPaths = []
+            for path in paths:
+                matchedPaths.append(path)
 
-        if callback is not None:
-            return self._notifySubstateNotFound(callback, target, value, keys)
+            if callback is not None:
+                return self._notifySubstateNotFound(callback, target, value, matchedPaths)
 
-        msg = "Can not find substate matching '{0}' in state {1}. Ambiguous with the following: {2}"
-        self.stateLogError(msg.format(value, self.fullPath, ', '.join(keys)))
+            msg = "Can not find substate matching '{0}' in state {1}. Ambiguous with the following: {2}"
+            self.stateLogError(msg.format(value, self.fullPath, ', '.join(matchedPaths)))
 
         self._notifySubstateNotFound(callback, target, value)
 
@@ -900,7 +913,7 @@ class State(EventDispatcher):
         if isinstance(state, basestring):
             state = self.statechart.getState(state)
 
-        return state in self.currentSubstates # [PORT] was !!current && ... but here we assume list is ever-present.
+        return True if state in self.currentSubstates else False
 
     """
       Used to check if a given state is a current substate of this state. Mainly used in cases
@@ -913,7 +926,7 @@ class State(EventDispatcher):
         if isinstance(state, basestring):
             state = self.statechart.getState(state)
 
-        return state in self.enteredSubstates
+        return True if state in self.enteredSubstates else False
 
     """
       Indicates if this state is the root state of the statechart.
@@ -921,7 +934,7 @@ class State(EventDispatcher):
       @property {Boolean}
     """
     def _isRootState(self, *l):
-        return self.statechart.rootState is self
+        self.isRootState = True if self.statechart.rootState is self else False
 
     """
       Indicates if this state is a current state of the statechart.
@@ -929,7 +942,7 @@ class State(EventDispatcher):
       @property {Boolean} 
     """
     def _isCurrentState(self, *l):
-        self.isCurrentState = self.stateIsCurrentSubstate(self)
+        self.isCurrentState = True if self.stateIsCurrentSubstate(self) else False
 
     """
       Indicates if this state is a concurrent state
@@ -937,7 +950,7 @@ class State(EventDispatcher):
       @property {Boolean}
     """
     def _isConcurrentState(self, *l):
-        self.isConcurrentState = self.parentState.substatesAreConcurrent
+        self.isConcurrentState = True if self.parentState.substatesAreConcurrent else False
 
     """
       Indicates if this state is a currently entered state. 
@@ -947,7 +960,7 @@ class State(EventDispatcher):
       was called, if at all.
     """
     def _isEnteredState(self, *l):
-        self.isEnteredState = self.stateIsEnteredSubstate(self)
+        self.isEnteredState = True if self.stateIsEnteredSubstate(self) else False
 
     """
       Indicate if this state has any substates
@@ -955,21 +968,19 @@ class State(EventDispatcher):
       @propety {Boolean}
     """
     def _hasSubstates(self, *l): # [PORT] Added *l when error said 3 args coming in here. What are args for bound callback in kivy?
-        return len(self.substates) > 0
+        self.hasSubstates = True if len(self.substates) > 0 else False
 
     """
       Indicates if this state has any current substates
     """
     def _hasCurrentSubstates(self, *l):
-        current = self.currentSubstates # [PORT] Do we have to do this check in python?
-        return current and len(current) > 0
+        self.hasCurrentSubstates = True if self.currentSubstates and len(self.currentSubstates) > 0 else False
 
     """
       Indicates if this state has any currently entered substates
     """
     def _hasEnteredSubstates(self, *l):
-        entered = self.enteredSubstates
-        return entered and len(entered) > 0
+        self.hasEnteredSubstates = True if self.currentSubstates and len(self.currentSubstates) > 0 else False
 
     """
       Will attempt to find a current state in the statechart that is relative to 

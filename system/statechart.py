@@ -660,7 +660,8 @@ class StatechartManager(EventDispatcher):
                 if trace:
                     self.statechartLogTrace("pivot state = {0}".format(pivotState))
                 if pivotState.substatesAreConcurrent and pivotState is not state:
-                    self.statechartLogError("Can not go to state {0} from {1}. Pivot state {2} has concurrent substates.".format(state, fromCurrentState, pivotState))
+                    msg = "Can not go to state {0} from {1}. Pivot state {2} has concurrent substates."
+                    self.statechartLogError(msg.format(state, fromCurrentState, pivotState))
                     self._gotoStateLocked = False
                     return
           
@@ -1120,7 +1121,7 @@ class StatechartManager(EventDispatcher):
             gotoStateActions.append(gotoStateAction)
             
             initialSubstate = state.initialSubstate if hasattr(state, 'initialSubstate') else None
-            historySubstate = state.historySubstate if hasattr(state, 'historySubstate') else None
+            historyState = state.historySubstate if hasattr(state, 'historySubstate') else None
             
             # State has concurrent substates. Need to enter all of the substates
             stateObj = self.getState(state)
@@ -1138,8 +1139,7 @@ class StatechartManager(EventDispatcher):
                 if inspect.isclass(initialSubstateObj) and issubclass(initialSubstateObj, HistoryState):
                     if not useHistory:
                         useHistory = initialSubstateObj.isRecursive
-                    #initialSubstate = initialSubstate.state # [PORT] Is the line below what it should be?
-                    initialSubstate = initialSubstate.initialSubstate
+                    initialSubstate = initialSubstate.state
                 self._traverseStatesToEnter(initialSubstate, None, None, useHistory, gotoStateActions)
             
             # Looks like we hit the end of the road. Therefore the state has now become
@@ -1346,8 +1346,6 @@ class StatechartManager(EventDispatcher):
         attrs = {}
           
         # [PORT] Check for rsExample.plugin removed here, because in Kivy, rsExample will be a class.
-
-        print '_construct..., rsExample', rsExample
 
         if inspect.isclass(rsExample) and not issubclass(rsExample, State): # [PORT] or issubclass?
             self._logStatechartCreationError("Invalid root state example")
