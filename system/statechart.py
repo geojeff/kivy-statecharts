@@ -230,8 +230,8 @@ class StatechartManager(EventDispatcher):
     rootState = ObjectProperty(None)
     
     """ 
-      Represents the class used to construct a class that will be the root state for
-      this statechart. The class assigned must derive from State. 
+      Represents the state used to construct a class that will be the root state for
+      this statechart. The class must derive from State. 
       
       This property will only be used if the rootState property is not assigned.
     
@@ -239,7 +239,7 @@ class StatechartManager(EventDispatcher):
     
       @property {State}
     """
-    rootStateExample = ObjectProperty(None)
+    rootStateExample = None
     
     """ 
       Indicates what state should be the initial state of this statechart. The value
@@ -1252,35 +1252,32 @@ class StatechartManager(EventDispatcher):
                is returned. The value is the result of the method that got invoked
                on a state.
     """
-    def invokeStateMethod(self, methodName, args=[], func=None):
+    def invokeStateMethod(self, methodName, *args):
         if methodName == 'unknownEvent':
             self.statechartLogError("can not invoke method unkownEvent")
             return
           
-        args = deque(args) # [PORT] was .A and shift, now is deque and popleft
-        if args:
-            args.popleft()
-          
-        arg = args[len(args)-1] if len(args) > 0 else None
-        callback = args.pop() if arg and inspect.isfunction(arg) else None # [PORT] pop, now on deque
-        i = 0
-        state = None
+        callback = None
         checkedStates = {}
-        method = None
-        result = None
         calledStates = 0
-              
-        for i in range(len(self.currentStates)):
-            state = self.currentStates[i] # [PORT] was objectAt i
+          
+        # If last arg is a callback function, set it, popping it off args.
+        args = list(args) if args else None
+        if args and (inspect.isfunction(args[-1]) or inspect.ismethod(args[-1])):
+            callback = args.pop()
+
+        # Search current states for methods matching methodName, call the method on each,
+        # and fire the callback on each, if it exists.
+        for state in self.currentStates:
             while state is not None:
                 if state.fullPath in checkedStates:
                     break
                 checkedStates[state.fullPath] = True
-                method = getattr(state, methodName)
-                if inspect.ismethod(method) and not (hasattr(method, 'isEventHandler') and not method.isEventHandler): # [PORT] ismethod, not isfunction
-                    result = method(state, args)
+                method = getattr(state, methodName) if hasattr(state, methodName) else None
+                if method and inspect.ismethod(method) and not (hasattr(method, 'isEventHandler') and not method.isEventHandler):
+                    result = method(*tuple(args if args else []))
                     if callback is not None:
-                        callback(self, state, result)
+                        callback(state, result)
                     calledStates += 1
                     break
                 state = state.parentState
@@ -1384,7 +1381,7 @@ class StatechartManager(EventDispatcher):
                 if key != 'initialState': # [PORT] Don't set this. rootState will only have initialSubstate, not initialState.
                     attrs[key] = value
                 stateCount += 1
-          
+
         if stateCount == 0:
             self._logStatechartCreationError("Must define one or more states")
             return None
