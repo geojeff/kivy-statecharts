@@ -11,7 +11,7 @@ from kivy_statechart.system.state import State
   @class
 
   Represents a history state that can be assigned to a State object's
-  initialSubstate property. 
+  initialSubstateKey property. 
   
   If a HistoryState object is assigned to a state's initial substate, 
   then after a state is entered the statechart will refer to the history 
@@ -23,8 +23,8 @@ from kivy_statechart.system.state import State
   
     stateA = State()
     
-    stateA.initialSubstate = HistoryState()
-    stateA.initialSubstate.defaultState = 'stateB'
+    stateA.initialSubstateKey = HistoryState()
+    stateA.initialSubstateKey.defaultState = 'stateB'
       
     stateA.stateB = State()
     stateA.stateC = State()

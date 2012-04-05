@@ -20,10 +20,10 @@ EMPTY_STATE_NAME = "__EMPTY_STATE__"
   @extends State
 """
 class EmptyState(State):
-    def __init__(self, **kw):
-        self.name = EMPTY_STATE_NAME
-        super(EmptyState, self).__init__(**kw)
+    def __init__(self, **kwargs):
+        kwargs['name'] = EMPTY_STATE_NAME
+        super(EmptyState, self).__init__(**kwargs)
   
-    def enterState(self):
+    def enterState(self, context=None):
         msg = "No initial substate was defined for state {0}. Entering default empty state"
-        this.stateLogWarning(msg.format(self.parentState))
+        self.stateLogWarning(msg.format(self.parentState))

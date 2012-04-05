@@ -77,7 +77,7 @@ class F(TestState):
 
 class E(TestState):
     def __init__(self, **kwargs):
-        self.initialSubstate = 'F'
+        kwargs['initialSubstateKey'] = 'F'
         super(E, self).__init__(**kwargs)
 
     @State.eventHandler(['plus', 'minus']) 
@@ -96,7 +96,7 @@ class Y(TestState):
 
 class Z(TestState):
     def __init__(self, **kwargs):
-        self.substatesAreConcurrent = True
+        kwargs['substatesAreConcurrent'] = True
         super(Z, self).__init__(**kwargs)
 
     def blue(self, context, *l):
@@ -107,7 +107,7 @@ class Z(TestState):
 
 class RootState(TestState):
     def __init__(self, **kwargs):
-        self.initialSubstate = 'A'
+        kwargs['initialSubstateKey'] = 'A'
         super(RootState, self).__init__(**kwargs)
     
     A = A
@@ -126,7 +126,7 @@ class RootState(TestState):
 
 class TestStatechart(StatechartManager):
     def __init__(self, **kwargs):
-        self.rootState = RootState
+        kwargs['rootState'] = RootState
         super(TestStatechart, self).__init__(**kwargs)
 
     someMethodInvoked = BooleanProperty(False)
@@ -170,7 +170,7 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
         self.assertFalse(state_A.respondsToEvent('event_A')) 
         self.assertFalse(state_A.respondsToEvent('event_B')) 
 
-        self.assertTrue(state_A.isCurrentState)
+        self.assertTrue(state_A.isCurrentState())
 
         self.assertTrue(statechart.respondsTo('foo')) 
         self.assertTrue(statechart.respondsTo('event_A')) 
@@ -194,7 +194,7 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
 
         statechart.gotoState('B')
 
-        self.assertTrue(state_B.isCurrentState)
+        self.assertTrue(state_B.isCurrentState())
         self.assertTrue(statechart.respondsTo('bar')) 
         self.assertTrue(statechart.respondsTo('frozen')) 
         self.assertTrue(statechart.respondsTo('canuck')) 
@@ -219,7 +219,7 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
   
         statechart.gotoState('C')
 
-        self.assertTrue(state_C.isCurrentState)
+        self.assertTrue(state_C.isCurrentState())
         self.assertTrue(statechart.respondsTo('yes')) 
         self.assertTrue(statechart.respondsTo('num1')) 
         self.assertTrue(statechart.respondsTo('num2')) 
@@ -237,7 +237,7 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
   
         statechart.gotoState('D')
 
-        self.assertTrue(state_D.isCurrentState)
+        self.assertTrue(state_D.isCurrentState())
         self.assertTrue(statechart.respondsTo('foo')) 
         self.assertTrue(statechart.respondsTo('xyz')) 
         self.assertTrue(statechart.respondsTo('event_A')) 
@@ -259,8 +259,8 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
   
         statechart.gotoState('E')
 
-        self.assertFalse(state_E.isCurrentState)
-        self.assertTrue(state_F.isCurrentState)
+        self.assertFalse(state_E.isCurrentState())
+        self.assertTrue(state_F.isCurrentState())
 
         self.assertTrue(statechart.respondsTo('foo'))
         self.assertTrue(statechart.respondsTo('plus'))
@@ -289,9 +289,9 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
 
         statechart.gotoState('Z')
 
-        self.assertFalse(state_Z.isCurrentState)
-        self.assertTrue(state_X.isCurrentState)
-        self.assertTrue(state_Y.isCurrentState)
+        self.assertFalse(state_Z.isCurrentState())
+        self.assertTrue(state_X.isCurrentState())
+        self.assertTrue(state_Y.isCurrentState())
 
         self.assertTrue(statechart.respondsTo('blue')) 
         self.assertTrue(statechart.respondsTo('yellow')) 
@@ -349,7 +349,7 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
     def test_yes_on_current_states_C(self):
         statechart.gotoState('C')
 
-        self.assertTrue(state_C.isCurrentState)
+        self.assertTrue(state_C.isCurrentState())
 
         self.assertTrue(statechart.tryToPerform('yes')) 
         self.assertTrue(state_C.handledEvent)
@@ -365,7 +365,7 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
     def test_num1_on_current_states_C(self):
         statechart.gotoState('C')
 
-        self.assertTrue(state_C.isCurrentState)
+        self.assertTrue(state_C.isCurrentState())
 
         self.assertTrue(statechart.tryToPerform('num1')) 
         self.assertTrue(state_C.handledEvent)
@@ -381,7 +381,7 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
     def test_abc_on_current_states_D(self):
         statechart.gotoState('D')
 
-        self.assertTrue(state_D.isCurrentState)
+        self.assertTrue(state_D.isCurrentState())
 
         self.assertTrue(statechart.tryToPerform('abc')) 
         self.assertTrue(state_D.handledEvent)
@@ -397,8 +397,8 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
     def test_yellow_on_current_states_X_and_Y(self):
         statechart.gotoState('Z')
 
-        self.assertTrue(state_X.isCurrentState)
-        self.assertTrue(state_Y.isCurrentState)
+        self.assertTrue(state_X.isCurrentState())
+        self.assertTrue(state_Y.isCurrentState())
 
         self.assertTrue(statechart.tryToPerform('yellow')) 
         self.assertTrue(state_X.handledEvent)

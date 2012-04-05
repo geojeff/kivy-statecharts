@@ -135,7 +135,6 @@ class StatePathMatcher(EventDispatcher):
             chain = chain.nextToken
 
         # If the path expression is A.B.C, self.tokens is [ A, B, C ], and self._chain is C -> B -> A
-        print self.expression
         c = self._chain
         while c:
             c = c.nextToken

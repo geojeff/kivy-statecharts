@@ -16,38 +16,33 @@ import os, inspect
 
 owner = ObjectProperty(None)
 
-class A(State):
-    def foo(self, *l):
-        print 'foo called, trying to goto B'
-        self.statechart.gotoState('B') # [PORT] self.gotoState should work...
-
-class B(State):
-    def bar(self, *l):
-        print 'bar called, trying to goto A'
-        self.statechart.gotoState('A')
-
 class Statechart_1(StatechartManager):
-    def __init__(self):
-        self.initialState = 'A'
-        super(Statechart_1, self).__init__()
+    def __init__(self, **kwargs):
+        kwargs['A'] = self.A
+        kwargs['B'] = self.B
+        kwargs['initialStateKey'] = 'A'
+        super(Statechart_1, self).__init__(**kwargs)
 
-    A = A
-    B = B
+    class A(State):
+        def foo(self, *l):
+            self.statechart.gotoState('B') # [PORT] self.gotoState should work...
+
+    class B(State):
+        def bar(self, *l):
+            self.statechart.gotoState('A')
 
 class C(State):
     def foo(self, *l):
-        print 'foo called, trying to goto D'
         self.statechart.gotoState('D') # [PORT] self.gotoState should work...
 
 class D(State):
     def bar(self, *l):
-        print 'bar called, trying to goto C'
         self.statechart.gotoState('C')
 
 class Statechart_2(StatechartManager):
-    def __init__(self):
-        self.statesAreConcurrent = True
-        super(Statechart_2, self).__init__()
+    def __init__(self, **kwargs):
+        kwargs['statesAreConcurrent'] = True
+        super(Statechart_2, self).__init__(**kwargs)
 
     C = C
     D = D
@@ -65,7 +60,7 @@ class Statechart_3(StatechartManager):
         attrs = { 
             'owner': owner,
             'rootStateExample': RootStateExample,
-            'initialState': 'E',
+            'initialStateKey': 'E',
             'E': E
             }
         super(Statechart_3, self).__init__(**attrs) 
@@ -78,13 +73,13 @@ class Statechart_4(StatechartManager):
         attrs = { 
             'autoInitStatechart': False,
             'rootStateExample': RootStateExample,
-            'initialState': 'F',
+            'initialStateKey': 'F',
             'F': F
             }
         super(Statechart_4, self).__init__(**attrs) 
 
 #Statechart_1 = StatechartManager(**{
-#    'initialState': 'A',
+#    'initialStateKey': 'A',
 #    'A': State(**{ 'foo': lambda self,*l: self.gotoState('B')}),
 #    'B': State(**{ 'bar': lambda self,*l: self.gotoState('A')})
 #    })
@@ -129,8 +124,8 @@ class StatechartTestCase(unittest.TestCase):
         self.assertTrue(isinstance(rootState_1, State))
         self.assertFalse(rootState_1.substatesAreConcurrent)
 
-        self.assertEqual(statechart_1.initialState, state_A.name)
-        self.assertEqual(rootState_1.initialSubstate, 'A')
+        self.assertEqual(statechart_1.initialStateKey, state_A.name)
+        self.assertEqual(rootState_1.initialSubstateKey, 'A')
         self.assertEqual(state_A, rootState_1.getSubstate('A'))
         self.assertEqual(state_B, rootState_1.getSubstate('B'))
         
@@ -138,13 +133,13 @@ class StatechartTestCase(unittest.TestCase):
         self.assertEqual(state_A.owner, statechart_1)
         self.assertEqual(state_B.owner, statechart_1)
 
-        self.assertTrue(state_A.isCurrentState)
-        self.assertFalse(state_B.isCurrentState)
+        self.assertTrue(state_A.isCurrentState())
+        self.assertFalse(state_B.isCurrentState())
 
         statechart_1.sendEvent('foo')
 
-        self.assertFalse(state_A.isCurrentState)
-        self.assertTrue(state_B.isCurrentState)
+        self.assertFalse(state_A.isCurrentState())
+        self.assertTrue(state_B.isCurrentState())
 
     def test_statechart_2(self):
         self.assertTrue(statechart_2.isStatechart)
@@ -152,8 +147,8 @@ class StatechartTestCase(unittest.TestCase):
         self.assertTrue(isinstance(rootState_2, State))
         self.assertTrue(rootState_2.substatesAreConcurrent)
 
-        self.assertEqual(statechart_2.initialState, None)
-        self.assertEqual(rootState_2.initialSubstate, None)
+        self.assertEqual(statechart_2.initialStateKey, '')
+        self.assertEqual(rootState_2.initialSubstateKey, '')
         self.assertEqual(state_C, rootState_2.getSubstate('C'))
         self.assertEqual(state_D, rootState_2.getSubstate('D'))
         
@@ -161,8 +156,8 @@ class StatechartTestCase(unittest.TestCase):
         self.assertEqual(state_C.owner, statechart_2)
         self.assertEqual(state_D.owner, statechart_2)
 
-        self.assertTrue(state_C.isCurrentState)
-        self.assertTrue(state_D.isCurrentState)
+        self.assertTrue(state_C.isCurrentState())
+        self.assertTrue(state_D.isCurrentState())
 
     def test_statechart_3(self):
         self.assertTrue(statechart_3.isStatechart)
@@ -173,10 +168,10 @@ class StatechartTestCase(unittest.TestCase):
         self.assertEqual(rootState_3.owner, owner)
         self.assertEqual(state_E.owner, owner)
 
-        self.assertEqual(statechart_3.initialState, 'E')
-        self.assertEqual(rootState_3.initialSubstate, 'E')
+        self.assertEqual(statechart_3.initialStateKey, 'E')
+        self.assertEqual(rootState_3.initialSubstateKey, 'E')
         self.assertEqual(state_E, rootState_3.getSubstate('E'))
-        self.assertTrue(state_E.isCurrentState)
+        self.assertTrue(state_E.isCurrentState())
 
     def test_statechart_4(self):
         self.assertTrue(statechart_4.isStatechart)

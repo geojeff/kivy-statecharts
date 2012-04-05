@@ -70,21 +70,21 @@ class Z(TestState):
 
 class Y(TestState):
     def __init__(self, **kwargs):
-        self.initialSubstate = 'Z'
+        self.initialSubstateKey = 'Z'
         super(Y, self).__init__(**kwargs)
 
     Z = Z
 
 class X(TestState):
     def __init__(self, **kwargs):
-        self.initialSubstate = 'Y'
+        self.initialSubstateKey = 'Y'
         super(X, self).__init__(**kwargs)
 
     Y = Y
 
 class Statechart_1(TestStatechart):
     def __init__(self, **kwargs):
-        self.initialState = 'A'
+        kwargs['initialStateKey'] = 'A'
         super(Statechart_1, self).__init__(**kwargs)
       
     A = A
@@ -153,13 +153,13 @@ class StatechartOwnerTestCase(unittest.TestCase):
         state_Z = statechart_1.getState('Z')
         
         owner_2 = Owner_2()
-        statechart_2 = Statechart_2(owner=owner_2, initialState='C')
+        statechart_2 = Statechart_2(owner=owner_2, initialStateKey='C')
         rootState_2 = statechart_2.rootState
         state_C = statechart_2.getState('C')
         state_D = statechart_2.getState('D')
 
         owner_3 = Owner_3()
-        statechart_3 = Statechart_3(initialState='E', statechartOwnerKey='fooOwner', fooOwner=owner_3)
+        statechart_3 = Statechart_3(initialStateKey='E', statechartOwnerKey='fooOwner', fooOwner=owner_3)
         rootState_3 = statechart_3.rootState
         state_E = statechart_3.getState('E')
         state_F = statechart_3.getState('F')
@@ -193,7 +193,7 @@ class StatechartOwnerTestCase(unittest.TestCase):
 
     # access owner via invokeStateMethod
     def test_state_A(self):
-        self.assertTrue(state_A.isCurrentState)
+        self.assertTrue(state_A.isCurrentState())
         self.assertIsNone(state_A.accessedOwner)
 
         statechart_1.render()
@@ -209,7 +209,7 @@ class StatechartOwnerTestCase(unittest.TestCase):
     # access owner via invokeStateMethod
     def test_state_Z(self):
         statechart_1.gotoState('Z')
-        self.assertTrue(state_Z.isCurrentState)
+        self.assertTrue(state_Z.isCurrentState())
         self.assertIsNone(state_Z.accessedOwner)
   
         statechart_1.render()

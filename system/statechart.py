@@ -5,6 +5,7 @@
 # ================================================================================
 
 from kivy.event import EventDispatcher
+from kivy_statechart.debug.monitor import StatechartMonitor
 from kivy_statechart.system.async import Async
 from kivy_statechart.system.state import State
 from kivy_statechart.system.history_state import HistoryState
@@ -37,7 +38,7 @@ import inspect
   
       MyApp.Statechart = Object.extend(StatechartManager, {
         rootState: State.design({
-          initialSubstate: 'stateA',
+          initialSubstateKey: 'stateA',
 
           stateA: State.design({
             # ... can continue to nest further states
@@ -49,7 +50,7 @@ import inspect
         })
       });
   
-  Note how in the example above, the root state as an explicit initial substate to enter into. If no
+  Note how in the example above, the root state has an explicit initial substate to enter. If no
   initial substate is provided, then the statechart will default to the the state's first substate.
   
   You can also defined states without explicitly defining the root state. To do so, simply create properties
@@ -57,7 +58,7 @@ import inspect
   by the mixin and make the states on the object substates of the root state. As an example:
   
       MyApp.Statechart = Object.extend(StatechartManager, {
-        initialState: 'stateA',
+        initialStateKey: 'stateA',
 
         stateA: State.design({
           # ... can continue to nest further states
@@ -68,7 +69,7 @@ import inspect
         })
       });
   
-  If you liked to specify a class that should be used as the root state but using the above method to defined
+  If you specified a class that should be used as the root state but used the above method to defined
   states, you can set the rootStateExample property with a class that extends from State. If the 
   rootStateExample property is not explicitly assigned the then default class used will be State.
   
@@ -115,7 +116,7 @@ import inspect
   
       MyApp.Statechart = Object.extend(StatechartManager, {
         rootState: State.design({
-          initialSubstate: 'stateA',
+          initialSubstateKey: 'stateA',
 
           stateA: State.design({
             substatesAreConcurrent: True,
@@ -126,7 +127,7 @@ import inspect
           }),
         
           stateB: State.design({
-            initialSubstate: 'stateX',
+            initialSubstateKey: 'stateX',
 
             stateX: State.design({ ... })
             stateY: State.desgin({ ... })
@@ -163,7 +164,7 @@ import inspect
 
       MyApp.Statechart = Object.extend(StatechartManager, {
         rootState: State.design({
-          initialSubstate: 'stateA',
+          initialSubstateKey: 'stateA',
           stateA: State.plugin('MyApp.StateA'),
           stateB: State.plugin('MyApp.StateB')
         })
@@ -177,7 +178,7 @@ import inspect
 
 class StatechartManager(EventDispatcher):
     """
-      Computed property that returns an objects that adheres to the
+      Computed property that returns an object that adheres to the
       {@link StatechartDelegate} mixin. If the {@link #delegate} is not
       assigned then this object is the default value returned.
       
@@ -186,8 +187,7 @@ class StatechartManager(EventDispatcher):
     """
     statechartDelegate = ObjectProperty(None)
 
-    currentStates = ListProperty([])
-    enteredStates = ListProperty([])
+    currentStates = []
     gotoStateActive = ObjectProperty(None)
     gotoStateSuspended = ObjectProperty(None)
     statechartLogPrefix = StringProperty(None)
@@ -208,7 +208,7 @@ class StatechartManager(EventDispatcher):
     statechartIsInitialized = BooleanProperty(False)
 
     """
-      Optional name you can provide the statechart with. If set this will be included
+      Optional name you can provide the statechart. If set this will be included
       in tracing and error output as well as detail output. Useful for 
       debugging/diagnostic purposes
     """
@@ -217,12 +217,12 @@ class StatechartManager(EventDispatcher):
     """
       The root state of this statechart. All statecharts must have a root state.
       
-      If this property is left unassigned then when the statechart is initialized
-      it will use the rootStateExample, initialState, and statesAreConcurrent
+      If this property is left unassigned, then when the statechart is initialized
+      it will use the rootStateExample, initialStateKey, and statesAreConcurrent
       properties to construct a root state.
       
       @see #rootStateExample
-      @see #initialState
+      @see #initialStateKey
       @see #statesAreConcurrent
       
       @property {State}
@@ -251,19 +251,19 @@ class StatechartManager(EventDispatcher):
       [PORT] This is a String in the original javascript, despite a conditional in initStatechart
              that sets it to the actual state in rootState, and despite a test that compares it
              to actual class objects. Here it is kept a String, and the conditional commented out,
-             and the tests changed to check against strings, when either statechart.initialState
-             or state.initialSubstate are used.
+             and the tests changed to check against strings, when either statechart.initialStateKey
+             or state.initialSubstateKey are used.
     
       @see #rootState
     
       @property {String} 
     """
-    initialState = ObjectProperty(None)
+    initialStateKey = ''
     
     """ 
       Indicates if properties on this object representing states are concurrent to each other.
-      If True then they are concurrent, otherwise they are not. If the True, then the
-      initialState property must not be assigned.
+      If True then they are concurrent, otherwise they are not. If True, then the
+      initialStateKey property must not be assigned.
       
       This property will only be used if the rootState property is not assigned.
     
@@ -274,7 +274,7 @@ class StatechartManager(EventDispatcher):
     statesAreConcurrent = BooleanProperty(False)
     
     """ 
-      Indicates whether to use a monitor to monitor that statechart's activities. If true then
+      Indicates whether to use a monitor for the statechart's activities. If true then
       the monitor will be active, otherwise the monitor will not be used. Useful for debugging
       purposes.
       
@@ -356,17 +356,12 @@ class StatechartManager(EventDispatcher):
     """
     delegate = ObjectProperty(None)
 
-    firstCurrentState = ObjectProperty(None)
-    currentStateCount = NumericProperty(0)
-        
     def __init__(self, **kw):
-        self.bind(currentStates=self._firstCurrentState)
-        self.bind(currentStates=self._currentStateCount)
+        #self.bind(currentStates=self._currentStates)
         self.bind(monitorIsActive=self._monitorIsActiveDidChange)
         self.bind(statechartTraceKey=self._statechartTraceDidChange)
         self.bind(delegate=self._statechartDelegate)
-        self.bind(rootState=self._currentStates) # [PORT] Added enteredStates property
-        self.bind(rootState=self._enteredStates) # [PORT] Added enteredStates property
+        self.bind(rootState=self._currentStates) # [PORT] Added currentStates property
         self.bind(statechartOwnerKey=self._ownerDidChange) # [PORT] Added, to use top-down updating approach in kivy.
         self.bind(owner=self._ownerDidChange) # [PORT] Added, to use top-down updating approach in kivy.
 
@@ -408,12 +403,12 @@ class StatechartManager(EventDispatcher):
         self.sendAction = self.sendEvent
           
         if self.monitorIsActive:
-            self.monitor = StatechartMonitor(self)
+            self.monitor = StatechartMonitor(statechart=self)
       
         self._statechartTraceDidChange() # [PORT] this call needed for kivy?
       
         trace = self.allowStatechartTracing
-        rootState = self.rootState # [PORT] Clarify in docs that rootState is None or is a func that returns class def RootState(State). Or is it?
+        rootState = self.rootState # [PORT] Clarify in docs that rootState is None or is a class.
         msg = ''
           
         if trace:
@@ -431,26 +426,39 @@ class StatechartManager(EventDispatcher):
             self.statechartLogError(msg)
             raise Exception(msg)
           
+        # Instantiate the rootState class.
         rootState = self.createRootState(rootState, ROOT_STATE_NAME)
           
+        # Set self.rootState to be the instantiated object.
         self.rootState = rootState
 
         rootState.initState()
           
-        if not hasattr(rootState, 'initialSubstate') or (inspect.isclass(rootState.initialSubstate) and issubclass(rootState.initialSubstate, EmptyState)):
-            msg = "Unable to initialize statechart. Root state must have an initial substate explicilty defined"
+        # The initialState of rootState must be a real state -- can't be the EmptyState.
+        problemWithInitialRootState = False
+        if hasattr(rootState, 'initialSubstateKey') and rootState.initialSubstateKey:
+            initialRootState = rootState.getSubstate(rootState.initialSubstateKey)
+            if initialRootState is None:
+                problemWithInitialRootState = True
+            elif inspect.isclass(initialRootState) and issubclass(initialRootState, EmptyState):
+                problemWithInitialRootState = True
+        elif not hasattr(rootState, 'substatesAreConcurrent') or not rootState.substatesAreConcurrent:
+            problemWithInitialRootState = True
+
+        if problemWithInitialRootState:
+            msg = "Unable to initialize statechart. Root state must have an initial substate explicitly defined"
             self.statechartLogError(msg)
             raise Exception(msg)
           
         # In the original javascript, an if here did this:
         #
-        #     If the initialState here is set (a string), reset it to the actual state by that name in rootState
+        #     If the initialStateKey here is set (a string), reset it to the actual state by that name in rootState
         #
-        # This is not consistent with initialState defined as a String, but it is consistent with tests that check initialState
+        # This is not consistent with initialStateKey defined as a String, but it is consistent with tests that check initialStateKey
         # against actual class objects. Here we will leave it as a String, and skip this set.
         #
-        #if self.initialState:
-            #self.initialState = getattr(rootState, str(self.initialState))
+        #if self.initialStateKey:
+            #self.initialStateKey = getattr(rootState, str(self.initialStateKey))
           
         self.statechartIsInitialized = True
 
@@ -465,29 +473,13 @@ class StatechartManager(EventDispatcher):
     def createRootState(self, state, name):
         return state(statechart=self, name=name)
         
-    """
-      Returns an array of all the current states for this statechart
-      
-      @returns {Array} the current states
-    """
+    #"""
+      #Returns an array of all the current states for this statechart
+      #
+      #@returns {Array} the current states
+    #"""
     def _currentStates(self, *l):
         self.currentStates = self.rootState.currentSubstates
-
-    """
-      Returns the first current state for this statechart. 
-      
-      @return {State}
-    """
-    def _firstCurrentState(self, *l):
-        self.firstCurrentState = self.currentStates[0] if self.currentStates else None
-
-    """
-      Returns the count of the current states for this statechart
-      
-      @returns {Number} the count 
-    """
-    def _currentStateCount(self, *l):
-        self.currentStateCount = len(self.currentStates)
 
     """
       Checks if a given state is a current state of this statechart. 
@@ -504,8 +496,8 @@ class StatechartManager(EventDispatcher):
       
       @returns {Array} the currently entered states
     """
-    def _enteredStates(self, *l): # [PORT] added *l
-        self.enteredStates = self.rootState.enteredSubstates
+    def enteredStates(self):
+        return self.rootState.enteredSubstates
 
     """
       Checks if a given state is a currently entered state of this statechart.
@@ -539,7 +531,7 @@ class StatechartManager(EventDispatcher):
       
     """
       When called, the statechart will proceed with making state transitions in the statechart starting from 
-      a current state that meet the statechart conditions. When complete, some or all of the statechart's 
+      a current state that meets the statechart conditions. When complete, some or all of the statechart's 
       current states will be changed, and all states that were part of the transition process will either 
       be exited or entered in a specific order.
       
@@ -594,10 +586,8 @@ class StatechartManager(EventDispatcher):
         exitStates = deque()
         enterStates = deque()
         trace = self.allowStatechartTracing
-        rootState = self.rootState
         paramState = state
         paramFromCurrentState = fromCurrentState
-        msg = ''
           
         state = self.getState(state)
           
@@ -624,7 +614,7 @@ class StatechartManager(EventDispatcher):
         if fromCurrentState is not None:
             # Check to make sure the current state given is actually a current state of this statechart
             fromCurrentState = self.getState(fromCurrentState)
-            if fromCurrentState is None or not fromCurrentState.isCurrentState:
+            if fromCurrentState is None or not fromCurrentState.isCurrentState():
                 msg = "Can not to goto state {0}. {1} is not a recognized current state in statechart"
                 self.statechartLogError(msg.format(paramState, paramFromCurrentState))
                 self._gotoStateLocked = False
@@ -634,7 +624,7 @@ class StatechartManager(EventDispatcher):
             # to transition from.
             fromCurrentState = state.findFirstRelativeCurrentState()
             if fromCurrentState is None:
-                fromCurrentState = self.firstCurrentState
+                fromCurrentState = self.currentStates[0] if self.currentStates else None
               
             if trace:
                 self.statechartLogTrace("BEGIN gotoState: {0}".format(state))
@@ -744,10 +734,8 @@ class StatechartManager(EventDispatcher):
           
         #self.beginPropertyChanges()
         #self.notifyPropertyChange('currentStates') # [PORT] notify needed here in kivy?
-        #self.notifyPropertyChange('enteredStates') # [PORT] notify needed here in kivy?
         #self.endPropertyChanges()
         self._currentStates()
-        self._enteredStates()
           
         if self.allowStatechartTracing:
             self.statechartLogTrace("current states after: {0}".format(self.currentStates))
@@ -776,7 +764,8 @@ class StatechartManager(EventDispatcher):
           
         parentState = state;
         while parentState is not None:
-            parentState.enteredSubstates.remove(state)
+            if state in parentState.enteredSubstates:
+                parentState.enteredSubstates.remove(state)
             parentState = parentState.parentState
             
         if self.allowStatechartTracing:
@@ -789,7 +778,7 @@ class StatechartManager(EventDispatcher):
         state.stateDidBecomeExited(context)
           
         if self.monitorIsActive:
-            self.monitor.pushExitedState(state)
+            self.monitor.appendExitedState(state)
           
         state._traverseStatesToExit_skipState = False
           
@@ -811,7 +800,7 @@ class StatechartManager(EventDispatcher):
     def _enterState(self, state, current, context):
         state = self.getState(state) # [PORT] Insure this is an obj and not a string.
         parentState = state.parentState
-        if parentState and not state.isConcurrentState:
+        if parentState and not state.isConcurrentState():
             parentState.historyState = state
           
         if current:
@@ -833,7 +822,7 @@ class StatechartManager(EventDispatcher):
         state.stateDidBecomeEntered(context)
           
         if self.monitorIsActive:
-            self.monitor.pushEnteredState(state)
+            self.monitor.appendEnteredState(state)
           
         return result
         
@@ -950,7 +939,7 @@ class StatechartManager(EventDispatcher):
 
         statechartHandledEvent = False
         eventHandled = False
-        currentStates = self.currentStates[:]
+        currentStatesCopy = self.currentStates[:]
         checkedStates = {}
         state = None
         trace = self.allowStatechartTracing
@@ -972,9 +961,9 @@ class StatechartManager(EventDispatcher):
         if trace:
             self.statechartLogTrace("BEGIN sendEvent: '{0}'".format(event))
           
-        for state in currentStates:
+        for state in currentStatesCopy:
             eventHandled = False
-            if not state.isCurrentState:
+            if not state.isCurrentState():
                 continue
             while not eventHandled and state is not None:
                 if not state.fullPath in checkedStates:
@@ -1072,18 +1061,14 @@ class StatechartManager(EventDispatcher):
         # This state has concurrent substates. Therefore we have to make sure we
         # exit them up to this state before we can go any further up the exit chain.
         if state.substatesAreConcurrent:
-            currentSubstates = state.currentSubstates
-            currentState = None
-            
-            for i in range(len(currentSubstates)):
-                currentState = currentSubstates[i]
+            for currentState in state.currentSubstates:
                 if currentState._traverseStatesToExit_skipState == True:
                     continue
                 chain = self._createStateChain(currentState)
                 self._traverseStatesToExit(chain.popleft() if chain else None, chain, state, gotoStateActions)
           
         gotoStateActions.append({ 'action': EXIT_STATE, 'state': state })
-        if state.isCurrentState:
+        if state.isCurrentState():
             state._traverseStatesToExit_skipState = True
         self._traverseStatesToExit(exitStatePath.popleft() if exitStatePath else None, exitStatePath, stopState, gotoStateActions)
         
@@ -1101,7 +1086,7 @@ class StatechartManager(EventDispatcher):
       @param useHistory {Boolean} indicates whether to recursively follow history states 
     """
     def _traverseStatesToEnter(self, state, enterStatePath, pivotState, useHistory, gotoStateActions):
-        if state is None:
+        if not state:
             return
           
         trace = self.allowStatechartTracing
@@ -1120,7 +1105,7 @@ class StatechartManager(EventDispatcher):
             gotoStateAction = { 'action': ENTER_STATE, 'state': state, 'currentState': False }
             gotoStateActions.append(gotoStateAction)
             
-            initialSubstate = state.initialSubstate if hasattr(state, 'initialSubstate') else None
+            initialSubstateKey = state.initialSubstateKey if hasattr(state, 'initialSubstateKey') else ''
             historyState = state.historySubstate if hasattr(state, 'historySubstate') else None
             
             # State has concurrent substates. Need to enter all of the substates
@@ -1130,18 +1115,17 @@ class StatechartManager(EventDispatcher):
             
             # State has substates and we are instructed to recursively follow the state's
             # history state if it has one.
-            elif stateObj.hasSubstates and historyState and useHistory:
+            elif stateObj.substates > 0 and historyState and useHistory:
                 self._traverseStatesToEnter(historyState, None, None, useHistory, gotoStateActions)
             
             # State has an initial substate to enter
-            elif initialSubstate is not None:
-                initialSubstateObj = self.getState(initialSubstate)
+            elif initialSubstateKey:
+                initialSubstateObj = self.getState(initialSubstateKey)
                 if inspect.isclass(initialSubstateObj) and issubclass(initialSubstateObj, HistoryState):
                     if not useHistory:
                         useHistory = initialSubstateObj.isRecursive
-                    initialSubstate = initialSubstate.state
-                self._traverseStatesToEnter(initialSubstate, None, None, useHistory, gotoStateActions)
-            
+                self._traverseStatesToEnter(initialSubstateObj, None, None, useHistory, gotoStateActions)
+                
             # Looks like we hit the end of the road. Therefore the state has now become
             # a current state of the statechart.
             else:
@@ -1320,9 +1304,9 @@ class StatechartManager(EventDispatcher):
         return self.sendEvent(pending.event, pending.arg1, pending.arg2)
         
     """ @private """
-    def _monitorIsActiveDidChange(self):
+    def _monitorIsActiveDidChange(self, *l):
         if self.monitorIsActive and self.monitor is None:
-            self.monitor = StatechartMonitor()
+            self.monitor = StatechartMonitor(self)
         
     """ @private 
         
@@ -1331,29 +1315,24 @@ class StatechartManager(EventDispatcher):
       root state to be successfully built, the following much be met:
           
        - The rootStateExample property must be defined with a class that derives from State
-       - Either the initialState or statesAreConcurrent property must be set, but not both
+       - Either the initialStateKey or statesAreConcurrent property must be set, but not both
        - There must be one or more states that can be added to the root state
             
     """
     def _constructRootStateClass(self):
-        rsExample = self.rootStateExample
-        initialState = self.initialState
-        statesAreConcurrent = self.statesAreConcurrent
         stateCount = 0
         attrs = {}
           
-        # [PORT] Check for rsExample.plugin removed here, because in Kivy, rsExample will be a class.
-
-        if inspect.isclass(rsExample) and not issubclass(rsExample, State): # [PORT] or issubclass?
+        if inspect.isclass(self.rootStateExample) and not issubclass(self.rootStateExample, State):
             self._logStatechartCreationError("Invalid root state example")
             return None
           
-        if statesAreConcurrent and initialState: # [PORT] initialState was checked with SC.empty, which checks for null, undefined, and empty string
+        if self.statesAreConcurrent and self.initialStateKey:
             self._logStatechartCreationError("Can not assign an initial state when states are concurrent")
-        elif statesAreConcurrent:
+        elif self.statesAreConcurrent:
             attrs['substatesAreConcurrent'] = True
-        elif isinstance(initialState, basestring):
-            attrs['initialSubstate'] = initialState
+        elif self.initialStateKey:
+            attrs['initialSubstateKey'] = self.initialStateKey
         else:
             self._logStatechartCreationError("Must either define initial state or assign states as concurrent")
             return None
@@ -1378,7 +1357,7 @@ class StatechartManager(EventDispatcher):
             
             #if isinstance(value, State) and inspect.isclass(value) and self[key] is not self.__init__:
             if inspect.isclass(value) and issubclass(value, State): # [PORT] Compare to same usage in state.py. Same here?
-                if key != 'initialState': # [PORT] Don't set this. rootState will only have initialSubstate, not initialState.
+                if key != 'initialStateKey': # [PORT] Don't set this. rootState will only have initialSubstateKey, not initialStateKey.
                     attrs[key] = value
                 stateCount += 1
 
@@ -1388,10 +1367,10 @@ class StatechartManager(EventDispatcher):
           
         # [PORT] Using python type to make a new class...
 
-        if rsExample is None:
+        if self.rootStateExample is None:
             return type("RootState", (State,), attrs)
         else:
-            return type("RootState", (rsExample, ), attrs)
+            return type("RootState", (self.rootStateExample, ), attrs)
 
     """ @private """
     def _logStatechartCreationError(self, msg):

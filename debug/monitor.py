@@ -5,14 +5,16 @@
 # ================================================================================
 
 from kivy.event import EventDispatcher
-from kivy.properties import ListProperty, NumericProperty
+from kivy.properties import ListProperty, NumericProperty, ObjectProperty
+from kivy_statechart.debug.sequence_matcher import StatechartSequenceMatcher
 
 class StatechartMonitor(EventDispatcher):
-    length = NumericProperty(0)
     statechart = ObjectProperty(None)
+    length = NumericProperty(0)
     sequence = ListProperty([])
 
-    def __init__(self, **kwargs):
+    def __init__(self, statechart, **kwargs):
+        self.statechart = statechart
         self.bind(sequence=self._length)
         self.reset();
         super(StatechartMonitor, self).__init__(**kwargs)
@@ -22,17 +24,17 @@ class StatechartMonitor(EventDispatcher):
         self.sequence = []
         #self.propertyDidChange('length') #[PORT]
   
-    def _length(self):
+    def _length(self, *l):
         self.length = len(self.sequence)
   
-    def pushEnteredState(self, state):
+    def appendEnteredState(self, state):
         #self.propertyWillChange('length') #[PORT]
-        self.sequence.push({ action: 'entered', state: state })
+        self.sequence.append({ 'action': 'entered', 'state': state })
         #self.propertyDidChange('length') #[PORT]
   
-    def pushExitedState(self, state):
+    def appendExitedState(self, state):
         #self.propertyWillChange('length') #[PORT]
-        self.sequence.push({ action: 'exited', state: state })
+        self.sequence.append({ 'action': 'exited', 'state': state })
         #self.propertyDidChange('length') #[PORT]
   
     def matchSequence(self):
@@ -41,7 +43,7 @@ class StatechartMonitor(EventDispatcher):
     # [PORT] Check how arguments is used in the call. 
     def matchEnteredStates(self, *arguments):
         expected = arguments[0] if len(arguments) == 1 else arguments # [PORT] arguments, in javascript. so *arguments was added here
-        actual = self.statechart.enteredStates
+        actual = self.statechart.enteredStates()
         matched = 0
         statechart = self.statechart
     
@@ -53,7 +55,7 @@ class StatechartMonitor(EventDispatcher):
                 item = statechart.getState(item)
             if item is None:
                 return
-            if statechart.stateIsEntered(item) and item.isEnteredState:
+            if statechart.stateIsEntered(item) and item.isEnteredState():
                 matched += 1
     
         return matched == len(actual)

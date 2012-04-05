@@ -83,14 +83,6 @@ class State(EventDispatcher):
     """
     location = StringProperty(None) # [TODO] marked as idempotent in js
 
-    isRootState = BooleanProperty(False)
-    isCurrentState = BooleanProperty(False)
-    isConcurrentState = BooleanProperty(False)
-    isEnteredState = BooleanProperty(False)
-    hasSubstates = BooleanProperty(False)
-    hasCurrentSubstates = BooleanProperty(False)
-    hasEnteredSubstates = BooleanProperty(False)
-
     fullPath = StringProperty(None)
 
     """
@@ -130,7 +122,7 @@ class State(EventDispatcher):
       
       @property {String|State}
     """
-    initialSubstate = StringProperty(None) # [PORT] In python version, make this always a string.
+    initialSubstateKey = ''
 
     """
       Used to indicates if this state's immediate substates are to be
@@ -145,7 +137,7 @@ class State(EventDispatcher):
       
       @property {Array}
     """
-    substates = ListProperty([])
+    substates = []
 
     """
       The statechart that this state belongs to. Assigned by the owning
@@ -167,7 +159,7 @@ class State(EventDispatcher):
       
       @propety {Array}
     """
-    currentSubstates = ListProperty([])
+    currentSubstates = []
 
     """ 
       An array of this state's substates that are currently entered. Managed by
@@ -175,7 +167,7 @@ class State(EventDispatcher):
       
       @property {Array}
     """
-    enteredSubstates = ListProperty([])
+    enteredSubstates = []
 
     """
       Can optionally assign what route this state is to represent. 
@@ -196,17 +188,24 @@ class State(EventDispatcher):
     """
     representRoute = StringProperty(None)
 
+    #isRootState = BooleanProperty(False)
+    #isCurrentState = BooleanProperty(False)
+    #isConcurrentState = BooleanProperty(False)
+    #isEnteredState = BooleanProperty(False)
+    #hasCurrentSubstates = BooleanProperty(False)
+    #hasEnteredSubstates = BooleanProperty(False)
+
     def __init__(self, **kwargs):
-        self.bind(currentSubstates=self._isCurrentState)
-        self.bind(enteredSubstates=self._isEnteredState)
-        self.bind(substates=self._hasSubstates)
-        self.bind(currentSubstates=self._hasCurrentSubstates)
-        self.bind(enteredSubstates=self._hasEnteredSubstates)
+        #self.bind(currentSubstates=self._isCurrentState)
+        #self.bind(enteredSubstates=self._isEnteredState)
+        #self.bind(currentSubstates=self._hasCurrentSubstates)
+        #self.bind(enteredSubstates=self._hasEnteredSubstates)
+        #self.bind(enteredSubstates=self._enteredSubstatesDidChange) # [PORT] .observes("*enteredSubstates.[]")
+        #self.bind(currentSubstates=self._currentSubstatesDidChange) # [PORT] .observes("*currentSubstates.[]")
+
         self.bind(name=self._fullPath)
         self.bind(parentState=self._fullPath)
-        self.bind(parentState=self._isConcurrentState)
-        self.bind(enteredSubstates=self._enteredSubstatesDidChange) # [PORT] .observes("*enteredSubstates.[]")
-        self.bind(currentSubstates=self._currentSubstatesDidChange) # [PORT] .observes("*currentSubstates.[]")
+        #self.bind(parentState=self._isConcurrentState) # [PORT] Why is this commented out?
 
         self.bind(statechart=self._trace)
         self.bind(statechart=self._owner)
@@ -237,15 +236,15 @@ class State(EventDispatcher):
             self.bind(traceKey=self._statechartTraceDidChange)
 
         for k,v in kwargs.items():
-            if k == 'initialSubstate':
-                # [PORT] Force initialSubstate to always be string.
+            if k == 'initialSubstateKey':
+                # [PORT] Force initialSubstateKey to always be string.
                 if isinstance(v, basestring):
-                    self.initialSubstate = v
+                    self.initialSubstateKey = v
                 else:
                     name = v.name if hasattr(v, 'name') else None
                     if not name:
                         name = v.__name__ if hasattr(v, '__name__') else None
-                    self.initialSubstate = name if name else None
+                    self.initialSubstateKey = name if name else None
             else:
                 setattr(self, k, v)
 
@@ -299,7 +298,7 @@ class State(EventDispatcher):
         self.enteredSubstates = None
         self.parentState = None
         self.historyState = None
-        self.initialSubstate = None
+        self.initialSubstateKey = ''
         self.statechart = None
     
         #self.notifyPropertyChange("trace") # [PORT] Use kivy's dispatch?
@@ -326,24 +325,22 @@ class State(EventDispatcher):
     
         substates = []
         matchedInitialSubstate = False
-        initialSubstateName = self.initialSubstate # [PORT] Can come in as str or class in javascript version. Here, only as str.
         valueIsMethod = False
         historyState = None
     
         self.substates = substates
     
-        if initialSubstateName is not None:
-            initialSubstate = getattr(self, initialSubstateName) if hasattr(self, initialSubstateName) else None
-
+        if self.initialSubstateKey:
+            initialSubstate = self.getSubstate(self.initialSubstateKey)
             from kivy_statechart.system.history_state import HistoryState
-            if initialSubstate and inspect.isclass(initialSubstate) and isinstance(initialSubstate, HistoryState):
-                historyState = self.createSubstate(initialSubstateName)
+            if initialSubstate is not None and issubclass(initialSubstate, HistoryState):
+                historyState = self.createSubstate(self.initialSubstateKey)
           
-                #self.initialSubstate = historyState.__name__ # [PORT] No need, after treating initialState as string.
+                self.initialSubstateKey = historyState.name
           
-                if historyState.defaultState is None:
+                if not historyState.defaultState:
                     self.stateLogError("Initial substate is invalid. History state requires the name of a default state to be set")
-                    self.initialSubstate = None
+                    self.initialSubstateKey = ''
                     historyState = None
     
         # Iterate through all this state's substates, if any, create them, and then initialize
@@ -371,33 +368,37 @@ class State(EventDispatcher):
             #if inspect.isclass(value) and issubclass(value, State) and getattr(self, key) is not self.__init__: # [PORT] using inspect
             if inspect.isclass(value) and issubclass(value, State):
                 state = self._addSubstate(key, value, None)
-                if key == self.initialSubstate:
-                    self.initialSubstate = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
+                if key == self.initialSubstateKey:
+                    self.initialSubstateKey = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
                     matchedInitialSubstate = True
                 elif historyState and historyState.defaultState == key:
                     historyState.defaultState = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
                     matchedInitialSubstate = True
 
-            if self.initialSubstate is not None and not matchedInitialSubstate:
-                msg = "Unable to set initial substate {0} since it did not match any of state's {1} substates"
-                self.stateLogError(msg.format(self.initialSubstate, self))
+        if self.initialSubstateKey and not matchedInitialSubstate:
+            msg = "Unable to set initial substate {0} since it did not match any of state {1}'s substates"
+            self.stateLogError(msg.format(self.initialSubstateKey, self))
 
-            if len(self.substates) == 0:
-                if self.initialSubstate is not None:
-                    msg = "Unable to make {0} an initial substate since state {1} has no substates"
-                    self.stateLogWarning(msg.format(self.initialSubstate, self))
-            elif len(self.substates) > 0:
-                  state = self._addEmptyInitialSubstateIfNeeded()
-                  if state is None and self.initialSubstate is not None and self.substatesAreConcurrent:
-                        self.initialSubstate = None
-                        msg = "Can not use {0} as initial substate since substates are all concurrent for state {1}"
-                        self.stateLogWarning(msg.format(self.initialSubstate, self))
+        if len(self.substates) == 0:
+            if self.initialSubstateKey:
+                msg = "Unable to make {0} an initial substate since state {1} has no substates"
+                self.stateLogWarning(msg.format(self.initialSubstateKey, self))
+        elif len(self.substates) > 0:
+              state = self._addEmptyInitialSubstateIfNeeded()
+              if state is None and self.initialSubstateKey and self.substatesAreConcurrent:
+                    self.initialSubstateKey = ''
+                    msg = "Can not use {0} as initial substate since substates are all concurrent for state {1}"
+                    self.stateLogWarning(msg.format(self.initialSubstateKey, self))
 
-            #self.notifyPropertyChange("substates")
+        #self.notifyPropertyChange("substates")
+        # [PORT] substates have changed. Call _currentStates on statechart, which is bound to rootState,
+        #        and updates self.currentStates = self.rootState.substates. That binding won't fire if 
+        #        rootState.substates changes, so we manually call it in kivy.
+        self.statechart._currentStates()
 
-            self.currentSubstates = []
-            self.enteredSubstates = []
-            self.stateIsInitialized = True
+        self.currentSubstates = []
+        self.enteredSubstates = []
+        self.stateIsInitialized = True
 
     """ @private 
     
@@ -419,7 +420,7 @@ class State(EventDispatcher):
         if route is None:
             return
     
-        if self.isConcurrentState:
+        if self.isConcurrentState():
             self.stateLogError("State {0} cannot handle route '{1}' since state is concurrent".format(self, route))
             return
     
@@ -496,15 +497,13 @@ class State(EventDispatcher):
     """ @private """
     def _addEmptyInitialSubstateIfNeeded(self):
         from kivy_statechart.system.empty_state import EmptyState
-        initialSubstate = self.initialSubstate
-        substatesAreConcurrent = self.substatesAreConcurrent
 
-        if initialSubstate is not None or substatesAreConcurrent:
+        if self.initialSubstateKey or self.substatesAreConcurrent:
             return None
 
         state = self.createSubstate(EmptyState)
 
-        self.initialSubstate = state.name
+        self.initialSubstateKey = state.name
 
         self.substates.append(state)
 
@@ -540,7 +539,7 @@ class State(EventDispatcher):
       - If this state does not have any substates, then in addition to the 
         substate being added, an empty state will also be added and set as the 
         initial substate. To make the added substate the initial substate, set
-        this object's initialSubstate property.
+        this object's initialSubstateKey property.
          
       - If this state is a current state, the added substate will not be entered. 
       
@@ -691,7 +690,8 @@ class State(EventDispatcher):
         path = self.name
         parent = self.parentState
 
-        while parent is not None and parent is not state and state != type(self):
+        #while parent is not None and parent is not state and state != type(self):
+        while parent is not None and parent is not state:
             path = "{0}.{1}".format(parent.name, path)
             parent = parent.parentState
 
@@ -748,17 +748,6 @@ class State(EventDispatcher):
             self.stateLogError("Can not find matching subtype. value must be a State class or string: {0}".format(value))
             return None
 
-        # [PORT] value is a string. First try to find a substate with a matching name. [PORT] Added this, since in python version, value is always a str.
-        matchingSubstates = [state for state in self._registeredSubstates if state.name == value]
-        if len(matchingSubstates) > 0:
-            return matchingSubstates[0]
-
-        # [PORT] The matchingSubstate search above assumes that the order of sets to self._registeredSubstates is in root-first order, such that
-        # the first item matched will be the highest level substate with name matching value.
-
-        # [PORT] In testing, it appears that the following search algorithm will match the last, lowest-level ("leaf") matching state, which is
-        # probably not working correctly, hence the need for the matchingSubstates block above.
-
         # Not found yet, so look deeper for a nested substate.
         matcher = StatePathMatcher(state=self, expression=value)
         matches = []
@@ -781,6 +770,8 @@ class State(EventDispatcher):
         if len(matches) > 1:
             matchedPaths = []
             for path in paths:
+                if path == value: # [PORT] Added this. Perhaps the matcher should return only the exact match, if it exists.
+                    return paths[path]
                 matchedPaths.append(path)
 
             if callback is not None:
@@ -850,9 +841,9 @@ class State(EventDispatcher):
         state = self.getState(value)
 
         if state is None:
-           msg = "can not go to state {0} from state {1}. Invalid value."
-           self.stateLogError(msg.format(value, self))
-           return
+            msg = "can not go to state {0} from state {1}. Invalid value."
+            self.stateLogError(msg.format(value, self))
+            return
 
         fromState = self.findFirstRelativeCurrentState(state)
 
@@ -910,10 +901,16 @@ class State(EventDispatcher):
       @returns {Boolean} true is the given state is a current substate, otherwise False is returned
     """
     def stateIsCurrentSubstate(self, state=None):
+        stateObj = None
         if isinstance(state, basestring):
-            state = self.statechart.getState(state)
+            stateObj = self.statechart.getState(state)
+        else:
+            stateObj = state
 
-        return True if state in self.currentSubstates else False
+        if not stateObj:
+            return False
+
+        return True if stateObj in self.currentSubstates else False
 
     """
       Used to check if a given state is a current substate of this state. Mainly used in cases
@@ -923,34 +920,40 @@ class State(EventDispatcher):
       @returns {Boolean} true is the given state is a current substate, otherwise False is returned
     """
     def stateIsEnteredSubstate(self, state=None):
+        stateObj = None
         if isinstance(state, basestring):
-            state = self.statechart.getState(state)
+            stateObj = self.statechart.getState(state)
+        else:
+            stateObj = state
 
-        return True if state in self.enteredSubstates else False
+        if not stateObj:
+            return False
+
+        return True if stateObj in self.enteredSubstates else False
 
     """
       Indicates if this state is the root state of the statechart.
       
       @property {Boolean}
     """
-    def _isRootState(self, *l):
-        self.isRootState = True if self.statechart.rootState is self else False
+    def isRootState(self):
+        return True if self.statechart.rootState is self else False
 
     """
       Indicates if this state is a current state of the statechart.
       
       @property {Boolean} 
     """
-    def _isCurrentState(self, *l):
-        self.isCurrentState = True if self.stateIsCurrentSubstate(self) else False
+    def isCurrentState(self):
+        return True if self.stateIsCurrentSubstate(self) else False
 
     """
       Indicates if this state is a concurrent state
       
       @property {Boolean}
     """
-    def _isConcurrentState(self, *l):
-        self.isConcurrentState = True if self.parentState.substatesAreConcurrent else False
+    def isConcurrentState(self):
+        return True if self.parentState.substatesAreConcurrent else False
 
     """
       Indicates if this state is a currently entered state. 
@@ -959,28 +962,8 @@ class State(EventDispatcher):
       state's enterState method was invoked, but only after its exitState method 
       was called, if at all.
     """
-    def _isEnteredState(self, *l):
-        self.isEnteredState = True if self.stateIsEnteredSubstate(self) else False
-
-    """
-      Indicate if this state has any substates
-      
-      @propety {Boolean}
-    """
-    def _hasSubstates(self, *l): # [PORT] Added *l when error said 3 args coming in here. What are args for bound callback in kivy?
-        self.hasSubstates = True if len(self.substates) > 0 else False
-
-    """
-      Indicates if this state has any current substates
-    """
-    def _hasCurrentSubstates(self, *l):
-        self.hasCurrentSubstates = True if self.currentSubstates and len(self.currentSubstates) > 0 else False
-
-    """
-      Indicates if this state has any currently entered substates
-    """
-    def _hasEnteredSubstates(self, *l):
-        self.hasEnteredSubstates = True if self.currentSubstates and len(self.currentSubstates) > 0 else False
+    def isEnteredState(self):
+        return True if self.stateIsEnteredSubstate(self) else False
 
     """
       Will attempt to find a current state in the statechart that is relative to 
@@ -1005,29 +988,25 @@ class State(EventDispatcher):
       @return {State} a current state
     """
     def findFirstRelativeCurrentState(self, anchor=None):
-        if self.isCurrentState:
+        if self.isCurrentState():
             return self
 
-        currentSubstates = self.currentSubstates or []
-        numCurrent = len(currentSubstates)
-        parent = self.parentState
+        if not self.currentSubstates:
+            return self.parentState.findFirstRelativeCurrentState() if self.parentState is not None else None
 
-        if numCurrent == 0:
-            return parent.findFirstRelativeCurrentState() if parent is not None else None
-
-        if numCurrent > 1:
+        if len(self.currentSubstates) > 1:
             anchor = self.getSubstate(anchor)
             if anchor is not None:
                 return anchor.findFirstRelativeCurrentState()
 
-        return currentSubstates[0]
+        return self.currentSubstates[0]
 
     """
       Used to re-enter this state. Call this only when the state a current state of
       the statechart.  
     """
     def reenter(self):
-        if self.isEnteredState:
+        if self.isEnteredState():
             self.gotoState(self)
         else:
             Logger.error("Can not re-enter state {0} since it is not an entered state in the statechart".format(self))

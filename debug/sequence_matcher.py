@@ -23,7 +23,7 @@ class StatechartSequenceMatcher:
             raise "can not match sequence. sequence matcher has been left in an invalid state"
     
         monitor = self.statechartMonitor
-        result = self._matchSequence(self._start, 0) == length(monitor.sequence)
+        result = self._matchSequence(self._start, 0) == len(monitor.sequence)
 
         self.match = result
     
@@ -33,15 +33,15 @@ class StatechartSequenceMatcher:
         self._addStatesToCurrentGroup('entered', arguments) # [PORT] js arguments, so *arguments added here
         return self
   
-    def exited(self):
+    def exited(self, *arguments):
         self._addStatesToCurrentGroup('exited', arguments)
         return self
   
     def beginConcurrent(self):
-        group = { type: 'concurrent', values: [] }
+        group = { 'tokenType': 'concurrent', 'values': [] }
 
         if self._peek():
-            self._peek().values.append(group)
+            self._peek()['values'].append(group)
 
         self._stack.append(group)
 
@@ -52,10 +52,10 @@ class StatechartSequenceMatcher:
         return self
   
     def beginSequence(self):
-        group = { type: 'sequence', values: [] }
+        group = { 'tokenType': 'sequence', 'values': [] }
 
         if self._peek():
-            self._peek().values.append(group)
+            self._peek()['values'].append(group)
         self._stack.append(group)
         return self
   
@@ -64,18 +64,17 @@ class StatechartSequenceMatcher:
         return self
   
     def _peek(self):
-        return None if len(self._stack) == 0 else self._stack[len(self._stack)-1]
+        return None if len(self._stack) == 0 else self._stack[-1]
   
     def _addStatesToCurrentGroup(self, action, states):
         group = self._peek()
 
-        for i in range(len(states)):
-            group.values.append({ action: action, state: states[i] })
+        for state in states:
+            group['values'].append({ 'action': action, 'state': state })
   
     def _matchSequence(self, sequence, marker):
-        values = sequence.values
+        values = sequence['values']
         numberOfValues = len(values)
-        val = ''
         monitor = self.statechartMonitor
         
         if numberOfValues == 0:
@@ -84,13 +83,13 @@ class StatechartSequenceMatcher:
         if marker > len(monitor.sequence):
             return self.MISMATCH
         
-        for i in range(numberOfValues):
-            val = values[i]
-      
-            if val.tokenType == 'sequence':
-                marker = self._matchSequence(val, marker)
-            elif val.tokenType == 'concurrent':
-                marker = self._matchConcurrent(val, marker)
+        # values contains a mix of groups (tokenType/values) and items (action/state).
+        for val in values:
+            if hasattr(val, 'tokenType'):
+                if val['tokenType'] == 'sequence':
+                    marker = self._matchSequence(val, marker)
+                elif val['tokenType'] == 'concurrent':
+                    marker = self._matchConcurrent(val, marker)
             elif not self._matchItems(val, monitor.sequence[marker]):
                 return self.MISMATCH
             else:
@@ -118,9 +117,8 @@ class StatechartSequenceMatcher:
     # A B (Y O P) (X M N) C
   
     def _matchConcurrent(self, concurrent, marker):
-        values = concurrent.values[:]
+        values = concurrent['values'][:]
         numberOfValues = len(values)
-        val = ''
         tempMarker = marker
         match = false
         monitor = self.statechartMonitor
@@ -132,12 +130,10 @@ class StatechartSequenceMatcher:
             return self.MISMATCH
     
         while len(values) > 0:
-            for i in range(numberOfValues):
-                val = values[i]
-      
-                if val.tokenType == 'sequence':
+            for val in values:
+                if val['tokenType'] == 'sequence':
                     tempMarker = self._matchSequence(val, marker)
-                elif val.tokenType == 'concurrent':
+                elif val['tokenType'] == 'concurrent':
                     tempMarker = self._matchConcurrent(val, marker)
                 elif not self._matchItems(val, monitor.sequence[marker]):
                     tempMarker = self.MISMATCH
@@ -150,7 +146,7 @@ class StatechartSequenceMatcher:
                 if tempMarker == self.MISMATCH:
                     return self.MISMATCH
 
-                del values[i] # [PORT] was removeAt
+                del val
               
                 marker = tempMarker
     
@@ -160,13 +156,13 @@ class StatechartSequenceMatcher:
         if matcherItem is None or monitorItem is None:
             return False
   
-        if matcherItem.action is not monitorItem.action:
+        if matcherItem['action'] is not monitorItem['action']:
             return False
     
-        if isintance(matcherItem.state, Object) and matcherItem.state is monitorItem.state:
+        if isinstance(matcherItem['state'], object) and matcherItem['state'] is monitorItem['state']:
             return True
     
-        if matcherItem.state == monitorItem.state.name: # [PORT] This compares state to a state.name -- ok?
+        if matcherItem['state'] == monitorItem['state'].name: # [PORT] This compares state to a state.name -- ok?
             return True
   
         return False

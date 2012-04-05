@@ -19,8 +19,7 @@ class A(State):
         super(A, self).__init__(**kwargs)
 
     def foo(self, *l):
-        print 'foo called, trying to goto B'
-        self.statechart.gotoState('B') # [PORT] self.gotoState should work...
+        self.statechart.gotoState('B')
 
 class B(State):
     def __init__(self, **kwargs):
@@ -28,30 +27,29 @@ class B(State):
         super(B, self).__init__(**kwargs)
 
     def bar(self, *l):
-        print 'bar called, trying to goto A'
         self.statechart.gotoState('A')
 
 class RootState(State):
     def __init__(self, **kwargs):
-        self.initialSubstate = 'A'
+        kwargs['initialSubstateKey'] = 'A'
+        kwargs['A'] = A
+        kwargs['B'] = B
         super(RootState, self).__init__(**kwargs)
-    
-    A = A
-    B = B
 
 class Statechart_1(StatechartManager):
-    def __init__(self, app, **kw):
-        self.app = app
-        self.trace = True
-        self.rootState = RootState
-        super(Statechart_1, self).__init__(**kw)
+    def __init__(self, app, **kwargs):
+        kwargs['app'] = app
+        kwargs['trace'] = True
+        kwargs['rootState'] = RootState
+        super(Statechart_1, self).__init__(**kwargs)
 
+# [PORT] skipping this possibility.
 class Statechart_2(StatechartManager):
-    def __init__(self, **kw):
-        self.trace = True
-        self.autoInitStatechart = False
-        self.rootState = State
-        super(Statechart_2, self).__init__(**kw)
+    def __init__(self, **kwargs):
+        kwargs['trace'] = True
+        kwargs['autoInitStatechart'] = False
+        kwargs['rootState'] = State
+        super(Statechart_2, self).__init__(**kwargs)
 
 class TestApp(App):
     pass
@@ -64,17 +62,19 @@ class StatechartTestCase(unittest.TestCase):
         app = TestApp()
         statechart_1 = Statechart_1(app)
         app.statechart = statechart_1
-        statechart_2 = Statechart_2()
+
+        # [PORT] skipping this possibility.
+        #statechart_2 = Statechart_2()
 
     def test_init_with_assigned_root_state(self):
         self.assertTrue(app.statechart.isStatechart)
         self.assertTrue(app.statechart.statechartIsInitialized)
         self.assertEqual(app.statechart.rootState.name, '__ROOT_STATE__')
         self.assertTrue(isinstance(app.statechart.rootState, State))
-        self.assertEqual(app.statechart.initialState, None)
+        self.assertEqual(app.statechart.initialStateKey, '')
 
-        self.assertTrue(app.statechart.getState('A').isCurrentState)
-        self.assertFalse(app.statechart.getState('B').isCurrentState)
+        self.assertTrue(app.statechart.getState('A').isCurrentState())
+        self.assertFalse(app.statechart.getState('B').isCurrentState())
 
         # [PORT] Except for the cross-object observing bit (commented out), owner is not set. Even with it, it seems.
         #self.assertEqual(app.statechart.rootState.owner, app.statechart)
@@ -83,12 +83,13 @@ class StatechartTestCase(unittest.TestCase):
 
         app.statechart.sendEvent('foo')
 
-        self.assertFalse(app.statechart.getState('A').isCurrentState)
-        self.assertTrue(app.statechart.getState('B').isCurrentState)
+        self.assertFalse(app.statechart.getState('A').isCurrentState())
+        self.assertTrue(app.statechart.getState('B').isCurrentState())
 
-        self.assertTrue(statechart_2.isStatechart)
-        self.assertFalse(statechart_2.statechartIsInitialized)
+        # [PORT] skipping this possibility.
+        #self.assertTrue(statechart_2.isStatechart)
+        #self.assertFalse(statechart_2.statechartIsInitialized)
 
-        statechart_2.initStatechart()
+        #statechart_2.initStatechart()
 
-        self.assertTrue(statechart_2.statechartIsInitialized)
+        #self.assertTrue(statechart_2.statechartIsInitialized)

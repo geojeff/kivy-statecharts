@@ -43,7 +43,7 @@ class TestState(State):
       
 class RootStateExample_1(TestState):
     def __init__(self, **kwargs):
-        self.initialSubstate = 'A'
+        kwargs['initialSubstateKey'] = 'A'
         super(RootStateExample_1, self).__init__(**kwargs)
 
     def testX(self, *args):
@@ -64,7 +64,7 @@ class RootStateExample_1(TestState):
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['initialState'] = 'A'
+        kwargs['initialStateKey'] = 'A'
         kwargs['rootStateExample'] = RootStateExample_1
         kwargs['A'] = self.A
         kwargs['B'] = self.B
@@ -80,7 +80,7 @@ class Statechart_1(StatechartManager):
 
 class RootStateExample_2(TestState):
     def __init__(self, **kwargs):
-        self.substatesAreConcurrent = True
+        kwargs['substatesAreConcurrent'] = True
         super(RootStateExample_2, self).__init__(**kwargs)
 
     def testX(self, *args):
@@ -203,7 +203,7 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
     def test_invoke_method_test_state_B_two_args_return_statechart_1(self):
         setattr(state_B, 'returnValue', 100)
         statechart_1.gotoState('B')
-        self.assertTrue(state_B.isCurrentState)
+        self.assertTrue(state_B.isCurrentState())
         result = statechart_1.invokeStateMethod('test', 'frozen', 'canuck')
         self.assertFalse(state_A.testInvoked)
         self.assertEqual(state_B.testInvokedCount, 1)

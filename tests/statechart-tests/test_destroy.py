@@ -23,9 +23,9 @@ class B(State):
     pass
 
 class Statechart_1(StatechartManager):
-    def __init__(self):
-        self.initialState = 'A'
-        super(Statechart_1, self).__init__()
+    def __init__(self, **kwargs):
+        kwargs['initialStateKey'] = 'A'
+        super(Statechart_1, self).__init__(**kwargs)
 
     A = A
     B = B
@@ -54,7 +54,7 @@ class StatechartDestroyTestCase(unittest.TestCase):
         self.assertEqual(len(rootState_1.substates), 2)
         self.assertEqual(len(rootState_1.currentSubstates), 1)
         self.assertEqual(rootState_1.historyState, statechart_1.getState('A'))
-        self.assertEqual(rootState_1.initialSubstate, 'A')
+        self.assertEqual(rootState_1.initialSubstateKey, 'A')
         self.assertEqual(rootState_1.statechart, statechart_1)
         self.assertEqual(rootState_1.owner, statechart_1)
         
@@ -77,7 +77,7 @@ class StatechartDestroyTestCase(unittest.TestCase):
         #self.assertEqual(rootState_1.substates, None)
         #self.assertEqual(rootState_1.currentSubstates, None)
         #self.assertEqual(rootState_1.historyState, None)
-        #self.assertEqual(rootState_1.initialSubstate, None)
+        #self.assertEqual(rootState_1.initialSubstateKey, None)
         #self.assertEqual(rootState_1.statechart, None)
         #self.assertEqual(rootState_1.owner, None)
         

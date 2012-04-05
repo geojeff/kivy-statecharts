@@ -16,22 +16,22 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        self.rootState = self.RootState
+        kwargs['rootState'] = self.RootState
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            self.initialSubstate = 'A'
+            kwargs['initialSubstateKey'] = 'A'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
         class A(State):
             def __init__(self, **kwargs):
-                self.value = 'state A'
+                kwargs['value'] = 'state A'
                 super(Statechart_1.RootState.A, self).__init__(**kwargs)
 
         class B(State):
             def __init__(self, **kwargs):
-                self.value = 'state B'
+                kwargs['value'] = 'state B'
                 super(Statechart_1.RootState.B, self).__init__(**kwargs)
 
 class Statechart_2(StatechartManager):
@@ -41,39 +41,39 @@ class Statechart_2(StatechartManager):
 
     class RootState(State):
         def __init__(self, **kwargs):
-            self.initialSubstate = 'A'
+            self.initialSubstateKey = 'A'
             super(Statechart_2.RootState, self).__init__(**kwargs)
 
         class A(State):
             def __init__(self, **kwargs):
-                self.value = 'state A'
-                self.initialSubstate = 'C'
+                kwargs['value'] = 'state A'
+                self.initialSubstateKey = 'C'
                 super(Statechart_2.RootState.A, self).__init__(**kwargs)
 
             class C(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state C'
+                    kwargs['value'] = 'state C'
                     super(Statechart_2.RootState.A.C, self).__init__(**kwargs)
 
             class D(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state D'
+                    kwargs['value'] = 'state D'
                     super(Statechart_2.RootState.A.D, self).__init__(**kwargs)
 
         class B(State):
             def __init__(self, **kwargs):
-                self.value = 'state B'
-                self.initialSubstate = 'E'
+                kwargs['value'] = 'state B'
+                self.initialSubstateKey = 'E'
                 super(Statechart_2.RootState.B, self).__init__(**kwargs)
 
             class E(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state E'
+                    kwargs['value'] = 'state E'
                     super(Statechart_2.RootState.B.E, self).__init__(**kwargs)
 
             class F(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state F'
+                    kwargs['value'] = 'state F'
                     super(Statechart_2.RootState.B.F, self).__init__(**kwargs)
 
 class Statechart_3(StatechartManager):
@@ -83,39 +83,39 @@ class Statechart_3(StatechartManager):
 
     class RootState(State):
         def __init__(self, **kwargs):
-            self.initialSubstate = 'A'
+            kwargs['initialSubstateKey'] = 'A'
             super(Statechart_3.RootState, self).__init__(**kwargs)
 
         class A(State):
             def __init__(self, **kwargs):
-                self.value = 'state A'
+                kwargs['value'] = 'state A'
                 super(Statechart_3.RootState.A, self).__init__(**kwargs)
 
         class B(State):
             def __init__(self, **kwargs):
-                self.value = 'state B'
-                self.initialSubstate = 'A'
+                kwargs['value'] = 'state B'
+                self.initialSubstateKey = 'A'
                 super(Statechart_3.RootState.B, self).__init__(**kwargs)
 
             class A(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state B.A'
+                    kwargs['value'] = 'state B.A'
                     super(Statechart_3.RootState.B.A, self).__init__(**kwargs)
     
             class C(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state C'
-                    self.initialSubstate = 'A'
+                    kwargs['value'] = 'state C'
+                    self.initialSubstateKey = 'A'
                     super(Statechart_3.RootState.B.C, self).__init__(**kwargs)
 
                 class A(State):
                     def __init__(self, **kwargs):
-                        self.value = 'state B.C.A'
+                        kwargs['value'] = 'state B.C.A'
                         super(Statechart_3.RootState.B.C.A, self).__init__(**kwargs)
 
                 class D(State):
                     def __init__(self, **kwargs):
-                        self.value = 'state D'
+                        kwargs['value'] = 'state D'
                         super(Statechart_3.RootState.B.C.D, self).__init__(**kwargs)
 
 class Statechart_4(StatechartManager):
@@ -125,39 +125,39 @@ class Statechart_4(StatechartManager):
 
     class RootState(State):
         def __init__(self, **kwargs):
-            self.initialSubstate = 'A'
+            self.initialSubstateKey = 'A'
             super(Statechart_4.RootState, self).__init__(**kwargs)
 
         class A(State):
             def __init__(self, **kwargs):
-                self.value = 'state A'
-                self.initialSubstate = 'X'
+                kwargs['value'] = 'state A'
+                self.initialSubstateKey = 'X'
                 super(Statechart_4.RootState.A, self).__init__(**kwargs)
 
             class X(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state A.X'
+                    kwargs['value'] = 'state A.X'
                     super(Statechart_4.RootState.A.X, self).__init__(**kwargs)
     
             class Y(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state A.Y'
+                    kwargs['value'] = 'state A.Y'
                     super(Statechart_4.RootState.A.Y, self).__init__(**kwargs)
 
         class B(State):
             def __init__(self, **kwargs):
-                self.value = 'state B'
-                self.initialSubstate = 'X'
+                kwargs['value'] = 'state B'
+                self.initialSubstateKey = 'X'
                 super(Statechart_4.RootState.B, self).__init__(**kwargs)
 
             class X(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state B.X'
+                    kwargs['value'] = 'state B.X'
                     super(Statechart_4.RootState.B.X, self).__init__(**kwargs)
     
             class Y(State):
                 def __init__(self, **kwargs):
-                    self.value = 'state B.Y'
+                    kwargs['value'] = 'state B.Y'
                     super(Statechart_4.RootState.B.Y, self).__init__(**kwargs)
 
 class StatechartGetStateTestCase(unittest.TestCase):
@@ -273,10 +273,10 @@ class StatechartGetStateTestCase(unittest.TestCase):
   
         print 'expecting to get an error message...'
         state = statechart_4.getState('X')
-        self.assertIsNotNone(state) # [PORT] Forced as IsNotNone, when should be IsNone. Must fix getState, etc.
+        self.assertIsNone(state)
   
         print 'expecting to get an error message...'
         state = statechart_4.getState('Y')
-        self.assertIsNotNone(state) # [PORT] Forced as IsNotNone, when should be IsNone. Must fix getState, etc.
+        self.assertIsNone(state)
 
 
