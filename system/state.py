@@ -559,7 +559,7 @@ class State(EventDispatcher):
       @param {Hash} [attr] liternal to be applied to the substate
       @returns {State} an instance of the given state class
     """
-    def addSubstate(self, name, state, attr):
+    def addSubstate(self, name, state=None, attr={}):
         if not name: # [PORT] this used the empty(name) function.
             self.stateLogError("Can not add substate. name required")
             return None
@@ -572,15 +572,13 @@ class State(EventDispatcher):
             self.stateLogError("Can not add substate '{0}'. this state is not yet initialized".format(name))
             return None
 
-        numberOfArguments = len(arguments)
-
-        if numberOfArguments == 1:
+        if state is None:
             state = State
-        elif numberOfArguments == 2 and isinstance(state, dict):
+        elif state is not None and isinstance(state, dict):
             attr = state
             state = State
 
-        stateIsValid = issubclass(state, State) and inspect.isclass(state)
+        stateIsValid = inspect.isclass(state) and issubclass(state, State)
 
         if not stateIsValid:
             self.stateLogError("Can not add substate '{0}'. must provide a state class".format(name))
@@ -590,7 +588,8 @@ class State(EventDispatcher):
 
         self._addEmptyInitialSubstateIfNeeded()
 
-        self.dispatch('substates')
+        # [PORT] Should there be a manual update call here?
+        #self.dispatch('substates')
         #self.notifyPropertyChange("substates")
 
         return state
