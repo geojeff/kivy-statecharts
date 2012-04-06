@@ -741,6 +741,7 @@ class State(EventDispatcher):
         # If the value is an object then just check if the value is 
         # a registered substate of this state, and if so return it. 
         if not isinstance(value, basestring): # [PORT] if not a string, is an object
+            print 'srs', self._registeredSubstates
             return value if value in self._registeredSubstates else None
 
         if not isinstance(value, basestring):
@@ -754,6 +755,7 @@ class State(EventDispatcher):
             return None
 
         # Grab the paths associated with this state name.
+        print 'srsp', self, self._registeredSubstatePaths
         paths = self._registeredSubstatePaths[matcher.lastPart] if matcher.lastPart in self._registeredSubstatePaths else None
 
         if paths is None:
@@ -803,13 +805,23 @@ class State(EventDispatcher):
       For path expression syntax, refer to the {@link StatePathMatcher} class.
     """
     def getState(self, value):
-        if value == self.name:
+        if value == self.name or value == self: # [PORT] Added the second part. See get_state tests.
             return self
 
+        # [PORT] This doesn't make sense. It is like a protection for a wrong call.
         if inspect.isclass(value) and issubclass(value, State):
             return value
 
-        self.getSubstate(value, self._handleSubstateNotFound)
+        # [PORT] Added this call to self.statechart.getState, and the conditional following. The original
+        #        javascript test only had the last line, but there is a difference in the way getState in
+        #        state.py and in statechart.py work in the python port. Tests pass if this call is punted
+        #        up to the statechart.
+        state = self.statechart.getState(value)
+
+        if state is not None:
+            return state
+        else:
+            return self.getSubstate(value, self._handleSubstateNotFound)
 
     """ @private """
     def _handleSubstateNotFound(self, state, value, keys=None):
@@ -820,7 +832,7 @@ class State(EventDispatcher):
 
         if keys is not None:
             msg = "Can not find state matching '{0}'. Ambiguous with the following: {1}"
-            self.stateLogError(msg.format(value, keys.join(", ")))
+            self.stateLogError(msg.format(value, ', '.join(keys)))
 
         return None
 
