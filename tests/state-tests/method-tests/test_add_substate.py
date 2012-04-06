@@ -11,6 +11,7 @@ from kivy.app import App
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty
 from kivy_statechart.system.state import State
 from kivy_statechart.system.empty_state import EmptyState
+from kivy_statechart.system.empty_state import EMPTY_STATE_NAME
 from kivy_statechart.system.statechart import StatechartManager
 
 import os, inspect
@@ -79,4 +80,54 @@ class StateAddSubstateTestCase(unittest.TestCase):
 
         self.assertTrue(state.isEnteredState())
         self.assertTrue(state.isCurrentState())
+
+    # Add a substate to state A
+    def test_add_substate_to_state_A_statechart_1(self):
+        self.assertIsNone(state_A.getSubstate('Z'))
+        # In [PORT], EmptyState is created only for states with substates, and no initialSubstate set. Correct?
+        self.assertEqual(state_A.initialSubstateKey, '')
+
+        state = state_A.addSubstate('Z')
+
+        self.assertTrue(isinstance(state, State))
+        self.assertEqual(state_A.getSubstate('Z'), state)
+        self.assertEqual(state_A.initialSubstateKey, EMPTY_STATE_NAME)
+        self.assertFalse(state.isEnteredState())
+        self.assertFalse(state.isCurrentState())
+        self.assertTrue(state_A.isEnteredState())
+        self.assertTrue(state_A.isCurrentState())
+
+        print 'reentering state A'
+        setattr(state_A, 'initialSubstateKey', state.name)
+        state_A.reenter()
+
+        self.assertTrue(state.isEnteredState())
+        self.assertTrue(state.isCurrentState())
+        self.assertTrue(state_A.isEnteredState())
+        self.assertFalse(state_A.isCurrentState())
+
+    # Add a substate to state B
+    def test_add_substate_to_state_B_statechart_1(self):
+        self.assertIsNone(state_B.getSubstate('Z'))
+
+        statechart_1.gotoState('B')
+
+        state = state_B.addSubstate('Z')
+
+        self.assertTrue(isinstance(state, State))
+        self.assertEqual(state_B.getSubstate('Z'), state)
+        self.assertFalse(state.isEnteredState())
+        self.assertFalse(state.isCurrentState())
+        self.assertFalse(state_B.isCurrentState())
+        self.assertEqual(state_B.initialSubstateKey, '')
+        self.assertTrue(state_B.isEnteredState())
+        self.assertEqual(len(state_B.currentSubstates), 2)
+
+        state_B.reenter()
+
+        self.assertTrue(state.isEnteredState())
+        self.assertTrue(state.isCurrentState())
+        self.assertTrue(state_B.isEnteredState())
+        self.assertEqual(len(state_B.currentSubstates), 3)
+
 

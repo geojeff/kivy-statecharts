@@ -838,6 +838,7 @@ class State(EventDispatcher):
     """
     def gotoState(self, value, context=None):
         state = self.getState(value)
+        print 'gotoState', state, value
 
         if state is None:
             msg = "can not go to state {0} from state {1}. Invalid value."
@@ -845,6 +846,8 @@ class State(EventDispatcher):
             return
 
         fromState = self.findFirstRelativeCurrentState(state)
+
+        print 'gotoState', state, fromState, value
 
         self.statechart.gotoState(state, fromState, False, context)
 
@@ -1001,12 +1004,15 @@ class State(EventDispatcher):
         return self.currentSubstates[0]
 
     """
-      Used to re-enter this state. Call this only when the state a current state of
+      Used to re-enter this state. Call this only when the state is a current state of
       the statechart.  
     """
     def reenter(self):
         if self.isEnteredState():
-            self.gotoState(self)
+            # [PORT] Changed this from self to self.name, after str and key changes. Then, had
+            #        to change it form self.gotoState to self.statechart.gotoState -- need to pin
+            #        down that difference.
+            self.statechart.gotoState(self.name)
         else:
             Logger.error("Can not re-enter state {0} since it is not an entered state in the statechart".format(self))
 

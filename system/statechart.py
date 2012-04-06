@@ -780,7 +780,7 @@ class StatechartManager(EventDispatcher):
         if self.monitorIsActive:
             self.monitor.appendExitedState(state)
           
-        state._traverseStatesToExit_skipState = False
+        setattr(state, '_traverseStatesToExit_skipState', False)
           
         return result
         
@@ -1062,14 +1062,14 @@ class StatechartManager(EventDispatcher):
         # exit them up to this state before we can go any further up the exit chain.
         if state.substatesAreConcurrent:
             for currentState in state.currentSubstates:
-                if currentState._traverseStatesToExit_skipState == True:
+                if hasattr(currentState, '_traverseStatesToExit_skipState') and currentState._traverseStatesToExit_skipState == True:
                     continue
                 chain = self._createStateChain(currentState)
                 self._traverseStatesToExit(chain.popleft() if chain else None, chain, state, gotoStateActions)
           
         gotoStateActions.append({ 'action': EXIT_STATE, 'state': state })
         if state.isCurrentState():
-            state._traverseStatesToExit_skipState = True
+            setattr(state, '_traverseStatesToExit_skipState', True)
         self._traverseStatesToExit(exitStatePath.popleft() if exitStatePath else None, exitStatePath, stopState, gotoStateActions)
         
     """ @private
