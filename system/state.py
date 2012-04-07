@@ -1071,13 +1071,22 @@ class State(EventDispatcher):
         
           });
     """
-    def tryToHandleEvent(self, event, arg1, arg2):
+    def tryToHandleEvent(self, event, arg1=None, arg2=None):
         trace = self.trace
         sc = self.statechart
         ret = None
 
         # First check if the name of the event is the same as a registered event handler. If so,
         # then do not handle the event.
+        #
+        # [PORT] So, this means that if you have a method called eventHandler1, you need to call the
+        #        associated event event1, not eventHandler1. This is confusing. Methods in a state class
+        #        are by definition event handlers, registerd by the method names. These are handled below.
+        #        Special 'event handlers', capable of handling more than one event are the ones marked with the
+        #        State.eventHandler([]) decorator. And then there are plain event handlers, treated by this
+        #        conditional. What are they? There probably be better terminology to differentiate,
+        #        e.g., registeredMethods vs. eventHandlers vs. multipleEventHanders, perhaps.
+        #
         if event in self._registeredEventHandlers:
             self.stateLogWarning("state {0} can not handle event '{1}' since it is a registered event handler".format(self, event))
             return False
