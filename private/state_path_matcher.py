@@ -5,7 +5,7 @@
 # ================================================================================
 
 from kivy.event import EventDispatcher
-from kivy.properties import ListProperty, StringProperty
+from kivy.properties import ListProperty, StringProperty, ObjectProperty
 
 """ @class
 
@@ -104,9 +104,6 @@ class StatePathMatcher(EventDispatcher):
     """
     def _parseExpression(self):
         parts = self.expression.split('.') if self.expression else []
-        part = ''
-        chain = None
-        token = ''
         tokens = []
       
         for part in parts:
@@ -190,16 +187,16 @@ class _Token(EventDispatcher):
     """
     lastPart = StringProperty(None)
 
-    def __init__(self): 
-        """ The type of this token """
-        self.tokenType = None
+    """ The state path matcher that owns this token """
+    owningMatcher = ObjectProperty(None)
   
-        """ The state path matcher that owns this token """
-        self.owningMatcher = None
-  
-        """ The next token in the matching chain """
-        self.nextToken = None
+    """ The next token in the matching chain """
+    nextToken = ObjectProperty(None)
         
+    def __init__(self, tokenType): 
+        """ The type of this token """
+        self.tokenType = tokenType
+  
         super(_Token, self).__init__() 
   
     """ 
@@ -222,10 +219,9 @@ class _BasicToken(_Token):
     def __init__(self, value):
         self.bind(value=self._lastPart)
 
-        self.tokenType = 'basic'
         self.value = value
 
-        super(_BasicToken, self).__init__() 
+        super(_BasicToken, self).__init__(tokenType='basic') 
 
     def _lastPart(self, *l):
         self.lastPart = self.value
@@ -254,33 +250,28 @@ class _BasicToken(_Token):
   are satisfied then False is returned.
 """
 class _ExpandToken(_Token):
+    start = StringProperty(None)
     end = StringProperty(None)
 
     def __init__(self, start=None, end=None):
         self.bind(end=self._lastPart)
 
-        self.tokenType = 'expand'
         self.start = start
         self.end = end
 
-        super(_ExpandToken, self).__init__() 
+        super(_ExpandToken, self).__init__(tokenType='expand') 
 
     def _lastPart(self, *l):
         self.lastPart = self.end
 
     def match(self):
-        start = self.start
-        end = self.end
-        part = ''
-        token = self.nextToken
-          
         part = self.owningMatcher._pop() if self.owningMatcher else None
-        if part != end:
+        if part != self.end:
             return False
       
         while part:
-            if part == start:
-                return token.match() if token else True
+            if part == self.start:
+                return self.nextToken.match() if self.nextToken else True
             part = self.owningMatcher._pop() if self.owningMatcher else None
       
         return False
@@ -296,22 +287,18 @@ class _ExpandToken(_Token):
 """
 class _ThisToken(_Token):
     def __init__(self):
-        self.tokenType = 'self'
         self.lastPart = 'self'
 
-        super(_ThisToken, self).__init__() 
+        super(_ThisToken, self).__init__(tokenType='this') 
   
     def match(self):
-        state = self.owningMatcher.state
-        substates = state.substates
-        
         part = self.owningMatcher._lastPopped
 
         if part is None or len(self.owningMatcher._stack) != 0:
             return False
     
-        for i in range(len(self.substates)):
-            if substates[i]['name'] == part:
+        for substate in self.owningMatcher.state.substates:
+            if substate.name == part:
                 return True
     
         return False

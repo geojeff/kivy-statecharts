@@ -72,7 +72,7 @@ class Statechart_1(StatechartManager):
                 def __init__(self, **kwargs):
                     super(Statechart_1.RootState.C.Z, self).__init__(**kwargs)
 
-class StateGetSubstateTestCase(unittest.TestCase):
+class StateGetStateTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
         global rootState_1

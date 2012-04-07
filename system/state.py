@@ -741,7 +741,6 @@ class State(EventDispatcher):
         # If the value is an object then just check if the value is 
         # a registered substate of this state, and if so return it. 
         if not isinstance(value, basestring): # [PORT] if not a string, is an object
-            print 'srs', self._registeredSubstates
             return value if value in self._registeredSubstates else None
 
         if not isinstance(value, basestring):
@@ -755,7 +754,6 @@ class State(EventDispatcher):
             return None
 
         # Grab the paths associated with this state name.
-        print 'srsp', self, self._registeredSubstatePaths
         paths = self._registeredSubstatePaths[matcher.lastPart] if matcher.lastPart in self._registeredSubstatePaths else None
 
         if paths is None:
@@ -771,7 +769,11 @@ class State(EventDispatcher):
         if len(matches) > 1:
             matchedPaths = []
             for path in paths:
-                if path == value: # [PORT] Added this. Perhaps the matcher should return only the exact match, if it exists.
+                # [PORT] Added this. Perhaps the matcher should return only the exact match, if it exists.
+                #        This will catch substate A, when there are also substates X.A and B.Y.A. Otherwise,
+                #        as apparently the way the javascript version works, there would be no match, because
+                #        of that ambiguity. This way, state references must be explicit.
+                if path == value: 
                     return paths[path]
                 matchedPaths.append(path)
 
@@ -850,7 +852,6 @@ class State(EventDispatcher):
     """
     def gotoState(self, value, context=None):
         state = self.getState(value)
-        print 'gotoState', state, value
 
         if state is None:
             msg = "can not go to state {0} from state {1}. Invalid value."
@@ -858,8 +859,6 @@ class State(EventDispatcher):
             return
 
         fromState = self.findFirstRelativeCurrentState(state)
-
-        print 'gotoState', state, fromState, value
 
         self.statechart.gotoState(state, fromState, False, context)
 
@@ -1346,7 +1345,7 @@ class State(EventDispatcher):
       this state to the statechart's root state, but without including
       the root state in the path. For instance, if the name of this
       state if "foo" and the parent state's name is "bar" where bar's
-      parent state is the root state, then the full path is "bar.foo"
+      parent state is the root state, then the full path is "Bar.foo"
     
       @property {String}
     """
