@@ -626,51 +626,51 @@ class StatechartManager(EventDispatcher):
             if fromCurrentState is None:
                 fromCurrentState = self.currentStates[0] if self.currentStates else None
               
+        if trace:
+            self.statechartLogTrace("BEGIN gotoState: {0}".format(state))
+            msg = "starting from current state: {0}"
+            msg = msg.format(fromCurrentState if fromCurrentState else '---')
+            self.statechartLogTrace(msg)
+            msg = "current states before: {0}"
+            msg = msg.format(self.currentStates if self.currentStates else '---')
+            self.statechartLogTrace(msg)
+      
+        # If there is a current state to start the transition process from, then determine what
+        # states are to be exited
+        if fromCurrentState is not None:
+            exitStates = self._createStateChain(fromCurrentState)
+          
+        # Now determine the initial states to be entered
+        enterStates = self._createStateChain(state)
+          
+        # Get the pivot state to indicate when to go from exiting states to entering states
+        pivotState = self._findPivotState(exitStates, enterStates)
+      
+        if pivotState is not None:
             if trace:
-                self.statechartLogTrace("BEGIN gotoState: {0}".format(state))
-                msg = "starting from current state: {0}"
-                msg = msg.format(fromCurrentState if fromCurrentState else '---')
-                self.statechartLogTrace(msg)
-                msg = "current states before: {0}"
-                msg = msg.format(self.currentStates if self.currentStates else '---')
-                self.statechartLogTrace(msg)
-      
-            # If there is a current state to start the transition process from, then determine what
-            # states are to be exited
-            if fromCurrentState is not None:
-                exitStates = self._createStateChain(fromCurrentState)
+                self.statechartLogTrace("pivot state = {0}".format(pivotState))
+            if pivotState.substatesAreConcurrent and pivotState is not state:
+                msg = "Can not go to state {0} from {1}. Pivot state {2} has concurrent substates."
+                self.statechartLogError(msg.format(state, fromCurrentState, pivotState))
+                self._gotoStateLocked = False
+                return
           
-            # Now determine the initial states to be entered
-            enterStates = self._createStateChain(state)
-          
-            # Get the pivot state to indicate when to go from exiting states to entering states
-            pivotState = self._findPivotState(exitStates, enterStates)
-      
-            if pivotState is not None:
-                if trace:
-                    self.statechartLogTrace("pivot state = {0}".format(pivotState))
-                if pivotState.substatesAreConcurrent and pivotState is not state:
-                    msg = "Can not go to state {0} from {1}. Pivot state {2} has concurrent substates."
-                    self.statechartLogError(msg.format(state, fromCurrentState, pivotState))
-                    self._gotoStateLocked = False
-                    return
-          
-            # Collect what actions to perform for the state transition process
-            gotoStateActions = []
+        # Collect what actions to perform for the state transition process
+        gotoStateActions = []
 
-            # Go ahead and find states that are to be exited
-            self._traverseStatesToExit(exitStates.popleft() if exitStates else None, exitStates, pivotState, gotoStateActions)
+        # Go ahead and find states that are to be exited
+        self._traverseStatesToExit(exitStates.popleft() if exitStates else None, exitStates, pivotState, gotoStateActions)
           
-            # Now go find states that are to be entered
-            if pivotState is not state:
-                self._traverseStatesToEnter(enterStates.pop(), enterStates, pivotState, useHistory, gotoStateActions)
-            else:
-                self._traverseStatesToExit(pivotState, deque(), None, gotoStateActions)
-                self._traverseStatesToEnter(pivotState, None, None, useHistory, gotoStateActions)
+        # Now go find states that are to be entered
+        if pivotState is not state:
+            self._traverseStatesToEnter(enterStates.pop(), enterStates, pivotState, useHistory, gotoStateActions)
+        else:
+            self._traverseStatesToExit(pivotState, deque(), None, gotoStateActions)
+            self._traverseStatesToEnter(pivotState, None, None, useHistory, gotoStateActions)
           
-            # Collected all the state transition actions to be performed. Now execute them.
-            self._gotoStateActions = gotoStateActions
-            self._executeGotoStateActions(state, gotoStateActions, None, context)
+        # Collected all the state transition actions to be performed. Now execute them.
+        self._gotoStateActions = gotoStateActions
+        self._executeGotoStateActions(state, gotoStateActions, None, context)
         
     """
       Indicates if the statechart is in an active goto state process
@@ -884,7 +884,7 @@ class StatechartManager(EventDispatcher):
       @param fromCurrentState {State|String} Optional. the current state to start the state transition process from
       @param recursive {Boolean} Optional. whether to follow history states recursively.
     """
-    def gotoHistoryState(self, state, fromCurrentState, recursive, context):
+    def gotoHistoryState(self, state, fromCurrentState=None, recursive=None, context=None):
         if not self.statechartIsInitialized:
             self.statechartLogError("can not go to state {0}'s history state. Statechart has not yet been initialized".format(state))
             return
@@ -907,12 +907,64 @@ class StatechartManager(EventDispatcher):
           
         if not recursive:
             if historyState is not None:
-                self.gotoState(historyState, fromCurrentState, context)
+                self.gotoState(state=historyState, fromCurrentState=fromCurrentState, context=context)
             else:
-                self.gotoState(state, fromCurrentState, context)
+                self.gotoState(state=state, fromCurrentState=fromCurrentState, context=context)
         else:
-            self.gotoState(state, fromCurrentState, True, context)
-        
+            self.gotoState(state=state, fromCurrentState=fromCurrentState, useHistory=True, context=context)
+
+    """ 
+      @private 
+      Will process the arguments supplied to the gotoState method.
+    
+      TODO: Come back to this and refactor the code. It works, but it
+            could certainly be improved
+
+      [PORT] Instead of this, made args optional, and made gotoState and gotoHistoryState 
+             calls with explicit args
+    """
+    def _processGotoStateArgs(self, args):
+        processedArgs = { 
+            'state': None, 
+            'fromCurrentState': None, 
+            'useHistory': False, 
+            'context': None 
+        }
+          
+        args = (arg for arg in args if arg)
+      
+        if (len(args) < 1):
+            return processedArgs
+      
+        processedArgs['state'] = args[0]
+    
+        if (len(args) == 2):
+            value = args[1]
+            if isinstance(value, bool):
+                processedArgs['useHistory'] = value
+            elif (isinstance(value, dict) or isinstance(value, object)) and not isinstance(value, State):
+                processedArgs['context'] = value
+            else:
+                processedArgs['fromCurrentState'] = value
+        elif (len(args) == 3):
+            value = args[1]
+            if isinstance(value, bool):
+                processedArgs['useHistory'] = value
+                processedArgs['context'] = args[2]
+            else:
+                processedArgs['fromCurrentState'] = value
+                value = args[2]
+                if isinstance(value, bool):
+                    processedArgs['useHistory'] = value
+                else:
+                    processedArgs['context'] = value
+        else:
+            processedArgs['fromCurrentState'] = args[1]
+            processedArgs['useHistory'] = args[2]
+            processedArgs['context'] = args[3]
+      
+        return processedArgs
+ 
     """
       Sends a given event to all the statechart's current states.
           
@@ -1290,7 +1342,7 @@ class StatechartManager(EventDispatcher):
         pending = self._pendingStateTransitions.popleft() if self._pendingStateTransitions else None
         if not pending:
             return
-        self.gotoState(pending.state, pending.fromCurrentState, pending.useHistory, pending.context)
+        self.gotoState(state=pending.state, fromCurrentState=pending.fromCurrentState, useHistory=pending.useHistory, context=pending.context)
         
     """ @private
       

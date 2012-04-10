@@ -492,7 +492,7 @@ class State(EventDispatcher):
       By default the method invokes a state transition to this state.
     """
     def handleTriggeredRoute(self, context):
-        self.gotoState(self, context)
+        self.gotoState(state=self, context=context)
 
     """ @private """
     def _addEmptyInitialSubstateIfNeeded(self):
@@ -860,7 +860,7 @@ class State(EventDispatcher):
 
         fromState = self.findFirstRelativeCurrentState(state)
 
-        self.statechart.gotoState(state, fromState, False, context)
+        self.statechart.gotoState(state=state, fromCurrentState=fromState, useHistory=False, context=context)
 
     """
       Used to go to a given state's history state in the statechart either directly from this state if it
@@ -888,7 +888,7 @@ class State(EventDispatcher):
       @param [context] {Hash|Object} context object that will be supplied to all states that are exited
              entered during the state transition process. Context can not be an instance of State.
     """
-    def gotoHistoryState(self, value, recursive, context):
+    def gotoHistoryState(self, value, recursive=None, context=None):
         state = self.getState(value)
 
         if state is None:
@@ -898,7 +898,7 @@ class State(EventDispatcher):
 
         fromState = self.findFirstRelativeCurrentState(state)
 
-        self.statechart.gotoHistoryState(state, fromState, recursive, context)
+        self.statechart.gotoHistoryState(state=state, fromCurrentState=fromState, useHistory=recursive, context=context)
 
     """
       Resumes an active goto state transition process that has been suspended.
@@ -1023,7 +1023,7 @@ class State(EventDispatcher):
             # [PORT] Changed this from self to self.name, after str and key changes. Then, had
             #        to change it form self.gotoState to self.statechart.gotoState -- need to pin
             #        down that difference.
-            self.statechart.gotoState(self.name)
+            self.statechart.gotoState(state=self.name)
         else:
             Logger.error("Can not re-enter state {0} since it is not an entered state in the statechart".format(self))
 

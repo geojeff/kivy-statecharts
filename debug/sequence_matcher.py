@@ -4,6 +4,8 @@
 # Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
 # ================================================================================
 
+from kivy_statechart.system.state import State
+
 class StatechartSequenceMatcher:
     def __init__(self, statechartMonitor):
         self.statechartMonitor = statechartMonitor
@@ -23,7 +25,11 @@ class StatechartSequenceMatcher:
             raise "can not match sequence. sequence matcher has been left in an invalid state"
     
         monitor = self.statechartMonitor
-        result = self._matchSequence(self._start, 0) == len(monitor.sequence)
+
+        result = False
+        
+        if self._matchSequence(self._start, 0) == len(monitor.sequence):
+            result = True
 
         self.match = result
     
@@ -56,6 +62,7 @@ class StatechartSequenceMatcher:
 
         if self._peek():
             self._peek()['values'].append(group)
+
         self._stack.append(group)
         return self
   
@@ -74,18 +81,18 @@ class StatechartSequenceMatcher:
   
     def _matchSequence(self, sequence, marker):
         values = sequence['values']
-        numberOfValues = len(values)
         monitor = self.statechartMonitor
         
-        if numberOfValues == 0:
+        if not values:
             return marker
 
         if marker > len(monitor.sequence):
             return self.MISMATCH
         
-        # values contains a mix of groups (tokenType/values) and items (action/state).
+        # values is hierarchical, so that it is: {values: [{ values: [{ values: ...
+        # and actions are mixed in there.
         for val in values:
-            if hasattr(val, 'tokenType'):
+            if 'tokenType' in val:
                 if val['tokenType'] == 'sequence':
                     marker = self._matchSequence(val, marker)
                 elif val['tokenType'] == 'concurrent':
@@ -117,24 +124,26 @@ class StatechartSequenceMatcher:
     # A B (Y O P) (X M N) C
   
     def _matchConcurrent(self, concurrent, marker):
-        values = concurrent['values'][:]
-        numberOfValues = len(values)
+        values = list(concurrent['values']) # copy
         tempMarker = marker
-        match = false
+        match = False
         monitor = self.statechartMonitor
         
-        if numberOfValues == 0:
+        if not values:
             return marker
     
         if marker > len(monitor.sequence):
             return self.MISMATCH
     
+        # values is hierarchical, so that it is: {values: [{ values: [{ values: ... , tokenType: 'sequence'}
+        # and actions are list items in values lists, with tokenType as the second key/value pair in the dicts.
         while len(values) > 0:
             for val in values:
-                if val['tokenType'] == 'sequence':
-                    tempMarker = self._matchSequence(val, marker)
-                elif val['tokenType'] == 'concurrent':
-                    tempMarker = self._matchConcurrent(val, marker)
+                if 'tokenType' in val:
+                    if val['tokenType'] == 'sequence':
+                        tempMarker = self._matchSequence(val, marker)
+                    elif val['tokenType'] == 'concurrent':
+                        tempMarker = self._matchConcurrent(val, marker)
                 elif not self._matchItems(val, monitor.sequence[marker]):
                     tempMarker = self.MISMATCH
                 else:
@@ -143,26 +152,26 @@ class StatechartSequenceMatcher:
                 if tempMarker != self.MISMATCH:
                     break
       
-                if tempMarker == self.MISMATCH:
-                    return self.MISMATCH
+            if tempMarker == self.MISMATCH:
+                return self.MISMATCH
 
-                del val
+            values.remove(val)
               
-                marker = tempMarker
+            marker = tempMarker
     
-            return marker
+        return marker
   
     def _matchItems(self, matcherItem, monitorItem):
         if matcherItem is None or monitorItem is None:
             return False
   
-        if matcherItem['action'] is not monitorItem['action']:
+        if 'action' in matcherItem and matcherItem['action'] != monitorItem['action']:
             return False
     
-        if isinstance(matcherItem['state'], object) and matcherItem['state'] is monitorItem['state']:
+        if 'state' in matcherItem and isinstance(matcherItem['state'], State) and matcherItem['state'] is monitorItem['state']:
             return True
     
-        if matcherItem['state'] == monitorItem['state'].name: # [PORT] This compares state to a state.name -- ok?
+        if 'state' in matcherItem and matcherItem['state'] == monitorItem['state'].name:
             return True
   
         return False

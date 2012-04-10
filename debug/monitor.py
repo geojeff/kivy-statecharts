@@ -23,6 +23,7 @@ class StatechartMonitor(EventDispatcher):
         #self.propertyWillChange('length') #[PORT]
         self.sequence = []
         #self.propertyDidChange('length') #[PORT]
+        self._length() # [PORT] length has changed
   
     def _length(self, *l):
         self.length = len(self.sequence)
@@ -31,11 +32,13 @@ class StatechartMonitor(EventDispatcher):
         #self.propertyWillChange('length') #[PORT]
         self.sequence.append({ 'action': 'entered', 'state': state })
         #self.propertyDidChange('length') #[PORT]
+        self._length() # [PORT] length has changed
   
     def appendExitedState(self, state):
         #self.propertyWillChange('length') #[PORT]
         self.sequence.append({ 'action': 'exited', 'state': state })
         #self.propertyDidChange('length') #[PORT]
+        self._length() # [PORT] length has changed
   
     def matchSequence(self):
         return StatechartSequenceMatcher(self) # [PORT] call was ({ statechartMonitor: self }), but __init__ on SSM was changed to take monitor
