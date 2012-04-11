@@ -5,12 +5,15 @@
 # ================================================================================
 
 from kivy_statechart.system.state import State
+from kivy.properties import BooleanProperty
+
+MISMATCH = {}
 
 class StatechartSequenceMatcher:
+    match = BooleanProperty(False)
+
     def __init__(self, statechartMonitor):
         self.statechartMonitor = statechartMonitor
-        self.match = None
-        self.MISMATCH = {}
   
     def begin(self):
         self._stack = []
@@ -24,23 +27,21 @@ class StatechartSequenceMatcher:
         if len(self._stack) > 0:
             raise "can not match sequence. sequence matcher has been left in an invalid state"
     
-        monitor = self.statechartMonitor
-
         result = False
         
-        if self._matchSequence(self._start, 0) == len(monitor.sequence):
+        if self._matchSequence(self._start, 0) == len(self.statechartMonitor.sequence):
             result = True
 
         self.match = result
     
         return result
   
-    def entered(self, *arguments):
-        self._addStatesToCurrentGroup('entered', arguments) # [PORT] js arguments, so *arguments added here
+    def entered(self, *states):
+        self._addStatesToCurrentGroup('entered', states) # [PORT] js arguments, so *states added here
         return self
   
-    def exited(self, *arguments):
-        self._addStatesToCurrentGroup('exited', arguments)
+    def exited(self, *states):
+        self._addStatesToCurrentGroup('exited', states)
         return self
   
     def beginConcurrent(self):
@@ -81,13 +82,12 @@ class StatechartSequenceMatcher:
   
     def _matchSequence(self, sequence, marker):
         values = sequence['values']
-        monitor = self.statechartMonitor
         
         if not values:
             return marker
 
-        if marker > len(monitor.sequence):
-            return self.MISMATCH
+        if marker > len(self.statechartMonitor.sequence):
+            return MISMATCH
         
         # values is hierarchical, so that it is: {values: [{ values: [{ values: ...
         # and actions are mixed in there.
@@ -97,13 +97,13 @@ class StatechartSequenceMatcher:
                     marker = self._matchSequence(val, marker)
                 elif val['tokenType'] == 'concurrent':
                     marker = self._matchConcurrent(val, marker)
-            elif not self._matchItems(val, monitor.sequence[marker]):
-                return self.MISMATCH
+            elif marker > len(self.statechartMonitor.sequence)-1 or not self._matchItems(val, self.statechartMonitor.sequence[marker]):
+                return MISMATCH
             else:
                 marker += 1
       
-            if marker == self.MISMATCH:
-                return self.MISMATCH
+            if marker == MISMATCH:
+                return MISMATCH
     
         return marker
 
@@ -133,7 +133,7 @@ class StatechartSequenceMatcher:
             return marker
     
         if marker > len(monitor.sequence):
-            return self.MISMATCH
+            return MISMATCH
     
         # values is hierarchical, so that it is: {values: [{ values: [{ values: ... , tokenType: 'sequence'}
         # and actions are list items in values lists, with tokenType as the second key/value pair in the dicts.
@@ -144,16 +144,16 @@ class StatechartSequenceMatcher:
                         tempMarker = self._matchSequence(val, marker)
                     elif val['tokenType'] == 'concurrent':
                         tempMarker = self._matchConcurrent(val, marker)
-                elif not self._matchItems(val, monitor.sequence[marker]):
-                    tempMarker = self.MISMATCH
+                elif marker > len(self.statechartMonitor.sequence)-1 or not self._matchItems(val, monitor.sequence[marker]):
+                    tempMarker = MISMATCH
                 else:
                     tempMarker = marker + 1
       
-                if tempMarker != self.MISMATCH:
+                if tempMarker != MISMATCH:
                     break
       
-            if tempMarker == self.MISMATCH:
-                return self.MISMATCH
+            if tempMarker == MISMATCH:
+                return MISMATCH
 
             values.remove(val)
               
