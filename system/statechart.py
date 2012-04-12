@@ -188,8 +188,10 @@ class StatechartManager(EventDispatcher):
     statechartDelegate = ObjectProperty(None)
 
     currentStates = []
-    gotoStateActive = ObjectProperty(None)
-    gotoStateSuspended = ObjectProperty(None)
+    gotoStateLocked = BooleanProperty(False)
+    gotoStateActive = BooleanProperty(True)
+    gotoStateSuspendedPoint = ObjectProperty(None, allownone=True)
+    gotoStateSuspended = BooleanProperty(False)
     statechartLogPrefix = StringProperty(None)
     allowStatechartTracing = BooleanProperty(True)
     details = ObjectProperty(None)
@@ -364,6 +366,9 @@ class StatechartManager(EventDispatcher):
         self.bind(rootState=self._currentStates) # [PORT] Added currentStates property
         self.bind(statechartOwnerKey=self._ownerDidChange) # [PORT] Added, to use top-down updating approach in kivy.
         self.bind(owner=self._ownerDidChange) # [PORT] Added, to use top-down updating approach in kivy.
+        self.bind(gotoStateLocked=self._gotoStateActive)
+        self.bind(gotoStateLocked=self._gotoStateSuspended)
+        self.bind(gotoStateSuspendedPoint=self._gotoStateSuspended)
 
         for k,v in kw.items():
             if k == 'allowStatechartTracing': # [PORT] hack to set self.trace -- why is there also allowStatechartTracing? limit to one or other.
@@ -395,7 +400,7 @@ class StatechartManager(EventDispatcher):
         if self.statechartIsInitialized:
             return
           
-        self._gotoStateLocked = False
+        self.gotoStateLocked = False
         self._sendEventLocked = False
         self._pendingStateTransitions = deque()
         self._pendingSentEvents = deque()
@@ -595,7 +600,7 @@ class StatechartManager(EventDispatcher):
             self.statechartLogError("Can not to goto state {0}. Not a recognized state in statechart".format(paramState))
             return
           
-        if self._gotoStateLocked:
+        if self.gotoStateLocked:
             # There is a state transition currently happening. Add this requested state
             # transition to the queue of pending state transitions. The request will
             # be invoked after the current state transition is finished.
@@ -609,7 +614,7 @@ class StatechartManager(EventDispatcher):
           
         # Lock the current state transition so that no other requested state transition 
         # interferes. 
-        self._gotoStateLocked = True
+        self.gotoStateLocked = True
           
         if fromCurrentState is not None:
             # Check to make sure the current state given is actually a current state of this statechart
@@ -617,7 +622,7 @@ class StatechartManager(EventDispatcher):
             if fromCurrentState is None or not fromCurrentState.isCurrentState():
                 msg = "Can not to goto state {0}. {1} is not a recognized current state in statechart"
                 self.statechartLogError(msg.format(paramState, paramFromCurrentState))
-                self._gotoStateLocked = False
+                self.gotoStateLocked = False
                 return
         else:
             # No explicit current state to start from; therefore, need to find a current state
@@ -652,7 +657,7 @@ class StatechartManager(EventDispatcher):
             if pivotState.substatesAreConcurrent and pivotState is not state:
                 msg = "Can not go to state {0} from {1}. Pivot state {2} has concurrent substates."
                 self.statechartLogError(msg.format(state, fromCurrentState, pivotState))
-                self._gotoStateLocked = False
+                self.gotoStateLocked = False
                 return
           
         # Collect what actions to perform for the state transition process
@@ -675,15 +680,15 @@ class StatechartManager(EventDispatcher):
     """
       Indicates if the statechart is in an active goto state process
     """
-    def _gotoStateActive(self):
-        self.gotoStateActive = self._gotoStateLocked
+    def _gotoStateActive(self, *l):
+        self.gotoStateActive = self.gotoStateLocked
 
     """
       Indicates if the statechart is in an active goto state process
       that has been suspended
     """
-    def _gotoStateSuspended(self):
-        self.gotoStateSuspended = self._gotoStateLocked and self._gotoStateSuspendedPoint is not None # [PORT] this was !!self._gotoStateSuspendedPoint -- boolean force?
+    def _gotoStateSuspended(self, *l):
+        self.gotoStateSuspended = self.gotoStateLocked and self.gotoStateSuspendedPoint is not None # [PORT] this was !!self.gotoStateSuspendedPoint -- boolean force?
         
     """
       Resumes an active goto state transition process that has been suspended.
@@ -693,8 +698,8 @@ class StatechartManager(EventDispatcher):
             self.statechartLogError("Can not resume goto state since it has not been suspended")
             return
           
-        point = self._gotoStateSuspendedPoint
-        self._executeGotoStateActions(point.gotoState, point.actions, point.marker, point.context)
+        point = self.gotoStateSuspendedPoint
+        self._executeGotoStateActions(point['gotoState'], point['actions'], point['marker'], point['context'])
         
     """ @private """
     def _executeGotoStateActions(self, gotoState, actions, marker, context):
@@ -719,15 +724,16 @@ class StatechartManager(EventDispatcher):
             # else to resume this statechart's state transition process by calling the
             # statechart's resumeGotoState method.
             #
-            if actionResult and inspect.isclass(actionResult) and issubclass(actionResult, Async):
-                self._gotoStateSuspendedPoint = {
+            #if actionResult and inspect.isclass(actionResult) and issubclass(actionResult, Async):
+            if actionResult and isinstance(actionResult, Async):
+                self.gotoStateSuspendedPoint = {
                     'gotoState': gotoState,
                     'actions': actions,
                     'marker': marker + 1,
                     'context': context
                 }
               
-                actionResult.tryToPerform(action['state']) # [PORT] Note: This is not the same as self.tryToPerform. See Async.
+                actionResult.tryToPerform(self.getState(action['state'])) # [PORT] state arg must be object, not string key
                 return
 
             marker += 1
@@ -746,9 +752,9 @@ class StatechartManager(EventDispatcher):
     """ @private """
     def _cleanupStateTransition(self):
         self._currentGotoStateAction = None
-        self._gotoStateSuspendedPoint = None
+        self.gotoStateSuspendedPoint = None
         self._gotoStateActions = None
-        self._gotoStateLocked = False
+        self.gotoStateLocked = False
         if self._pendingStateTransitions: # [PORT] There is an error check in the function that this if now skips. But isn't it ok to be empty?
             self._flushPendingStateTransition()
         
@@ -996,7 +1002,7 @@ class StatechartManager(EventDispatcher):
         state = None
         trace = self.allowStatechartTracing
           
-        if self._sendEventLocked or self._gotoStateLocked:
+        if self._sendEventLocked or self.gotoStateLocked:
             # Want to prevent any actions from being processed by the states until 
             # they have had a chance to handle the most immediate action or completed 
             # a state transition
@@ -1342,7 +1348,7 @@ class StatechartManager(EventDispatcher):
         pending = self._pendingStateTransitions.popleft() if self._pendingStateTransitions else None
         if not pending:
             return
-        self.gotoState(state=pending.state, fromCurrentState=pending.fromCurrentState, useHistory=pending.useHistory, context=pending.context)
+        self.gotoState(state=pending['state'], fromCurrentState=pending['fromCurrentState'], useHistory=pending['useHistory'], context=pending['context'])
         
     """ @private
       
@@ -1353,7 +1359,7 @@ class StatechartManager(EventDispatcher):
         pending = self._pendingSentEvents.popleft() if self._pendingSentEvents else None
         if not pending:
             return None
-        return self.sendEvent(pending.event, pending.arg1, pending.arg2)
+        return self.sendEvent(pending['event'], pending['arg1'], pending['arg2'])
         
     """ @private """
     def _monitorIsActiveDidChange(self, *l):

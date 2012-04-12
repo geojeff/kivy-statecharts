@@ -4,6 +4,8 @@
 # Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
 # ================================================================================
 
+import inspect
+
 """
   @class
 
@@ -15,21 +17,19 @@
   @author Michael Cohen
 """
 class Async:
-    def __init__(self):
-        self.func = None
-        arg1 = None
-        arg2 = None
+    def __init__(self, func, arg1=None, arg2=None):
+        self.func = func
+        self.arg1 = arg1
+        self.arg2 = arg2
 
     """ @private
       Called by the statechart
     """
     def tryToPerform(self, state):
-        funcType = typeOf(func);
-  
-        if isinstance(self.func, T_STRING):
-            state.tryToPerform(self.func, self.arg1, self.arg2)
-        elif isinstance(self.func, T_FUNCTION):
-            self.func(state, [self.arg1, self.arg2])
+        if isinstance(self.func, basestring):
+            getattr(state, self.func)(self.arg1, self.arg2)
+        elif inspect.isfunction(self.func) or inspect.ismethod(self.func): # [PORT] Either one, same call sig?
+            self.func(state, self.arg1, self.arg2)
 
 """
   Singleton
@@ -63,6 +63,6 @@ class AsyncMixin:
       @param arg2 Optional. An argument to pass to the given function
       @return {Async} a new instance of a Async
     """
-    def perform(self, func, arg1, arg2):
-        return Async.create({ func: func, arg1: arg1, arg2: arg2 })
+    def perform(self, func, arg1=None, arg2=None):
+        return Async(func, arg1=arg1, arg2=arg2)
 

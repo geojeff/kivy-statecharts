@@ -6,6 +6,7 @@
 
 from kivy.event import EventDispatcher
 from kivy_statechart.private.state_path_matcher import StatePathMatcher
+from kivy_statechart.system.async import AsyncMixin
 from kivy.properties import BooleanProperty, ListProperty, ObjectProperty, StringProperty
 from collections import deque
 
@@ -764,7 +765,7 @@ class State(EventDispatcher):
                 matches.append(paths[path])
 
         if len(matches) == 1:
-            return matches[0]
+            return self.getState(matches[0])
 
         if len(matches) > 1:
             matchedPaths = []
@@ -774,7 +775,7 @@ class State(EventDispatcher):
                 #        as apparently the way the javascript version works, there would be no match, because
                 #        of that ambiguity. This way, state references must be explicit.
                 if path == value: 
-                    return paths[path]
+                    return self.getState(paths[path])
                 matchedPaths.append(path)
 
             if callback is not None:
@@ -1319,8 +1320,8 @@ class State(EventDispatcher):
       @see enterState
       @see exitState
     """
-    def performAsync(self, func, arg1, arg2):
-        Async.perform(func, arg1, arg2)
+    def performAsync(self, func, arg1=None, arg2=None):
+        return AsyncMixin().perform(func, arg1=arg1, arg2=arg2)
 
     """ @override
     
