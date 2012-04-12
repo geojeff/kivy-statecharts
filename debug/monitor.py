@@ -48,17 +48,16 @@ class StatechartMonitor(EventDispatcher):
         expected = arguments[0] if len(arguments) == 1 else arguments # [PORT] arguments, in javascript. so *arguments was added here
         actual = self.statechart.enteredStates()
         matched = 0
-        statechart = self.statechart
     
         if len(expected) != len(actual):
             return False
     
         for item in expected:
-            if instanceof(item, basestring):
-                item = statechart.getState(item)
+            if isinstance(item, basestring):
+                item = self.statechart.getState(item)
             if item is None:
-                return
-            if statechart.stateIsEntered(item) and item.isEnteredState():
+                return False
+            if self.statechart.stateIsEntered(item) and item.isEnteredState():
                 matched += 1
     
         return matched == len(actual)
