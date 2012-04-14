@@ -135,6 +135,8 @@ class StatePathMatcher(EventDispatcher):
         c = self._chain
         while c:
             c = c.nextToken
+
+        print 'expression chain:', self._chain
   
     """
       Returns the last part of the expression. So if the
@@ -163,7 +165,7 @@ class StatePathMatcher(EventDispatcher):
         #
         self._stack = path.split('.') if path else None
 
-        # Bug out is path is None or if path is not a string.
+        # Bug out if path is None or if path is not a string.
         if path is None or not isinstance(path, basestring):
             return False
 

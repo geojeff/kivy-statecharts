@@ -1099,7 +1099,7 @@ class StatechartManager(EventDispatcher):
         for state in stateChain1:
             if state in stateChain2:
                 return state
-        
+
     """ @private
           
       Recursively follow states that are to be exited during a state transition process. The exit

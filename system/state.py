@@ -747,6 +747,11 @@ class State(EventDispatcher):
         if not isinstance(value, basestring):
             self.stateLogError("Can not find matching subtype. value must be a State class or string: {0}".format(value))
             return None
+        
+        # [PORT] Considered this, but it seemed to match on what should remain ambiguous.
+        #for state in self._registeredSubstates:
+            #if value == state.name:
+                #return state
 
         # Not found yet, so look deeper for a nested substate.
         matcher = StatePathMatcher(state=self, expression=value)
@@ -899,7 +904,7 @@ class State(EventDispatcher):
 
         fromState = self.findFirstRelativeCurrentState(state)
 
-        self.statechart.gotoHistoryState(state=state, fromCurrentState=fromState, useHistory=recursive, context=context)
+        self.statechart.gotoHistoryState(state=state, fromCurrentState=fromState, recursive=recursive, context=context)
 
     """
       Resumes an active goto state transition process that has been suspended.
