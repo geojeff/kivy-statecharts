@@ -149,34 +149,32 @@ class StateTransitioningHistoryStandardContextWithoutConcurrentTestCase(unittest
         self.assertEqual(state_B.exitStateContext, context)
         self.assertEqual(state_F.exitStateContext, context)
 
-# [PORT] See also test_core.py, for a commented-out section that might be failing for the same reason.
+    # Pass context when going to state a history state using statechart - gotoState('f', true, context)
+    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_true_context(self):
+        statechart_1.gotoState('F')
+        statechart_1.gotoHistoryState('A', recursive=True, context=context)
+        self.assertTrue(state_D.isCurrentState())
+        self.assertEqual(state_D.enterStateContext, context)
+        self.assertEqual(state_A.enterStateContext, context)
+        self.assertEqual(state_B.exitStateContext, context)
+        self.assertEqual(state_F.exitStateContext, context)
 
-#    # Pass context when going to state a history state using statechart - gotoState('f', true, context)
-#    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_true_context(self):
-#        statechart_1.gotoState('F')
-#        statechart_1.gotoHistoryState('A', recursive=True, context=context)
-#        self.assertTrue(state_D.isCurrentState())
-#        self.assertEqual(state_D.enterStateContext, context)
-#        self.assertEqual(state_A.enterStateContext, context)
-#        self.assertEqual(state_B.exitStateContext, context)
-#        self.assertEqual(state_F.exitStateContext, context)
+    # Pass context when going to state a history state using statechart - gotoState('f', state_F, true, context)
+    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_state_C_true_context(self):
+        statechart_1.gotoState('F')
+        statechart_1.gotoHistoryState('A', fromCurrentState=state_F, recursive=True, context=context)
+        self.assertTrue(state_D.isCurrentState())
+        self.assertEqual(state_D.enterStateContext, context)
+        self.assertEqual(state_A.enterStateContext, context)
+        self.assertEqual(state_B.exitStateContext, context)
+        self.assertEqual(state_F.exitStateContext, context)
 
-#    # Pass context when going to state a history state using statechart - gotoState('f', state_F, true, context)
-#    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_state_C_true_context(self):
-#        statechart_1.gotoState('F')
-#        statechart_1.gotoHistoryState('A', fromCurrentState=state_F, recursive=True, context=context)
-#        self.assertTrue(state_D.isCurrentState())
-#        self.assertEqual(state_D.enterStateContext, context)
-#        self.assertEqual(state_A.enterStateContext, context)
-#        self.assertEqual(state_B.exitStateContext, context)
-#        self.assertEqual(state_F.exitStateContext, context)
-#
-#    # Pass context when going to state a history state using statechart - gotoState('f', true, context)
-#    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_true_context(self):
-#        statechart_1.gotoState('F')
-#        state_F.gotoHistoryState('A', recursive=True, context=context)
-#        self.assertTrue(state_D.isCurrentState())
-#        self.assertEqual(state_D.enterStateContext, context)
-#        self.assertEqual(state_A.enterStateContext, context)
-#        self.assertEqual(state_B.exitStateContext, context)
-#        self.assertEqual(state_F.exitStateContext, context)
+    # Pass context when going to state a history state using statechart - gotoState('f', true, context)
+    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_true_context(self):
+        statechart_1.gotoState('F')
+        state_F.gotoHistoryState('A', recursive=True, context=context)
+        self.assertTrue(state_D.isCurrentState())
+        self.assertEqual(state_D.enterStateContext, context)
+        self.assertEqual(state_A.enterStateContext, context)
+        self.assertEqual(state_B.exitStateContext, context)
+        self.assertEqual(state_F.exitStateContext, context)

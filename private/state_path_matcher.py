@@ -136,8 +136,6 @@ class StatePathMatcher(EventDispatcher):
         while c:
             c = c.nextToken
 
-        print 'expression chain:', self._chain
-  
     """
       Returns the last part of the expression. So if the
       expression is 'foo.bar' or 'foo~bar' then 'bar' is returned
