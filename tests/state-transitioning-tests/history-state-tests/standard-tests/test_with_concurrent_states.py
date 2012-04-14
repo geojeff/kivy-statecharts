@@ -99,7 +99,10 @@ class StateTransitioningHistoryStandardWithConcurrentTestCase(unittest.TestCase)
         self.assertFalse(state_E.isCurrentState())
 
         monitor_1.reset()
-
+  
+        state_D.gotoState('Z');
+        self.assertTrue(state_Z.isCurrentState())
+ 
         state_Z.gotoHistoryState('A')
 
         self.assertEqual(state_A.historyState, state_D)
