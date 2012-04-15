@@ -187,7 +187,7 @@ class StatechartManager(EventDispatcher):
     """
     statechartDelegate = ObjectProperty(None)
 
-    currentStates = []
+    currentStates = ListProperty([])
     gotoStateLocked = BooleanProperty(False)
     gotoStateActive = BooleanProperty(True)
     gotoStateSuspendedPoint = ObjectProperty(None, allownone=True)
@@ -241,7 +241,7 @@ class StatechartManager(EventDispatcher):
     
       @property {State}
     """
-    rootStateExample = None
+    rootStateExample = ObjectProperty(None)
     
     """ 
       Indicates what state should be the initial state of this statechart. The value
@@ -260,7 +260,7 @@ class StatechartManager(EventDispatcher):
     
       @property {String} 
     """
-    initialStateKey = ''
+    initialStateKey = StringProperty('')
     
     """ 
       Indicates if properties on this object representing states are concurrent to each other.
@@ -484,7 +484,10 @@ class StatechartManager(EventDispatcher):
       #@returns {Array} the current states
     #"""
     def _currentStates(self, *l):
-        self.currentStates = self.rootState.currentSubstates
+        if self.rootState.currentSubstates is None:
+            self.currentStates = []
+        else:
+            self.currentStates = self.rootState.currentSubstates
 
     """
       Checks if a given state is a current state of this statechart. 

@@ -160,7 +160,7 @@ class StateTransitioningHistoryStandardContextWithoutConcurrentTestCase(unittest
         self.assertEqual(state_F.exitStateContext, context)
 
     # Pass context when going to state a history state using statechart - gotoState('f', state_F, true, context)
-    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_state_C_true_context(self):
+    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_state_f_true_context(self):
         statechart_1.gotoState('F')
         statechart_1.gotoHistoryState('A', fromCurrentState=state_F, recursive=True, context=context)
         self.assertTrue(state_D.isCurrentState())

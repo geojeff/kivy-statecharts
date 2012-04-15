@@ -123,7 +123,7 @@ class State(EventDispatcher):
       
       @property {String|State}
     """
-    initialSubstateKey = ''
+    initialSubstateKey = StringProperty('')
 
     """
       Used to indicates if this state's immediate substates are to be
@@ -138,7 +138,7 @@ class State(EventDispatcher):
       
       @property {Array}
     """
-    substates = []
+    substates = ListProperty([])
 
     """
       The statechart that this state belongs to. Assigned by the owning
@@ -160,7 +160,7 @@ class State(EventDispatcher):
       
       @propety {Array}
     """
-    currentSubstates = []
+    currentSubstates = ListProperty([])
 
     """ 
       An array of this state's substates that are currently entered. Managed by
@@ -168,7 +168,7 @@ class State(EventDispatcher):
       
       @property {Array}
     """
-    enteredSubstates = []
+    enteredSubstates = ListProperty([])
 
     """
       Can optionally assign what route this state is to represent. 
