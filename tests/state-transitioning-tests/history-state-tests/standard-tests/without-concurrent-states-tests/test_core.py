@@ -16,7 +16,7 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootState'] = self.RootState
+        kwargs['rootStateClass'] = self.RootState
         kwargs['monitorIsActive'] = True
         super(Statechart_1, self).__init__(**kwargs)
 
@@ -109,7 +109,7 @@ class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.Te
 
         statechart_1 = Statechart_1()
         statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         monitor_1 = statechart_1.monitor
         state_A = statechart_1.getState('A')
         state_B = statechart_1.getState('B')
@@ -128,7 +128,7 @@ class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.Te
 
     # Check initial statechart history state objects
     def test_initial_statechart_history_state_objects(self):
-        self.assertEqual(statechart_1.rootState.historyState, statechart_1.getState('A'))
+        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('A'))
 
         self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('C'))
         self.assertEqual(statechart_1.getState('C').historyState, statechart_1.getState('G'))
@@ -178,7 +178,7 @@ class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.Te
         statechart_1.gotoState('B')
         self.assertTrue(monitor_1.matchSequence().begin().exited('G', 'C', 'A').entered('B', 'E', 'K').end())
 
-        self.assertEqual(statechart_1.rootState.historyState, statechart_1.getState('B'))
+        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('B'))
         self.assertEqual(statechart_1.getState('B').historyState, statechart_1.getState('E'))
         self.assertEqual(statechart_1.getState('E').historyState, statechart_1.getState('K'))
         self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('C'))
@@ -197,7 +197,7 @@ class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.Te
         self.assertTrue(monitor_1.matchSequence().begin().exited('M', 'F', 'B').entered('A', 'D', 'I').end())
         self.assertEqual(len(statechart_1.currentStates), 1)
         self.assertTrue(statechart_1.stateIsCurrentState('I'))
-        self.assertEqual(statechart_1.rootState.historyState, statechart_1.getState('A'))
+        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('A'))
         self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('D'))
         self.assertEqual(statechart_1.getState('D').historyState, statechart_1.getState('I'))
 
@@ -215,7 +215,7 @@ class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.Te
 #        self.assertTrue(monitor_1.matchSequence().begin().exited('M', 'F', 'B').entered('A', 'D', 'J').end())
 #        self.assertEqual(len(statechart_1.currentStates), 1)
 #        self.assertTrue(statechart_1.stateIsCurrentState('J'))
-#        self.assertEqual(statechart_1.rootState.historyState, statechart_1.getState('A'))
+#        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('A'))
 #        self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('D'))
 #        self.assertEqual(statechart_1.getState('D').historyState, statechart_1.getState('I'))
 
@@ -229,7 +229,7 @@ class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.Te
         self.assertTrue(monitor_1.matchSequence().begin().exited('G', 'C', 'A').entered('B', 'E', 'K').end())
         self.assertEqual(len(statechart_1.currentStates), 1)
         self.assertTrue(statechart_1.stateIsCurrentState('K'))
-        self.assertEqual(statechart_1.rootState.historyState, statechart_1.getState('B'))
+        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('B'))
         self.assertEqual(statechart_1.getState('B').historyState, statechart_1.getState('E'))
         self.assertEqual(statechart_1.getState('E').historyState, statechart_1.getState('K'))
 
@@ -244,7 +244,7 @@ class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.Te
         self.assertTrue(monitor_1.matchSequence().begin().exited('G', 'C', 'A').entered('B', 'E', 'K').end())
         self.assertEqual(len(statechart_1.currentStates), 1)
         self.assertTrue(statechart_1.stateIsCurrentState('K'))
-        self.assertEqual(statechart_1.rootState.historyState, statechart_1.getState('B'))
+        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('B'))
         self.assertEqual(statechart_1.getState('B').historyState, statechart_1.getState('E'))
         self.assertEqual(statechart_1.getState('E').historyState, statechart_1.getState('K'))
 

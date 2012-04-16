@@ -18,7 +18,7 @@ import os, inspect
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
         kwargs['monitorIsActive'] = True
-        kwargs['rootState'] = self.RootState
+        kwargs['rootStateClass'] = self.RootState
         kwargs['trace'] = True
         super(Statechart_1, self).__init__(**kwargs)
 
@@ -66,7 +66,7 @@ class StateInitialSubstateTestCase(unittest.TestCase):
 
         statechart_1 = Statechart_1()
         statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         monitor_1 = statechart_1.monitor
         state_A = statechart_1.getState('A')
         state_B = statechart_1.getState('B')

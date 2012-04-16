@@ -29,7 +29,7 @@ class TestState(State):
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootState'] = self.RootState
+        kwargs['rootStateClass'] = self.RootState
         kwargs['monitorIsActive'] = True
         super(Statechart_1, self).__init__(**kwargs)
 
@@ -82,7 +82,7 @@ class StateTransitioningHistoryStandardContextWithoutConcurrentTestCase(unittest
 
         statechart_1 = Statechart_1()
         statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         monitor_1 = statechart_1.monitor
         state_A = statechart_1.getState('A')
         state_B = statechart_1.getState('B')

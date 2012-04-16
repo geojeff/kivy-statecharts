@@ -83,7 +83,7 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
 
         statechart_1 = Statechart_1()
         statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         monitor_1 = StatechartMonitor(statechart_1)
         state_A = statechart_1.getState('A')
         state_B = statechart_1.getState('B')

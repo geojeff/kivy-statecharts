@@ -16,7 +16,7 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootState'] = self.RootState
+        kwargs['rootStateClass'] = self.RootState
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(State):
@@ -36,7 +36,7 @@ class Statechart_1(StatechartManager):
 
 class Statechart_2(StatechartManager):
     def __init__(self, **kwargs):
-        self.rootState = self.RootState
+        self.rootStateClass = self.RootState
         super(Statechart_2, self).__init__(**kwargs)
 
     class RootState(State):
@@ -78,7 +78,7 @@ class Statechart_2(StatechartManager):
 
 class Statechart_3(StatechartManager):
     def __init__(self, **kwargs):
-        self.rootState = self.RootState
+        self.rootStateClass = self.RootState
         super(Statechart_3, self).__init__(**kwargs)
 
     class RootState(State):
@@ -120,7 +120,7 @@ class Statechart_3(StatechartManager):
 
 class Statechart_4(StatechartManager):
     def __init__(self, **kwargs):
-        self.rootState = self.RootState
+        self.rootStateClass = self.RootState
         super(Statechart_4, self).__init__(**kwargs)
 
     class RootState(State):

@@ -58,7 +58,7 @@ class StateFirstRelativeCurrentStateWithoutConcurrentTestCase(unittest.TestCase)
 
         statechart_1 = Statechart_1()
         statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         state_A = statechart_1.getState('A')
         state_B = statechart_1.getState('B')
         state_C = statechart_1.getState('C')

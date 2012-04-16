@@ -392,9 +392,9 @@ class State(EventDispatcher):
                     self.stateLogWarning(msg.format(self.initialSubstateKey, self))
 
         #self.notifyPropertyChange("substates")
-        # [PORT] substates have changed. Call _currentStates on statechart, which is bound to rootState,
-        #        and updates self.currentStates = self.rootState.substates. That binding won't fire if 
-        #        rootState.substates changes, so we manually call it in kivy.
+        # [PORT] substates have changed. Call _currentStates on statechart, which is bound to rootStateInstance,
+        #        and updates self.currentStates = self.rootStateInstance.substates. That binding won't fire if 
+        #        rootStateInstance.substates changes, so we manually call it in kivy.
         self.statechart._currentStates()
 
         self.currentSubstates = []
@@ -956,7 +956,7 @@ class State(EventDispatcher):
       @property {Boolean}
     """
     def isRootState(self):
-        return True if self.statechart.rootState is self else False
+        return True if self.statechart.rootStateInstance is self else False
 
     """
       Indicates if this state is a current state of the statechart.
@@ -1365,7 +1365,7 @@ class State(EventDispatcher):
       @property {String}
     """
     def _fullPath(self, *l): # [PORT] Added *l
-        root = self.statechart.rootState if self.statechart else None
+        root = self.statechart.rootStateInstance if self.statechart else None
         if root is None:
             self.fullPath = self.name
         else:

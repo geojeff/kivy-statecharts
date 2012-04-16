@@ -126,7 +126,7 @@ class RootState(TestState):
 
 class TestStatechart(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootState'] = RootState
+        kwargs['rootStateClass'] = RootState
         super(TestStatechart, self).__init__(**kwargs)
 
     someMethodInvoked = BooleanProperty(False)
@@ -152,7 +152,7 @@ class StatechartRespondToEventTestCase(unittest.TestCase):
 
         statechart = TestStatechart()
         statechart.initStatechart()
-        rootState = statechart.rootState
+        rootState = statechart.rootStateInstance
         state_A = statechart.getState('A')
         state_B = statechart.getState('B')
         state_C = statechart.getState('C')

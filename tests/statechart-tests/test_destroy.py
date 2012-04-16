@@ -38,7 +38,7 @@ class StatechartDestroyTestCase(unittest.TestCase):
         global state_B
 
         statechart_1 = Statechart_1()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         state_A = statechart_1.getState('A')
         state_B = statechart_1.getState('B')
         
@@ -48,7 +48,7 @@ class StatechartDestroyTestCase(unittest.TestCase):
         #        Not sure how to check on observer existence anyway... Maybe something like:
         #self.assertTrue(hasattr(statechart_1.rootState.__storage[SOMETHING]['observers'], 'owner'))
         #self.assertTrue(hasattr(statechart_1.rootState.__storage[SOMETHING]['observers'], 'trace'))
-        self.assertEqual(statechart_1.rootState, rootState_1)
+        self.assertEqual(statechart_1.rootStateInstance, rootState_1)
 
         #self.assertFalse(rootState_1.isDestroyed) # [PORT] There is no isDestroyed in kivy.
         self.assertEqual(len(rootState_1.substates), 2)
@@ -71,7 +71,7 @@ class StatechartDestroyTestCase(unittest.TestCase):
         #self.assertIsNone(statechart_1) 
         #self.assertFalse(statechart_1.rootState.is_event_type('owner')) # [PORT] not on statechart, but on states; is_event_type isn't it anyway.
         #self.assertFalse(statechart_1.rootState.is_event_type('trace'))
-        #self.assertEqual(statechart_1.rootState, None)
+        #self.assertEqual(statechart_1.rootStateInstance, None)
 
         #self.assertTrue(rootState_1.isDestroyed)
         #self.assertEqual(rootState_1.substates, None)

@@ -65,7 +65,7 @@ class RootStateExample_1(TestState):
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
         kwargs['initialStateKey'] = 'A'
-        kwargs['rootStateExample'] = RootStateExample_1
+        kwargs['rootStateExampleClass'] = RootStateExample_1
         kwargs['A'] = self.A
         kwargs['B'] = self.B
         super(Statechart_1, self).__init__(**kwargs)
@@ -102,7 +102,7 @@ class RootStateExample_2(TestState):
 class Statechart_2(StatechartManager):
     def __init__(self, **kwargs):
         kwargs['statesAreConcurrent'] = True
-        kwargs['rootStateExample'] = RootStateExample_2
+        kwargs['rootStateExampleClass'] = RootStateExample_2
         kwargs['C'] = self.C
         kwargs['D'] = self.D
         super(Statechart_2, self).__init__(**kwargs)
@@ -147,12 +147,12 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
 
         statechart_1 = Statechart_1()
         statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         state_A = statechart_1.getState('A')
         state_B = statechart_1.getState('B')
         statechart_2 = Statechart_2()
         statechart_2.initStatechart()
-        rootState_2 = statechart_2.rootState
+        rootState_2 = statechart_2.rootStateInstance
         state_C = statechart_2.getState('C')
         state_D = statechart_2.getState('D')
         

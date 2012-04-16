@@ -130,7 +130,7 @@ class StateGetSubstateTestCase(unittest.TestCase):
 
         statechart_1 = Statechart_1()
         statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         
     # Get immediate substates from root state
     def test_get_immediate_substates_from_root_state(self):

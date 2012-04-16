@@ -143,7 +143,7 @@ class StatechartOwnerTestCase(unittest.TestCase):
         global state_Z
 
         statechart_1 = Statechart_1()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         owner_1 = Owner_1()
         state_A = statechart_1.getState('A')
         state_B = statechart_1.getState('B')
@@ -154,13 +154,13 @@ class StatechartOwnerTestCase(unittest.TestCase):
         
         owner_2 = Owner_2()
         statechart_2 = Statechart_2(owner=owner_2, initialStateKey='C')
-        rootState_2 = statechart_2.rootState
+        rootState_2 = statechart_2.rootStateInstance
         state_C = statechart_2.getState('C')
         state_D = statechart_2.getState('D')
 
         owner_3 = Owner_3()
         statechart_3 = Statechart_3(initialStateKey='E', statechartOwnerKey='fooOwner', fooOwner=owner_3)
-        rootState_3 = statechart_3.rootState
+        rootState_3 = statechart_3.rootStateInstance
         state_E = statechart_3.getState('E')
         state_F = statechart_3.getState('F')
 
@@ -246,7 +246,7 @@ class StatechartOwnerTestCase(unittest.TestCase):
   
         # [PORT] The javascript version had a dynamic system of observing the property with the
         #        name given by the value of statechartOwnerKey. However, in kivy-statechart, as of now,
-        #        you can't just change fooOwner (it isn't being observed), you have to rest the
+        #        you can't just change fooOwner (it isn't being observed), you have to reset the
         #        statechartOwnerKey to trigger an update.
         #
         setattr(statechart_3, 'fooOwner', None)

@@ -34,7 +34,7 @@ class TestState(State):
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootState'] = self.RootState
+        kwargs['rootStateClass'] = self.RootState
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(TestState):
@@ -57,7 +57,7 @@ class Statechart_1(StatechartManager):
         
 class Statechart_2(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootState'] = self.RootState
+        kwargs['rootStateClass'] = self.RootState
         super(Statechart_2, self).__init__(**kwargs)
 
     class RootState(TestState):
@@ -69,7 +69,7 @@ class Statechart_2(StatechartManager):
  
 class Statechart_3(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootState'] = self.RootState
+        kwargs['rootStateClass'] = self.RootState
         super(Statechart_3, self).__init__(**kwargs)
 
     class RootState(TestState):
@@ -86,7 +86,7 @@ class Statechart_3(StatechartManager):
 
 class Statechart_4(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootState'] = self.RootState
+        kwargs['rootStateClass'] = self.RootState
         super(Statechart_4, self).__init__(**kwargs)
 
     class RootState(TestState):
@@ -142,16 +142,16 @@ class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
 
         statechart_1 = Statechart_1()
         statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         statechart_2 = Statechart_2()
         statechart_2.initStatechart()
-        rootState_2 = statechart_2.rootState
+        rootState_2 = statechart_2.rootStateInstance
         statechart_3 = Statechart_3()
         statechart_3.initStatechart()
-        rootState_3 = statechart_3.rootState
+        rootState_3 = statechart_3.rootStateInstance
         statechart_4 = Statechart_4()
         statechart_4.initStatechart()
-        rootState_4 = statechart_4.rootState
+        rootState_4 = statechart_4.rootStateInstance
         state_A = statechart_4.getState('A')
         state_B = statechart_4.getState('B')
 

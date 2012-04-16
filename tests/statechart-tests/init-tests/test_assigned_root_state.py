@@ -40,15 +40,25 @@ class Statechart_1(StatechartManager):
     def __init__(self, app, **kwargs):
         kwargs['app'] = app
         kwargs['trace'] = True
-        kwargs['rootState'] = RootState
+        kwargs['rootStateClass'] = RootState
         super(Statechart_1, self).__init__(**kwargs)
 
-# [PORT] skipping this possibility.
+# [PORT] State doesn't have initialSubstate or substatesAreConcurrent defined
+#        by default, as apparently it was in the javascript version, because
+#        in the test there, they set rootState to State. Here we force the set
+#        of initialSubstate in a subclass, and will make the API require the set.
+#
+class TestState(State):
+    def __init__(self, **kwargs):
+        kwargs['initialSubstateKey'] = 'A'
+        kwargs['A'] = A
+        super(TestState, self).__init__(**kwargs)
+
 class Statechart_2(StatechartManager):
     def __init__(self, **kwargs):
         kwargs['trace'] = True
         kwargs['autoInitStatechart'] = False
-        kwargs['rootState'] = State
+        kwargs['rootStateClass'] = TestState
         super(Statechart_2, self).__init__(**kwargs)
 
 class TestApp(App):
@@ -63,33 +73,30 @@ class StatechartTestCase(unittest.TestCase):
         statechart_1 = Statechart_1(app)
         app.statechart = statechart_1
 
-        # [PORT] skipping this possibility.
-        #statechart_2 = Statechart_2()
+        statechart_2 = Statechart_2()
 
     def test_init_with_assigned_root_state(self):
         self.assertTrue(app.statechart.isStatechart)
         self.assertTrue(app.statechart.statechartIsInitialized)
-        self.assertEqual(app.statechart.rootState.name, '__ROOT_STATE__')
-        self.assertTrue(isinstance(app.statechart.rootState, State))
+        self.assertEqual(app.statechart.rootStateInstance.name, '__ROOT_STATE__')
+        self.assertTrue(isinstance(app.statechart.rootStateInstance, State))
         self.assertEqual(app.statechart.initialStateKey, '')
 
         self.assertTrue(app.statechart.getState('A').isCurrentState())
         self.assertFalse(app.statechart.getState('B').isCurrentState())
 
-        # [PORT] Except for the cross-object observing bit (commented out), owner is not set. Even with it, it seems.
-        #self.assertEqual(app.statechart.rootState.owner, app.statechart)
-        #self.assertEqual(app.statechart.getState('A').owner, app.statechart)
-        #self.assertEqual(app.statechart.getState('B').owner, app.statechart)
+        self.assertEqual(app.statechart.rootStateInstance.owner, app.statechart)
+        self.assertEqual(app.statechart.getState('A').owner, app.statechart)
+        self.assertEqual(app.statechart.getState('B').owner, app.statechart)
 
         app.statechart.sendEvent('foo')
 
         self.assertFalse(app.statechart.getState('A').isCurrentState())
         self.assertTrue(app.statechart.getState('B').isCurrentState())
 
-        # [PORT] skipping this possibility.
-        #self.assertTrue(statechart_2.isStatechart)
-        #self.assertFalse(statechart_2.statechartIsInitialized)
+        self.assertTrue(statechart_2.isStatechart)
+        self.assertFalse(statechart_2.statechartIsInitialized)
 
-        #statechart_2.initStatechart()
+        statechart_2.initStatechart()
 
-        #self.assertTrue(statechart_2.statechartIsInitialized)
+        self.assertTrue(statechart_2.statechartIsInitialized)

@@ -91,7 +91,7 @@ class StateTryToHandleEventTestCase(unittest.TestCase):
 
         statechart_1 = Statechart_1()
         statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootState
+        rootState_1 = statechart_1.rootStateInstance
         foo = statechart_1.getState('FOO')
         
     # Try to invoke state foo's eventHandler1 event handler
