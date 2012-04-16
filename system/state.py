@@ -1,4 +1,3 @@
-# ================================================================================
 # Project:   Kivy.Statechart - A Statechart Framework for Kivy
 # Copyright: (c) 2010, 2011 Michael Cohen, and contributors.
 # Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
@@ -51,6 +50,14 @@ class State(EventDispatcher):
       @property {Object}
     """
     owner = ObjectProperty(None)
+
+    # [PORT] Adding ownerKey as property
+    #
+    ownerKey = StringProperty(None)
+
+    # [PORT] Adding traceKey as property
+    #
+    traceKey = StringProperty(None)
 
     """
       Returns the statechart's assigned delegate. A statechart delegate is one
@@ -105,7 +112,7 @@ class State(EventDispatcher):
           
       @property {State}
     """
-    historyState = ObjectProperty(None)
+    historyState = ObjectProperty(None, allownone=True)
 
     """
       Used to indicate the initial substate of this state to enter into. 

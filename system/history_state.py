@@ -4,7 +4,7 @@
 # Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
 # ================================================================================
 
-from kivy.properties import AliasProperty, StringProperty
+from kivy.properties import BooleanProperty, ObjectProperty, StringProperty
 from kivy_statechart.system.state import State
 
 """
@@ -33,39 +33,27 @@ from kivy_statechart.system.state import State
   @extends Object
 """
 class HistoryState(State):
-    def __init__(self, **kw):
-        """
-          Used to indicate if the statechart should recurse the 
-          history states after entering the this object's parent state
+    """
+      Used to indicate if the statechart should recurse the 
+      history states after entering the this object's parent state
+
+      @property {Boolean}
+    """
+    isRecursive = BooleanProperty(False)
+
+    """ @private
+      Managed by the statechart 
+  
+      The statechart that owns this object.
+    """
+    statechart = ObjectProperty(None)
     
-          @property {Boolean}
-        """
-        self.isRecursive = False
-  
-        """ @private
-          Managed by the statechart 
-          
-          The statechart that owns this object.
-        """
-        self.create_property('statechart')
+    """ @private
+      Managed by the statechart 
         
-        """ @private
-          Managed by the statechart 
-            
-          The state that owns this object
-        """
-        self.create_property('parentState')
-
-        # [PORT] The javascript history state has a parentHistoryStateDidChange that observes
-        #        *parentState.historyState (if either the parentState or the parentState's 
-        #        historyState changes) which calls notifyPropertyChange('state'). We will
-        #        hope here that the state property, with its get_state will be updated.
-  
-        self.statechart = kw.pop('statechart', None)
-        self.parentState = kw.pop('parentState', None)
-        self.defaultState = kw.pop('defaultState', None)
-
-        super(HistoryState, self).__init__(**kw)
+      The state that owns this object
+    """
+    parentState = ObjectProperty(None)
 
     """
       The default state to enter if the parent state does not
@@ -80,21 +68,25 @@ class HistoryState(State):
     """
     defaultState = StringProperty(None, allownone=True)
 
+    def __init__(self, **kw):
+        self.statechart = kw.pop('statechart', None)
+        self.parentState = kw.pop('parentState', None)
+        self.defaultState = kw.pop('defaultState', None)
+
+        super(HistoryState, self).__init__(**kw)
+
     """
       Used by the statechart during a state transition process. 
-    
+      
       Returns a state to enter based on whether the parent state has
       its historyState property assigned. If not then this object's
       assigned default state is returned.
 
       PORT: This was a simple computed property, so it could be observed.
-            Here, we make state a class Property and use this _state
-            method as a backing.
+            Here, we make it a simple dynamic method.
     """
-    def get_state(self):
-        defaultState = self.defaultState
+    def state(self):
+        defaultState = self.getState(self.defaultState)
         historyState = self.parentState.historyState
 
         return historyState if historyState else defaultState
-    
-    state = AliasProperty(get_state, None)
