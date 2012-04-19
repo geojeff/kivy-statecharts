@@ -11,20 +11,22 @@ from kivy_statechart.system.state import State
   @class
 
   Represents a history state that can be assigned to a State object's
-  initialSubstateKey property. 
+  initialSubstate property. 
   
   If a HistoryState object is assigned to a state's initial substate, 
   then after a state is entered the statechart will refer to the history 
   state object to determine the next course of action. If the state has 
-  its historyState property assigned then the that state will be entered, 
+  its historyState property assigned then that state will be entered, 
   otherwise the default state assigned to history state object will be entered.
   
+  [PORT] API is to use a state called InitialSubstate. See tests.
+
   An example of how to use:
   
     stateA = State()
     
-    stateA.initialSubstateKey = HistoryState()
-    stateA.initialSubstateKey.defaultState = 'stateB'
+    stateA.initialSubstate = HistoryState()
+    stateA.initialSubstate.defaultState = 'stateB'
       
     stateA.stateB = State()
     stateA.stateC = State()
@@ -41,20 +43,6 @@ class HistoryState(State):
     """
     isRecursive = BooleanProperty(False)
 
-    """ @private
-      Managed by the statechart 
-  
-      The statechart that owns this object.
-    """
-    statechart = ObjectProperty(None)
-    
-    """ @private
-      Managed by the statechart 
-        
-      The state that owns this object
-    """
-    parentState = ObjectProperty(None)
-
     """
       The default state to enter if the parent state does not
       yet have its historyState property assigned to something 
@@ -68,12 +56,8 @@ class HistoryState(State):
     """
     defaultState = StringProperty(None, allownone=True)
 
-    def __init__(self, **kw):
-        self.statechart = kw.pop('statechart', None)
-        self.parentState = kw.pop('parentState', None)
-        self.defaultState = kw.pop('defaultState', None)
-
-        super(HistoryState, self).__init__(**kw)
+    def __init__(self, **kwargs):
+        super(HistoryState, self).__init__(**kwargs)
 
     """
       Used by the statechart during a state transition process. 

@@ -124,17 +124,14 @@ class StatePathMatcher(EventDispatcher):
       
         self.tokens = tokens
       
-        stack = tokens[:]
+        stack = list(tokens)
         chain = stack.pop() if stack else None
         self._chain = chain
-        while chain:
-            chain.nextToken = stack.pop() if stack else None
-            chain = chain.nextToken
-
-        # If the path expression is A.B.C, self.tokens is [ A, B, C ], and self._chain is C -> B -> A
-        c = self._chain
-        while c:
-            c = c.nextToken
+        token = stack.pop() if stack else None
+        while token:
+            chain.nextToken = token
+            chain = token
+            token = stack.pop() if stack else None
 
     """
       Returns the last part of the expression. So if the
@@ -163,8 +160,9 @@ class StatePathMatcher(EventDispatcher):
         #
         self._stack = path.split('.') if path else None
 
-        # Bug out if path is None or if path is not a string.
-        if path is None or not isinstance(path, basestring):
+
+        # Bug out if path is None or is '' or if path is not a string.
+        if path is None or not path or not isinstance(path, basestring):
             return False
 
         # self._chain is the head of a linked-list of chained tokens. Kick off a

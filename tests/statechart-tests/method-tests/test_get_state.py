@@ -83,7 +83,7 @@ class Statechart_3(StatechartManager):
 
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'A'
+            self.initialSubstateKey = 'A'
             super(Statechart_3.RootState, self).__init__(**kwargs)
 
         class A(State):

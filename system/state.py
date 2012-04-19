@@ -132,6 +132,8 @@ class State(EventDispatcher):
     """
     initialSubstateKey = StringProperty('')
 
+    initialSubstateObject = ObjectProperty(None)
+
     """
       Used to indicates if this state's immediate substates are to be
       concurrent (orthogonal) to each other. 
@@ -338,18 +340,19 @@ class State(EventDispatcher):
     
         self.substates = substates
     
-        if self.initialSubstateKey:
-            initialSubstate = self.getSubstate(self.initialSubstateKey)
+        if hasattr(self, 'InitialSubstate'):
+            initialSubstateClass = getattr(self, 'InitialSubstate')
             from kivy_statechart.system.history_state import HistoryState
-            if initialSubstate is not None and issubclass(initialSubstate, HistoryState):
-                historyState = self.createSubstate(self.initialSubstateKey)
-          
-                self.initialSubstateKey = historyState.name
-          
-                if not historyState.defaultState:
-                    self.stateLogError("Initial substate is invalid. History state requires the name of a default state to be set")
-                    self.initialSubstateKey = ''
-                    historyState = None
+            if initialSubstateClass is not None:
+                if issubclass(initialSubstateClass, HistoryState):
+                    historyState = self.createSubstate(initialSubstateClass)
+              
+                    if not historyState.defaultState:
+                        self.stateLogError("Initial substate is invalid. History state requires the name of a default state to be set")
+                        self.initialSubstateKey = ''
+                        historyState = None
+                    else:
+                        setattr(self, 'initialSubstateKey', historyState.defaultState)
     
         # Iterate through all this state's substates, if any, create them, and then initialize
         # them. This causes a recursive process.
@@ -376,11 +379,18 @@ class State(EventDispatcher):
             #if inspect.isclass(value) and issubclass(value, State) and getattr(self, key) is not self.__init__: # [PORT] using inspect
             if inspect.isclass(value) and issubclass(value, State):
                 state = self._addSubstate(key, value, None)
-                if key == self.initialSubstateKey:
+                # [PORT] Added clarification in this condition to distinguish between the normal case of
+                #        having a simple initialSubstateKey defined, vs. the use of a HistoryState as the
+                #        initialSubstate.
+                if key == self.initialSubstateKey and historyState is None:
                     self.initialSubstateKey = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
+                    self.initialSubstateObject = state
                     matchedInitialSubstate = True
                 elif historyState and historyState.defaultState == key:
-                    historyState.defaultState = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
+                    # [PORT] No need to do this in python version, because defaultState is a key; We do not reset
+                    #        defaultState to be a state object -- we rely on getSubstate to find it by the key
+                    #        when it is accessed. defaultState has already been set (See check above).
+                    #historyState.defaultState = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
                     matchedInitialSubstate = True
 
         if self.initialSubstateKey and not matchedInitialSubstate:
@@ -511,11 +521,13 @@ class State(EventDispatcher):
 
         state = self.createSubstate(EmptyState)
 
-        self.initialSubstateKey = state.name
+        self.initialSubstateKey = state.name if state.name else state.__class__.__name__
 
         self.substates.append(state)
 
         setattr(self, state.name, state)
+
+        self.initialSubstateObject = state
 
         state.initState()
 
@@ -755,14 +767,22 @@ class State(EventDispatcher):
             self.stateLogError("Can not find matching subtype. value must be a State class or string: {0}".format(value))
             return None
         
+        # [PORT] In python API for history states, the history state must be called InitialSubstate.
+        #        We need an explicit check for it here, otherwise the path matcher might fail if there
+        #        are other substates with history states (multiple matches on 'InitialSubstate').
+        if value == 'InitialSubstate' and hasattr(self, 'InitialSubstate'):
+            return getattr(self, 'InitialSubstate')
+
         # [PORT] Considered this, but it seemed to match on what should remain ambiguous.
         #for state in self._registeredSubstates:
             #if value == state.name:
                 #return state
 
-        # Not found yet, so look deeper for a nested substate.
+        # Not found yet, so keep looking with path matcher.
         matcher = StatePathMatcher(state=self, expression=value)
+
         matches = []
+
         if len(matcher.tokens) == 0:
             return None
 
@@ -770,37 +790,48 @@ class State(EventDispatcher):
         paths = self._registeredSubstatePaths[matcher.lastPart] if matcher.lastPart in self._registeredSubstatePaths else None
 
         if paths is None:
-            return self._notifySubstateNotFound(callback, target, value)
+            return self._notifySubstateNotFound(callback=callback, target=target, value=value)
 
-        for path in paths:
-            if matcher.match(path):
-                matches.append(paths[path])
+        if value in paths:
+            matches.append(paths[value])
+        else:
+            for path in paths:
+                if matcher.match(path):
+                    matches.append(paths[path])
 
         if len(matches) == 1:
-            return self.getState(matches[0])
+            return matches[0]
 
         if len(matches) > 1:
-            matchedPaths = []
-            for path in paths:
+            pathKeys = []
+            for key in paths:
                 # [PORT] Added this. Perhaps the matcher should return only the exact match, if it exists.
                 #        This will catch substate A, when there are also substates X.A and B.Y.A. Otherwise,
                 #        as apparently the way the javascript version works, there would be no match, because
                 #        of that ambiguity. This way, state references must be explicit.
-                if path == value: 
-                    return self.getState(paths[path])
-                matchedPaths.append(path)
+                #if path == value: 
+                #    return self.getState(paths[path])
+                pathKeys.append(key)
 
             if callback is not None:
-                return self._notifySubstateNotFound(callback, target, value, matchedPaths)
+                return self._notifySubstateNotFound(callback=callback, target=target, value=value, keys=pathKeys)
 
             msg = "Can not find substate matching '{0}' in state {1}. Ambiguous with the following: {2}"
-            self.stateLogError(msg.format(value, self.fullPath, ', '.join(matchedPaths)))
+            self.stateLogError(msg.format(value, self.fullPath, ', '.join(pathKeys)))
 
-        self._notifySubstateNotFound(callback, target, value)
+        return self._notifySubstateNotFound(callback=callback, target=target, value=value)
 
     """ @private """
     def _notifySubstateNotFound(self, callback=None, target=None, value=None, keys=None):
-        return callback(target or self, value, keys) if callback is not None else None
+        if callback:
+            if target and hasattr(target, callback.__name__):
+                return getattr(target, callback.__name__)(self, value, keys)
+            elif hasattr(self, callback.__name__):
+                return getattr(self, callback.__name__)(self, value, keys)
+            else:
+                return callback(self, value, keys)
+        else:
+            return None
 
     """
       Will attempt to get a state relative to this state. 
@@ -824,19 +855,11 @@ class State(EventDispatcher):
             return self
 
         # [PORT] This doesn't make sense. It is like a protection for a wrong call.
-        if inspect.isclass(value) and issubclass(value, State):
+        #
+        if isinstance(value, State):
             return value
 
-        # [PORT] Added this call to self.statechart.getState, and the conditional following. The original
-        #        javascript test only had the last line, but there is a difference in the way getState in
-        #        state.py and in statechart.py work in the python port. Tests pass if this call is punted
-        #        up to the statechart.
-        state = self.statechart.getState(value)
-
-        if state is not None:
-            return state
-        else:
-            return self.getSubstate(value, self._handleSubstateNotFound)
+        return self.getSubstate(value, self._handleSubstateNotFound)
 
     """ @private """
     def _handleSubstateNotFound(self, state, value, keys=None):

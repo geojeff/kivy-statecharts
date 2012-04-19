@@ -446,10 +446,10 @@ class StatechartManager(EventDispatcher):
         # The initialState of rootState must be a real state -- can't be the EmptyState.
         problemWithInitialRootState = False
         if hasattr(rootStateInstance, 'initialSubstateKey') and rootStateInstance.initialSubstateKey:
-            initialRootState = rootStateInstance.getSubstate(rootStateInstance.initialSubstateKey)
+            initialRootState = rootStateInstance.initialSubstateObject
             if initialRootState is None:
                 problemWithInitialRootState = True
-            elif inspect.isclass(initialRootState) and issubclass(initialRootState, EmptyState):
+            elif isinstance(initialRootState, EmptyState):
                 problemWithInitialRootState = True
         elif not hasattr(rootStateInstance, 'substatesAreConcurrent') or not rootStateInstance.substatesAreConcurrent:
             problemWithInitialRootState = True
@@ -458,6 +458,17 @@ class StatechartManager(EventDispatcher):
             msg = "Unable to initialize statechart. Root state must have an initial substate or substatesAreConcurrent explicitly defined."
             self.statechartLogError(msg)
             raise Exception(msg)
+
+    #if (SC.kindOf(rootState.get('initialSubstate'), SC.EmptyState)) {
+      #msg = "Unable to initialize statechart. Root state must have an initial substate explicilty defined";
+      #this.statechartLogError(msg);
+      #throw msg;
+    #}
+    #
+    ##if (!SC.empty(this.get('initialState'))) {
+      #var key = 'initialState';
+      #this.set(key, rootState.get(this.get(key)));
+    #} 
           
         # In the original javascript, an if here did this:
         #
@@ -1170,7 +1181,7 @@ class StatechartManager(EventDispatcher):
             gotoStateActions.append(gotoStateAction)
             
             initialSubstateKey = state.initialSubstateKey if hasattr(state, 'initialSubstateKey') else ''
-            historyState = state.historySubstate if hasattr(state, 'historySubstate') else None
+            historyState = state.historyState
             
             # State has concurrent substates. Need to enter all of the substates
             stateObj = self.getState(state)
@@ -1184,8 +1195,8 @@ class StatechartManager(EventDispatcher):
             
             # State has an initial substate to enter
             elif initialSubstateKey:
-                initialSubstateObj = self.getState(initialSubstateKey)
-                if inspect.isclass(initialSubstateObj) and issubclass(initialSubstateObj, HistoryState):
+                initialSubstateObj = getattr(state, initialSubstateKey)
+                if initialSubstateObj is not None and isinstance(initialSubstateObj, HistoryState):
                     if not useHistory:
                         useHistory = initialSubstateObj.isRecursive
                 self._traverseStatesToEnter(initialSubstateObj, None, None, useHistory, gotoStateActions)
