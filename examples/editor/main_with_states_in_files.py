@@ -22,7 +22,7 @@ class RootState(State):
     def __init__(self, **kwargs):
         super(RootState, self).__init__(**kwargs)
     
-    initialSubstate = 'SHOWING_MAIN'
+    initialSubstateKey = 'SHOWING_MAIN'
     
     SHOWING_MAIN = SHOWING_MAIN
     SHOWING_LOAD_DIALOG  = SHOWING_LOAD_DIALOG
@@ -45,7 +45,7 @@ class AppStatechart(StatechartManager):
     def __init__(self, app, **kw):
         self.app = app
         self.trace = True
-        self.rootState = RootState
+        self.rootStateClass = RootState
         super(AppStatechart, self).__init__(**kw)
 
 #######
