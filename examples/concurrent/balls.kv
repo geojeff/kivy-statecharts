@@ -1,0 +1,36 @@
+#:kivy 1.0.9
+
+<Ball>:
+    size: 50, 50 
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+
+<BallsView>:
+    ball_1: b_1
+    ball_2: b_2
+    ball_3: b_3
+    ball_4: b_4
+    ball_5: b_5
+    
+    Ball:
+        id: b_1
+        center: self.parent.center
+        
+    Ball:
+        id: b_2
+        center: self.parent.center
+        
+    Ball:
+        id: b_3
+        center: self.parent.center
+        
+    Ball:
+        id: b_4
+        center: self.parent.center
+        
+    Ball:
+        id: b_5
+        center: self.parent.center
+        
