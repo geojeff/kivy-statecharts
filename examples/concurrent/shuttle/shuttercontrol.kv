@@ -1,0 +1,174 @@
+#:kivy 1.0.9
+
+#<ThrustersImage>:
+#    canvas:
+#        Color:
+#            rgb: (1, 1, 1)
+#        Rectangle:
+#            texture: self.texture
+#            size: self.size
+#            pos: self.pos
+
+<ThrusterGroupControl>:
+    size: 50, 50 
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            on_touch_down: root.app.statechart.sendEvent(self.id)
+
+<RotationalMotionControl>:
+    size: 46, 70 
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.size          
+            on_touch_down: root.app.statechart.sendEvent(self.id)
+
+<TranslationalMotionControl>:
+    size: 46, 70 
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.size          
+            on_touch_down: root.app.statechart.sendEvent(self.id)
+
+<ShuttleControlView>:
+    #background_image: thrusters
+
+    thruster_group_1: thruster_group_1
+    thruster_group_2: thruster_group_2
+    thruster_group_3: thruster_group_3
+    thruster_group_4: thruster_group_4
+    thruster_group_5: thruster_group_5
+    thruster_group_6: thruster_group_6
+    thruster_group_7: thruster_group_7
+    thruster_group_8: thruster_group_8
+    thruster_group_9: thruster_group_9
+    thruster_group_10: thruster_group_10
+    thruster_group_11: thruster_group_11
+    thruster_group_12: thruster_group_12
+    thruster_group_13: thruster_group_13
+    thruster_group_14: thruster_group_14
+
+    yaw_plus: yaw_plus
+    yaw_minus: yaw_minus
+    pitch_plus: pitch_plus
+    pitch_minus: pitch_minus
+    roll_plus: roll_plus
+    roll_minus: roll_minus
+    
+    translate_x_plus: translate_x_plus
+    translate_x_minus: translate_x_minus
+    translate_y_plus: translate_y_plus
+    translate_y_minus: translate_y_minus
+    translate_z_plus: translate_z_plus
+    translate_z_minus: translate_z_minus
+
+    ThrustersImage: 
+        id: thrusters
+
+    ThrusterGroupControl:
+        id: thruster_group_1
+        pos: (133, 406)
+        
+    ThrusterGroupControl:
+        id: thruster_group_2
+        pos: (293, 483)
+        
+    ThrusterGroupControl:
+        id: thruster_group_3
+        pos: (82, 425)
+        
+    ThrusterGroupControl:
+        id: thruster_group_4
+        pos: (184, 324)
+        
+    ThrusterGroupControl:
+        id: thruster_group_5
+        pos: (124, 522)
+        
+    ThrusterGroupControl:
+        id: thruster_group_6
+        pos: (237, 548)
+        
+    ThrusterGroupControl:
+        id: thruster_group_7
+        pos: (324, 214)
+        
+    ThrusterGroupControl:
+        id: thruster_group_8
+        pos: (546, 245)
+        
+    ThrusterGroupControl:
+        id: thruster_group_9
+        pos: (540, 363)
+        
+    ThrusterGroupControl:
+        id: thruster_group_10
+        pos: (247, 252)
+        
+    ThrusterGroupControl:
+        id: thruster_group_11
+        pos: (459, 237)
+        
+    ThrusterGroupControl:
+        id: thruster_group_12
+        pos: (332, 202)
+        
+    ThrusterGroupControl:
+        id: thruster_group_13
+        pos: (468, 415)
+        
+    ThrusterGroupControl:
+        id: thruster_group_14
+        pos: (340, 362)
+        
+    RotationalMotionControl:
+        id: yaw_plus
+        pos: (4, 620)
+        
+    RotationalMotionControl:
+        id: yaw_minus
+        pos: (52, 620)
+        
+    RotationalMotionControl:
+        id: pitch_plus
+        pos: (98, 620)
+        
+    RotationalMotionControl:
+        id: pitch_minus
+        pos: (168, 620)
+        
+    RotationalMotionControl:
+        id: roll_plus
+        pos: (238, 620)
+        
+    RotationalMotionControl:
+        id: roll_minus
+        pos: (286, 620)
+        
+    TranslationalMotionControl:
+        id: translate_x_plus
+        pos: (340, 620)
+        
+    TranslationalMotionControl:
+        id: translate_x_minus
+        pos: (384, 620)
+        
+    TranslationalMotionControl:
+        id: translate_y_plus
+        pos: (426, 620)
+        
+    TranslationalMotionControl:
+        id: translate_y_minus
+        pos: (486, 620)
+        
+    TranslationalMotionControl:
+        id: translate_z_plus
+        pos: (510, 620)
+        
+    TranslationalMotionControl:
+        id: translate_z_minus
+        pos: (554, 620)
+        
