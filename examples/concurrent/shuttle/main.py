@@ -15,9 +15,8 @@ from kivy_statechart.system.statechart import StatechartManager
 import inspect
 
 
-class ThrustersImage(Image):
-    def __init__(self, source):
-        super(ThrustersImage, self).__init__(source=source)
+class ThrustersImage(Widget):
+    pass
 
 
 class ThrusterGroupControl(Widget):
@@ -587,7 +586,7 @@ class ShuttleControlApp(App):
 
     def build(self):
         print 'BUILDING'
-        self.mainView = ShuttleControlView(app=self, background_image=ThrustersImage("RCSJetCode.png"))
+        self.mainView = ShuttleControlView(app=self, background_image=ThrustersImage())
         self.statechart = AppStatechart(app=self)
         self.statechart.initStatechart()
         return self.mainView
