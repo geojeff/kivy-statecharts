@@ -1,13 +1,13 @@
 #:kivy 1.0.9
 
-#<ThrustersImage>:
-#    canvas:
-#        Color:
-#            rgb: (1, 1, 1)
-#        Rectangle:
-#            texture: self.texture
-#            size: self.size
-#            pos: self.pos
+<ThrustersImage>:
+    canvas:
+        Color:
+            rgb: (1, 1, 1)
+        Rectangle:
+            texture: self.texture
+            size: self.size
+            pos: self.pos
 
 <ThrusterGroupControl>:
     size: 50, 50 
@@ -34,7 +34,7 @@
             on_touch_down: root.app.statechart.sendEvent(self.id)
 
 <ShuttleControlView>:
-    #background_image: thrusters
+    background_image: thrusters
 
     thruster_group_1: thruster_group_1
     thruster_group_2: thruster_group_2
