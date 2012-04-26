@@ -6,7 +6,7 @@
             rgb: (1, 1, 1)
         Rectangle:
             source: 'RCSJetCode.png'
-            size: self.size
+            size: 600, 714
             pos: self.pos
 
 <ThrusterGroupControl>:
@@ -34,6 +34,12 @@
             on_touch_down: root.app.statechart.sendEvent(self.id)
 
 <ShuttleControlView>:
+    size: 600, 714
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: 600, 714
+
     background_image: thrusters
 
     thruster_group_1: thruster_group_1
