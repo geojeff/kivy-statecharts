@@ -1,7 +1,6 @@
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.uix.image import Image
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, StringProperty, ListProperty
 from kivy.vector import Vector
 from kivy.factory import Factory
@@ -13,10 +12,6 @@ from kivy_statechart.system.statechart import Statechart
 from kivy_statechart.system.statechart import StatechartManager
 
 import inspect
-
-
-class ThrustersImage(Widget):
-    pass
 
 
 class ThrusterGroupControl(Widget):
@@ -133,10 +128,8 @@ class ShuttleControlView(Widget):
     translate_z_plus = ObjectProperty(None)
     translate_z_minus = ObjectProperty(None)
 
-    def __init__(self, app, background_image):
+    def __init__(self, app):
         self.app = app
-        self.background_image = background_image
-        print background_image
         super(ShuttleControlView, self).__init__() 
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
@@ -574,7 +567,6 @@ class AppStatechart(StatechartManager):
                     pass
 
 
-Factory.register("ThrustersImage", ThrustersImage)
 Factory.register("RotationalMotionControl", RotationalMotionControl)
 Factory.register("TranslationalMotionControl", TranslationalMotionControl)
 Factory.register("ThrusterGroupControl", ThrusterGroupControl)
@@ -586,7 +578,7 @@ class ShuttleControlApp(App):
 
     def build(self):
         print 'BUILDING'
-        self.mainView = ShuttleControlView(app=self, background_image=ThrustersImage())
+        self.mainView = ShuttleControlView(app=self)
         self.statechart = AppStatechart(app=self)
         self.statechart.initStatechart()
         return self.mainView

@@ -1,14 +1,5 @@
 #:kivy 1.0.9
 
-<ThrustersImage>:
-    canvas:
-        Color:
-            rgb: (1, 1, 1)
-        Rectangle:
-            source: 'RCSJetCode.png'
-            size: 600, 714
-            pos: self.pos
-
 <ThrusterGroupControl>:
     size: 50, 50 
     canvas:
@@ -36,11 +27,12 @@
 <ShuttleControlView>:
     size: 600, 714
     canvas:
+        Color:
+            rgb: (1, 1, 1)
         Rectangle:
-            pos: self.pos
+            source: 'RCSJetCode.png'
             size: 600, 714
-
-    background_image: thrusters
+            pos: self.pos
 
     thruster_group_1: thruster_group_1
     thruster_group_2: thruster_group_2
@@ -70,9 +62,6 @@
     translate_y_minus: translate_y_minus
     translate_z_plus: translate_z_plus
     translate_z_minus: translate_z_minus
-
-    ThrustersImage: 
-        id: thrusters
 
     ThrusterGroupControl:
         id: thruster_group_1
