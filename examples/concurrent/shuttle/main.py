@@ -137,6 +137,7 @@ class ShuttleControlView(Widget):
     def __init__(self, app, background_image):
         self.app = app
         self.background_image = background_image
+        print background_image
         super(ShuttleControlView, self).__init__() 
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
@@ -248,7 +249,6 @@ class AppStatechart(StatechartManager):
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_1, self).__init__(**kwargs)
                     self.tgKey = 'thruster_group_1'
                     self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
-                    print 'YOOOOOOO', self.thruster_group
                     self.setThrusterCount()
 
                 def translate_x_minus(self):
