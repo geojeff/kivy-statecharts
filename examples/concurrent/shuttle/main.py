@@ -1,6 +1,7 @@
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
+from kivy.uix.floatlayout import FloatLayout
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, StringProperty, ListProperty
 from kivy.vector import Vector
 from kivy.factory import Factory
@@ -128,9 +129,9 @@ class ShuttleControlView(Widget):
     translate_z_plus = ObjectProperty(None)
     translate_z_minus = ObjectProperty(None)
 
-    def __init__(self, app):
+    def __init__(self, app, **kwargs):
         self.app = app
-        super(ShuttleControlView, self).__init__() 
+        super(ShuttleControlView, self).__init__(**kwargs) 
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
@@ -578,10 +579,12 @@ class ShuttleControlApp(App):
 
     def build(self):
         print 'BUILDING'
+        layout = FloatLayout(size=(1000,1000), size_hint=(1,1))
         self.mainView = ShuttleControlView(app=self)
+        layout.add_widget(self.mainView)
         self.statechart = AppStatechart(app=self)
         self.statechart.initStatechart()
-        return self.mainView
+        return layout
 
 if __name__ in ('__android__', '__main__'):
     app = ShuttleControlApp()
