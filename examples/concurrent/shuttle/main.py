@@ -58,41 +58,36 @@ class ThrusterGroupControl(Widget):
     def slide_up_and_down_less(self):
         self.vibrate_less()
 
-class RotationalMotionControl(Widget):
-    pass
-#    statechart = ObjectProperty(None)
-#
-#    def on_touch_down(self, touch):
-#        print touch.x, touch.y, self.x, self.right, self.y, self.top
-#        with self.canvas:
-#            Color(1, 1, 0)
-#            d = 10.
-#            Ellipse(pos=(touch.x - d/2, touch.y - d/2), size=(d, d))
-#        self.statechart.sendEvent('yaw_plus')
-#
-#    def on_touch_move(self, touch):
-#        pass
-#
-#    def on_touch_up(self, touch):
-#        pass
+class MotionControlWidget(Widget):
+    statechart = ObjectProperty(None)
+    kvId = StringProperty('')
 
-class TranslationalMotionControl(Widget):
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            # if the touch is colliding to our widget, let's grab it.
+            touch.grab(self)
+        
+            #with self.canvas:
+                #Color(1, 1, 0)
+                #d = 10.
+                #Ellipse(pos=(touch.x - d/2, touch.y - d/2), size=(d, d))
+    
+            return True
+
+    def on_touch_up(self, touch):
+        if touch.grab_current is self:
+    
+            touch.ungrab(self)
+
+            self.statechart.sendEvent(self.kvId)
+    
+            return True
+
+class RotationalMotionControl(MotionControlWidget):
     pass
-#    statechart = ObjectProperty(None)
-#
-#    def on_touch_down(self, touch):
-#        print touch.x, touch.y, self.x, self.right, self.y, self.top
-#        with self.canvas:
-#            Color(1, 1, 0)
-#            d = 10.
-#            Ellipse(pos=(touch.x - d/2, touch.y - d/2), size=(d, d))
-#        self.statechart.sendEvent('yaw_plus')
-#
-#    def on_touch_move(self, touch):
-#        pass
-#
-#    def on_touch_up(self, touch):
-#        pass
+
+class TranslationalMotionControl(MotionControlWidget):
+    pass
 
 
 class ShuttleControlView(Widget):
@@ -159,6 +154,12 @@ class ShuttleControlView(Widget):
         for thruster_group in (self.thruster_group_1, self.thruster_group_2, self.thruster_group_3, self.thruster_group_4, self.thruster_group_5, self.thruster_group_6, self.thruster_group_7, self.thruster_group_8, self.thruster_group_9, self.thruster_group_10, self.thruster_group_11, self.thruster_group_12, self.thruster_group_13, self.thruster_group_14):
             thruster_group.vibration = vibration
 
+    def set_statechart_in_motion_controls(self, statechart):
+        controls = { 'yaw_plus': self.yaw_plus, 'yaw_minus': self.yaw_minus, 'pitch_plus': self.pitch_plus, 'pitch_minus': self.pitch_minus, 'roll_plus': self.roll_plus, 'roll_minus': self.roll_minus, 'translate_x_plus': self.translate_x_plus, 'translate_x_minus': self.translate_x_minus, 'translate_y_plus': self.translate_y_plus, 'translate_y_minus': self.translate_y_minus, 'translate_z_plus': self.translate_z_plus, 'translate_z_minus': self.translate_z_minus }
+        for kvId in controls:
+            setattr(controls[kvId], 'kvId', kvId)
+            setattr(controls[kvId], 'statechart', statechart)
+
     def update(self, *args):
         # Wiggle thruster_groups by their vibrate amounts.
         for thruster_group in (self.thruster_group_1, self.thruster_group_2, self.thruster_group_3, self.thruster_group_4, self.thruster_group_5, self.thruster_group_6, self.thruster_group_7, self.thruster_group_8, self.thruster_group_9, self.thruster_group_10, self.thruster_group_11, self.thruster_group_12, self.thruster_group_13, self.thruster_group_14):
@@ -216,6 +217,7 @@ class AppStatechart(StatechartManager):
         def enterState(self, context=None):
             print 'RootState/enterState'
             self.statechart.app.mainView.place_thruster_groups()
+            self.statechart.app.mainView.set_statechart_in_motion_controls(self.statechart)
             Clock.schedule_interval(self.statechart.app.mainView.update, 1.0/60.0)
                         
         def exitState(self, context=None):
