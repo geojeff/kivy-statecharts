@@ -6,8 +6,7 @@
             rgb: (.8, .2, .2)
         Ellipse:
             pos: self.pos
-            size: 12, 12
-            on_touch_down: root.app.statechart.sendEvent(self.id)
+            size: 5, 5
 
 <RotationalMotionControl>:
     canvas:
@@ -16,7 +15,6 @@
         Rectangle:
             pos: self.pos
             size: self.size
-            on_touch_down: root.app.statechart.sendEvent(self.id)
 
 <TranslationalMotionControl>:
     canvas:
@@ -25,7 +23,6 @@
         Rectangle:
             pos: self.pos
             size: self.size
-            on_touch_down: root.app.statechart.sendEvent(self.id)
 
 <ShuttleControlView>:
     canvas:
@@ -125,59 +122,71 @@
         id: yaw_plus
         pos: (4, 22)
         size: 46, 72
+        on_touch_down: root.app.statechart.sendEvent('yaw_plus')
         
     RotationalMotionControl:
         id: yaw_minus
         pos: (52, 22)
         size: 46, 72
+        on_touch_down: root.app.statechart.sendEvent('yaw_minus')
         
     RotationalMotionControl:
         id: pitch_plus
         pos: (98, 22)
         size: 72, 72
+        on_touch_down: root.app.statechart.sendEvent('pitch_plus')
         
     RotationalMotionControl:
         id: pitch_minus
         pos: (168, 22)
         size: 72, 72
+        on_touch_down: root.app.statechart.sendEvent('pitch_minus')
         
     RotationalMotionControl:
         id: roll_plus
         size: 72, 72
         pos: (238, 22)
+        on_touch_down: root.app.statechart.sendEvent('roll_plus')
         
     RotationalMotionControl:
         id: roll_minus
         pos: (286, 22)
         size: 46, 72
+        on_touch_down: root.app.statechart.sendEvent('roll_minus')
         
     TranslationalMotionControl:
         id: translate_x_plus
         pos: (340, 22)
         size: 46, 72
+        on_touch_down: root.app.statechart.sendEvent('translate_x_plus')
         
     TranslationalMotionControl:
         id: translate_x_minus
         pos: (384, 22)
         size: 46, 72
+        on_touch_down: root.app.statechart.sendEvent('translate_x_plus')
         
     TranslationalMotionControl:
         id: translate_y_plus
         pos: (426, 22)
         size: 46, 72
+        on_touch_down: root.app.statechart.sendEvent('translate_y_plus')
         
     TranslationalMotionControl:
         id: translate_y_minus
         pos: (467, 22)
         size: 46, 72
+        on_touch_down: root.app.statechart.sendEvent('translate_y_minus')
         
     TranslationalMotionControl:
         id: translate_z_plus
         pos: (510, 22)
         size: 46, 72
+        on_touch_down: root.app.statechart.sendEvent('translate_z_plus')
         
     TranslationalMotionControl:
         id: translate_z_minus
         pos: (554, 22)
         size: 46, 72
+        on_touch_down: root.app.statechart.sendEvent('translate_z_minus')
         

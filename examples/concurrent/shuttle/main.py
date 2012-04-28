@@ -2,12 +2,15 @@ import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.floatlayout import FloatLayout
-from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, StringProperty, ListProperty
+from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, StringProperty, ListProperty, BooleanProperty
 from kivy.vector import Vector
 from kivy.factory import Factory
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.graphics import Color, Ellipse
+
 from random import randint, random
+
 from kivy_statechart.system.state import State
 from kivy_statechart.system.statechart import Statechart
 from kivy_statechart.system.statechart import StatechartManager
@@ -16,84 +19,80 @@ import inspect
 
 
 class ThrusterGroupControl(Widget):
+    alternate = BooleanProperty(False)
     vibration_x = NumericProperty(0)
     vibration_y = NumericProperty(0)
     vibration = ReferenceListProperty(vibration_x, vibration_y)
     
     def vibrate(self):
-        self.pos = Vector(*self.vibration) + self.pos
+        if self.alternate:
+            self.size = (self.size[0]+self.vibration_x, self.size[1]+self.vibration_y)
+            self.alternate = False
+        else:
+            self.size = (1,1)
+            self.alternate = True
+
+    def vibrate_more(self):
+        self.vibration_x += 1
+        self.vibration_y += 1
+
+    def vibrate_less(self):
+        self.vibration_x -= 1
+        self.vibration_y -= 1
 
     def slide_back_and_forth_more(self):
-        self.pos = Vector(*self.vibration) + self.pos
+        self.vibrate_more()
 
     def slide_back_and_forth_less(self):
-        self.pos = Vector(*self.vibration) + self.pos
+        self.vibrate_less()
 
     def slide_in_and_out_more(self):
-        self.pos = Vector(*self.vibration) + self.pos
+        self.vibrate_more()
 
     def slide_in_and_out_less(self):
-        self.pos = Vector(*self.vibration) + self.pos
+        self.vibrate_less()
 
-    def slide_in_and_out_more(self):
-        self.pos = Vector(*self.vibration) + self.pos
+    def slide_up_and_down_more(self):
+        self.vibrate_more()
 
-    def slide_in_and_out_less(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
+    def slide_up_and_down_less(self):
+        self.vibrate_less()
 
 class RotationalMotionControl(Widget):
-    vibration_x = NumericProperty(0)
-    vibration_y = NumericProperty(0)
-    vibration = ReferenceListProperty(vibration_x, vibration_y)
-    
-    def vibrate(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_back_and_forth_more(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_back_and_forth_less(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_in_and_out_more(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_in_and_out_less(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_in_and_out_more(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_in_and_out_less(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
+    pass
+#    statechart = ObjectProperty(None)
+#
+#    def on_touch_down(self, touch):
+#        print touch.x, touch.y, self.x, self.right, self.y, self.top
+#        with self.canvas:
+#            Color(1, 1, 0)
+#            d = 10.
+#            Ellipse(pos=(touch.x - d/2, touch.y - d/2), size=(d, d))
+#        self.statechart.sendEvent('yaw_plus')
+#
+#    def on_touch_move(self, touch):
+#        pass
+#
+#    def on_touch_up(self, touch):
+#        pass
 
 class TranslationalMotionControl(Widget):
-    vibration_x = NumericProperty(0)
-    vibration_y = NumericProperty(0)
-    vibration = ReferenceListProperty(vibration_x, vibration_y)
-    
-    def vibrate(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_back_and_forth_more(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_back_and_forth_less(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_in_and_out_more(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_in_and_out_less(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_in_and_out_more(self):
-        self.pos = Vector(*self.vibration) + self.pos
-
-    def slide_in_and_out_less(self):
-        self.pos = Vector(*self.vibration) + self.pos
+    pass
+#    statechart = ObjectProperty(None)
+#
+#    def on_touch_down(self, touch):
+#        print touch.x, touch.y, self.x, self.right, self.y, self.top
+#        with self.canvas:
+#            Color(1, 1, 0)
+#            d = 10.
+#            Ellipse(pos=(touch.x - d/2, touch.y - d/2), size=(d, d))
+#        self.statechart.sendEvent('yaw_plus')
+#
+#    def on_touch_move(self, touch):
+#        pass
+#
+#    def on_touch_up(self, touch):
+#        pass
 
 
 class ShuttleControlView(Widget):
@@ -132,8 +131,8 @@ class ShuttleControlView(Widget):
     def __init__(self, app, **kwargs):
         self.app = app
         super(ShuttleControlView, self).__init__(**kwargs) 
-        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
-        self._keyboard.bind(on_key_down=self._on_keyboard_down)
+        #self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+        #self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
     def _keyboard_closed(self):
         print 'My keyboard has been closed!'
@@ -159,7 +158,7 @@ class ShuttleControlView(Widget):
     def place_thruster_groups(self, vibration=(4,0)):
         for thruster_group in (self.thruster_group_1, self.thruster_group_2, self.thruster_group_3, self.thruster_group_4, self.thruster_group_5, self.thruster_group_6, self.thruster_group_7, self.thruster_group_8, self.thruster_group_9, self.thruster_group_10, self.thruster_group_11, self.thruster_group_12, self.thruster_group_13, self.thruster_group_14):
             thruster_group.vibration = vibration
-        
+
     def update(self, *args):
         # Wiggle thruster_groups by their vibrate amounts.
         for thruster_group in (self.thruster_group_1, self.thruster_group_2, self.thruster_group_3, self.thruster_group_4, self.thruster_group_5, self.thruster_group_6, self.thruster_group_7, self.thruster_group_8, self.thruster_group_9, self.thruster_group_10, self.thruster_group_11, self.thruster_group_12, self.thruster_group_13, self.thruster_group_14):
@@ -216,8 +215,8 @@ class AppStatechart(StatechartManager):
         
         def enterState(self, context=None):
             print 'RootState/enterState'
-            #self.statechart.app.mainView.place_thruster_groups()
-            #Clock.schedule_interval(self.statechart.app.mainView.update, 1.0/60.0)
+            self.statechart.app.mainView.place_thruster_groups()
+            Clock.schedule_interval(self.statechart.app.mainView.update, 1.0/60.0)
                         
         def exitState(self, context=None):
             print 'RootState/exitState'
@@ -244,7 +243,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
                     self.setThrusterCount()
 
-                def translate_x_minus(self):
+                def translate_x_minus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_back_and_forth_less()
 
                 class AdjustingThruster_F1F(State):
@@ -259,15 +258,16 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_2(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_2'
-                    self.vibration_x = 2
-                    self.vibration_y = 2
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_2, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_2'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def yaw_plus(self):
-                    self.thruster_group.rotate_more()
+                def yaw_plus(self, arg1=None, arg2=None):
+                    print 'yaw_plus firing'
+                    self.thruster_group.vibrate_more()
 
-                def translate_y_plus(self):
+                def translate_y_plus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_up_and_down_more()
 
                 class AdjustingThruster_F1L(State):
@@ -279,15 +279,15 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_3(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_3'
-                    self.vibration_x = 3
-                    self.vibration_y = 3
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_3, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_3'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def yaw_minus(self):
-                    self.thruster_group.rotate_less()
+                def yaw_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_less()
 
-                def translate_y_minus(self):
+                def translate_y_minus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_up_and_down_less()
 
                 class AdjustingThruster_F2R(State):
@@ -299,15 +299,15 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_4(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_4'
-                    self.vibration_x = 4
-                    self.vibration_y = 4
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_4, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_4'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def pitch_minus(self):
-                    self.thruster_group.rotate_less()
+                def pitch_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_less()
 
-                def translate_z_plus(self):
+                def translate_z_plus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_in_and_out_more()
 
                 class AdjustingThruster_F1U(State):
@@ -322,15 +322,15 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_5(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_5'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_5, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_5'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def pitch_plus(self):
-                    self.thruster_group.rotate_more()
+                def pitch_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_more()
 
-                def translate_z_minus(self):
+                def translate_z_minus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_in_and_out_less()
 
                 class AdjustingThruster_F5R(State):
@@ -345,15 +345,15 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_6(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_6'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_6, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_6'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def roll_plus(self):
-                    self.thruster_group.rotate_more()
+                def roll_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_more()
 
-                def translate_z_minus(self):
+                def translate_z_minus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_in_and_out_less()
 
                 class AdjustingThruster_F1D(State):
@@ -368,15 +368,15 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_7(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_7'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_7, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_7'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def pitch_minus(self):
-                    self.thruster_group.rotate_less()
+                def pitch_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_less()
 
-                def translate_x_plus(self):
+                def translate_x_plus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_back_and_forth_more()
 
                 class AdjustingThruster_R1A(State):
@@ -388,15 +388,15 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_8(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_8'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_8, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_8'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def pitch_plus(self):
-                    self.thruster_group.rotate_more()
+                def pitch_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_more()
 
-                def translate_x_plus(self):
+                def translate_x_plus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_back_and_forth_more()
 
                 class AdjustingThruster_L1A(State):
@@ -408,15 +408,15 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_9(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_9'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_9, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_9'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def yaw_minus(self):
-                    self.thruster_group.rotate_less()
+                def yaw_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_less()
 
-                def translate_y_plus(self):
+                def translate_y_plus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_up_and_down_more()
 
                 class AdjustingThruster_L1L(State):
@@ -434,15 +434,15 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_10(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_10'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_10, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_10'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def yaw_plus(self):
-                    self.thruster_group.rotate_more()
+                def yaw_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_more()
 
-                def translate_y_minus(self):
+                def translate_y_minus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_up_and_down_less()
 
                 class AdjustingThruster_R1R(State):
@@ -460,18 +460,18 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_11(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_11'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_11, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_11'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def pitch_plus(self):
-                    self.thruster_group.rotate_more()
+                def pitch_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_more()
 
-                def roll_minus(self):
-                    self.thruster_group.rotate_less()
+                def roll_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_less()
 
-                def translate_z_plus(self):
+                def translate_z_plus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_in_and_out_more()
 
                 class AdjustingThruster_L1U(State):
@@ -486,18 +486,18 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_12(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_12'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_12, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_12'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def pitch_plus(self):
-                    self.thruster_group.rotate_more()
+                def pitch_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_more()
 
-                def roll_plus(self):
-                    self.thruster_group.rotate_more()
+                def roll_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_more()
 
-                def translate_z_plus(self):
+                def translate_z_plus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_in_and_out_more()
 
                 class AdjustingThruster_R1U(State):
@@ -512,18 +512,18 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_13(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_13'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_13, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_13'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def pitch_minus(self):
-                    self.thruster_group.rotate_less()
+                def pitch_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_less()
 
-                def roll_plus(self):
-                    self.thruster_group.rotate_more()
+                def roll_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_more()
 
-                def translate_z_minus(self):
+                def translate_z_minus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_in_and_out_less()
 
                 class AdjustingThruster_L2D(State):
@@ -541,18 +541,18 @@ class AppStatechart(StatechartManager):
             class AdjustingThrusterGroup_14(ThrusterControlState):
                 def __init__(self, **kwargs):
                     kwargs['substatesAreConcurrent'] = True
-                    self.tgKey = 'thruster_group_14'
-                    self.vibration_x = 5
-                    self.vibration_y = 5
                     super(AppStatechart.RootState.ShowingThrusterControls.AdjustingThrusterGroup_14, self).__init__(**kwargs)
+                    self.tgKey = 'thruster_group_14'
+                    self.thruster_group = getattr(self.statechart.app.mainView, self.tgKey)
+                    self.setThrusterCount()
 
-                def pitch_minus(self):
-                    self.thruster_group.rotate_less()
+                def pitch_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_less()
 
-                def roll_minus(self):
-                    self.thruster_group.rotate_less()
+                def roll_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.vibrate_less()
 
-                def translate_z_minus(self):
+                def translate_z_minus(self, arg1=None, arg2=None):
                     self.thruster_group.slide_in_and_out_less()
 
                 class AdjustingThruster_R2D(State):
