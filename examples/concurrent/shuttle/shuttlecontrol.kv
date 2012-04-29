@@ -3,15 +3,15 @@
 <ThrusterGroupControl>:
     canvas:
         Color:
-            rgb: (.8, .2, .2)
+            rgb: .8, .2, .2
         Ellipse:
             pos: self.pos
-            size: 5, 5
+            size: self.size
 
 <RotationalMotionControl>:
     canvas:
-        Color:
-            rgb: (.8, .2, .2)
+        #Color:
+            #rgb: .2, .5, .5, .5
         Rectangle:
             pos: self.pos
             size: self.size
@@ -19,7 +19,7 @@
 <TranslationalMotionControl>:
     canvas:
         Color:
-            rgb: (.8, .2, .2)
+            rgb: .8, .5, .5, .5
         Rectangle:
             pos: self.pos
             size: self.size
@@ -64,117 +64,131 @@
 
     ThrusterGroupControl:
         id: thruster_group_1
-        pos: (133-5, 714-406-5)
+        pos: 133, 714-406
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_2
-        pos: (293-5, 714-483-5)
+        pos: 293, 714-483
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_3
-        pos: (82-5, 714-425-5)
+        pos: 82, 714-425
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_4
-        pos: (184-5, 714-324-5)
+        pos: 184, 714-324
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_5
-        pos: (124-5, 714-522-5)
+        pos: 124, 714-522
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_6
-        pos: (237-5, 714-548-5)
+        pos: 237, 714-548
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_7
-        pos: (432-5, 714-214-5)
+        pos: 432, 714-214
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_8
-        pos: (546-5, 714-245-5)
+        pos: 546, 714-245
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_9
-        pos: (540-5, 714-363-5)
+        pos: 540, 714-363
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_10
-        pos: (247-5, 714-252-5)
+        pos: 247, 714-252
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_11
-        pos: (459-5, 714-237-5)
+        pos: 459, 714-237
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_12
-        pos: (332-5, 714-202-5)
+        pos: 332, 714-202
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_13
-        pos: (468-5, 714-415-5)
+        pos: 468, 714-415
+        size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_14
-        pos: (340-5, 714-362-5)
+        pos: 340, 714-362
+        size: 10, 10
         
     RotationalMotionControl:
         id: yaw_plus
-        pos: (4, 22)
+        pos: 4, 22
         size: 46, 72
         
     RotationalMotionControl:
         id: yaw_minus
-        pos: (52, 22)
+        pos: 52, 22
         size: 46, 72
         
     RotationalMotionControl:
         id: pitch_plus
-        pos: (98, 22)
+        pos: 98, 22
         size: 72, 72
         
     RotationalMotionControl:
         id: pitch_minus
-        pos: (168, 22)
+        pos: 168, 22
         size: 72, 72
         
     RotationalMotionControl:
         id: roll_plus
         size: 72, 72
-        pos: (238, 22)
+        pos: 238, 22
         
     RotationalMotionControl:
         id: roll_minus
-        pos: (286, 22)
+        pos: 286, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_x_plus
-        pos: (340, 22)
+        pos: 340, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_x_minus
-        pos: (384, 22)
+        pos: 384, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_y_plus
-        pos: (426, 22)
+        pos: 426, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_y_minus
-        pos: (467, 22)
+        pos: 467, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_z_plus
-        pos: (510, 22)
+        pos: 510, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_z_minus
-        pos: (554, 22)
+        pos: 554, 22
         size: 46, 72
         

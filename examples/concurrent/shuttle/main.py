@@ -19,27 +19,38 @@ import inspect
 
 
 class ThrusterGroupControl(Widget):
+    # The control location is set in the kv file initially. The pos value is set based
+    # on this and the pulsation (ellipse size) value, so that the control stays centered.
+    location_x = NumericProperty(0)
+    location_y = NumericProperty(0)
+    location = ReferenceListProperty(location_x, location_y)
+
+    # For pulsation, we alternate between the original size and the pulsation size.
     alternator = BooleanProperty(False)
-    pulsation_x = NumericProperty(0)
-    pulsation_y = NumericProperty(0)
+    
+    # The pulsation is the amount of size increase over the normal size. When off,
+    # a thruster's pulsation is zero, and it paints as normal.
+    pulsation_x = NumericProperty(10)
+    pulsation_y = NumericProperty(10)
     pulsation = ReferenceListProperty(pulsation_x, pulsation_y)
     
     def pulsate(self):
         if self.alternator:
+            self.pos = (self.location_x+self.size[0]/2-self.pulsation_x/2, self.location_y+self.size[1]/2-self.pulsation_y/2)
             self.size = (self.pulsation_x, self.pulsation_y)
             self.alternator = False
         else:
-            self.size = (5,5)
+            self.size = (10,10)
+            self.pos = (self.location_x, self.location_y)
             self.alternator = True
-        print self.size
 
     def pulsate_more(self):
-        self.pulsation_x += 1
-        self.pulsation_y += 1
+        self.pulsation_x = self.pulsation_x+1
+        self.pulsation_y = self.pulsation_y+1
 
     def pulsate_less(self):
-        self.pulsation_x = self.pulsation_x+1 if self.pulsation_x > 1 else 1
-        self.pulsation_y = self.pulsation_y+1 if self.pulsation_y > 1 else 1
+        self.pulsation_x = self.pulsation_x-1 if self.pulsation_x > 1 else 1
+        self.pulsation_y = self.pulsation_y-1 if self.pulsation_y > 1 else 1
 
     def slide_back_and_forth_more(self):
         self.pulsate_more()
@@ -153,7 +164,12 @@ class ShuttleControlView(Widget):
 
     def initialize_thruster_groups(self, pulsation=(10,10)):
         for thruster_group in (self.thruster_group_1, self.thruster_group_2, self.thruster_group_3, self.thruster_group_4, self.thruster_group_5, self.thruster_group_6, self.thruster_group_7, self.thruster_group_8, self.thruster_group_9, self.thruster_group_10, self.thruster_group_11, self.thruster_group_12, self.thruster_group_13, self.thruster_group_14):
+            # Set a default pulsation value.
             thruster_group.pulsation = pulsation
+
+            # The initial value of location_x and location_y are taken from the pos set in the kv file.
+            thruster_group.location_x = thruster_group.pos[0] - thruster_group.size[0]/2
+            thruster_group.location_y = thruster_group.pos[1] - thruster_group.size[1]/2
 
     def set_statechart_in_motion_controls(self, statechart):
         controls = { 'yaw_plus': self.yaw_plus, 
