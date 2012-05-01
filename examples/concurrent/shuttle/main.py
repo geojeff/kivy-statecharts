@@ -20,7 +20,7 @@ import inspect
 
 class Viewport(ScatterPlane):
     def __init__(self, **kwargs):
-        kwargs.setdefault('size', (620, 734))
+        kwargs.setdefault('size', (600, 714))
         kwargs.setdefault('size_hint', (None, None))
         kwargs.setdefault('do_scale', False)
         kwargs.setdefault('do_translation', False)
@@ -628,9 +628,9 @@ class ShuttleControlApp(App):
     mainView = ObjectProperty(None)
 
     def build(self):
-        Config.set('graphics', 'width', '620') # not working, must be set from command line
-        Config.set('graphics', 'height', '734') # not working, must be set from command line
-        self.root = Viewport(size=(620,734))
+        Config.set('graphics', 'width', '600') # not working, must be set from command line
+        Config.set('graphics', 'height', '714') # not working, must be set from command line
+        self.root = Viewport(size=(600,714))
         self.mainView = ShuttleControlView(app=self)
         self.root.add_widget(self.mainView)
         self.statechart = AppStatechart(app=self)
