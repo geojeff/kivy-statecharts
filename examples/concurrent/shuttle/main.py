@@ -204,12 +204,13 @@ class ShuttleControlView(Widget):
                      'translate_y_minus': self.translate_y_minus, 
                      'translate_z_plus': self.translate_z_plus, 
                      'translate_z_minus': self.translate_z_minus }
+
         for control_id in controls:
             setattr(controls[control_id], 'control_id', control_id)
             setattr(controls[control_id], 'statechart', statechart)
 
     def update(self, *args):
-        # Wiggle thruster_groups by their pulsate amounts.
+        # Pulsate thruster_groups by their pulsate amounts.
         for thruster_group in (self.thruster_group_1, self.thruster_group_2, self.thruster_group_3, self.thruster_group_4, self.thruster_group_5, self.thruster_group_6, self.thruster_group_7, self.thruster_group_8, self.thruster_group_9, self.thruster_group_10, self.thruster_group_11, self.thruster_group_12, self.thruster_group_13, self.thruster_group_14):
             thruster_group.pulsate()
         
@@ -231,17 +232,9 @@ class ThrusterControlState(State):
                 thruster_ids.append(item.__name__[-3:])
         self.thruster_ids = thruster_ids
 
-    def speed_up(self, arg1=None, arg2=None):
-        self.thruster_group.pulsation_x += len(self.thrusters)
-        self.thruster_group.pulsation_y += len(self.thrusters)
-
-    def slow_down(self, arg1=None, arg2=None):
-        self.thruster_group.pulsation_x -= len(self.thrusters)
-        self.thruster_group.pulsation_y -= len(self.thrusters)
-
     def zero_out(self, arg1=None, arg2=None):
-        self.thruster_group.pulsation_x = 0
-        self.thruster_group.pulsation_y = 0
+        self.thruster_group.pulsation_x = self.thruster_group.size[0]
+        self.thruster_group.pulsation_y = self.thruster_group.size[1]
 
 
 ##############
