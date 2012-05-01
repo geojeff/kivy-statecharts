@@ -90,24 +90,6 @@ class ThrusterGroupControl(Widget):
         self.pulsation_x = self.pulsation_x-1 if self.pulsation_x > 1 else 1
         self.pulsation_y = self.pulsation_y-1 if self.pulsation_y > 1 else 1
 
-    def slide_back_and_forth_more(self):
-        self.pulsate_more()
-
-    def slide_back_and_forth_less(self):
-        self.pulsate_less()
-
-    def slide_in_and_out_more(self):
-        self.pulsate_more()
-
-    def slide_in_and_out_less(self):
-        self.pulsate_less()
-
-    def slide_up_and_down_more(self):
-        self.pulsate_more()
-
-    def slide_up_and_down_less(self):
-        self.pulsate_less()
-
 class MotionControlWidget(Widget):
     statechart = ObjectProperty(None)
     control_id = StringProperty('')
@@ -312,7 +294,7 @@ class AppStatechart(StatechartManager):
                     self.setThrusterCount()
 
                 def translate_x_minus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_back_and_forth_less()
+                    self.thruster_group.pulsate_less()
 
                 class AdjustingThruster_F1F(State):
                     pass
@@ -336,7 +318,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_more()
 
                 def translate_y_plus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_up_and_down_more()
+                    self.thruster_group.pulsate_more()
 
                 class AdjustingThruster_F1L(State):
                     pass
@@ -356,7 +338,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_less()
 
                 def translate_y_minus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_up_and_down_less()
+                    self.thruster_group.pulsate_less()
 
                 class AdjustingThruster_F2R(State):
                     pass
@@ -376,7 +358,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_less()
 
                 def translate_z_plus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_in_and_out_more()
+                    self.thruster_group.pulsate_more()
 
                 class AdjustingThruster_F1U(State):
                     pass
@@ -399,7 +381,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_more()
 
                 def translate_z_minus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_in_and_out_less()
+                    self.thruster_group.pulsate_less()
 
                 class AdjustingThruster_F5R(State):
                     pass
@@ -422,7 +404,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_more()
 
                 def translate_z_minus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_in_and_out_less()
+                    self.thruster_group.pulsate_less()
 
                 class AdjustingThruster_F1D(State):
                     pass
@@ -445,7 +427,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_less()
 
                 def translate_x_plus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_back_and_forth_more()
+                    self.thruster_group.pulsate_more()
 
                 class AdjustingThruster_R1A(State):
                     pass
@@ -465,7 +447,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_more()
 
                 def translate_x_plus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_back_and_forth_more()
+                    self.thruster_group.pulsate_more()
 
                 class AdjustingThruster_L1A(State):
                     pass
@@ -485,7 +467,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_less()
 
                 def translate_y_plus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_up_and_down_more()
+                    self.thruster_group.pulsate_more()
 
                 class AdjustingThruster_L1L(State):
                     pass
@@ -511,7 +493,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_more()
 
                 def translate_y_minus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_up_and_down_less()
+                    self.thruster_group.pulsate_less()
 
                 class AdjustingThruster_R1R(State):
                     pass
@@ -540,7 +522,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_less()
 
                 def translate_z_plus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_in_and_out_more()
+                    self.thruster_group.pulsate_more()
 
                 class AdjustingThruster_L1U(State):
                     pass
@@ -566,7 +548,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_more()
 
                 def translate_z_plus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_in_and_out_more()
+                    self.thruster_group.pulsate_more()
 
                 class AdjustingThruster_R1U(State):
                     pass
@@ -592,7 +574,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_more()
 
                 def translate_z_minus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_in_and_out_less()
+                    self.thruster_group.pulsate_less()
 
                 class AdjustingThruster_L2D(State):
                     pass
@@ -621,7 +603,7 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.pulsate_less()
 
                 def translate_z_minus(self, arg1=None, arg2=None):
-                    self.thruster_group.slide_in_and_out_less()
+                    self.thruster_group.pulsate_less()
 
                 class AdjustingThruster_R2D(State):
                     pass
