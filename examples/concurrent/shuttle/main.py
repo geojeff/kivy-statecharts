@@ -8,7 +8,8 @@ from kivy.factory import Factory
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics import Color, Ellipse
-
+from kivy.uix.scatter import ScatterPlane
+from kivy.config import Config 
 from random import randint, random
 
 from kivy_statechart.system.state import State
@@ -16,6 +17,43 @@ from kivy_statechart.system.statechart import Statechart
 from kivy_statechart.system.statechart import StatechartManager
 
 import inspect
+
+class Viewport(ScatterPlane):
+    def __init__(self, **kwargs):
+        kwargs.setdefault('size', (620, 734))
+        kwargs.setdefault('size_hint', (None, None))
+        kwargs.setdefault('do_scale', False)
+        kwargs.setdefault('do_translation', False)
+        kwargs.setdefault('do_rotation', False)
+        super(Viewport, self).__init__( **kwargs)
+        Window.bind(system_size=self.on_window_resize)
+        Clock.schedule_once(self.fit_to_window, -1)
+
+    def on_window_resize(self, window, size):
+        self.fit_to_window()
+
+    def fit_to_window(self, *args):
+        print self.width, self.height, Window.width, Window.height
+        if self.width < self.height: #portrait
+            if Window.width < Window.height: #so is window
+                self.scale = Window.width/float(self.width)
+            else: #window is landscape..so rotate viewport
+                self.scale = Window.height/float(self.width)
+                self.rotation = -90
+        else: #landscape
+            if Window.width > Window.height: #so is window
+                self.scale = Window.width/float(self.width)
+            else: #window is portrait..so rotate viewport
+                self.scale = Window.height/float(self.width)
+                self.rotation = -90
+
+        self.center = Window.center
+        for c in self.children:
+            c.size = self.size
+
+    def add_widget(self, w, *args, **kwargs):
+        super(Viewport, self).add_widget(w, *args, **kwargs)
+        w.size = self.size
 
 
 class ThrusterGroupControl(Widget):
@@ -608,13 +646,14 @@ class ShuttleControlApp(App):
     mainView = ObjectProperty(None)
 
     def build(self):
-        print 'BUILDING'
-        layout = FloatLayout(size=(1000,1000), size_hint=(1,1))
+        Config.set('graphics', 'width', '620') # not working, must be set from command line
+        Config.set('graphics', 'height', '734') # not working, must be set from command line
+        self.root = Viewport(size=(620,734))
         self.mainView = ShuttleControlView(app=self)
-        layout.add_widget(self.mainView)
+        self.root.add_widget(self.mainView)
         self.statechart = AppStatechart(app=self)
         self.statechart.initStatechart()
-        return layout
+        return self.root
 
 if __name__ in ('__android__', '__main__'):
     app = ShuttleControlApp()

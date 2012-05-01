@@ -10,21 +10,28 @@
 
 <RotationalMotionControl>:
     canvas:
-        #Color:
-            #rgb: .2, .5, .5, .5
-        Rectangle:
+        Color:
+            rgb: .2, .2, .8, .5
+        Ellipse:
             pos: self.pos
-            size: self.size
+            size: 20, 20
+        #Rectangle:
+            #pos: self.pos
+            #size: self.size
 
 <TranslationalMotionControl>:
     canvas:
         Color:
-            rgb: .8, .5, .5, .5
-        Rectangle:
+            rgb: .2, .2, .8, .5
+        Ellipse:
             pos: self.pos
-            size: self.size
+            size: 20, 20
+        #Rectangle:
+            #pos: self.pos
+            #size: self.size
 
 <ShuttleControlView>:
+    size: 620, 734
     canvas:
         Color:
             rgb: (1, 1, 1)

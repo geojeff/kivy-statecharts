@@ -1,3 +1,6 @@
+Description
+===========
+
 *shuttle* is a mock control panel for the Space Shuttle's Reaction Control System (RCS) used for controlling forward and aft bays of small thrusters. 
 
 You can see images and descriptions of the system on these web pages:
@@ -16,4 +19,16 @@ You can see one of the forward thrusters firing in these videos: http://www.yout
 
 In reality, the RCS system is controlled by the autopilot system or manually controlled by the astronauts: http://science.ksc.nasa.gov/shuttle/technology/sts-newsref/sts-rcs.html, specifically by the rotational and translational hand controllers: http://science.ksc.nasa.gov/shuttle/technology/sts-newsref/sts-rhc.html#sts-rhc
 
-In the shuttle app, touches on the rectangular boxes for the rotational controllers (roll, pitch, yaw) and for the translational controllers (x, y, z), fire one or more of 14 thruster group controls marked by red circles. When a group of thrusters is firing, there will be a visual display of a pulsating red circle for that group.
+The Shuttle App
+===============
+
+In the shuttle app, touches on the blue circles in the rectangular boxes along the bottom, for the rotational controllers (roll, pitch, yaw) and for the translational controllers (x, y, z), fire one or more of 14 thruster group controls marked by red circles. When a group of thrusters is firing, there will be a visual display of a pulsating red circle for that group.
+
+Running
+-------
+
+Use of kivy.config to set the Window width and height in the python code hasn't worked yet, so pass app size as a command line argument:
+
+    python main.py --size=600x714
+
+The background image, RCS_Jet_Code.png, has the dimensions 600x714, the same as the window size passed in, but there is margin added to top and right. This can probably be fixed with a size hint, but a fix for the use of kivy.config is a better solution.
