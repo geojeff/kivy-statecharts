@@ -87,8 +87,8 @@ class ThrusterGroupControl(Widget):
         self.pulsation_y = self.pulsation_y+1
 
     def pulsate_less(self):
-        self.pulsation_x = self.pulsation_x-1 if self.pulsation_x > 1 else 1
-        self.pulsation_y = self.pulsation_y-1 if self.pulsation_y > 1 else 1
+        self.pulsation_x = self.pulsation_x-1 if self.pulsation_x > self.size[0] else self.size[0]
+        self.pulsation_y = self.pulsation_y-1 if self.pulsation_y > self.size[1] else self.size[1]
 
 class MotionControlWidget(Widget):
     statechart = ObjectProperty(None)
