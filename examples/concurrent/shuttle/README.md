@@ -1,9 +1,13 @@
 Description
 ===========
 
-*shuttle* is a mock control panel for the Space Shuttle's Reaction Control System (RCS) used for controlling forward and aft bays of small thrusters. 
+*shuttle* is a mock control panel for the Space Shuttle's Reaction Control System (RCS) used for controlling forward and aft bays of small thrusters. There are 44 thrusters that individually fire in some combination when the fuel is mixed with an oxidizing substance (hypergolic combination), so that there is no need for an igniter device. Most of the 44 are a larger type called primary thrusters; six of the 44 are smaller vernier thrusters.
 
-You can see images and descriptions of the system on these web pages:
+"Each RCS thruster burns a combination of monomethyl hydrazine and nitrogen tetroxide liquid fuel. Each primary thruster can produce a thrust of 870 pounds, while each vernier thruster can produce a thrust of 24 pounds. The RCS thrusters can be fired in a plethora of combinations depending on the specific mission requirements." (from http://spaceline.org/rocketsum/orbiter-systems.html).
+
+The OMS, the Orbital Maneuvering System, is a different system consisting of two larger engines.
+
+You can see images and descriptions of the RCS system on these web pages:
 
 http://www.columbiassacrifice.com/&0_shttlovrvw.htm
 
@@ -11,13 +15,15 @@ http://www.spaceflight.nasa.gov/shuttle/reference/shutref/orbiter/rcs/overview.h
 
 http://howthingsfly.si.edu/media/shuttle-reaction-control-system
 
-The main background image for the mock control panel is from http://www.columbiassacrifice.com/subsections_Misc/RCS_Jet_Code.htm
+The main background image for the mock RCS control panel in the shuttle app is from http://www.columbiassacrifice.com/subsections_Misc/RCS_Jet_Code.htm
 
 Several other images are copied here to show the location of the forward and aft RCS thruster locations. In the main diagram, you will see thruster id codes for the aft system starting with the letter "F", e.g. "F4D", which is the 4th thruster with plume shooting downward. Labels for the aft RCS system are similar, either starting with the letter "R" for the aft-right set of thrusters or with "L" for the aft-left thrusters.
 
-You can see one of the forward thrusters firing in these videos: http://www.youtube.com/watch?v=2ewbD2Pv5ag&feature=related and this one at about 45 seconds: http://www.youtube.com/watch?v=1xT4GstMyKs&feature=related
+You can see one of the forward thrusters firing in these videos: http://www.youtube.com/watch?v=2ewbD2Pv5ag&feature=related and this one at about 45 seconds: http://www.youtube.com/watch?v=1xT4GstMyKs&feature=related. Nice still images of thruster testing: http://www.nasa.gov/centers/wstf/propulsion/shuttleFleetLeader.html
 
-In reality, the RCS system is controlled by the autopilot system or manually controlled by the astronauts: http://science.ksc.nasa.gov/shuttle/technology/sts-newsref/sts-rcs.html, specifically by the rotational and translational hand controllers: http://science.ksc.nasa.gov/shuttle/technology/sts-newsref/sts-rhc.html#sts-rhc
+In reality, the RCS system is controlled by the autopilot system, or by adhoc software control, or manually controlled by the astronauts: http://science.ksc.nasa.gov/shuttle/technology/sts-newsref/sts-rcs.html, specifically by the rotational and translational hand controllers: http://science.ksc.nasa.gov/shuttle/technology/sts-newsref/sts-rhc.html#sts-rhc
+
+NASA space shuttle mission reports like [this one](http://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19960001496_1996901496.pdf) include coverage of the operation of the RCS system.
 
 The Shuttle App
 ===============
