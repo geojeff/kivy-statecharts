@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="pos-neg-switch-background.svg"
+   inkscape:export-filename="/Users/geojeff/Development/kivy/kivy_statechart/examples/concurrent/shuttle/pos-neg-switch-background.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="17.337349"
+     inkscape:cx="178.64285"
+     inkscape:cy="898.28572"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1924"
+     inkscape:window-height="1105"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       ry="0.073559351"
+       y="138.24823"
+       x="160.78273"
+       height="31.696196"
+       width="19.360123"
+       id="rect3782"
+       style="fill:#112b00;fill-opacity:1;stroke:none" />
+    <rect
+       style="fill:#17280b;fill-opacity:1;stroke:none"
+       id="rect3757"
+       width="43"
+       height="31.696196"
+       x="137.14285"
+       y="138.24823"
+       ry="2.9790158" />
+    <rect
+       ry="3.0375304"
+       y="138.07646"
+       x="180.19649"
+       height="32"
+       width="39.946369"
+       id="rect3767"
+       style="fill:#241c1c;fill-opacity:1;stroke:none" />
+    <rect
+       style="fill:#241c1c;fill-opacity:1;stroke:none"
+       id="rect3780"
+       width="21.325012"
+       height="32"
+       x="180.19649"
+       y="138.07646"
+       ry="0" />
+    <text
+       transform="scale(0.99373036,1.0063092)"
+       sodipodi:linespacing="125%"
+       id="text3784"
+       y="166.31281"
+       x="143.28487"
+       style="font-size:40.25236511px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#501616;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="166.31281"
+         x="143.28487"
+         id="tspan3786"
+         sodipodi:role="line">+</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40.25236510999999950px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff2a2a;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="142.73415"
+       y="165.5065"
+       id="text3759"
+       sodipodi:linespacing="125%"
+       transform="scale(0.9937304,1.0063092)"><tspan
+         sodipodi:role="line"
+         id="tspan3761"
+         x="142.73415"
+         y="165.5065">+</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#280b0b;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="193.57513"
+       y="165.15651"
+       id="text3788"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3790"
+         x="193.57513"
+         y="165.15651">-</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3763"
+       y="164.34511"
+       x="193.02786"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#e6e6e6;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="164.34511"
+         x="193.02786"
+         id="tspan3765"
+         sodipodi:role="line">-</tspan></text>
+  </g>
+</svg>
