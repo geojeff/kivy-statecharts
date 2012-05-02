@@ -306,6 +306,7 @@ class AppStatechart(StatechartManager):
                     self.setThrusterCount()
 
                 def translate_x_minus(self, arg1=None, arg2=None):
+                    import pudb; pudb.set_trace()
                     self.thruster_group.adjust_pulsation(self.statechart.app.mainView.thruster_control_mode)
 
                 class AdjustingThruster_F1F(State):
