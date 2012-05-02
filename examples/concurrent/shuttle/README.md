@@ -32,3 +32,15 @@ Use of kivy.config to set the Window width and height in the python code hasn't 
     python main.py --size=600x714
 
 The background image, RCS_Jet_Code.png, has the dimensions 600x714, the same as the window size passed in, but there is margin added to top and right. This can probably be fixed with a size hint, but a fix for the use of kivy.config is a better solution.
+
+Usage
+-----
+
+The app is a one-panel display of the RCS diagram of 14 thruster groups in the three areas of the shuttle: forward, aft-left, and aft-right. There are red dots at each of the thruster group locations. Along the bottom are rectangular blocks for the main user interface controls that fire the thruster groups. On the left side are the rotational motion controls, for yaw, pitch, and roll, and on the right are translational motion controls for x, y, and z. Blue circles in these motion control accept touch actions for firing the thruster groups listed for each motion control. For example, if you tap the blue circle in the "yaw plus" motion control block, the G2 and G10 thruster groups will fire. Tap repeatedly, and you will see the affected thruster groups pulsate more and more. If you want to throttle back on the thrusters, switch the mode control from "More" to "Less" and tap the same blue buttons.
+
+System Design
+=============
+
+If you read the README for the kivy-statechart project, you will see use of the term "reactive system" in the 1987 research paper by David Harel on statecharts. Statecharts are ready-made for reactive systems that have many "stimuli" and complexity. It is not coincidence that the subject of the shuttle app is the space shuttles "reaction control system." Specifically, we highlight the use of orthogonality and concurrency in this app. The individual motion controls (yaw-plus, translate_x_minus, etc.) are orthogonal to one another: they happen independently. The same goes for the individual thruster groups, were they not linked together within the motion controls. Within a given thruster group, however, the affected thrusters operate concurrently. 
+
+This app has the benefit of adapting to an existing real, physical system, but you can imagine the usefullness of statecharts if such a touch-screen interface were to be developed (and the undoubted requirement for something similar, at least in the thought processes and electronics design, for the engineers who built this system).
