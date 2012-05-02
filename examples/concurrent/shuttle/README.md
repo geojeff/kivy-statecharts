@@ -37,7 +37,7 @@ Use of kivy.config to set the Window width and height in the python code hasn't 
 
     python main.py --size=600x714
 
-The background image, RCS_Jet_Code.png, has the dimensions 600x714, the same as the window size passed in, but there is margin added to top and right. This can probably be fixed with a size hint, but a fix for the use of kivy.config is a better solution.
+The background image, RCS_Jet_Code.png, has the dimensions 600x714, the same as the window size passed in.
 
 Usage
 -----
