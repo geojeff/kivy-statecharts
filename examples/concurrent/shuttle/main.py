@@ -19,7 +19,7 @@ from kivy_statechart.system.statechart import StatechartManager
 
 import inspect
 
-class PosNegSwitch(Switch):
+class ThrusterControlSwitch(Switch):
     pass
 
 
@@ -191,7 +191,7 @@ class ShuttleControlView(Widget):
 
     def initialize_thruster_mode(self):
         # Without this set, the initial mode would be 'decreasing'.
-        setattr(self.pos_neg_switch, 'active', False)
+        setattr(self.thruster_control_switch, 'active', False)
 
     def initialize_thruster_groups(self, pulsation=(10,10)):
         for thruster_group in (self.thruster_group_1, self.thruster_group_2, self.thruster_group_3, self.thruster_group_4, self.thruster_group_5, self.thruster_group_6, self.thruster_group_7, self.thruster_group_8, self.thruster_group_9, self.thruster_group_10, self.thruster_group_11, self.thruster_group_12, self.thruster_group_13, self.thruster_group_14):
@@ -220,12 +220,12 @@ class ShuttleControlView(Widget):
             setattr(controls[control_id], 'control_id', control_id)
             setattr(controls[control_id], 'statechart', statechart)
 
-    def pos_neg_changed(self):
-        if self.pos_neg_switch.active_norm_pos: 
+    def thruster_control_changed(self):
+        if self.thruster_control_switch.active_norm_pos: 
             self.thruster_control_mode = 'increasing'
         else:
             self.thruster_control_mode = 'decreasing'
-        print 'pos_neg_changed', self.pos_neg_switch.active_norm_pos, self.thruster_control_mode
+        print 'thruster_control_changed', self.thruster_control_switch.active_norm_pos, self.thruster_control_mode
 
     def update(self, *args):
         # Pulsate thruster_groups by their pulsate amounts.
@@ -630,7 +630,7 @@ class AppStatechart(StatechartManager):
                     pass
 
 
-Factory.register("PosNegSwitch", PosNegSwitch)
+Factory.register("ThrusterControlSwitch", ThrusterControlSwitch)
 Factory.register("RotationalMotionControl", RotationalMotionControl)
 Factory.register("TranslationalMotionControl", TranslationalMotionControl)
 Factory.register("ThrusterGroupControl", ThrusterGroupControl)
