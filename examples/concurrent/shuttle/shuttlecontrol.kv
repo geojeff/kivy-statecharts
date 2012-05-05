@@ -1,5 +1,49 @@
 #:kivy 1.0.9
 
+# Thanks to quanon for how to do the list with a template as a child
+# of another widget. This list of thrusters and pulsation values goes 
+# on the left side of the display.
+#
+[ThrustersItem@BoxLayout]:
+    lbl: lbl
+    canvas.before:
+        Color:
+            rgba: (1, 0, 1, .5) if self.parent and (len(self.parent.children) % 2 == 1) else (0, 0, 0, .5)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+        Color:
+            rgba: (1, 1, 1, 1)
+    Label:
+        id: lbl
+        color: 0, 0, 0, 1
+        text: ctx.thruster_id
+    Label:
+        color: 0, 1, 0, 1
+        text: ctx.pulsation
+
+<ThrustersListView>:
+    canvas:
+        Color:
+            rgb: (.4, .3, .2)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    size: 100, 714
+    pos: 0, 0
+    thrusters_item: thrusters_item
+    orientation: 'vertical'
+    size: thrusters_item.lbl.texture_size[0], thrusters_item.lbl.texture_size[1]* len(self.children)
+    ThrustersItem:
+        id: thrusters_item
+        thruster_id: 'self.thruster_id'
+        pulsation: 'self.pulsation'
+
+# From here down, are components of the display that sit atop
+# the 600 x 714 background image. All of these components will
+# be part of the ShuttleControlView widget, defined last.
+
 <ThrusterGroupControl>:
     canvas:
         Color:
@@ -44,20 +88,396 @@
             size: 43, 32
             pos: int(self.center_x - 41 + self.active_norm_pos * 41), int(self.center_y - 16)
 
-[ThrustersItem@BoxLayout]:
-    Label:
-        text: ctx.thruster_id
-    Label:
-        text: ctx.pulsation
-
-#<ThrustersListView>:
-#    thrusters_item: thrusters_item
+# A grid style layout of pulsation values. These elements will go in ThrustersGridView.
 #
-#    ThrustersItem:
-#        id: thrusters_item
+[HSeparator@Label]:
+    size_hint_y: None
+    height: 17
+    text: ctx.text if 'text' in ctx else ''
+    text_size: self.size
+    valign: 'middle'
+    halign: 'center'
+    canvas.before:
+        Color:
+            rgba: .4, .3, .2, .8
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+[ThrusterLabel@Label]:
+    size_hint_y: None
+    height: 17
+    text: ctx.text if 'text' in ctx else ''
+    text_size: self.size
+    valign: 'middle'
+    halign: 'center'
+    canvas.before:
+        Color:
+            rgba: .2, .2, .2, .8
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+<ForwardThrustersView>:
+    width: 100
+    canvas.before:
+        Color:
+            rgb: 0, 0, 0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    orientation: 'horizontal'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 1
+        spacing: 1
+
+        canvas.before:
+            Color:
+                rgb: .3, .4, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        f1f: f1f # Group 1
+        f2f: f2f
+        f3f: f3f
+
+        f1l: f1l # Group 2
+        f3l: f3l
+
+        HSeparator:
+            text: 'G1'
+        ThrusterLabel:
+            text: '1F:0'
+            #color: 0, 0, 0, 1
+            id: f1f
+        ThrusterLabel:
+            text: '2F:0'
+            id: f2f
+        ThrusterLabel:
+            text: '3F:0'
+            id: f3f
+
+        HSeparator:
+            text: 'G2'
+        ThrusterLabel:
+            text: '1L:0'
+            id: f1l
+        ThrusterLabel:
+            text: '3L:0'
+            id: f3l
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 1
+        spacing: 1
+
+        canvas.before:
+            Color:
+                rgb: .3, .4, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    
+        f2r: f2r # Group 3
+        f4r: f4r
+
+        f1u: f1u # Group 4
+        f2u: f2u
+        f3u: f3u
+
+        HSeparator:
+            text: 'G3'
+        ThrusterLabel:
+            text: '2R:0'
+            id: f2r
+        ThrusterLabel:
+            text: '4R:0'
+            id: f4r
+
+        HSeparator:
+            text: 'G4'
+        ThrusterLabel:
+            text: '1U:0'
+            id: f1u
+        ThrusterLabel:
+            text: '2U:0'
+            id: f2u
+        ThrusterLabel:
+            text: '3U:0'
+            id: f3u
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 1
+        spacing: 1
+
+        canvas.before:
+            Color:
+                rgb: .3, .4, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    
+        f5r: f5r # Group 5
+        f2d: f2d
+        f4d: f4d
+
+        f1d: f1d # Group 6
+        f3d: f3d
+        f5l: f5l
+
+        HSeparator:
+            text: 'G5'
+        ThrusterLabel:
+            text: '5R:0'
+            id: f5r
+        ThrusterLabel:
+            text: '2D:0'
+            id: f2d
+        ThrusterLabel:
+            text: '4D:0'
+            id: f4d
+
+        HSeparator:
+            text: 'G6'
+        ThrusterLabel:
+            text: '1D:0'
+            id: f1d
+        ThrusterLabel:
+            text: '3D:0'
+            id: f3d
+        ThrusterLabel:
+            text: '5L:0'
+            id: f5l
+
+<AftLeftThrustersView>:
+    width: 100
+    canvas.before:
+        Color:
+            rgb: 0, 0, 0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    orientation: 'horizontal'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 1
+        spacing: 1
+
+        canvas.before:
+            Color:
+                rgb: .3, .4, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    
+        l1a: l1a # Group 8
+        l3a: l3a
+
+        l1l: l1l # Group 9
+        l2l: l2l
+        l3l: l3l
+        l4l: l4l
+
+        HSeparator:
+            text: 'G8'
+        ThrusterLabel:
+            text: '1A:0'
+            id: l1a
+        ThrusterLabel:
+            text: '3A:0'
+            id: l3a
+
+        HSeparator:
+            text: 'G9'
+        ThrusterLabel:
+            text: '1L:0'
+            id: l1l
+        ThrusterLabel:
+            text: '2L:0'
+            id: l2l
+        ThrusterLabel:
+            text: '3L:0'
+            id: l3l
+        ThrusterLabel:
+            text: '4L:0'
+            id: l4l
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 1
+        spacing: 1
+
+        canvas.before:
+            Color:
+                rgb: .3, .4, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    
+        l1u: l1u # Group 11
+        l2u: l2u
+        l4u: l4u
+
+        l2d: l2d # Group 13
+        l3d: l3d
+        l4d: l4d
+        l5d: l5d
+
+        HSeparator:
+            text: 'G11'
+        ThrusterLabel:
+            text: '1U:0'
+            id: l1u
+        ThrusterLabel:
+            text: '2U:0'
+            id: l2u
+        ThrusterLabel:
+            text: '4U:0'
+            id: l4u
+
+        HSeparator:
+            text: 'G13'
+        ThrusterLabel:
+            text: '2D:0'
+            id: l2d
+        ThrusterLabel:
+            text: '3D:0'
+            id: l3d
+        ThrusterLabel:
+            text: '4D:0'
+            id: l4d
+        ThrusterLabel:
+            text: '5D:0'
+            id: l5d
+
+<AftRightThrustersView>:
+    width: 100
+    canvas.before:
+        Color:
+            rgb: 0, 0, 0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    orientation: 'horizontal'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 1
+        spacing: 1
+
+        canvas.before:
+            Color:
+                rgb: .3, .4, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    
+        r1a: r1a # Group 7
+        r3a: r3a
+
+        r1r: r1r # Group 10
+        r2r: r2r
+        r3r: r3r
+        r4r: r4r
+
+        HSeparator:
+            text: 'G7'
+        ThrusterLabel:
+            text: '1A:0'
+            id: r1a
+        ThrusterLabel:
+            text: '3A:0'
+            id: r3a
+
+        HSeparator:
+            text: 'G10'
+        ThrusterLabel:
+            text: '1R:0'
+            id: r1r
+        ThrusterLabel:
+            text: '2R:0'
+            id: r2r
+        ThrusterLabel:
+            text: '3R:0'
+            id: r3r
+        ThrusterLabel:
+            text: '4R:0'
+            id: r4r
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 1
+        spacing: 1
+
+        canvas.before:
+            Color:
+                rgb: .3, .4, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    
+        r1u: r1u # Group 12
+        r2u: r2u
+        r4u: r4u
+
+        r2d: r2d # Group 14
+        r3d: r3d
+        r4d: r4d
+        r5d: r5d
+
+        HSeparator:
+            text: 'G12'
+        ThrusterLabel:
+            text: '1U:0'
+            id: r1u
+        ThrusterLabel:
+            text: '2U:0'
+            id: r2u
+        ThrusterLabel:
+            text: '4U:0'
+            id: r4u
+
+        HSeparator:
+            text: 'G14'
+        ThrusterLabel:
+            text: '2D:0'
+            id: r2d
+        ThrusterLabel:
+            text: '3D:0'
+            id: r3d
+        ThrusterLabel:
+            text: '4D:0'
+            id: r4d
+        ThrusterLabel:
+            text: '5D:0'
+            id: r5d
+
+<ThrustersGridView>:
+    forward_thrusters: forward_thrusters
+    aft_left_thrusters: aft_left_thrusters
+    aft_right_thrusters: aft_right_thrusters
+
+    orientation: 'horizontal'
+    padding: 10
+    spacing: 10
+
+    ForwardThrustersView:
+        id: forward_thrusters
+        size_hint: .3, None
+
+    AftLeftThrustersView:
+        id: aft_left_thrusters
+        size_hint: .3, None
+
+    AftRightThrustersView:
+        id: aft_right_thrusters
+        size_hint: .3, None
 
 <ShuttleControlView>:
     size: 600, 714
+    pos: 100, 0
     canvas:
         Color:
             rgb: (1, 1, 1)
@@ -66,9 +486,9 @@
             size: 600, 714
             pos: self.pos
 
-    thruster_control_mode_switch: thruster_control_mode_switch
+    thrusters_grid_view: thrusters_grid_view
 
-    thrusters_list: thrusters_list
+    thruster_control_mode_switch: thruster_control_mode_switch
 
     thruster_group_1: thruster_group_1
     thruster_group_2: thruster_group_2
@@ -99,8 +519,21 @@
     translate_z_plus: translate_z_plus
     translate_z_minus: translate_z_minus
 
+    ThrustersGridView:
+        canvas.before:
+            Color:
+                rgb: 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        id: thrusters_grid_view
+        width: 400
+        height: 200
+        pos: 100 + 20, 530
+
     Label:
-        pos: 20, 420
+        pos: 100 + 20, 420
         height: 24
         text_size: self.width, None
         color: (1, 0, 0, .8)
@@ -108,142 +541,138 @@
 
     ThrusterControlModeSwitch:
         id: thruster_control_mode_switch
-        pos: 20, 340
+        pos: 100 + 20, 340
         active: True
         active_norm_pos: 1.0
         on_active_norm_pos: root.thruster_mode_control_changed()
 
-    ThrustersListView:
-        id: thrusters_list
-        pos: 20, 420
-
     ThrusterGroupControl:
         id: thruster_group_1
-        pos: 133, 714-406
+        pos: 100 + 133, 714-406
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_2
-        pos: 293, 714-483
+        pos: 100 + 293, 714-483
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_3
-        pos: 82, 714-425
+        pos: 100 + 82, 714-425
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_4
-        pos: 184, 714-324
+        pos: 100 + 184, 714-324
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_5
-        pos: 124, 714-522
+        pos: 100 + 124, 714-522
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_6
-        pos: 237, 714-548
+        pos: 100 + 237, 714-548
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_7
-        pos: 432, 714-214
+        pos: 100 + 432, 714-214
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_8
-        pos: 546, 714-245
+        pos: 100 + 546, 714-245
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_9
-        pos: 540, 714-363
+        pos: 100 + 540, 714-363
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_10
-        pos: 247, 714-252
+        pos: 100 + 247, 714-252
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_11
-        pos: 459, 714-237
+        pos: 100 + 459, 714-237
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_12
-        pos: 332, 714-202
+        pos: 100 + 332, 714-202
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_13
-        pos: 468, 714-415
+        pos: 100 + 468, 714-415
         size: 10, 10
         
     ThrusterGroupControl:
         id: thruster_group_14
-        pos: 340, 714-362
+        pos: 100 + 340, 714-362
         size: 10, 10
         
     RotationalMotionControl:
         id: yaw_plus
-        pos: 4, 22
+        pos: 100 + 4, 22
         size: 46, 72
         
     RotationalMotionControl:
         id: yaw_minus
-        pos: 52, 22
+        pos: 100 + 52, 22
         size: 46, 72
         
     RotationalMotionControl:
         id: pitch_plus
-        pos: 98, 22
+        pos: 100 + 98, 22
         size: 72, 72
         
     RotationalMotionControl:
         id: pitch_minus
-        pos: 168, 22
+        pos: 100 + 168, 22
         size: 72, 72
         
     RotationalMotionControl:
         id: roll_plus
         size: 72, 72
-        pos: 238, 22
+        pos: 100 + 238, 22
         
     RotationalMotionControl:
         id: roll_minus
-        pos: 286, 22
+        pos: 100 + 286, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_x_plus
-        pos: 340, 22
+        pos: 100 + 340, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_x_minus
-        pos: 384, 22
+        pos: 100 + 384, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_y_plus
-        pos: 426, 22
+        pos: 100 + 426, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_y_minus
-        pos: 467, 22
+        pos: 100 + 467, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_z_plus
-        pos: 510, 22
+        pos: 100 + 510, 22
         size: 46, 72
         
     TranslationalMotionControl:
         id: translate_z_minus
-        pos: 554, 22
+        pos: 100 + 554, 22
         size: 46, 72
         

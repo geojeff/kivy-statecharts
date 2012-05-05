@@ -4,6 +4,7 @@ from kivy.lang import Builder
 from kivy.uix.widget import Widget
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, StringProperty, ListProperty, BooleanProperty, OptionProperty
 from kivy.vector import Vector
 from kivy.factory import Factory
@@ -64,11 +65,26 @@ class ThrustersListView(BoxLayout):
         for item in self.items:
             w = Builder.template(self.item_template, **item)
             self.add_widget(w)
+
+class ThrustersGridView(BoxLayout):
+    pass
+
+
+class ForwardThrustersView(BoxLayout):
+    pass
+ 
+
+class AftLeftThrustersView(BoxLayout):
+    pass
+ 
+
+class AftRightThrustersView(BoxLayout):
+    pass
  
 
 class Viewport(ScatterPlane):
     def __init__(self, **kwargs):
-        kwargs.setdefault('size', (600, 714))
+        kwargs.setdefault('size', (700, 714))
         kwargs.setdefault('size_hint', (None, None))
         kwargs.setdefault('do_scale', False)
         kwargs.setdefault('do_translation', False)
@@ -490,7 +506,11 @@ class AppStatechart(StatechartManager):
 
 
 Factory.register("ThrusterControlModeSwitch", ThrusterControlModeSwitch)
+Factory.register("ThrustersGridView", ThrustersGridView)
 Factory.register("ThrustersListView", ThrustersListView)
+Factory.register("ForwardThrustersView", ForwardThrustersView)
+Factory.register("AftLeftThrustersView", AftLeftThrustersView)
+Factory.register("AftRightThrustersView", AftRightThrustersView)
 Factory.register("RotationalMotionControl", RotationalMotionControl)
 Factory.register("TranslationalMotionControl", TranslationalMotionControl)
 Factory.register("ThrusterGroupControl", ThrusterGroupControl)
@@ -498,27 +518,36 @@ Factory.register("ShuttleControlView", ShuttleControlView)
 
 class ShuttleControlApp(App):
     statechart = ObjectProperty(None)
+    thrustersListView = ObjectProperty(None)
     mainView = ObjectProperty(None)
 
     def build(self):
-        Config.set('graphics', 'width', '600') # not working, must be set from command line
+        Config.set('graphics', 'width', '700') # not working, must be set from command line
         Config.set('graphics', 'height', '714') # not working, must be set from command line
-        self.root = Viewport(size=(600,714))
+        self.root = Viewport(size=(700,714))
+
+        self.thrustersListView = ThrustersListView()
+        self.root.add_widget(self.thrustersListView)
+
         self.mainView = ShuttleControlView(app=self)
         self.root.add_widget(self.mainView)
+
         self.statechart = AppStatechart(app=self)
         self.statechart.initStatechart()
 
-        thruster_objects = []
+        # Create the 44 thrusters.
+        for thruster_group_id in thrusters:
+            for thruster_id in thrusters[thruster_group_id]:
+                thrusters[thruster_group_id][thruster_id] = Thruster(thruster_id, thruster_group_id)
 
         # Create the 44 thrusters, and add list items for them.
+        thruster_objects = []
         for thruster_group_id in thrusters:
             for thruster_id in thrusters[thruster_group_id]:
                 thrusters[thruster_group_id][thruster_id] = Thruster(thruster_id, thruster_group_id)
                 thruster_objects.append(thrusters[thruster_group_id][thruster_id])
-
-        self.mainView.thrusters_list.items = [{ 'thruster_id': str(t.thruster_id), 'pulsation': str(t.pulsation) } for t in thruster_objects]
-
+        self.thrustersListView.items = [{ 'thruster_id': str(t.thruster_id), 'pulsation': str(t.pulsation) } for t in thruster_objects]
+        
         return self.root
 
 if __name__ in ('__android__', '__main__'):
