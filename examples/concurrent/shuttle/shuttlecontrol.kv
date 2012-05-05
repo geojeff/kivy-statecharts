@@ -30,7 +30,7 @@
             #pos: self.pos
             #size: self.size
 
-<ThrusterControlSwitch>:
+<ThrusterControlModeSwitch>:
     active_norm_pos: max(0., min(1., (int(self.active) + self.touch_distance / 41)))
     canvas:
         Color:
@@ -44,8 +44,20 @@
             size: 43, 32
             pos: int(self.center_x - 41 + self.active_norm_pos * 41), int(self.center_y - 16)
 
+[ThrustersItem@BoxLayout]:
+    Label:
+        text: ctx.thruster_id
+    Label:
+        text: ctx.pulsation
+
+#<ThrustersListView>:
+#    thrusters_item: thrusters_item
+#
+#    ThrustersItem:
+#        id: thrusters_item
+
 <ShuttleControlView>:
-    size: 620, 734
+    size: 600, 714
     canvas:
         Color:
             rgb: (1, 1, 1)
@@ -54,7 +66,9 @@
             size: 600, 714
             pos: self.pos
 
-    thruster_control_switch: thruster_control_switch
+    thruster_control_mode_switch: thruster_control_mode_switch
+
+    thrusters_list: thrusters_list
 
     thruster_group_1: thruster_group_1
     thruster_group_2: thruster_group_2
@@ -92,12 +106,16 @@
         color: (1, 0, 0, .8)
         text: 'Thruster Control Mode:'
 
-    ThrusterControlSwitch:
-        id: thruster_control_switch
+    ThrusterControlModeSwitch:
+        id: thruster_control_mode_switch
         pos: 20, 340
         active: True
         active_norm_pos: 1.0
-        on_active_norm_pos: root.thruster_control_changed()
+        on_active_norm_pos: root.thruster_mode_control_changed()
+
+    ThrustersListView:
+        id: thrusters_list
+        pos: 20, 420
 
     ThrusterGroupControl:
         id: thruster_group_1
