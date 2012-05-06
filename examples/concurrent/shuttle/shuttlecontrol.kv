@@ -16,7 +16,7 @@
             rgba: (1, 1, 1, 1)
     Label:
         id: lbl
-        color: 0, 0, 0, 1
+        color: .2, .7, 0, 1
         text: ctx.thruster_id
     Label:
         color: 0, 1, 0, 1
@@ -27,7 +27,7 @@
     pos: 0, 0
     thrusters_item: thrusters_item
     orientation: 'vertical'
-    size: thrusters_item.lbl.texture_size[0], thrusters_item.lbl.texture_size[1]* len(self.children)
+    #size: thrusters_item.lbl.texture_size[0], thrusters_item.lbl.texture_size[1]* len(self.children)
     ThrustersItem:
         id: thrusters_item
         thruster_id: 'self.thruster_id'
@@ -127,7 +127,7 @@
 
         canvas.before:
             Color:
-                rgb: .3, .4, .2
+                rgb: 1, 1, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -168,7 +168,7 @@
 
         canvas.before:
             Color:
-                rgb: .3, .4, .2
+                rgb: 1, 1, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -208,7 +208,7 @@
 
         canvas.before:
             Color:
-                rgb: .3, .4, .2
+                rgb: 1, 1, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -261,7 +261,7 @@
 
         canvas.before:
             Color:
-                rgb: .3, .4, .2
+                rgb: 1, 1, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -305,7 +305,7 @@
 
         canvas.before:
             Color:
-                rgb: .3, .4, .2
+                rgb: 1, 1, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -362,7 +362,7 @@
 
         canvas.before:
             Color:
-                rgb: .3, .4, .2
+                rgb: 1, 1, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -406,7 +406,7 @@
 
         canvas.before:
             Color:
-                rgb: .3, .4, .2
+                rgb: 1, 1, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -455,18 +455,20 @@
     orientation: 'horizontal'
     padding: 10
     spacing: 10
+    width: 400
+    height: 200
 
     ForwardThrustersView:
         id: forward_thrusters
-        size_hint: .3, None
+        #size_hint: .3, None
 
     AftLeftThrustersView:
         id: aft_left_thrusters
-        size_hint: .3, None
+        #size_hint: .3, None
 
     AftRightThrustersView:
         id: aft_right_thrusters
-        size_hint: .3, None
+        #size_hint: .3, None
 
 <ShuttleControlView>:
     size: 600, 714
@@ -479,7 +481,7 @@
             size: 600, 714
             pos: self.pos
 
-    thrusters_grid_view: thrusters_grid_view
+    #thrusters_grid_view: thrusters_grid_view
 
     thruster_control_mode_switch: thruster_control_mode_switch
 
@@ -521,8 +523,6 @@
                 size: self.size
 
         id: thrusters_grid_view
-        width: 400
-        height: 200
         pos: 100 + 20, 530
 
     Label:

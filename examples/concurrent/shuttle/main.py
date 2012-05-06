@@ -59,14 +59,22 @@ class ThrusterControlModeSwitch(Switch):
 class ThrustersListView(BoxLayout):
     item_template = StringProperty('ThrustersItem')
     items = ListProperty([])
- 
+
+    def __init__ (self, **kwargs):
+        super(ThrustersListView, self).__init__(**kwargs)
+        Clock.schedule_once(self.update_width)
+
     def on_items(self, *args):
         self.clear_widgets()
         for item in self.items:
             w = Builder.template(self.item_template, **item)
             self.add_widget(w)
 
+    def update_width(self, dt):
+        self.width = 100
+
 class ThrustersGridView(BoxLayout):
+
     pass
 
 
