@@ -23,34 +23,48 @@ from kivy_statechart.system.statechart import StatechartManager
 import inspect
 
 
-# Thrusters data
-thrusters = {  1: { 'F1F': None, 'F2F': None, 'F3F': None },
-               2: { 'F1L': None, 'F3L': None },
-               3: { 'F2R': None, 'F4R': None },
-               4: { 'F1U': None, 'F2U': None, 'F3U': None },
-               5: { 'F5R': None, 'F2D': None, 'F4D': None },
-               6: { 'F1D': None, 'F3D': None, 'F5L': None },
-               7: { 'R1A': None, 'R3A': None },
-               8: { 'L1A': None, 'L3A': None },
-               9: { 'L1L': None, 'L2L': None, 'L3L': None, 'L4L': None },
-              10: { 'R1R': None, 'R2R': None, 'R3R': None, 'R4R': None },
-              11: { 'L1U': None, 'L2U': None, 'L4U': None },
-              12: { 'R1U': None, 'R2U': None, 'R4U': None },
-              13: { 'L2D': None, 'L3D': None, 'L4D': None, 'L5D': None },
-              14: { 'R2D': None, 'R3D': None, 'R4D': None, 'R5D': None }}
+#################
+#
+#  Data models
+#
 
-
-# The equivalent of Mediating Controllers
+# Thruster model.
 
 class Thruster(Widget):
     thruster_id = StringProperty('')
     thruster_group_id = NumericProperty(0)
+    thruster_grid_label = ObjectProperty(None)
+    thruster_list_label = ObjectProperty(None)
     pulsation = NumericProperty(0)
 
-    def __init__(self, thruster_id, thruster_group_id):
+    def __init__(self, thruster_id, group_id, grid_label, list_label):
         self.thruster_id = thruster_id
-        self.thruster_group_id = thruster_group_id
+        self.thruster_group_id = group_id
+        self.thruster_grid_label = grid_label
+        self.thruster_list_label = list_label
 
+
+# Thruster data reference dict -- [region][thruster_group][thruster_id] = thruster instance
+ 
+thrusters = { 'forward':   {  1: { 'F1F': None, 'F2F': None, 'F3F': None },
+                              2: { 'F1L': None, 'F3L': None },
+                              3: { 'F2R': None, 'F4R': None },
+                              4: { 'F1U': None, 'F2U': None, 'F3U': None },
+                              5: { 'F5R': None, 'F2D': None, 'F4D': None },
+                              6: { 'F1D': None, 'F3D': None, 'F5L': None }},
+              'aft-left':  {  8: { 'L1A': None, 'L3A': None },
+                              9: { 'L1L': None, 'L2L': None, 'L3L': None, 'L4L': None },
+                             11: { 'L1U': None, 'L2U': None, 'L4U': None },
+                             13: { 'L2D': None, 'L3D': None, 'L4D': None, 'L5D': None }},
+              'aft-right': {  7: { 'R1A': None, 'R3A': None },
+                             10: { 'R1R': None, 'R2R': None, 'R3R': None, 'R4R': None },
+                             12: { 'R1U': None, 'R2U': None, 'R4U': None },
+                             14: { 'R2D': None, 'R3D': None, 'R4D': None, 'R5D': None }}}
+
+##############################
+#
+#  User Interface components.
+#
 
 class ThrusterControlModeSwitch(Switch):
     pass
@@ -73,8 +87,8 @@ class ThrustersListView(BoxLayout):
     def update_width(self, dt):
         self.width = 100
 
-class ThrustersGridView(BoxLayout):
 
+class ThrustersGridView(BoxLayout):
     pass
 
 
@@ -90,6 +104,8 @@ class AftRightThrustersView(BoxLayout):
     pass
  
 
+# Viewport is from wiki.kivy.org snippets
+#
 class Viewport(ScatterPlane):
     def __init__(self, **kwargs):
         kwargs.setdefault('size', (700, 714))
@@ -105,7 +121,6 @@ class Viewport(ScatterPlane):
         self.fit_to_window()
 
     def fit_to_window(self, *args):
-        print self.width, self.height, Window.width, Window.height
         if self.width < self.height: #portrait
             if Window.width < Window.height: #so is window
                 self.scale = Window.width/float(self.width)
@@ -129,11 +144,11 @@ class Viewport(ScatterPlane):
 
 
 class ThrusterGroupControl(Widget):
-    # The control location is set in the kv file initially. The pos value is set based
-    # on this and the pulsation (ellipse radius) value, so that the control stays centered.
     location_x = NumericProperty(0)
     location_y = NumericProperty(0)
-    location = ReferenceListProperty(location_x, location_y)
+
+    # The region of the space shuttle: forward, aft-left, or aft-right
+    region = StringProperty('')
 
     # For pulsation, we alternate between the original size and the pulsation size.
     alternator = BooleanProperty(False)
@@ -158,8 +173,12 @@ class ThrusterGroupControl(Widget):
         else:
             self.pulsation = self.pulsation-1 if self.pulsation > self.size[0] else self.size[0]
 
-        for thruster_id in thrusters[thruster_group_id]:
-            thrusters[thruster_group_id][thruster_id].pulsation = self.pulsation - self.size[0]
+        for thruster_id in thrusters[self.region][thruster_group_id]:
+            new_pulsation = self.pulsation - self.size[0]
+            thrusters[self.region][thruster_group_id][thruster_id].pulsation = new_pulsation
+            thrusters[self.region][thruster_group_id][thruster_id].thruster_grid_label.text = "{0}:{1}".format(thruster_id[1:], str(new_pulsation))
+            thrusters[self.region][thruster_group_id][thruster_id].thruster_list_label.pulsation.text = str(new_pulsation)
+
 
 class MotionControlWidget(Widget):
     statechart = ObjectProperty(None)
@@ -189,8 +208,13 @@ class ShuttleControlView(Widget):
     app = ObjectProperty(None)
     background_image = ObjectProperty(None)
 
+    thrusters_list_view = ObjectProperty(None)
+    thrusters_grid_view = ObjectProperty(None)
+
+    # 'increasing' and 'decreasing' are mapped to 'more' and 'less' in the UI, for brevity.
     thruster_control_mode = OptionProperty('increasing', options=('increasing', 'decreasing'))
 
+    # The 14 group controls, which represent 44 individiual thrusters, fired in these groups.
     thruster_group_1 = ObjectProperty(None)
     thruster_group_2 = ObjectProperty(None)
     thruster_group_3 = ObjectProperty(None)
@@ -206,6 +230,7 @@ class ShuttleControlView(Widget):
     thruster_group_13 = ObjectProperty(None)
     thruster_group_14 = ObjectProperty(None)
 
+    # Rotational motion controls:
     yaw_plus = ObjectProperty(None)
     yaw_minus = ObjectProperty(None)
     pitch_plus = ObjectProperty(None)
@@ -213,6 +238,7 @@ class ShuttleControlView(Widget):
     roll_plus = ObjectProperty(None)
     roll_minus = ObjectProperty(None)
     
+    # Translational motion controls:
     translate_x_plus = ObjectProperty(None)
     translate_x_minus = ObjectProperty(None)
     translate_y_plus = ObjectProperty(None)
@@ -283,7 +309,6 @@ class ShuttleControlView(Widget):
             self.thruster_control_mode = 'increasing'
         else:
             self.thruster_control_mode = 'decreasing'
-        print 'thruster_control_changed', self.thruster_control_mode_switch.active_norm_pos, self.thruster_control_mode
 
     def update(self, *args):
         # Pulsate thruster_groups by their pulsate amounts.
@@ -291,8 +316,25 @@ class ShuttleControlView(Widget):
             thruster_group.pulsate()
         
 
-##############
-# Statechart
+#######################################################
+#
+#  Registration of UI Components with kv View System
+#
+Factory.register("ThrusterControlModeSwitch", ThrusterControlModeSwitch)
+Factory.register("ThrustersGridView", ThrustersGridView)
+Factory.register("ThrustersListView", ThrustersListView)
+Factory.register("ForwardThrustersView", ForwardThrustersView)
+Factory.register("AftLeftThrustersView", AftLeftThrustersView)
+Factory.register("AftRightThrustersView", AftRightThrustersView)
+Factory.register("RotationalMotionControl", RotationalMotionControl)
+Factory.register("TranslationalMotionControl", TranslationalMotionControl)
+Factory.register("ThrusterGroupControl", ThrusterGroupControl)
+Factory.register("ShuttleControlView", ShuttleControlView)
+
+
+############################
+#
+#  Application Statechart
 #
 class AppStatechart(StatechartManager):
     def __init__(self, app, **kw):
@@ -513,29 +555,20 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.adjust_pulsation(self.statechart.app.mainView.thruster_control_mode, self.group)
 
 
-Factory.register("ThrusterControlModeSwitch", ThrusterControlModeSwitch)
-Factory.register("ThrustersGridView", ThrustersGridView)
-Factory.register("ThrustersListView", ThrustersListView)
-Factory.register("ForwardThrustersView", ForwardThrustersView)
-Factory.register("AftLeftThrustersView", AftLeftThrustersView)
-Factory.register("AftRightThrustersView", AftRightThrustersView)
-Factory.register("RotationalMotionControl", RotationalMotionControl)
-Factory.register("TranslationalMotionControl", TranslationalMotionControl)
-Factory.register("ThrusterGroupControl", ThrusterGroupControl)
-Factory.register("ShuttleControlView", ShuttleControlView)
-
+#################
+#
+#  Application 
+#
 class ShuttleControlApp(App):
     statechart = ObjectProperty(None)
     thrustersListView = ObjectProperty(None)
     mainView = ObjectProperty(None)
+    thruster_ids_sorted = ListProperty([])
 
     def build(self):
         Config.set('graphics', 'width', '700') # not working, must be set from command line
         Config.set('graphics', 'height', '714') # not working, must be set from command line
         self.root = Viewport(size=(700,714))
-
-        self.thrustersListView = ThrustersListView()
-        self.root.add_widget(self.thrustersListView)
 
         self.mainView = ShuttleControlView(app=self)
         self.root.add_widget(self.mainView)
@@ -543,21 +576,38 @@ class ShuttleControlApp(App):
         self.statechart = AppStatechart(app=self)
         self.statechart.initStatechart()
 
-        # Create the 44 thrusters.
-        for thruster_group_id in thrusters:
-            for thruster_id in thrusters[thruster_group_id]:
-                thrusters[thruster_group_id][thruster_id] = Thruster(thruster_id, thruster_group_id)
+        Clock.schedule_once(self.create_thrusters, 5)
 
-        # Create the 44 thrusters, and add list items for them.
-        thruster_objects = []
-        for thruster_group_id in thrusters:
-            for thruster_id in thrusters[thruster_group_id]:
-                thrusters[thruster_group_id][thruster_id] = Thruster(thruster_id, thruster_group_id)
-                thruster_objects.append(thrusters[thruster_group_id][thruster_id])
-        self.thrustersListView.items = [{ 'thruster_id': str(t.thruster_id), 'pulsation': str(t.pulsation) } for t in thruster_objects]
-        
+        thruster_ids = []
+        for region in thrusters:
+            for thruster_group_id in thrusters[region]:
+                for thruster_id in thrusters[region][thruster_group_id]:
+                    thruster_ids.append(thruster_id)
+        self.thruster_ids_sorted = sorted(thruster_ids)
+
+        # Initialize list items.
+        self.mainView.thrusters_list_view.items = [{ 'thruster_id': t_id, 'pulsation': '0' } for t_id in self.thruster_ids_sorted]
+
         return self.root
 
+    def create_thrusters(self, dt):
+        # A sorted list of thruster ids is needed for setting grid items.
+        region_widgets = { 'forward': self.mainView.thrusters_grid_view.forward_thrusters,
+                           'aft-left': self.mainView.thrusters_grid_view.aft_left_thrusters,
+                           'aft-right': self.mainView.thrusters_grid_view.aft_right_thrusters }
+
+        # Create the 44 thruster data objects, setting them in the global reference data dict.
+        for region in thrusters:
+            for group_id in thrusters[region]:
+                for thruster_id in thrusters[region][group_id]:
+                    grid_label = getattr(region_widgets[region], thruster_id.lower())
+                    list_label = self.mainView.thrusters_list_view.children[self.thruster_ids_sorted.index(thruster_id)]
+                    thrusters[region][group_id][thruster_id] = Thruster(thruster_id, group_id, grid_label, list_label)
+
+##########
+#
+#  Main
+#
 if __name__ in ('__android__', '__main__'):
     app = ShuttleControlApp()
     app.run()
