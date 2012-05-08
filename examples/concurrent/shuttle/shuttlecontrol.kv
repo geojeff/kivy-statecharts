@@ -1,5 +1,29 @@
 #:kivy 1.0.9
 
+# The TopToolbar spans the width of the app, and is 60 pixels in height.
+#
+<TopToolbar>:
+    canvas:
+        Color:
+            rgb: .4, .3, .2
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    pos: 0, 714
+    size: 700, 60
+
+# AnimatedButton is used as the main toolbar application mode button.
+#
+<AnimatedButton>:
+    canvas.before:
+        Color:
+            rgb: (1, 1, 1)
+        BorderImage:
+            border: root.border if root.border else (16, 16, 16, 16)
+            pos: self.pos
+            size: self.size
+            texture: self.texture_background
+
 # Thanks to quanon for how to do the list with a template as a child
 # of another widget. This list of thrusters and pulsation values goes 
 # on the left side of the display.
@@ -8,14 +32,14 @@
     pulsation: pulsation
     canvas.before:
         Color:
-            rgba: (1, 0, 1, .5) if self.parent and (len(self.parent.children) % 2 == 1) else (0, 0, 0, .5)
+            rgba: (.4, .3, .2, .5) if self.parent and (len(self.parent.children) % 2 == 1) else (0, 0, 0, .5)
         Rectangle:
             size: self.size
             pos: self.pos
         Color:
             rgba: (1, 1, 1, 1)
     Label:
-        color: .2, .7, 0, 1
+        color: .4, .7, .2, 1
         text: ctx.thruster_id
     Label:
         id: pulsation
@@ -451,7 +475,7 @@
     padding: 10
     spacing: 10
     width: 450
-    height: 200
+    height: 175
 
     ForwardThrustersView:
         id: forward_thrusters

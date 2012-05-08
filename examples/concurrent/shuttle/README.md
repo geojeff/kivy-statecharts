@@ -35,7 +35,7 @@ Running
 
 Use of kivy.config to set the Window width and height in the python code hasn't worked yet, so pass app size as a command line argument:
 
-    python main.py --size=700x714
+    python main.py --size=700x774
 
 The background image, RCS_Jet_Code.png, has the dimensions 600x714, and shows on the right, with a 100 pixel wide list view on the left
 
