@@ -1,5 +1,17 @@
 #:kivy 1.0.9
 
+# AnimatedButton is used as the main toolbar application mode button.
+#
+<AnimatedButton>:
+    canvas.before:
+        Color:
+            rgb: (1, 1, 1)
+        BorderImage:
+            border: root.border if root.border else (16, 16, 16, 16)
+            pos: 0, 714
+            size: 700, 60
+            texture: self.texture_background
+
 # The TopToolbar spans the width of the app, and is 60 pixels in height.
 #
 <TopToolbar>:
@@ -8,8 +20,8 @@
         Color:
             rgb: .4, .3, .2
         Rectangle:
-            pos: self.pos
-            size: self.size
+            pos: 0, 714
+            size: 700, 60
     AnimatedButton:
         id: animated_button
         text: 'Hey!'
@@ -704,16 +716,3 @@
         pos: 100 + 554, 22
         size: 46, 72
         
-# AnimatedButton is used as the main toolbar application mode button.
-#
-<AnimatedButton>:
-    canvas.before:
-        Color:
-            rgb: (1, 1, 1)
-        BorderImage:
-            border: root.border if root.border else (16, 16, 16, 16)
-            pos: self.pos
-            size: self.size
-            texture: self.texture_background
-
-

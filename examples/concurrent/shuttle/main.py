@@ -335,7 +335,6 @@ Factory.register("TopToolbar", TopToolbar)
 Factory.register("Viewport", Viewport)
 
 
-
 ############################
 #
 #  Application Statechart
@@ -603,16 +602,12 @@ class ShuttleControlApp(App):
 
         self.root = Viewport(size=(700,774))
 
-        # Create top toolbar.
+        # Create top toolbar, and add it to the viewport.
         #
-        animated_button = AnimatedButton(text='Toolbar Animation', halign = 'center',\
-            background_normal = 'data/images/toolbar-button-background.png',\
-            background_down   = 'data/images/button_white_animated.zip')
-        self.top_toolbar = TopToolbar()
-        self.top_toolbar.add_widget(animated_button)
-        self.root.add_widget(self.top_toolbar)
+        self.root.top_toolbar = TopToolbar()
+        self.root.add_widget(self.root.top_toolbar)
 
-        # Create the main view.
+        # Create the main view, and add it to the viewport.
         #
         self.root.main_view = ShuttleControlView(app=self)
         self.root.add_widget(self.root.main_view)
