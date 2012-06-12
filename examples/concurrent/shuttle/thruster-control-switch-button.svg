@@ -15,8 +15,8 @@
    id="svg3835"
    version="1.1"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="pos-neg-switch-button.svg"
-   inkscape:export-filename="/Users/geojeff/Development/kivy/kivy_statechart/examples/concurrent/shuttle/pos-neg-switch-button.png"
+   sodipodi:docname="thruster-control-switch-button.svg"
+   inkscape:export-filename="/Users/geojeff/Development/kivy/kivy_statechart/examples/concurrent/shuttle/thruster-control-switch-button.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -57,9 +57,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="9.1514706"
-     inkscape:cx="280.65885"
-     inkscape:cy="685.71429"
+     inkscape:zoom="11.941667"
+     inkscape:cx="271.58724"
+     inkscape:cy="705.41625"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -84,21 +84,19 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <rect
-       style="fill:#241c1c;fill-opacity:1;stroke:none"
-       id="rect3912"
-       width="43"
-       height="32"
-       x="282.79608"
-       y="342.20309"
-       ry="3.0375304" />
-    <rect
-       ry="2.8404546"
-       y="343.18655"
-       x="283.77954"
-       height="29.923832"
-       width="40.81456"
+    <path
+       sodipodi:nodetypes="sssssssss"
+       inkscape:connector-curvature="0"
+       id="path4980"
+       d="m 285.19748,343.18655 36.55617,0 c 1.57361,0 2.84045,1.26685 2.84045,2.84046 l 0,24.24292 c 0,1.57361 -1.26684,2.84046 -2.84045,2.84046 l -36.55617,0 c -1.57362,0 -9.43087,-12.73178 -9.51705,-14.29716 l -0.11738,-2.13222 c -0.0862,-1.56538 8.06081,-13.49446 9.63443,-13.49446 z"
+       style="opacity:0.44827647;fill:#1a1a1a;fill-opacity:1;stroke:#526d72;stroke-width:0.30000001;stroke-miterlimit:4;stroke-opacity:1;filter:url(#filter4452)"
+       transform="matrix(2.3832628,0,0,1.5335045,-443.57647,-202.28047)" />
+    <path
+       transform="matrix(2.2549121,0,0,1.3618322,-404.47405,-140.8803)"
+       style="opacity:0.44827647;fill:#1a1a1a;fill-opacity:1;stroke:#526d72;stroke-width:0.30000001;stroke-miterlimit:4;stroke-opacity:1;filter:url(#filter4452)"
+       d="m 285.19748,343.18655 36.55617,0 c 1.57361,0 2.84045,1.26685 2.84045,2.84046 l 0,24.24292 c 0,1.57361 -1.26684,2.84046 -2.84045,2.84046 l -36.55617,0 c -1.57362,0 -9.43087,-12.73178 -9.51705,-14.29716 l -0.11738,-2.13222 c -0.0862,-1.56538 8.06081,-13.49446 9.63443,-13.49446 z"
        id="rect3914"
-       style="fill:url(#linearGradient4462);fill-opacity:1;stroke:#526d72;stroke-opacity:1;filter:url(#filter4452);stroke-width:0.29999999999999999;stroke-miterlimit:4;stroke-dasharray:none;opacity:0.44827586000000003" />
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="sssssssss" />
   </g>
 </svg>
