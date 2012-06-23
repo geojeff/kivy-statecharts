@@ -5,6 +5,7 @@ from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.animation import Animation
 from kivy.uix.treeview import TreeView, TreeViewNode, TreeViewLabel
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
 from kivy.uix.label import Label
@@ -140,6 +141,13 @@ class TreeViewTwo(TreeNodeView):
 #
 #  Application Statechart
 #
+
+# Utility method for constructing state name from cosmetic label text
+# of tab headers.
+#
+def state_name(text):
+    return 'Showing{0}'.format(text.replace(' ', ''))
+
 class AppStatechart(StatechartManager):
     def __init__(self, app, **kw):
         self.app = app
@@ -152,7 +160,7 @@ class AppStatechart(StatechartManager):
     #
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'ShowingDefaultTab'
+            kwargs['initialSubstateKey'] = 'ShowingMain'
             super(AppStatechart.RootState, self).__init__(**kwargs)
         
         def enterState(self, context=None):
@@ -161,59 +169,108 @@ class AppStatechart(StatechartManager):
         def exitState(self, context=None):
             print 'RootState/exitState'
 
-        def show_default_tab(self, sender=None, context=None):
-            self.gotoState('ShowingDefaultTab')
-
-        def show_tree_one(self, sender=None, context=None):
-            self.gotoState('ShowingTreeOne')
-
-        def show_tree_two(self, sender=None, context=None):
-            self.gotoState('ShowingTreeTwo')
-
         ##############################
-        # ShowingDefaultTab
+        # ShowingMain
         #
-        class ShowingDefaultTab(State):
+        class ShowingMain(State):
             def __init__(self, **kwargs):
-                super(AppStatechart.RootState.ShowingDefaultTab, self).__init__(**kwargs)
+                kwargs['initialSubstateKey'] = 'ShowingInstructions' # Initial system startup
+                super(AppStatechart.RootState.ShowingMain, self).__init__(**kwargs)
         
             def enterState(self, context=None):
-                print 'ShowingDefaultTab/enterState'
+                print 'ShowingMain/enterState'
                         
             def exitState(self, context=None):
-                print 'ShowingDefaultTab/exitState'
+                print 'ShowingMain/exitState'
 
-        ##############################
-        # ShowingTreeOne
-        #
-        class ShowingTreeOne(State):
-            def __init__(self, **kwargs):
-                super(AppStatechart.RootState.ShowingTreeOne, self).__init__(**kwargs)
-        
-            def enterState(self, context=None):
-                print 'ShowingTreeOne/enterState'
-                        
-            def exitState(self, context=None):
-                print 'ShowingTreeOne/exitState'
+            def tab_selection_did_change(self, tab_header=None, context=None):
+                self.gotoState(state_name(tab_header.text))
 
-            def node_clicked(self, node_id=None, touch=None):
-                print 'node clicked - tree one', node_id, touch
+            ######################################
+            # ShowingInstructions (default tab)
+            #
+            class ShowingInstructions(State):
+                def __init__(self, **kwargs):
+                    super(AppStatechart.RootState.ShowingMain.ShowingInstructions, self).__init__(**kwargs)
+            
+                def enterState(self, context=None):
+                    print 'ShowingInstructions/enterState'
+                            
+                def exitState(self, context=None):
+                    print 'ShowingInstructions/exitState'
+    
+            ##############################
+            # ShowingTreeOne
+            #
+            class ShowingTreeOne(State):
+                def __init__(self, **kwargs):
+                    super(AppStatechart.RootState.ShowingMain.ShowingTreeOne, self).__init__(**kwargs)
+            
+                def enterState(self, context=None):
+                    print 'ShowingTreeOne/enterState'
+                            
+                def exitState(self, context=None):
+                    print 'ShowingTreeOne/exitState'
+    
+                def node_clicked(self, node_id=None, touch=None):
+                    print 'node clicked - tree one', node_id, touch
+    
+            ##############################
+            # ShowingTreeTwo
+            #
+            class ShowingTreeTwo(State):
+                def __init__(self, **kwargs):
+                    super(AppStatechart.RootState.ShowingMain.ShowingTreeTwo, self).__init__(**kwargs)
+            
+                def enterState(self, context=None):
+                    print 'ShowingTreeTwo/enterState'
+                            
+                def exitState(self, context=None):
+                    print 'ShowingTreeTwo/exitState'
+    
+                def node_clicked(self, node_id=None, touch=None):
+                    print 'node clicked - tree two', node_id, touch
+    
+    
+class MainTabbedPanel(TabbedPanel):
+    app = ObjectProperty(None)
 
-        ##############################
-        # ShowingTreeTwo
-        #
-        class ShowingTreeTwo(State):
-            def __init__(self, **kwargs):
-                super(AppStatechart.RootState.ShowingTreeTwo, self).__init__(**kwargs)
-        
-            def enterState(self, context=None):
-                print 'ShowingTreeTwo/enterState'
-                        
-            def exitState(self, context=None):
-                print 'ShowingTreeTwo/exitState'
+    # Override tab switching method to animate on tab switch,
+    # and to fire tab actions to the statechart.
+    #
+    def switch_to(self, header):
+        if header.content is None:
+            return
+        anim = Animation(color=(1, 1, 1, 0), d =.24, t = 'in_out_quad')
 
-            def node_clicked(self, node_id=None, touch=None):
-                print 'node clicked - tree two', node_id, touch
+        def start_anim(_anim, child, in_complete, *lt):
+            if hasattr(child, 'color'):
+                _anim.start(child)
+            elif not in_complete:
+                _on_complete()
+
+        def _on_complete(*lt):
+            if hasattr(header.content, 'color'):
+                header.content.color = (0, 0, 0, 0)
+                anim = Animation(color = (1, 1, 1, 1), d =.23, t = 'in_out_quad')
+                start_anim(anim, header.content, True)
+
+            # Guard for early firing, when the TabbedPanel will switch_to the default_tab
+            # on instantiation, which the statechart matches by its default state setup.
+            #
+            # So, at app startup, the UI and the statechart will be in sync on the default tab,
+            # but here we dispatch later tab changes to stay in sync.
+            #
+            if self.app.statechart: 
+                self.app.statechart.sendEvent('tab_selection_did_change', header)
+
+            super(MainTabbedPanel, self).switch_to(header)
+
+        anim.bind(on_complete = _on_complete)
+        if self.content and self.content.children:
+            start_anim(anim, self.content.children[0], False)
+        else:
+            _on_complete()
 
 
 #################
@@ -224,31 +281,20 @@ class TreesApp(App):
     statechart = ObjectProperty(None)
     main_view = ObjectProperty(None)
 
-    def show_default_tab(self):
-        self.statechart.sendEvent('show_default_tab')
-
-    def show_tree_one(self, touch):
-        self.statechart.sendEvent('show_tree_one')
-
-    def show_tree_two(self, touch):
-        self.statechart.sendEvent('show_tree_two')
-
     def build(self):
         Config.set('graphics', 'width', '800') # not working, must be set from command line
         Config.set('graphics', 'height', '600') # not working, must be set from command line
 
         self.root = Viewport(size=(800,600))
 
-        tp = TabbedPanel(pos_hint={ 'center_x': .5, 'center_y': .5 }, size_hint=(.5, .5), default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two.'))
+        tp = MainTabbedPanel(app=self, pos_hint={ 'center_x': .5, 'center_y': .5 }, size_hint=(.5, .5), default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two.'))
 
         self.th_one = TabbedPanelHeader(text='Tree One')
-        self.th_one.bind(on_press=self.show_tree_one)
         self.tree_one = TreeViewOne(app=self, pos_hint={'top': 0.9}) #, size_hint=(1, .5))
         self.th_one.content = self.tree_one
         tp.add_widget(self.th_one)
 
         self.th_two = TabbedPanelHeader(text='Tree Two')
-        self.th_two.bind(on_press=self.show_tree_two)
         self.tree_two = TreeViewTwo(app=self, pos_hint={'top': 0.9}) #, size_hint=(1, .5))
         self.th_two.content = self.tree_two
         tp.add_widget(self.th_two)
