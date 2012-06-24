@@ -63,80 +63,6 @@ class Viewport(ScatterPlane):
         w.size = self.size
 
 
-class TreeNodeButton(Button, TreeViewLabel):
-    statechart = ObjectProperty(None)
-    app = ObjectProperty(None)
-
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            touch.grab(self)
-            return True
-
-    def on_touch_up(self, touch):
-        if touch.grab_current is self:
-            touch.ungrab(self)
-            self.app.statechart.sendEvent('node_clicked', self.text, touch)
-            return True
-
-
-class TreeNodeView(Widget):
-    app = ObjectProperty(None)
-    statechart = ObjectProperty(None)
-
-    def __init__(self, app, tree, **kwargs):
-        self.app = app
-        self.tree = tree
-        super(TreeNodeView, self).__init__(**kwargs) 
-
-        self.tv = TreeView(hide_root=True, indent_level=4)
-
-        self.add_node(None, tree)
-
-        self.add_widget(self.tv)
-        
-    def add_node(self, parent, node):
-        if parent is None:
-            tree_node_button = self.tv.add_node(TreeNodeButton(app=self.app, text=node['node_id'], is_open=True))
-        else:
-            tree_node_button = self.tv.add_node(TreeNodeButton(app=self.app, text=node['node_id'], is_open=True), parent)
-
-        for child_node in node['children']:
-            self.add_node(tree_node_button, child_node)
-        
-        
-class TreeViewOne(TreeNodeView):
-    def __init__(self, app, **kwargs):
-        tree = {'node_id': '1',
-                'children': [{'node_id': '1.1',
-                              'children': [{'node_id': '1.1.1',
-                                            'children': [{'node_id': '1.1.1.1',
-                                                          'children': []}]},
-                                           {'node_id': '1.1.2',
-                                            'children': []},
-                                           {'node_id': '1.1.3',
-                                            'children': []}]},
-                              {'node_id': '1.2',
-                               'children': []}]}
-
-        super(TreeViewOne, self).__init__(app, tree, **kwargs)
-
-class TreeViewTwo(TreeNodeView):
-    def __init__(self, app, **kwargs):
-        tree = {'node_id': '2',
-                'children': [{'node_id': '2.1',
-                              'children': [{'node_id': '2.1.1',
-                                            'children': [{'node_id': '2.1.1.1',
-                                                          'children': []}]},
-                                           {'node_id': '2.1.2',
-                                            'children': []},
-                                           {'node_id': '2.1.3',
-                                            'children': []}]},
-                              {'node_id': '2.2',
-                               'children': []}]}
-
-        super(TreeViewTwo, self).__init__(app, tree, **kwargs)
-
-
 ############################
 #
 #  Application Statechart
@@ -232,6 +158,9 @@ class AppStatechart(StatechartManager):
                     print 'node clicked - tree two', node_id, touch
     
     
+# See kivy/examples/widgets/tabbed_panel_showcase.py for the original code
+# for how to subclass TabbedPanel for animation.
+#
 class MainTabbedPanel(TabbedPanel):
     app = ObjectProperty(None)
 
@@ -273,6 +202,21 @@ class MainTabbedPanel(TabbedPanel):
             _on_complete()
 
 
+class TreeNodeButton(Button, TreeViewLabel):
+    app = ObjectProperty(None)
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            touch.grab(self)
+            return True
+
+    def on_touch_up(self, touch):
+        if touch.grab_current is self:
+            touch.ungrab(self)
+            self.app.statechart.sendEvent('node_clicked', self.text, touch)
+            return True
+
+
 #################
 #
 #  Application 
@@ -287,17 +231,59 @@ class TreesApp(App):
 
         self.root = Viewport(size=(800,600))
 
-        tp = MainTabbedPanel(app=self, pos_hint={ 'center_x': .5, 'center_y': .5 }, size_hint=(.5, .5), default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two.'))
+        tp = MainTabbedPanel(app=self, default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two.'))
 
-        self.th_one = TabbedPanelHeader(text='Tree One')
-        self.tree_one = TreeViewOne(app=self, pos_hint={'top': 0.9}) #, size_hint=(1, .5))
-        self.th_one.content = self.tree_one
-        tp.add_widget(self.th_one)
+        # Recursive utility function for adding nodes to the tree view.
+        #
+        # The custom tree node type, TreeNodeButton, has an app property, giving access to
+        # the statechart for sending node click events to the statechart.
+        #
+        def populate_tree_nodes(tree_view, parent, node):
+            if parent is None:
+                tree_node_button = tree_view.add_node(TreeNodeButton(app=self, text=node['node_id'], is_open=True))
+            else:
+                tree_node_button = tree_view.add_node(TreeNodeButton(app=self, text=node['node_id'], is_open=True), parent)
+    
+            for child_node in node['children']:
+                populate_tree_nodes(tree_view, tree_node_button, child_node)
+        
+        # Add tree one.
+        #
+        tree = {'node_id': '1',
+                'children': [{'node_id': '1.1',
+                              'children': [{'node_id': '1.1.1',
+                                            'children': [{'node_id': '1.1.1.1',
+                                                          'children': []}]},
+                                           {'node_id': '1.1.2',
+                                            'children': []},
+                                           {'node_id': '1.1.3',
+                                            'children': []}]},
+                              {'node_id': '1.2',
+                               'children': []}]}
+        tph = TabbedPanelHeader(text='Tree One')
+        tree_one = TreeView(root_options=dict(text='Tree One'), hide_root=False, indent_level=4)
+        populate_tree_nodes(tree_one, None, tree)
+        tph.content = tree_one
+        tp.add_widget(tph)
 
-        self.th_two = TabbedPanelHeader(text='Tree Two')
-        self.tree_two = TreeViewTwo(app=self, pos_hint={'top': 0.9}) #, size_hint=(1, .5))
-        self.th_two.content = self.tree_two
-        tp.add_widget(self.th_two)
+        # Add tree two.
+        #
+        tree = {'node_id': '2',
+                'children': [{'node_id': '2.1',
+                              'children': [{'node_id': '2.1.1',
+                                            'children': [{'node_id': '2.1.1.1',
+                                                          'children': []}]},
+                                           {'node_id': '2.1.2',
+                                            'children': []},
+                                           {'node_id': '2.1.3',
+                                            'children': []}]},
+                              {'node_id': '2.2',
+                               'children': []}]}
+        tph = TabbedPanelHeader(text='Tree Two')
+        tree_two = TreeView(root_options=dict(text='Tree Two'), hide_root=False, indent_level=4)
+        populate_tree_nodes(tree_two, None, tree)
+        tph.content = tree_two
+        tp.add_widget(tph)
 
         self.root.add_widget(tp)
 
