@@ -126,7 +126,7 @@ class ShowingTree(State):
 
             content = GridLayout(cols=1)
 
-            content_question_label = Label(text=self.selected_node.question)
+            content_question_label = Label(text=self.selected_node.question, text_size=(200, None))
             self.content_answer_input = TextInput(text=self.selected_node.answer)
             content_ok = Button(text='OK', size_hint_y=None, height=40)
             content_cancel = Button(text='Cancel', size_hint_y=None, height=40)
@@ -187,7 +187,7 @@ class ShowingTree(State):
             print 'ShowingNodeAlreadyCompletedPopup/enterState'
             content = GridLayout(cols=1)
 
-            content_label = Label(text="Your correct answer: {0}.".format(self.statechart.app.tabbed_panel.current_tab.content.selected_node.answer))
+            content_label = Label(text="Your correct answer: {0}.".format(self.statechart.app.tabbed_panel.current_tab.content.selected_node.answer), text_size=(200, None))
             content_ok_button = Button(text='OK', size_hint_y=None, height=40)
 
             content_ok_button.bind(on_release=self.cancel)
@@ -217,7 +217,7 @@ class ShowingTree(State):
             selected_node = self.statechart.app.tabbed_panel.current_tab.content.tree_view.selected_node
             content = GridLayout(cols=1)
 
-            content_label = Label(text="(You skipped one or more parents).".format(selected_node.text))
+            content_label = Label(text="(You skipped one or more parents).".format(selected_node.text), text_size=(200, None))
             content_ok_button = Button(text='OK', size_hint_y=None, height=40)
 
             content_ok_button.bind(on_release=self.cancel)
@@ -246,7 +246,7 @@ class ShowingTree(State):
             print 'ShowingWrongAnswerPopup/enterState'
             content = GridLayout(cols=1)
 
-            content_label = Label(text=self.statechart.app.tabbed_panel.current_tab.content.tree_view.selected_node.question)
+            content_label = Label(text=self.statechart.app.tabbed_panel.current_tab.content.tree_view.selected_node.question, text_size=(200, None))
             content_give_up_button = Button(text='I give up for now', size_hint_y=None, height=40)
             content_try_again_button = Button(text='Try Again', size_hint_y=None, height=40)
 
@@ -435,7 +435,7 @@ class TreesApp(App):
 
         self.root = Viewport(size=(800,600))
 
-        self.tabbed_panel = MainTabbedPanel(app=self, default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two, and answer qeuestions that pop up.'))
+        self.tabbed_panel = MainTabbedPanel(app=self, default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two, and answer qeuestions that pop up. You are forced to answer the root question first, and you will not be able to answer the question for a node unless all of the node\'s parents have already been answered successfully.', text_size=(200, None)))
 
         # Recursive utility function for adding nodes to the tree view.
         #
