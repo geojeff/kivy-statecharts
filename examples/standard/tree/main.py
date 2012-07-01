@@ -131,8 +131,8 @@ class ShowingTree(State):
             content_ok = Button(text='OK', size_hint_y=None, height=40)
             content_cancel = Button(text='Cancel', size_hint_y=None, height=40)
 
-            content_ok.bind(on_release=self.cancel)
-            content_cancel.bind(on_release=self.evaluate_answer)
+            content_ok.bind(on_release=self.evaluate_answer)
+            content_cancel.bind(on_release=self.cancel)
 
             content.add_widget(content_question_label)
             content.add_widget(self.content_answer_input)
