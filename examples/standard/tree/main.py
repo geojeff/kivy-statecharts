@@ -98,7 +98,7 @@ class ShowingTree(State):
 
     def node_clicked(self, node_id=None, touch=None):
         print 'node clicked - tree one', node_id, touch
-        self.selected_node = self.statechart.app.tabbed_panel.current_tab.tree_view.selected_node
+        self.selected_node = self.statechart.app.tabbed_panel.current_tab.content.tree_view.selected_node
 
         print 'clicked on TreeNodeLabel', self.selected_node.text, self.selected_node.level
 
@@ -112,7 +112,7 @@ class ShowingTree(State):
 
     class ShowingNodeQuestion(State):
         selected_node = ObjectProperty(None) # [TODO] Better to get from parentState?
-        current_tab = ObjectProperty(None)
+        current_tab_content = ObjectProperty(None)
         content_answer_input = ObjectProperty(None)
 
         def __init__(self, **kwargs):
@@ -121,8 +121,8 @@ class ShowingTree(State):
         def enterState(self, context=None):
             print 'ShowingNodeQuestion/enterstate'
 
-            self.current_tab = self.statechart.app.tabbed_panel.current_tab
-            self.selected_node = self.current_tab.tree_view.selected_node
+            self.current_tab_content = self.statechart.app.tabbed_panel.current_tab.content
+            self.selected_node = self.current_tab_content.tree_view.selected_node
 
             content = GridLayout(cols=1)
 
@@ -155,15 +155,15 @@ class ShowingTree(State):
 
                 # Are there any unanswered questions in this tree? If not, mark the entire tree of questions as complete.
                 # Otherwise, update the score.
-                num_correct = len([1 for node_button in self.current_tab.tree_view.iterate_all_nodes() 
+                num_correct = len([1 for node_button in self.current_tab_content.tree_view.iterate_all_nodes() 
                                        if type(node_button) == TreeNodeButton and node_button.is_answered is True])
-                num_questions = len(self.current_tab.tree_view.children)-1 # - 1 for the root TreeViewLabel
+                num_questions = len(self.current_tab_content.tree_view.children)-1 # - 1 for the root TreeViewLabel
 
                 if num_correct == num_questions:
-                    self.current_tab.is_completed = True 
-                    self.current_tab.completion_status_label.text = "All questions were answered correctly!"
+                    self.current_tab_content.is_completed = True 
+                    self.current_tab_content.completion_status_label.text = "All questions were answered correctly!"
                 else:
-                    self.current_tab.completion_status_label.text = "Score: {0}/{1}".format(num_correct, num_questions)
+                    self.current_tab_content.completion_status_label.text = "Score: {0}/{1}".format(num_correct, num_questions)
 
                 self.gotoState(self.parentState)
             else:
@@ -187,7 +187,7 @@ class ShowingTree(State):
             print 'ShowingNodeAlreadyCompletedPopup/enterState'
             content = GridLayout(cols=1)
 
-            content_label = Label(text="Your correct answer: {0}.".format(self.statechart.app.tabbed_panel.current_tab.selected_node.answer))
+            content_label = Label(text="Your correct answer: {0}.".format(self.statechart.app.tabbed_panel.current_tab.content.selected_node.answer))
             content_ok_button = Button(text='OK', size_hint_y=None, height=40)
 
             content_ok_button.bind(on_release=self.cancel)
@@ -214,7 +214,7 @@ class ShowingTree(State):
     
         def enterState(self, context=None):
             print 'ShowingIneligibleNodePopup/enterState'
-            selected_node = self.statechart.app.tabbed_panel.current_tab.tree_view.selected_node
+            selected_node = self.statechart.app.tabbed_panel.current_tab.content.tree_view.selected_node
             content = GridLayout(cols=1)
 
             content_label = Label(text="(You skipped one or more parents).".format(selected_node.text))
@@ -246,7 +246,7 @@ class ShowingTree(State):
             print 'ShowingWrongAnswerPopup/enterState'
             content = GridLayout(cols=1)
 
-            content_label = Label(text=self.statechart.app.tabbed_panel.current_tab.tree_view.selected_node.question)
+            content_label = Label(text=self.statechart.app.tabbed_panel.current_tab.content.tree_view.selected_node.question)
             content_give_up_button = Button(text='I give up for now', size_hint_y=None, height=40)
             content_try_again_button = Button(text='Try Again', size_hint_y=None, height=40)
 
