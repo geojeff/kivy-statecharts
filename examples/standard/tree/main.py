@@ -2,7 +2,7 @@ import kivy
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.widget import Widget
-from kivy.properties import ObjectProperty, StringProperty, BooleanProperty
+from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.animation import Animation
@@ -75,11 +75,14 @@ class Viewport(ScatterPlane):
 # Utility method for constructing state name from cosmetic label text
 # of tab headers.
 #
-def state_name(text):
+def construct_state_name(text):
     return 'Showing{0}'.format(text.replace(' ', ''))
 
-###############
-# ShowingTree
+######################################################
+# ShowingTree -- designed for reuse for tree states
+#
+# [TODO] In reuse, the states are each unique objects, but do not have unique names.
+#        Will this work?
 #
 class ShowingTree(State):
     selected_node = ObjectProperty(None)
@@ -95,7 +98,7 @@ class ShowingTree(State):
 
     def node_clicked(self, node_id=None, touch=None):
         print 'node clicked - tree one', node_id, touch
-        self.selected_node = self.statechart.app.tabbed_panel.content.children[0].selected_node
+        self.selected_node = self.statechart.app.tabbed_panel.current_tab.tree_view.selected_node
 
         print 'clicked on TreeNodeLabel', self.selected_node.text, self.selected_node.level
 
@@ -108,7 +111,8 @@ class ShowingTree(State):
             self.gotoState('ShowingIneligibleNodePopup')
 
     class ShowingNodeQuestion(State):
-        selected_node = ObjectProperty(None)
+        selected_node = ObjectProperty(None) # [TODO] Better to get from parentState?
+        current_tab = ObjectProperty(None)
         content_answer_input = ObjectProperty(None)
 
         def __init__(self, **kwargs):
@@ -117,7 +121,8 @@ class ShowingTree(State):
         def enterState(self, context=None):
             print 'ShowingNodeQuestion/enterstate'
 
-            self.selected_node = self.statechart.app.tabbed_panel.content.children[0].selected_node
+            self.current_tab = self.statechart.app.tabbed_panel.current_tab
+            self.selected_node = self.current_tab.tree_view.selected_node
 
             content = GridLayout(cols=1)
 
@@ -147,6 +152,19 @@ class ShowingTree(State):
             if self.content_answer_input.text.lower() == self.selected_node.answer:
                 self.selected_node.background_color = [0., 1., 0., 1.]
                 self.selected_node.is_answered = True
+
+                # Are there any unanswered questions in this tree? If not, mark the entire tree of questions as complete.
+                # Otherwise, update the score.
+                num_correct = len([1 for node_button in self.current_tab.tree_view.iterate_all_nodes() 
+                                       if type(node_button) == TreeNodeButton and node_button.is_answered is True])
+                num_questions = len(self.current_tab.tree_view.children)-1 # - 1 for the root TreeViewLabel
+
+                if num_correct == num_questions:
+                    self.current_tab.is_completed = True 
+                    self.current_tab.completion_status_label.text = "All questions were answered correctly!"
+                else:
+                    self.current_tab.completion_status_label.text = "Score: {0}/{1}".format(num_correct, num_questions)
+
                 self.gotoState(self.parentState)
             else:
                 self.selected_node.background_color = [1., 0., 0., 1.]
@@ -169,7 +187,7 @@ class ShowingTree(State):
             print 'ShowingNodeAlreadyCompletedPopup/enterState'
             content = GridLayout(cols=1)
 
-            content_label = Label(text="Your correct answer: {0}.".format(self.statechart.app.tabbed_panel.content.children[0].selected_node.answer))
+            content_label = Label(text="Your correct answer: {0}.".format(self.statechart.app.tabbed_panel.current_tab.selected_node.answer))
             content_ok_button = Button(text='OK', size_hint_y=None, height=40)
 
             content_ok_button.bind(on_release=self.cancel)
@@ -196,7 +214,7 @@ class ShowingTree(State):
     
         def enterState(self, context=None):
             print 'ShowingIneligibleNodePopup/enterState'
-            selected_node = self.statechart.app.tabbed_panel.content.children[0].selected_node
+            selected_node = self.statechart.app.tabbed_panel.current_tab.tree_view.selected_node
             content = GridLayout(cols=1)
 
             content_label = Label(text="(You skipped one or more parents).".format(selected_node.text))
@@ -228,7 +246,7 @@ class ShowingTree(State):
             print 'ShowingWrongAnswerPopup/enterState'
             content = GridLayout(cols=1)
 
-            content_label = Label(text=self.statechart.app.tabbed_panel.content.children[0].selected_node.question)
+            content_label = Label(text=self.statechart.app.tabbed_panel.current_tab.tree_view.selected_node.question)
             content_give_up_button = Button(text='I give up for now', size_hint_y=None, height=40)
             content_try_again_button = Button(text='Try Again', size_hint_y=None, height=40)
 
@@ -290,7 +308,7 @@ class AppStatechart(StatechartManager):
                 print 'ShowingMain/exitState'
 
             def tab_selection_did_change(self, tab_header=None, context=None):
-                self.gotoState(state_name(tab_header.text))
+                self.gotoState(construct_state_name(tab_header.text))
 
             #####################################
             # ShowingInstructions (default tab)
@@ -329,7 +347,7 @@ class MainTabbedPanel(TabbedPanel):
     # Override tab switching method to animate on tab switch,
     # and to fire tab actions to the statechart.
     #
-    def switch_to(self, header):
+    def switch_to(self, header, *args):
         if header.content is None:
             return
         anim = Animation(color=(1, 1, 1, 0), d =.24, t = 'in_out_quad')
@@ -382,6 +400,27 @@ class TreeNodeButton(Button, TreeViewLabel):
             return True
 
 
+##################
+#
+#  TabBoxLayout
+#
+class TabBoxLayout(BoxLayout):
+    tree_view = ObjectProperty(None)
+    completion_status_label = ObjectProperty(None)
+    is_complete = BooleanProperty(False)
+    num_questions = NumericProperty(0)
+
+    def __init__(self, tree_view=None, completion_status_label=None, num_questions=0, **kwargs):
+        self.tree_view = tree_view
+        self.completion_status_label = completion_status_label
+        self.num_questions = num_questions
+
+        super(TabBoxLayout, self).__init__(**kwargs)
+
+        self.add_widget(tree_view)
+        self.add_widget(completion_status_label)
+
+
 #################
 #
 #  Application 
@@ -396,12 +435,14 @@ class TreesApp(App):
 
         self.root = Viewport(size=(800,600))
 
-        self.tabbed_panel = MainTabbedPanel(app=self, default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two.'))
+        self.tabbed_panel = MainTabbedPanel(app=self, default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two, and answer qeuestions that pop up.'))
 
         # Recursive utility function for adding nodes to the tree view.
         #
         # The custom tree node type, TreeNodeButton, has an app property, giving access to
         # the statechart for sending node click events to the statechart.
+        #
+        # Leverage this recursion for counting the questions.
         #
         def populate_tree_nodes(tree_view, parent, node):
             if parent is None:
@@ -443,7 +484,8 @@ class TreesApp(App):
         tph = TabbedPanelHeader(text='Tree One')
         tree_one = TreeView(root_options=dict(text='Tree One'), hide_root=False, indent_level=4)
         populate_tree_nodes(tree_one, None, tree)
-        tph.content = tree_one
+        tab_content = TabBoxLayout(tree_view=tree_one, completion_status_label=Label(text='Not started'), orientation='vertical')
+        tph.content = tab_content
         self.tabbed_panel.add_widget(tph)
 
         # Add tree two.
@@ -477,7 +519,7 @@ class TreesApp(App):
         tph = TabbedPanelHeader(text='Tree Two')
         tree_two = TreeView(root_options=dict(text='Tree Two'), hide_root=False, indent_level=4)
         populate_tree_nodes(tree_two, None, tree)
-        tph.content = tree_two
+        tph.content = TabBoxLayout(tree_view=tree_two, completion_status_label=Label(text='Not started'), orientation='vertical')
         self.tabbed_panel.add_widget(tph)
 
         self.root.add_widget(self.tabbed_panel)
