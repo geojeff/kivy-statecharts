@@ -435,7 +435,7 @@ class TreesApp(App):
 
         self.root = Viewport(size=(800,600))
 
-        self.tabbed_panel = MainTabbedPanel(app=self, default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two, and answer qeuestions that pop up. You are forced to answer the root question first, and you will not be able to answer the question for a node unless all of the node\'s parents have already been answered successfully.', text_size=(200, None)))
+        self.tabbed_panel = MainTabbedPanel(app=self, default_tab_text='Instructions', default_tab_content=Label(text='Click on tree nodes in trees one and two, and answer qeuestions that pop up. You are forced to answer the root question first, and you will not be able to answer the question for a node unless all of the node\'s parents have already been answered successfully. As questions for nodes are answered, the nodes are colored green. If answered incorrectly, nodes are marked as red. The goal to "solve" a tree of questions is to paint all nodes green.', text_size=(200, None)))
 
         # Recursive utility function for adding nodes to the tree view.
         #
