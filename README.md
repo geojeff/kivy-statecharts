@@ -28,6 +28,15 @@ Example Apps
 
 The examples directory contains several of the Kivy example apps adapted to use statecharts. New examples illustrate specific statechart functionality.
 
+In a Nutshell
+=============
+
+The developer draws a statechart -- on a piece of paper is fine, but there are good drawing programs. This process is easy enough to start laying out what needs to happen as the app loads, and user interaction begins. Each user action envisioned is drawn from states representing user interface elements, more is added, as details are considered. Once the developer has the hang of the simple code constructs, it is a straightforward process to write the code. 
+
+Iteration of refining the statechart and writing code goes along as the app develops. 
+
+For testing, a human-readable table of events and actions can be made from the statechart, and test cases made to cover each item.
+
 Background
 ==========
 
