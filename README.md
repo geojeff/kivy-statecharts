@@ -76,7 +76,7 @@ Now you can appreciate this, also from the Harel paper:
 
 To attempt a paraphrase:
 
-_Statecharts add to basic state-diagrams the functionality to arrange states in a hierarchy, specifying which states are independent of one another, which ones are concurrent with each other, and to write code for the states that responds to events delivered to the statechart as discrete action functions that have narrow effect. Events firing to the action functions may have broadcast effect across multiple related or concurrent states._
+_Statecharts add to basic state-diagrams the functionality to arrange states in a hierarchy, specifying which states are independent of one another and which ones are concurrent with each other. Code is written within states as discrete action functions that respond to events delivered to the statechart. Events firing to the action functions may have broadcast effect across multiple related or concurrent states._
 
 Statecharts and Terminology in MVA/MVC Systems
 ----------------------------------------------
