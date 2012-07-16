@@ -50,7 +50,7 @@ A Wikipedia article on [state diagrams](http://en.wikipedia.org/wiki/State_diagr
 
 Reading the 1987 paper by Harel, you see in the abstract that statecharts concern "the notions of hierarchy, concurrency, and communication." Statecharts offer formalization to modularize code in a hierarchy of states that exist as discrete blocks that can act independently or concurrently, and communicate within an event system, allowing easier modeling of complexity.
 
-So, statecharts help us build complex systems? Well, yes, but what software system stays simple? Not many. Especially systems that involve many interacting parts, "reactive" systems in the parlance of the 1987 Harel paper.
+So, statecharts help us build complex systems? Well, yes, but simple ones too. Besides, what software application stays simple for very long? Not many. Especially systems that involve many interacting parts -- typical software programs are "reactive" systems in the parlance of the 1987 Harel paper.
 
 Speaking of the parlance of the Harel paper, here are some terms and concepts as used there, paraphrasing from the text:
 
@@ -76,38 +76,30 @@ Now you can appreciate this, also form the Harel paper:
 
 To attempt a paraphrase, we may say that statecharts add to basic state-diagrams the functionality to arrange states in a hierarchy, specifying which states are orthogonal to one another, which ones are concurrent with each other, and to write code for the states that responds to events delivered to the statechart, as discrete events that have narrow effect and as events that have broadcast effect across multiple related or concurrent states.
 
-Application in Model-View-Controller Systems
---------------------------------------------
+Statecharts and Terminology in MVA/MVC Systems
+----------------------------------------------
 
-Statecharts are applicable to software systems in general, but Kivy, like SproutCore and so many other systems, involves a user interface with buttons and sliders and lists and custom views, tied to models of record types by means of controllers, which are like bridging connections. MVC systems are "reactive" systems, so are amenable to statechart treatment.
+MVA = Model-View-Adapter System
 
-Statecharts enhance the traditional controller system. Where you may find some sort of event and callback system forming "controller" functionality, statecharts offer formalization beyond that, helping the programmer think more clearly about discrete elements and interactions. In Kivy there is an event system, and there are idioms for setting up a "controller" in python code that is tied to the user interface and responding to "action" events: http://kivy.org/docs/guide/designwithkv.html. You can build something elaborate with this existing functionality, but adding statecharts to the mix will offer the many benefits enjoyed in other systems. 
+MVC = Model-View-Controller System
 
-SproutCore had a system of controllers too, allowing very effective programming before statecharts were added. We can benefit from the similar history of introduction. Notably, for controllers, we can read blog posts by Michael Cohen (nick: frozencanuck) that help with concepts. It will help you to realize that SproutCore is based on Cocoa. Let's look back at some relevant history (history in the sense of SproutCore's heritage; Cocoa and related iOS programming is alive and well, as you know).
+Statecharts are applicable to software systems in general, but Kivy, like so many other systems, involves a user interface with buttons and sliders and lists and custom views, tied to models of record types by means of adapters or controllers. Kivy has a sophisticated property bindings and observer system that is more similar to MVA design, than to MVC systems, generally. Regardless, whatever terminology is used, Kivy and other similar systems are "reactive" systems, so are amenable to statechart treatment.
 
-In Cocoa, we see differentation for terminology for controllers: primarily coordinating vs. mediating controllers. Mediating controllers are a bit lower-level than coordinating controllers. Mediating controllers have some sort of backing content that needs updating, usually models of record types used in the system. Coordinating controllers are more general, and can contain broader level application logic. Differences between these types of controllers are subtle and can be confused, a subject addressed by Michael Cohen in an important [blog post](http://frozencanuck.wordpress.com/2011/03/09/sproutcore-statecharts-vs-controllers/). The upshot is that the higher level logic blocks in controllers will often "turn into brutish monsters containing many if-else or switch-case statements to know what state the application is currently in." 
+Statecharts enhance the traditional MVA/MVC system. Where you may find some sort of event and callback system forming "adapter/controller" functionality, statecharts offer formalization beyond that, helping the programmer think more clearly about discrete elements and interactions.
 
-Statecharts in Kivy
--------------------
+For learning about "adapters/controllers" and terminology, we can read blog posts by Michael Cohen (nick: frozencanuck), the original author of the statecharts framework ported here from SproutCore. It will help you to realize that SproutCore is based on Cocoa. In Cocoa, we see differentation between coordinating vs. mediating controllers. Mediating controllers are a bit lower-level than coordinating controllers. Mediating controllers have some sort of backing content, usually data models with record types used in the system, that needs updating per user action in user interface views.
 
-If you have been a Kivy developer, you may take all of this with a grain of salt, if you have already developed complex apps or games. Howevever, endeavoring to appreciate the port to kivy-statechart, and the history of related projects might open up new lines of thinking, and it might offer key advantages, as happened with SproutCore. So, what do statecharts offer the Kivy developer?
+Coordinating controllers are more general than mediating controllers, and contain broader level application logic. Differences between these types of controllers are subtle and can be confused, a subject addressed by Michael Cohen in an important [blog post](http://frozencanuck.wordpress.com/2011/03/09/sproutcore-statecharts-vs-controllers/). The upshot of the blog post is that the higher level logic blocks in controllers will often "turn into brutish monsters containing many if-else or switch-case statements to know what state the application is currently in." 
 
-We still need mediating controllers as interfaces, but these should be small and operate via the bindings already fully functional in Kivy's property system, and the kv language system. By "small" here, we mean restricted in scope, not containing big logic blocks for application control.  The simple mediating controller role is covered by the existing Kivy properties system, where you create models as python classes, define properties in them that are bound to the user interface defined in kv files, and enjoy automatic updating. 
+Statecharts for Kivy
+--------------------
 
-Keep more substantial application logic in the statechart system, which takes on *much* of the role played by coordinating controllers, offering the key advantages outlined above. 
+Kivy has adapters that are like mediating controllers. Kivy has a property and bindings system, whereby a kind of view-mediating adapter coupling is built as a custom Widget.
 
-For comparison, as you may be familiar with design patterns in general, the Michael Cohen blog post contains a full comparison to the [state design pattern](http://en.wikipedia.org/wiki/State_pattern) using traditional coordinating controller type treatments, as described in the "Gang of Four" book on [Design Patterns](http://en.wikipedia.org/wiki/Design_Patterns_%28book%29), concluding that to flesh it out with comparative functionality, you would be building a statecharts framework.
+Kivy does not formally have coordinatng controllers.
 
-In a final parallel, because Kivy focuses on touch interactions, the points made near the end of the Michael Cohen blog post about the "delegate" pattern, for use in such things in drag-and-drop and between views, some equivalent to the concept of the coordinating controller is likely warranted in Kivy as well. Python has the concept of mixins, as well, so this might be a direct parallel.
+Code in Kivy that plays the "coordinating controller" role can be found in specific functions written to respond to user actions. A great example of clean layout for this can be seen in the DeflectTouch game that won the first Kivy app competition. For example, look at the substantial code in the level_button_pressed() function: https://github.com/stocyr/Deflectouch/blob/master/main.py#L181 -- this is "coordinating controller" code.
 
-Perhaps another marching order for kivy-statechart, in addition to enhancement via startechart functionality directly, is the examination of existing Kivy idioms for controllers and how they fit into the differentiation covered here and in linked posts. Coding of formal controller classes for Kivy is a possibility, if only developed as part of the examples.
+The code in the DeflecTouch level_button_pressed() function could just as well be put in a "ShowingMainScreen" state, in a "show_levels" action function. Rewriting DeflecTouch with statecharts would simply entail moving such code into discrete states, and to action functions that respond to events such as "show levels." And, in the process, benefit from the formalization and especially from the clarity that drawing an app statechart would bring.
 
-
-
-
-
-
-
-
-
-
+Although good examples are starting to appear in the kivy-statechart framework, a version of DeflecTouch with statecharts will be highly illustrative... Stay tuned...
