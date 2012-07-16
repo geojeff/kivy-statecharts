@@ -31,7 +31,7 @@ The examples directory contains several of the Kivy example apps adapted to use 
 In a Nutshell
 =============
 
-The developer draws a statechart -- on a piece of paper is fine, but there are good drawing programs. This process is easy enough to start laying out what needs to happen as the app loads, and user interaction begins. Each user action envisioned is drawn from states representing user interface elements, more is added to the statechart, as details are considered.
+The developer draws a statechart -- on a piece of paper is fine, but there are good drawing programs. This process is easy enough to start laying out what needs to happen as the app loads, and user interaction begins. As each user action is envisioned, it is drawn as a connector between states representing different parts of the user interface. More is added to the statechart, as details are realized and considered.
 
 Once the developer has the hang of the simple coding constructs, it is a straightforward process to write the code corresponding to states and transitions on the statechart. 
 
@@ -68,13 +68,15 @@ Speaking of the parlance of the Harel paper, here are some terms and concepts as
 
 **broadcast communication** -- event-driven, with the capability to send an event that can trigger action across states.
 
-Now you can appreciate this, also form the Harel paper:
+Now you can appreciate this, also from the Harel paper:
 
     statecharts = state-diagrams + depth + orthogonality + broadcast-communication
 
 (where orthogonality implies functionality for handling concurrency as well).
 
-To attempt a paraphrase, we may say that statecharts add to basic state-diagrams the functionality to arrange states in a hierarchy, specifying which states are orthogonal to one another, which ones are concurrent with each other, and to write code for the states that responds to events delivered to the statechart, as discrete events that have narrow effect and as events that have broadcast effect across multiple related or concurrent states.
+To attempt a paraphrase:
+
+_Statecharts add to basic state-diagrams the functionality to arrange states in a hierarchy, specifying which states are independent of one another, which ones are concurrent with each other, and to write code for the states that responds to events delivered to the statechart as discrete action functions that have narrow effect. Events firing to the action functions may have broadcast effect across multiple related or concurrent states._
 
 Statecharts and Terminology in MVA/MVC Systems
 ----------------------------------------------
