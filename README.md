@@ -83,6 +83,8 @@ MVA = Model-View-Adapter System
 
 MVC = Model-View-Controller System
 
+Kivy seems closer to MVA, but ongoing current work on the framework will help to clarify. MVA/MVC terms are mentioned here because you will not see the term "controller" used much in Kivy, and the term "adapter" is just now starting to be used.
+
 Statecharts are applicable to software systems in general, but Kivy, like so many other systems, involves a user interface with buttons and sliders and lists and custom views, tied to models of record types by means of adapters or controllers. Kivy has a sophisticated property bindings and observer system that is more similar to MVA design, than to MVC systems, generally. Regardless, whatever terminology is used, Kivy and other similar systems are "reactive" systems, so are amenable to statechart treatment.
 
 Statecharts enhance the traditional MVA/MVC system. Where you may find some sort of event and callback system forming "adapter/controller" functionality, statecharts offer formalization beyond that, helping the programmer think more clearly about discrete elements and interactions.
