@@ -797,6 +797,7 @@ class AppStatechart(StatechartManager):
                                 self.statechart.app.obstacle_list.append(image)
                                 # the actual widget adding is done in build_level()
                                 #self.background.add_widget(image)
+                                self.statechart.app.game_screen.background.add_widget(image)
 
                             elif color == [0, 0, 1]:
                                 # create a goal brick on blue pixels
@@ -807,7 +808,7 @@ class AppStatechart(StatechartManager):
                                               allow_stretch = True)
                                 self.statechart.app.goal_list.append(image)
                                 # the actual widget adding is done in build_level()
-                                #self.background.add_widget(image)
+                                self.statechart.app.game_screen.background.add_widget(image)
 
                     # but in the lowermost row there is also stored the value for the maximum stock
                     for x in range(LEVEL_WIDTH):
