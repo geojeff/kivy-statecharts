@@ -246,7 +246,7 @@ class Deflector(Scatter):
         except Exception, e:
             return
         # get the current stock from the root widget:
-        current_stock = self.parent.parent.stockbar.width
+        current_stock = self.parent.app.stockbar.width
         stock_for_me = current_stock + self.length
         
         # now set the limitation for scaling:
@@ -290,8 +290,8 @@ class Deflector(Scatter):
             or point2_parent[0] - GRAB_RADIUS <= x <= point2_parent[0] + GRAB_RADIUS and point2_parent[1] - GRAB_RADIUS <= y <= point2_parent[1] + GRAB_RADIUS
     
     def on_touch_down(self, touch):
-        if self.parent.parent.app.sound['deflector_down'].status != 'play':
-            self.parent.parent.app.sound['deflector_down'].play()
+        if self.parent.app.sound['deflector_down'].status != 'play':
+            self.parent.app.sound['deflector_down'].play()
         
         return super(Deflector, self).on_touch_down(touch)
     
@@ -302,8 +302,8 @@ class Deflector(Scatter):
             return True
         
         if self.parent != None and self.collide_grab_point(*touch.pos):
-            if self.parent.parent.app.sound['deflector_up'].status != 'play':
-                self.parent.parent.app.sound['deflector_up'].play()
+            if self.parent.app.sound['deflector_up'].status != 'play':
+                self.parent.app.sound['deflector_up'].play()
         
         return super(Deflector, self).on_touch_up(touch)
 
