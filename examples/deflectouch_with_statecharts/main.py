@@ -701,7 +701,7 @@ class AppStatechart(StatechartManager):
                 self.statechart.app.deflector_list.append(deflector)
                 self.statechart.app.game_screen.add_widget(deflector)
 
-                self.statechart.app.stockbar.new_deflector(length)
+                self.new_deflector(length)
 
             def delete_deflector(self, deflector):
                 self.statechart.app.sound['deflector_delete'].play()
@@ -796,7 +796,6 @@ class AppStatechart(StatechartManager):
                                               allow_stretch = True)
                                 self.statechart.app.obstacle_list.append(image)
                                 # the actual widget adding is done in build_level()
-                                #self.background.add_widget(image)
                                 self.statechart.app.game_screen.background.add_widget(image)
 
                             elif color == [0, 0, 1]:
@@ -833,6 +832,7 @@ class AppStatechart(StatechartManager):
                         Clock.schedule_interval(self.build_level, 0.01)
 
                 def build_level(self, instance):
+                    print 'in build_level', instance 
                     #if self.statechart.app.level_build_index % int(0.02 / (0.5 / (len(self.statechart.app.obstacle_list) + len(self.statechart.app.goal_list)))) == 0:
                     # play a sound every now and then:
                     self.statechart.app.sound['beep'].play()
