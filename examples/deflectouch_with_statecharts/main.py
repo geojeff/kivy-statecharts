@@ -290,9 +290,7 @@ class Deflector(Scatter):
             or point2_parent[0] - GRAB_RADIUS <= x <= point2_parent[0] + GRAB_RADIUS and point2_parent[1] - GRAB_RADIUS <= y <= point2_parent[1] + GRAB_RADIUS
     
     def on_touch_down(self, touch):
-        if self.parent.app.sound['deflector_down'].status != 'play':
-            self.parent.app.sound['deflector_down'].play()
-        
+        self.statechart.sendEvent('deflector_down')
         return super(Deflector, self).on_touch_down(touch)
     
     def on_touch_up(self, touch):
@@ -302,8 +300,7 @@ class Deflector(Scatter):
             return True
         
         if self.parent != None and self.collide_grab_point(*touch.pos):
-            if self.parent.app.sound['deflector_up'].status != 'play':
-                self.parent.app.sound['deflector_up'].play()
+            self.statechart.sendEvent('deflector_up')
         
         return super(Deflector, self).on_touch_up(touch)
 
@@ -602,6 +599,8 @@ class AppStatechart(StatechartManager):
             # ShowingLevelAccomplished
             #
             class ShowingLevelAccomplished(State):
+                animation = None
+
                 def enterState(self, context):
                     print 'ShowingLevelAccomplished/enterState'
                     self.statechart.app.sound['accomplished'].play()
@@ -615,15 +614,16 @@ class AppStatechart(StatechartManager):
                     # show up a little image with animation: size*2 and out_bounce and the wait 1 sec
                     image = Image(source='graphics/accomplished.png', size_hint=(None, None), size=(200, 200))
                     image.center = self.statechart.app.game_screen.center
-                    animation = Animation(size=(350, 416), duration=1, t='out_bounce')
-                    animation &= Animation(center=self.statechart.app.game_screen.center, duration=1, t='out_bounce')
-                    animation += Animation(size=(350, 416), duration=1)  # little hack to sleep for 1 sec
+                    self.animation = Animation(size=(350, 416), duration=1, t='out_bounce')
+                    self.animation &= Animation(center=self.statechart.app.game_screen.center, duration=1, t='out_bounce')
+                    self.animation += Animation(size=(350, 416), duration=1)  # little hack to sleep for 1 sec
 
                     self.statechart.app.game_screen.add_widget(image)
-                    animation.start(image)
-                    animation.bind(on_complete=self.accomplished_animation_complete)
+                    self.animation.start(image)
+                    self.animation.bind(on_complete=self.accomplished_animation_complete)
 
                 def accomplished_animation_complete(self, animation, widget):
+                    self.animation.unbind(on_complete=self.accomplished_animation_complete)
                     self.statechart.app.game_screen.remove_widget(widget)
 
                     # open the level dialog?
@@ -702,10 +702,11 @@ class AppStatechart(StatechartManager):
                 self.statechart.app.game_screen.add_widget(deflector)
 
                 self.new_deflector(length)
-
-            def delete_deflector(self, deflector):
+        
+            #@State.eventHandler(['delete_deflector']) 
+            def delete_deflector(self, event, deflector, context):
                 self.statechart.app.sound['deflector_delete'].play()
-                self.statechart.app.stockbar.deflector_deleted(deflector.length)
+                self.deflector_deleted(deflector.length)
 
                 self.statechart.app.game_screen.remove_widget(deflector)
                 self.statechart.app.deflector_list.remove(deflector)
@@ -749,17 +750,8 @@ class AppStatechart(StatechartManager):
                     # [statechart port] Should the following bullet killing and deflector delecting 
                     #                   sections be done? Originally was call to this code in reset_level(),
                     #                   which is now in enterState of ShowingLevel state.
-
-                    # if bullet, kill the bullet
-                    if self.statechart.app.bullet is not None:
-                        self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
-                        self.statechart.app.bullet.animation.unbind(on_complete=self.statechart.app.bullet.on_collision_with_edge)
-                        self.statechart.app.bullet.animation.stop(self.statechart.app.bullet)
-                        self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
-                        self.statechart.app.bullet = None
-
-                    # Delete all the deflectors.
-                    self.delete_all_deflectors()
+                    #
+                    #    *** moved to exitState ***
 
                     # The user begins with 3 lives:
                     self.statechart.app.lives = 3
@@ -850,24 +842,44 @@ class AppStatechart(StatechartManager):
                 def exitState(self, context):
                     print 'ShowingLevel/exitState'
 
-                def reset_level(self, *args):
-                    self.statechart.app.sound['reset'].play()
-
-                    # first kill the bullet
+                    # if bullet, kill the bullet
                     if self.statechart.app.bullet is not None:
                         self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
-                        self.statechart.app.bullet.animation.unbind(on_complete=self.statechart.app.bullet.on_collision_with_edge)
+                        #self.statechart.app.bullet.animation.unbind(on_complete=self.statechart.app.bullet.on_collision_with_edge)
                         self.statechart.app.bullet.animation.stop(self.statechart.app.bullet)
                         self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
                         self.statechart.app.bullet = None
 
-                    # then delete all the deflectors.
+                    # Delete all the deflectors.
                     self.delete_all_deflectors()
 
-                    # now the user can begin once again with 3 lives:
-                    self.statechart.app.lives = 3
+                def deflector_down(self, *args):
+                    if self.statechart.app.sound['deflector_down'].status != 'play':
+                        self.statechart.app.sound['deflector_down'].play()
 
-                    self.gotoState('ShowingLevel')
+                def deflector_up(self, *args):
+                    if self.statechart.app.sound['deflector_up'].status != 'play':
+                        self.statechart.app.sound['deflector_up'].play()
+
+# [statechart port] removed -- See enterState/exitState
+#                def reset_level(self, *args):
+#                    self.statechart.app.sound['reset'].play()
+#
+#                    # first kill the bullet
+#                    if self.statechart.app.bullet is not None:
+#                        self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
+#                        self.statechart.app.bullet.animation.unbind(on_complete=self.statechart.app.bullet.on_collision_with_edge)
+#                        self.statechart.app.bullet.animation.stop(self.statechart.app.bullet)
+#                        self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
+#                        self.statechart.app.bullet = None
+#
+#                    # then delete all the deflectors.
+#                    self.delete_all_deflectors()
+#
+#                    # now the user can begin once again with 3 lives:
+#                    self.statechart.app.lives = 3
+#
+#                    self.gotoState('ShowingLevel')
 
                 def delete_all_deflectors(self):
                     for deflector in self.statechart.app.deflector_list:
@@ -1087,7 +1099,7 @@ class AppStatechart(StatechartManager):
                         animation.start(deflector.point2)
 
                         # calculate deflection angle
-                        impact_angle = (radians(deflector_vector.angle(Vector(1, 0))) % pi) - (self.button.angle % pi)
+                        impact_angle = (radians(deflector_vector.angle(Vector(1, 0))) % pi) - (self.statechart.app.bullet.angle % pi)
                         self.statechart.app.bullet.angle = (self.statechart.app.bullet.angle + 2 * impact_angle) % (2 * pi)
 
                         destination = self.calc_bullet_destination(self.statechart.app.bullet.angle)
@@ -1099,15 +1111,20 @@ class AppStatechart(StatechartManager):
                         self.bullet_animation.bind(on_complete=self.finish_colliding_with_deflector)
 
                     def finish_colliding_with_deflector(self, *args):
+                        print 'finish_colliding_with_deflector'
+                        self.bullet_animation.unbind(on_complete=self.finish_colliding_with_deflector)
                         self.explode_bullet()
 
                     def collide_with_obstacle(self, *args):
+                        print 'collide_with_obstacle'
                         self.explode_bullet()
 
                     def collide_with_edge(self, *args):
+                        print 'collide_with_edge'
                         self.explode_bullet()
 
                     def collide_with_goal(self, *args):
+                        print 'collide_with_goal'
                         # i still have some strange exceptions because of multiple function calls:
                         if self.statechart.app.game_screen is None:
                             return
@@ -1116,33 +1133,39 @@ class AppStatechart(StatechartManager):
                         self.gotoState('ShowingLevelAccomplished')
 
                     def explode_bullet(self):
-                        if self.statechart.app.bullet.exploding is True:
-                            return
-                        self.statechart.app.bullet.exploding = True
+                        # [statechart port] Modified defensive check, needed for some reason.
+                        #                   One thing noticed was multiple successive calls from
+                        #                   finish_colliding_with_deflector(), but this could
+                        #                   have to do with problems in deflector touches and
+                        #                   callbacks.
+                        if self.statechart.app.bullet is None and self.statechart.app.bullet.exploding is False:
+                            self.statechart.app.bullet.exploding = True
 
-                        self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
+                            self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
 
-                        #self.bullet_animation.unbind(on_complete=self.explode_bullet)
-                        self.bullet_animation.stop(self)
+                            #self.bullet_animation.unbind(on_complete=self.explode_bullet)
+                            self.bullet_animation.stop(self)
 
-                        self.statechart.app.sound['explosion'].play()
+                            self.statechart.app.sound['explosion'].play()
 
-                        # create an animation on the old bullets position:
-                        # bug: gif isn't transparent
-                        #old_pos = self.bullet.center
-                        #self.bullet.anim_delay = 0.1
-                        #self.bullet.size = 96, 96
-                        #self.bullet.center = old_pos
-                        #self.bullet.source = 'graphics/explosion.gif'
-                        #Clock.schedule_once(self.bullet_exploded, 1)
+                            # create an animation on the old bullets position:
+                            # bug: gif isn't transparent
+                            #old_pos = self.bullet.center
+                            #self.bullet.anim_delay = 0.1
+                            #self.bullet.size = 96, 96
+                            #self.bullet.center = old_pos
+                            #self.bullet.source = 'graphics/explosion.gif'
+                            #Clock.schedule_once(self.bullet_exploded, 1)
 
-                        self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
-                        self.statechart.app.bullet = None
-                        # or should i write del self.bullet instead?
+                            self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
+                            self.statechart.app.bullet = None
+                            # or should i write del self.bullet instead?
 
-                        self.statechart.app.lives -= 1
-                        if self.statechart.app.lives == 0:
-                            self.parentState.reset_level()
+                            self.statechart.app.lives -= 1
+                            if self.statechart.app.lives == 0:
+                                #self.parentState.reset_level()
+                                self.statechart.app.sound['reset'].play()
+                                self.gotoState('ShowingLevel')
 
 class GameScreen(Widget):
     app = ObjectProperty(None)
