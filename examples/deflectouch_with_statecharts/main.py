@@ -288,6 +288,16 @@ class Deflector(Scatter):
         
         return point1_parent[0] - GRAB_RADIUS <= x <= point1_parent[0] + GRAB_RADIUS and point1_parent[1] - GRAB_RADIUS <= y <= point1_parent[1] + GRAB_RADIUS \
             or point2_parent[0] - GRAB_RADIUS <= x <= point2_parent[0] + GRAB_RADIUS and point2_parent[1] - GRAB_RADIUS <= y <= point2_parent[1] + GRAB_RADIUS
+
+
+    # [statechart port] ******************* NOTE ********************
+    #
+    #                   If the return super() calls for on_touch_down
+    #                   and on_touch_up are commented out, the action
+    #                   on multitouch, for the deflector is much
+    #                   better, but still something is off.
+    #
+    #                   *********************************************
     
     def on_touch_down(self, touch):
         self.statechart.sendEvent('deflector_down')
@@ -295,8 +305,11 @@ class Deflector(Scatter):
     
     def on_touch_up(self, touch):
         # if the deflector want's to be removed (touches too close to each other):
+        # [statechart port] context could normally be a class or some sort,
+        #                   but probably could be anything. Setting to string here.
+        context = 'on_touch_up'
         if self.length < MIN_DEFLECTOR_LENGTH and self.parent != None:
-            self.statechart.sendEvent('delete_deflector')
+            self.statechart.sendEvent('delete_deflector', self, context)
             return True
         
         if self.parent != None and self.collide_grab_point(*touch.pos):
@@ -646,14 +659,6 @@ class AppStatechart(StatechartManager):
                 def exitState(self, context):
                     print 'ShowingLevelAccomplished/exitState'
 
-
-            '''
-            #######################################
-            ##
-            ##   Game Play Actions and Functions
-            ##
-            #######################################
-            '''
             def background_touched(self, background, touch):
                 ud = touch.ud
 
@@ -688,13 +693,6 @@ class AppStatechart(StatechartManager):
                 # if no second touch was found: tag the current one as a 'lonely' touch
                 ud['lonely'] = True
 
-            '''
-            #######################################
-            ##
-            ##   Deflector and Stockbar Functions
-            ##
-            #######################################
-            '''
             def create_deflector(self, touch_1, touch_2, length):
                 self.statechart.app.sound['deflector_new'].play()
                 deflector = Deflector(statechart=self.statechart, touch1=touch_1, touch2=touch_2, length=length)
@@ -703,8 +701,8 @@ class AppStatechart(StatechartManager):
 
                 self.new_deflector(length)
         
-            #@State.eventHandler(['delete_deflector']) 
-            def delete_deflector(self, event, deflector, context):
+            @State.eventHandler(['delete_deflector']) 
+            def delete_deflector_handler(self, event, deflector, context):
                 self.statechart.app.sound['deflector_delete'].play()
                 self.deflector_deleted(deflector.length)
 

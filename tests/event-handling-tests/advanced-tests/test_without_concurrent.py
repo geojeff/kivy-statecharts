@@ -159,7 +159,7 @@ class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
     def check_statechart_1_event_handling(self):
         class Sender:
             pass
-        class Contect:
+        class Context:
             pass
         sender = Sender()
         context = Context()
