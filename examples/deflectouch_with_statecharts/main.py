@@ -1112,14 +1112,9 @@ class AppStatechart(StatechartManager):
 
                         # start the animation
                         self.bullet_animation.start(self.statechart.app.bullet)
-                        self.bullet_animation.bind(on_complete=self.finish_colliding_with_deflector)
+                        self.bullet_animation.bind(on_complete=self.collide_with_edge)
 
                     def end_bullet_animation(self, *args):
-                        self.explode_bullet()
-
-                    def finish_colliding_with_deflector(self, *args):
-                        print 'finish_colliding_with_deflector'
-                        self.bullet_animation.unbind(on_complete=self.finish_colliding_with_deflector)
                         self.explode_bullet()
 
                     def collide_with_obstacle(self, *args):
@@ -1150,7 +1145,7 @@ class AppStatechart(StatechartManager):
 
                             self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
 
-                            self.bullet_animation.unbind(on_complete=self.end_bullet_animation)
+                            self.bullet_animation.unbind(on_complete=self.collide_with_edge)
                             self.bullet_animation.stop(self)
 
                             self.statechart.app.sound['explosion'].play()
@@ -1171,6 +1166,16 @@ class AppStatechart(StatechartManager):
                             self.statechart.app.lives -= 1
                             if self.statechart.app.lives == 0:
                                 #self.parentState.reset_level()
+
+                                # [statechart port] No explicit call to reset_level() now, because by
+                                #                   exiting the current state, ShowingBullet, the code
+                                #                   in exitState() will do tear-down ops for the bullet,
+                                #                   and, in turn, we will leave ShowingLevel state in
+                                #                   order to re-enter it, so the ShowingLevel.exitState()
+                                #                   will do tear-down for the current level.
+                                #
+                                #                   But check this... [TODO]
+                                #
                                 self.statechart.app.sound['reset'].play()
                                 self.gotoState('ShowingLevel')
 
