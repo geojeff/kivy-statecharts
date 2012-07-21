@@ -942,7 +942,7 @@ class AppStatechart(StatechartManager):
                         self.bullet_animation = self.create_bullet_animation(speed, destination)
 
                         self.bullet_animation.start(self.statechart.app.bullet)
-                        self.bullet_animation.bind(on_complete=self.end_bullet_animation)
+                        self.bullet_animation.bind(on_complete=self.collide_with_edge)
 
                         # start to track the position changes
                         self.statechart.app.bullet.bind(pos=self.bullet_pos_callback)
@@ -1052,12 +1052,15 @@ class AppStatechart(StatechartManager):
                             # there is a collision!
                             # kill the animation!
 
-                            # [statechart port] Commented out the following two lines.
-                            #self.bullet_animation.unbind(on_complete=self.end_bullet_animation)
-                            #self.bullet_animation.stop(self)
+                            # [statechart port] Made function terminate_bullet_animation_to_edge().
+                            self.terminate_bullet_animation_to_edge().
 
                             # call the collision handler
                             self.collide_with_deflector(deflector, deflector_vector)
+
+                    def termination_bullet_animation_to_edge(self):
+                        self.bullet_animation.unbind(on_complete=self.collide_with_edge)
+                        self.bullet_animation.stop(self)
 
                     def bullet_pos_callback(self, instance, pos):
                         if self.statechart.app.bullet is None:
@@ -1108,14 +1111,12 @@ class AppStatechart(StatechartManager):
 
                         destination = self.calc_bullet_destination_at_edge(self.statechart.app.bullet.angle)
                         speed = boundary(self.statechart.app.config.getint('GamePlay', 'BulletSpeed'), 1, 10)
+
                         self.statechart.app.bullet_animation = self.create_bullet_animation(speed, destination)
 
                         # start the animation
                         self.bullet_animation.start(self.statechart.app.bullet)
                         self.bullet_animation.bind(on_complete=self.collide_with_edge)
-
-                    def end_bullet_animation(self, *args):
-                        self.explode_bullet()
 
                     def collide_with_obstacle(self, *args):
                         print 'collide_with_obstacle'
