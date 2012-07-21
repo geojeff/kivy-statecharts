@@ -935,11 +935,12 @@ class AppStatechart(StatechartManager):
                         self.statechart.app.bullet.center = bullet_position
                         self.statechart.app.game_screen.add_widget(self.statechart.app.bullet)
 
-                        destination = self.calc_bullet_destination(self.statechart.app.bullet.angle)
+                        destination = self.calc_bullet_destination_at_edge(self.statechart.app.bullet.angle)
                         speed = boundary(self.statechart.app.config.getint('GamePlay', 'BulletSpeed'), 1, 10)
 
                         # start the animation
                         self.bullet_animation = self.create_bullet_animation(speed, destination)
+
                         self.bullet_animation.start(self.statechart.app.bullet)
                         self.bullet_animation.bind(on_complete=self.end_bullet_animation)
 
@@ -958,7 +959,7 @@ class AppStatechart(StatechartManager):
                         time = Vector(self.statechart.app.bullet.center).distance(destination) / (speed * 30)
                         return Animation(pos=destination, duration=time)
 
-                    def calc_bullet_destination(self, angle):
+                    def calc_bullet_destination_at_edge(self, angle):
                         # calculate the path until the bullet hits the edge of the screen
                         win = self.statechart.app.bullet.get_parent_window()
                         left = 150.0 * win.width / 1920.0
@@ -1050,8 +1051,11 @@ class AppStatechart(StatechartManager):
                         if distance < (self.statechart.app.bullet.width / 2):
                             # there is a collision!
                             # kill the animation!
-                            self.bullet_animation.unbind(on_complete=self.end_bullet_animation)
-                            self.bullet_animation.stop(self)
+
+                            # [statechart port] Commented out the following two lines.
+                            #self.bullet_animation.unbind(on_complete=self.end_bullet_animation)
+                            #self.bullet_animation.stop(self)
+
                             # call the collision handler
                             self.collide_with_deflector(deflector, deflector_vector)
 
@@ -1102,7 +1106,7 @@ class AppStatechart(StatechartManager):
                         impact_angle = (radians(deflector_vector.angle(Vector(1, 0))) % pi) - (self.statechart.app.bullet.angle % pi)
                         self.statechart.app.bullet.angle = (self.statechart.app.bullet.angle + 2 * impact_angle) % (2 * pi)
 
-                        destination = self.calc_bullet_destination(self.statechart.app.bullet.angle)
+                        destination = self.calc_bullet_destination_at_edge(self.statechart.app.bullet.angle)
                         speed = boundary(self.statechart.app.config.getint('GamePlay', 'BulletSpeed'), 1, 10)
                         self.statechart.app.bullet_animation = self.create_bullet_animation(speed, destination)
 
