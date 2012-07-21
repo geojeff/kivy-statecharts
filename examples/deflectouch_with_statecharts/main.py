@@ -97,10 +97,21 @@ GRAB_RADIUS = 30
 #  Background
 #
 class Background(Image):
-    def pass_along_on_touch_down(self, touch):
-        super(Background, self).on_touch_down(touch)
+    def on_touch_down(self, touch):
+        ud = touch.ud
 
+        # if a bullet has been fired and is flying now, don't allow ANY change!
+        if self.parent.app.bullet is not None:
+            return True
 
+        for deflector in self.parent.app.deflector_list:
+            if deflector.collide_grab_point(*touch.pos):
+                # pass the touch to the deflector scatter
+                return super(Background, self).on_touch_down(touch)
+
+        self.parent.app.statechart.sendEvent('background_touched', touch)
+
+        # [statechart port] There is no return True here anymore. Does it matter?
 #
 #  Bullet
 #
@@ -301,7 +312,7 @@ class Deflector(Scatter):
     
     def on_touch_down(self, touch):
         self.statechart.sendEvent('deflector_down')
-        return super(Deflector, self).on_touch_down(touch)
+        #return super(Deflector, self).on_touch_down(touch)
     
     def on_touch_up(self, touch):
         # if the deflector want's to be removed (touches too close to each other):
@@ -315,7 +326,7 @@ class Deflector(Scatter):
         if self.parent != None and self.collide_grab_point(*touch.pos):
             self.statechart.sendEvent('deflector_up')
         
-        return super(Deflector, self).on_touch_up(touch)
+        #return super(Deflector, self).on_touch_up(touch)
 
 
 ############################
@@ -355,9 +366,6 @@ class AppStatechart(StatechartManager):
 
                 # create the root widget and give it a reference of the application instance (so it can access the application settings)
                 self.statechart.app.game_screen = self.statechart.app.root
-
-                # Set up callback for background touches.
-                self.statechart.app.game_screen.background.bind(on_touch_down=self.background_touched)
 
                 # start the background music:
                 self.statechart.app.music = SoundLoader.load('sound/deflectouch.ogg')
@@ -659,17 +667,9 @@ class AppStatechart(StatechartManager):
                 def exitState(self, context):
                     print 'ShowingLevelAccomplished/exitState'
 
-            def background_touched(self, background, touch):
+            @State.eventHandler(['background_touched']) 
+            def background_touch_handler(self, event, touch, context):
                 ud = touch.ud
-
-                # if a bullet has been fired and is flying now, don't allow ANY change!
-                if self.statechart.app.bullet is not None:
-                    return True
-
-                for deflector in self.statechart.app.deflector_list:
-                    if deflector.collide_grab_point(*touch.pos):
-                        # pass the touch to the deflector scatter
-                        self.statechart.app.game_screen.background.pass_along_on_touch_down(touch)
 
                 # if i didn't wanted to move / scale a deflector and but rather create a new one:
                 # search for other 'lonely' touches
@@ -682,25 +682,22 @@ class AppStatechart(StatechartManager):
                             length = Vector(search_touch.pos).distance(touch.pos)
                             # create only a new one if he's not too big and not too small
                             if MIN_DEFLECTOR_LENGTH <= length <= self.statechart.app.stockbar.width:
-                                self.create_deflector(search_touch, touch, length)
+                                self.statechart.app.sound['deflector_new'].play()
+                                deflector = Deflector(statechart=self.statechart, touch1=search_touch, touch2=touch, length=length)
+                                self.statechart.app.deflector_list.append(deflector)
+                                self.statechart.app.game_screen.add_widget(deflector)
+                
+                                self.new_deflector(length)
                             else:
                                 self.statechart.app.sound['no_deflector'].play()
                         else:
                             self.statechart.app.sound['no_deflector'].play()
 
-                        return True
+                        return
 
                 # if no second touch was found: tag the current one as a 'lonely' touch
                 ud['lonely'] = True
 
-            def create_deflector(self, touch_1, touch_2, length):
-                self.statechart.app.sound['deflector_new'].play()
-                deflector = Deflector(statechart=self.statechart, touch1=touch_1, touch2=touch_2, length=length)
-                self.statechart.app.deflector_list.append(deflector)
-                self.statechart.app.game_screen.add_widget(deflector)
-
-                self.new_deflector(length)
-        
             @State.eventHandler(['delete_deflector']) 
             def delete_deflector_handler(self, event, deflector, context):
                 self.statechart.app.sound['deflector_delete'].play()
