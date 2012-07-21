@@ -683,7 +683,10 @@ class AppStatechart(StatechartManager):
                             # create only a new one if he's not too big and not too small
                             if MIN_DEFLECTOR_LENGTH <= length <= self.statechart.app.stockbar.width:
                                 self.statechart.app.sound['deflector_new'].play()
-                                deflector = Deflector(statechart=self.statechart, touch1=search_touch, touch2=touch, length=length)
+                                deflector = Deflector(statechart=self.statechart,
+                                                      touch1=search_touch,
+                                                      touch2=touch,
+                                                      length=length)
                                 self.statechart.app.deflector_list.append(deflector)
                                 self.statechart.app.game_screen.add_widget(deflector)
                 
@@ -938,7 +941,7 @@ class AppStatechart(StatechartManager):
                         # start the animation
                         self.bullet_animation = self.create_bullet_animation(speed, destination)
                         self.bullet_animation.start(self.statechart.app.bullet)
-                        #self.bullet_animation.bind(on_complete=self.explode_bullet)
+                        self.bullet_animation.bind(on_complete=self.end_bullet_animation)
 
                         # start to track the position changes
                         self.statechart.app.bullet.bind(pos=self.bullet_pos_callback)
@@ -1047,8 +1050,8 @@ class AppStatechart(StatechartManager):
                         if distance < (self.statechart.app.bullet.width / 2):
                             # there is a collision!
                             # kill the animation!
-                            #self.bullet_animation.unbind(on_complete=self.explode_bullet)
-                            #self.bullet_animation.stop(self)
+                            self.bullet_animation.unbind(on_complete=self.end_bullet_animation)
+                            self.bullet_animation.stop(self)
                             # call the collision handler
                             self.collide_with_deflector(deflector, deflector_vector)
 
@@ -1067,18 +1070,20 @@ class AppStatechart(StatechartManager):
                                     self.check_deflector_collision(deflector)
                                     return
 
-                        # then check if there's a collision with the goal:
-                        if not len(self.statechart.app.goal_list) == 0:
-                            for goal in self.statechart.app.goal_list:
-                                if self.statechart.app.bullet.collide_widget(goal):
-                                    self.collide_with_goal()
-                                    return
+                        # [statechart port] Moved the check for obstacle before the check for goal.
 
                         # then check if there's a collision with obstacles:
                         if not len(self.statechart.app.obstacle_list) == 0:
                             for obstacle in self.statechart.app.obstacle_list:
                                 if self.statechart.app.bullet.collide_widget(obstacle):
                                     self.collide_with_obstacle()
+                                    return
+
+                        # then check if there's a collision with the goal:
+                        if not len(self.statechart.app.goal_list) == 0:
+                            for goal in self.statechart.app.goal_list:
+                                if self.statechart.app.bullet.collide_widget(goal):
+                                    self.collide_with_goal()
                                     return
 
                     def collide_with_deflector(self, deflector, deflector_vector):
@@ -1104,6 +1109,9 @@ class AppStatechart(StatechartManager):
                         # start the animation
                         self.bullet_animation.start(self.statechart.app.bullet)
                         self.bullet_animation.bind(on_complete=self.finish_colliding_with_deflector)
+
+                    def end_bullet_animation(self, *args):
+                        self.explode_bullet()
 
                     def finish_colliding_with_deflector(self, *args):
                         print 'finish_colliding_with_deflector'
@@ -1138,7 +1146,7 @@ class AppStatechart(StatechartManager):
 
                             self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
 
-                            #self.bullet_animation.unbind(on_complete=self.explode_bullet)
+                            self.bullet_animation.unbind(on_complete=self.end_bullet_animation)
                             self.bullet_animation.stop(self)
 
                             self.statechart.app.sound['explosion'].play()
