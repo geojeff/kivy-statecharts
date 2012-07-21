@@ -944,9 +944,9 @@ class AppStatechart(StatechartManager):
 
                         # if bullet, kill the bullet
                         if self.statechart.app.bullet is not None:
-                            self.bullet.unbind(pos=self.bullet_pos_callback)
-                            self.bullet.animation.unbind(on_complete=self.on_collision_with_edge)
-                            self.bullet.animation.stop(self.statechart.app.bullet)
+                            self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
+                            self.bullet_animation.unbind(on_complete=self.collide_with_edge)
+                            self.bullet_animation.stop(self.statechart.app.bullet)
                             self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
                             self.statechart.app.bullet = None
 
@@ -1141,7 +1141,7 @@ class AppStatechart(StatechartManager):
                         #                   finish_colliding_with_deflector(), but this could
                         #                   have to do with problems in deflector touches and
                         #                   callbacks.
-                        if self.statechart.app.bullet is None and self.statechart.app.bullet.exploding is False:
+                        if self.statechart.app.bullet is not None and self.statechart.app.bullet.exploding is False:
                             self.statechart.app.bullet.exploding = True
 
                             self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
@@ -1178,7 +1178,9 @@ class AppStatechart(StatechartManager):
                                 #                   But check this... [TODO]
                                 #
                                 self.statechart.app.sound['reset'].play()
-                                self.gotoState('ShowingLevel')
+
+                                # [statechart port] Allowed?
+                                self.exitState()
 
 class GameScreen(Widget):
     app = ObjectProperty(None)
