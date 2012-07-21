@@ -840,14 +840,6 @@ class AppStatechart(StatechartManager):
                 def exitState(self, context):
                     print 'ShowingLevel/exitState'
 
-                    # if bullet, kill the bullet
-                    if self.statechart.app.bullet is not None:
-                        self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
-                        #self.statechart.app.bullet.animation.unbind(on_complete=self.statechart.app.bullet.on_collision_with_edge)
-                        self.statechart.app.bullet.animation.stop(self.statechart.app.bullet)
-                        self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
-                        self.statechart.app.bullet = None
-
                     # Delete all the deflectors.
                     self.delete_all_deflectors()
 
@@ -949,6 +941,14 @@ class AppStatechart(StatechartManager):
 
                     def exitState(self, context=None):
                         print 'ShowingBullet/exitState'
+
+                        # if bullet, kill the bullet
+                        if self.statechart.app.bullet is not None:
+                            self.bullet.unbind(pos=self.bullet_pos_callback)
+                            self.bullet.animation.unbind(on_complete=self.on_collision_with_edge)
+                            self.bullet.animation.stop(self.statechart.app.bullet)
+                            self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
+                            self.statechart.app.bullet = None
 
                     def create_bullet_animation(self, speed, destination):
                         # create the animation
@@ -1053,7 +1053,7 @@ class AppStatechart(StatechartManager):
                             # kill the animation!
 
                             # [statechart port] Made function terminate_bullet_animation_to_edge().
-                            self.terminate_bullet_animation_to_edge().
+                            self.terminate_bullet_animation_to_edge()
 
                             # call the collision handler
                             self.collide_with_deflector(deflector, deflector_vector)
