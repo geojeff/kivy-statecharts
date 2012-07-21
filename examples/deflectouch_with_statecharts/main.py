@@ -905,18 +905,18 @@ class AppStatechart(StatechartManager):
                     # If there is already a bullet existing (which means 
                     # its flying around or exploding somewhere) don't fire.
                     if self.statechart.app.bullet is None:
-                        self.gotoState('ShowingBullet')
+                        self.gotoState('ShowingBulletAnimation')
 
-                # ShowingBullet
+                # ShowingBulletAnimation
                 #
-                class ShowingBullet(State):
+                class ShowingBulletAnimation(State):
                     bullet_animation = None
 
                     def __init__(self, **kwargs):
-                        super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.ShowingBullet, self).__init__(**kwargs)
+                        super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.ShowingBulletAnimation, self).__init__(**kwargs)
 
                     def enterState(self, context=None):
-                        print 'ShowingBullet/enterState'
+                        print 'ShowingBulletAnimation/enterState'
                         self.statechart.app.sound['bullet_start'].play()
 
                         # create a bullet, calculate the start position and fire it.
@@ -940,7 +940,7 @@ class AppStatechart(StatechartManager):
                         self.statechart.app.bullet.bind(pos=self.bullet_pos_callback)
 
                     def exitState(self, context=None):
-                        print 'ShowingBullet/exitState'
+                        print 'ShowingBulletAnimation/exitState'
 
                         # if bullet, kill the bullet
                         if self.statechart.app.bullet is not None:
@@ -1169,7 +1169,7 @@ class AppStatechart(StatechartManager):
                                 #self.parentState.reset_level()
 
                                 # [statechart port] No explicit call to reset_level() now, because by
-                                #                   exiting the current state, ShowingBullet, the code
+                                #                   exiting the current state, ShowingBulletAnimation, the code
                                 #                   in exitState() will do tear-down ops for the bullet,
                                 #                   and, in turn, we will leave ShowingLevel state in
                                 #                   order to re-enter it, so the ShowingLevel.exitState()
