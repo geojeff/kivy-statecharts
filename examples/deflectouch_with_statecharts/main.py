@@ -251,9 +251,7 @@ class Deflector(Scatter):
         #self.length = Vector(self.touch1.pos).distance(self.touch2.pos)
         self.length = self.length_origin * self.scale
         try:
-            #self.parent.parent.stockbar.recalculate_stock()
-            # [statechart port]
-            self.statechart.sendEvent('recalculate_stock')
+            self.statechart.app.recalculate_stock()
         except Exception, e:
             return
         # get the current stock from the root widget:
@@ -437,7 +435,7 @@ class AppStatechart(StatechartManager):
                 self.gotoState('ShowingSettingsPopup')
 
             def show_help_first_time(self, *args):
-                self.gotoState('ShowingHelpPopupFirstTime')
+                self.gotoState('ShowingWelcomePopup')
 
             def show_help(self, *args):
                 self.gotoState('ShowingHelpPopup')
@@ -608,11 +606,15 @@ class AppStatechart(StatechartManager):
                 def dismiss(self, *args):
                     self.gotoState(self.parentState)
 
-            # ShowingHelpPopupFirstTime
+            # [statechart port] Note reuse of ShowingHelpPopup through subclassing.
+            #                   Only difference is that dismiss fires to ShowingLevel
+            #                   (See statechart drawing).
+
+            # ShowingWelcomePopup
             #
-            class ShowingHelpPopupFirstTime(ShowingHelpPopup):
+            class ShowingWelcomePopup(ShowingHelpPopup):
                 def __init__(self, **kwargs):
-                    super(AppStatechart.RootState.ShowingGameScreen.ShowingHelpPopupFirstTime, self).__init__(**kwargs)
+                    super(AppStatechart.RootState.ShowingGameScreen.ShowingWelcomePopup, self).__init__(**kwargs)
 
                 def dismiss(self, *args):
                     self.gotoState('ShowingLevel')
@@ -647,22 +649,15 @@ class AppStatechart(StatechartManager):
                     self.animation.unbind(on_complete=self.accomplished_animation_complete)
                     self.statechart.app.game_screen.remove_widget(widget)
 
-                    # open the level dialog?
-                    #self.level_button_pressed()
-
-                    # no. just open the next level.
                     if self.statechart.app.level != 40:
                         if self.statechart.app.level % 8 == 0:
-                            # if it was the last level of one row, another row has been unlocked!
-                            Popup(title='New levels unlocked!', content=Label(text='Next 8 levels unlocked!', font_size=18), size_hint=(0.3, 0.15)).open()
+                            Popup(title='New levels unlocked!', 
+                                  content=Label(text='Next 8 levels unlocked!', 
+                                                font_size=18), 
+                                                size_hint=(0.3, 0.15)).open()
 
-                        #self.reset_level()
-                        #self.load_level(self.statechart.app.level + 1)
-                        # [statechart port] new:
                         self.statechart.app.current_level += 1
                         self.gotoState('ShowingLevel')
-
-                    # [statechart port] Why as there a call to bullet_explode() here? Had it not been done earlier?
 
                 def exitState(self, context):
                     print 'ShowingLevelAccomplished/exitState'
@@ -716,9 +711,25 @@ class AppStatechart(StatechartManager):
             def deflector_deleted(self, length):
                 self.statechart.app.stockbar.width += length
 
+            # ResettingLevel
+            #
+            class ResettingLevel(State):
+                def enterState(self, context=None):
+                    print 'ResettingLevel/enterState'
+                    self.statechart.app.sound['reset'].play()
+
+                    self.gotoState('ShowingLevel')
+
+                def exitState(self, context=None):
+                    print 'ResettingLevel/exitState'
+
             # ShowingLevel
             #
             class ShowingLevel(State):
+                def __init__(self, **kwargs):
+                    kwargs['initialSubstateKey'] = 'WaitingForFire'
+                    super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel, self).__init__(**kwargs)
+
                 def enterState(self, context=None):
                     print 'ShowingLevel/enterState'
                     BRICK_WIDTH = self.statechart.app.game_screen.height / 17.73
@@ -740,10 +751,6 @@ class AppStatechart(StatechartManager):
                         error_text = 'Unable to load Level %d!\n\nReason: %s' % (level, e)
                         Popup(title='Level loading error:', content=Label(text=error_text, font_size=18), size_hint=(0.3, 0.2)).open()
                         return
-
-                    # First of all, delete the old level:
-                    #self.reset_level()
-                    self.statechart.app.sound['reset'].play()
 
                     # [statechart port] Should the following bullet killing and deflector delecting 
                     #                   sections be done? Originally was call to this code in reset_level(),
@@ -822,7 +829,6 @@ class AppStatechart(StatechartManager):
                         Clock.schedule_interval(self.build_level, 0.01)
 
                 def build_level(self, instance):
-                    print 'in build_level', instance 
                     #if self.statechart.app.level_build_index % int(0.02 / (0.5 / (len(self.statechart.app.obstacle_list) + len(self.statechart.app.goal_list)))) == 0:
                     # play a sound every now and then:
                     self.statechart.app.sound['beep'].play()
@@ -840,8 +846,16 @@ class AppStatechart(StatechartManager):
                 def exitState(self, context):
                     print 'ShowingLevel/exitState'
 
-                    # Delete all the deflectors.
                     self.delete_all_deflectors()
+
+                def delete_all_deflectors(self):
+                    for deflector in self.statechart.app.deflector_list:
+                        self.statechart.app.game_screen.remove_widget(deflector)
+
+                    self.statechart.app.deflector_list = []
+
+                    if self.statechart.app.stockbar is not None:
+                        self.statechart.app.recalculate_stock()
 
                 def deflector_down(self, *args):
                     if self.statechart.app.sound['deflector_down'].status != 'play':
@@ -851,336 +865,423 @@ class AppStatechart(StatechartManager):
                     if self.statechart.app.sound['deflector_up'].status != 'play':
                         self.statechart.app.sound['deflector_up'].play()
 
-# [statechart port] removed -- See enterState/exitState
-#                def reset_level(self, *args):
-#                    self.statechart.app.sound['reset'].play()
-#
-#                    # first kill the bullet
-#                    if self.statechart.app.bullet is not None:
-#                        self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
-#                        self.statechart.app.bullet.animation.unbind(on_complete=self.statechart.app.bullet.on_collision_with_edge)
-#                        self.statechart.app.bullet.animation.stop(self.statechart.app.bullet)
-#                        self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
-#                        self.statechart.app.bullet = None
-#
-#                    # then delete all the deflectors.
-#                    self.delete_all_deflectors()
-#
-#                    # now the user can begin once again with 3 lives:
-#                    self.statechart.app.lives = 3
-#
-#                    self.gotoState('ShowingLevel')
-
-                def delete_all_deflectors(self):
-                    for deflector in self.statechart.app.deflector_list:
-                        self.statechart.app.game_screen.remove_widget(deflector)
-                    self.statechart.app.deflector_list = []
-
-                    if self.statechart.app.stockbar is not None:
-                        self.recalculate_stock()
-
-                def recalculate_stock(self, *args):
-                    # this function is called every time a deflector size is changing
-                    # first sum up all the deflectors on screen
-                    length_sum = 0
-
-                    if not len(self.statechart.app.deflector_list) == 0:
-                        for deflector in self.statechart.app.deflector_list:
-                            length_sum += deflector.length
-
-                    self.statechart.app.stockbar.width = self.statechart.app.max_stock - length_sum
-
-                    if self.statechart.app.stockbar.width < MIN_DEFLECTOR_LENGTH:
-                        # if the stock material doesn't suffice for a new deflector, disable new deflectors
-                        self.statechart.app.stockbar.source = 'graphics/deflector_red.png'
-                        self.statechart.app.new_deflectors_allowed = False
-                    elif self.statechart.app.stockbar.width <= 0:
-                        # if all the stock material was used up, disable new deflectors
-                        self.statechart.app.new_deflectors_allowed = False
-                    else:
-                        self.statechart.app.stockbar.source = 'graphics/deflector_blue.png'
-                        self.statechart.app.new_deflectors_allowed = True
-
-                def fire(self, *args):
-                    # If there is already a bullet existing (which means 
-                    # its flying around or exploding somewhere) don't fire.
-                    if self.statechart.app.bullet is None:
-                        self.gotoState('ShowingBulletAnimation')
-
-                # ShowingBulletAnimation
+                # WaitingForFire (transitional state)
                 #
-                class ShowingBulletAnimation(State):
-                    bullet_animation = None
-
+                class WaitingForFire(State):
                     def __init__(self, **kwargs):
-                        super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.ShowingBulletAnimation, self).__init__(**kwargs)
+                        super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.WaitingForFire, self).__init__(**kwargs)
 
                     def enterState(self, context=None):
-                        print 'ShowingBulletAnimation/enterState'
-                        self.statechart.app.sound['bullet_start'].play()
-
-                        # create a bullet, calculate the start position and fire it.
-                        tower_angle = radians(self.statechart.app.game_screen.tank.tank_tower_scatter.rotation)
-                        tower_position = self.statechart.app.game_screen.tank.pos
-                        bullet_position = (tower_position[0] + 48 + cos(tower_angle) * 130, tower_position[1] + 70 + sin(tower_angle) * 130)
-                        self.statechart.app.bullet = Bullet(angle=tower_angle)
-                        self.statechart.app.bullet.center = bullet_position
-                        self.statechart.app.game_screen.add_widget(self.statechart.app.bullet)
-
-                        destination = self.calc_bullet_destination_at_edge(self.statechart.app.bullet.angle)
-                        speed = boundary(self.statechart.app.config.getint('GamePlay', 'BulletSpeed'), 1, 10)
-
-                        # start the animation
-                        self.bullet_animation = self.create_bullet_animation(speed, destination)
-
-                        self.bullet_animation.start(self.statechart.app.bullet)
-                        self.bullet_animation.bind(on_complete=self.collide_with_edge)
-
-                        # start to track the position changes
-                        self.statechart.app.bullet.bind(pos=self.bullet_pos_callback)
+                        print 'WaitingForFire/enterState'
 
                     def exitState(self, context=None):
-                        print 'ShowingBulletAnimation/exitState'
+                        print 'WaitingForFire/exitState'
 
-                        # if bullet, kill the bullet
-                        if self.statechart.app.bullet is not None:
+                    def fire(self, *args):
+                        # If there is already a bullet existing (which means 
+                        # its flying around or exploding somewhere) don't fire.
+                        if self.statechart.app.bullet is None:
+                            self.gotoState('BulletMoving')
+  
+                # BulletMoving
+                #
+                class BulletMoving(State):
+                    def __init__(self, **kwargs):
+                        kwargs['initialSubstateKey'] = 'EstablishingTrajectory'
+                        super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving, self).__init__(**kwargs)
+
+                    def enterState(self, context=None):
+                        print 'BulletMoving/enterState'
+                        self.statechart.app.sound['bullet_start'].play()
+
+                    def exitState(self, context=None):
+                        print 'BulletMoving/exitState'
+
+                  # EstablishingTrajectory (transitional state)
+                    #
+                    class EstablishingTrajectory(State):
+                        def __init__(self, **kwargs):
+                            super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving.EstablishingTrajectory, self).__init__(**kwargs)
+
+                        def enterState(self, context=None):
+                            print 'EstablishingTrajectory/enterState'
+                            # Calculate bullet start position.
+                            tower_angle = radians(self.statechart.app.game_screen.tank.tank_tower_scatter.rotation)
+                            tower_position = self.statechart.app.game_screen.tank.pos
+                            bullet_position = (tower_position[0] + 48 + cos(tower_angle) * 130, tower_position[1] + 70 + sin(tower_angle) * 130)
+
+                            # Create the bullet.
+                            self.statechart.app.bullet = Bullet(angle=tower_angle)
+                            self.statechart.app.bullet.center = bullet_position
+
+                            self.statechart.gotoState('OnTrajectory')
+
+                        def exitState(self, context=None):
+                            print 'EstablishingTrajectory/exitState'
+
+                    # ChangingTrajectory (transitional state)
+                    #
+                    class ChangingTrajectory(State):
+                        deflector_vector = None
+
+                        def __init__(self, **kwargs):
+                            super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving.ChangingTrajectory, self).__init__(**kwargs)
+
+                        def enterState(self, context=None):
+                            print 'ChangingTrajectory/enterState'
+
+                            self.deflector,self.deflector_vector = self.statechart.app.current_deflector_and_vector
+
+                            # calculate deflection angle
+                            impact_angle = (radians(self.deflector_vector.angle(Vector(1, 0))) % pi) - (self.statechart.app.bullet.angle % pi)
+                            self.statechart.app.bullet.angle = (self.statechart.app.bullet.angle + 2 * impact_angle) % (2 * pi)
+
+                            self.statechart.gotoState('OnTrajectory')
+
+                        def exitState(self, context=None):
+                            print 'ChangingTrajectory/exitState'
+
+                    # OnTrajectory
+                    #
+                    class OnTrajectory(State):
+                        bullet_animation = None
+
+                        def __init__(self, **kwargs):
+                            super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving.OnTrajectory, self).__init__(**kwargs)
+
+                        def enterState(self, context=None):
+                            print 'OnTrajectory/enterState'
+                            self.statechart.app.game_screen.add_widget(self.statechart.app.bullet)
+
+                            # start the animation
+                            destination = self.calc_bullet_destination_at_edge(self.statechart.app.bullet.angle)
+                            speed = boundary(self.statechart.app.config.getint('GamePlay', 'BulletSpeed'), 1, 10)
+
+                            self.bullet_animation = self.create_bullet_animation(speed, destination)
+
+                            self.bullet_animation.start(self.statechart.app.bullet)
+                            self.bullet_animation.bind(on_complete=self.collide_with_edge)
+
+                            # start to track the position changes
+                            self.statechart.app.bullet.bind(pos=self.bullet_pos_callback)
+
+                        def exitState(self, context=None):
+                            print 'OnTrajectory/exitState'
                             self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
                             self.bullet_animation.unbind(on_complete=self.collide_with_edge)
                             self.bullet_animation.stop(self.statechart.app.bullet)
-                            self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
-                            self.statechart.app.bullet = None
 
-                    def create_bullet_animation(self, speed, destination):
-                        # create the animation
-                        # t = s/v -> v from 1 to 10 / unit-less
-                        # NOTE: THE DIFFERENCE BETWEEN TWO RENDERED ANIMATION STEPS
-                        # MUST *NOT* EXCESS THE RADIUS OF THE BULLET! OTHERWISE I
-                        # HAVE PROBLEMS DETECTING A COLLISION WITH A DEFLECTOR!!
-                        time = Vector(self.statechart.app.bullet.center).distance(destination) / (speed * 30)
-                        return Animation(pos=destination, duration=time)
+                        def create_bullet_animation(self, speed, destination):
+                            # create the animation
+                            # t = s/v -> v from 1 to 10 / unit-less
+                            # NOTE: THE DIFFERENCE BETWEEN TWO RENDERED ANIMATION STEPS
+                            # MUST *NOT* EXCESS THE RADIUS OF THE BULLET! OTHERWISE I
+                            # HAVE PROBLEMS DETECTING A COLLISION WITH A DEFLECTOR!!
+                            time = Vector(self.statechart.app.bullet.center).distance(destination) / (speed * 30)
+                            return Animation(pos=destination, duration=time)
 
-                    def calc_bullet_destination_at_edge(self, angle):
-                        # calculate the path until the bullet hits the edge of the screen
-                        win = self.statechart.app.bullet.get_parent_window()
-                        left = 150.0 * win.width / 1920.0
-                        right = win.width - 236.0 * win.width / 1920.0
-                        top = win.height - 50.0 * win.height / 1920.0
-                        bottom = 96.0 * win.height / 1920.0
+                        def calc_bullet_destination_at_edge(self, angle):
+                            # calculate the path until the bullet hits the edge of the screen
+                            win = self.statechart.app.bullet.get_parent_window()
+                            left = 150.0 * win.width / 1920.0
+                            right = win.width - 236.0 * win.width / 1920.0
+                            top = win.height - 50.0 * win.height / 1920.0
+                            bottom = 96.0 * win.height / 1920.0
 
-                        bullet_x_to_right = right - self.statechart.app.bullet.center_x
-                        bullet_x_to_left = left - self.statechart.app.bullet.center_x
-                        bullet_y_to_top = top - self.statechart.app.bullet.center_y
-                        bullet_y_to_bottom = bottom - self.statechart.app.bullet.center_y
+                            bullet_x_to_right = right - self.statechart.app.bullet.center_x
+                            bullet_x_to_left = left - self.statechart.app.bullet.center_x
+                            bullet_y_to_top = top - self.statechart.app.bullet.center_y
+                            bullet_y_to_bottom = bottom - self.statechart.app.bullet.center_y
 
-                        destination_x = 0
-                        destination_y = 0
+                            destination_x = 0
+                            destination_y = 0
 
-                        # this is a little bit ugly, but i couldn't find a nicer way in the hurry
-                        if 0 <= self.statechart.app.bullet.angle < pi / 2:
-                            # 1st quadrant
-                            if self.statechart.app.bullet.angle == 0:
-                                destination_x = bullet_x_to_right
-                                destination_y = 0
-                            else:
-                                destination_x = boundary(bullet_y_to_top / tan(self.statechart.app.bullet.angle), bullet_x_to_left, bullet_x_to_right)
-                                destination_y = boundary(tan(self.statechart.app.bullet.angle) * bullet_x_to_right, bullet_y_to_bottom, bullet_y_to_top)
+                            # this is a little bit ugly, but i couldn't find a nicer way in the hurry
+                            if 0 <= self.statechart.app.bullet.angle < pi / 2:
+                                # 1st quadrant
+                                if self.statechart.app.bullet.angle == 0:
+                                    destination_x = bullet_x_to_right
+                                    destination_y = 0
+                                else:
+                                    destination_x = boundary(bullet_y_to_top / tan(self.statechart.app.bullet.angle), bullet_x_to_left, bullet_x_to_right)
+                                    destination_y = boundary(tan(self.statechart.app.bullet.angle) * bullet_x_to_right, bullet_y_to_bottom, bullet_y_to_top)
 
-                        elif pi / 2 <= self.statechart.app.bullet.angle < pi:
-                            # 2nd quadrant
-                            if self.statechart.app.bullet.angle == pi / 2:
-                                destination_x = 0
-                                destination_y = bullet_y_to_top
-                            else:
-                                destination_x = boundary(bullet_y_to_top / tan(self.statechart.app.bullet.angle), bullet_x_to_left, bullet_x_to_right)
-                                destination_y = boundary(tan(self.statechart.app.bullet.angle) * bullet_x_to_left, bullet_y_to_bottom, bullet_y_to_top)
+                            elif pi / 2 <= self.statechart.app.bullet.angle < pi:
+                                # 2nd quadrant
+                                if self.statechart.app.bullet.angle == pi / 2:
+                                    destination_x = 0
+                                    destination_y = bullet_y_to_top
+                                else:
+                                    destination_x = boundary(bullet_y_to_top / tan(self.statechart.app.bullet.angle), bullet_x_to_left, bullet_x_to_right)
+                                    destination_y = boundary(tan(self.statechart.app.bullet.angle) * bullet_x_to_left, bullet_y_to_bottom, bullet_y_to_top)
 
-                        elif pi <= self.statechart.app.bullet.angle < 3 * pi / 2:
-                            # 3rd quadrant
-                            if self.statechart.app.bullet.angle == pi:
-                                destination_x = bullet_x_to_left
-                                destination_y = 0
-                            else:
-                                destination_x = boundary(bullet_y_to_bottom / tan(self.statechart.app.bullet.angle), bullet_x_to_left, bullet_x_to_right)
-                                destination_y = boundary(tan(self.statechart.app.bullet.angle) * bullet_x_to_left, bullet_y_to_bottom, bullet_y_to_top)
+                            elif pi <= self.statechart.app.bullet.angle < 3 * pi / 2:
+                                # 3rd quadrant
+                                if self.statechart.app.bullet.angle == pi:
+                                    destination_x = bullet_x_to_left
+                                    destination_y = 0
+                                else:
+                                    destination_x = boundary(bullet_y_to_bottom / tan(self.statechart.app.bullet.angle), bullet_x_to_left, bullet_x_to_right)
+                                    destination_y = boundary(tan(self.statechart.app.bullet.angle) * bullet_x_to_left, bullet_y_to_bottom, bullet_y_to_top)
 
-                        elif self.statechart.app.bullet.angle >= 3 * pi / 2:
-                            # 4th quadrant
-                            if self.statechart.app.bullet.angle == 3 * pi / 2:
-                                destination_x = 0
-                                destination_y = bullet_y_to_bottom
-                            else:
-                                destination_x = boundary(bullet_y_to_bottom / tan(self.statechart.app.bullet.angle), bullet_x_to_left, bullet_x_to_right)
-                                destination_y = boundary(tan(self.statechart.app.bullet.angle) * bullet_x_to_right, bullet_y_to_bottom, bullet_y_to_top)
+                            elif self.statechart.app.bullet.angle >= 3 * pi / 2:
+                                # 4th quadrant
+                                if self.statechart.app.bullet.angle == 3 * pi / 2:
+                                    destination_x = 0
+                                    destination_y = bullet_y_to_bottom
+                                else:
+                                    destination_x = boundary(bullet_y_to_bottom / tan(self.statechart.app.bullet.angle), bullet_x_to_left, bullet_x_to_right)
+                                    destination_y = boundary(tan(self.statechart.app.bullet.angle) * bullet_x_to_right, bullet_y_to_bottom, bullet_y_to_top)
 
-                        # because all of the calculations above were relative, add the bullet position to it.
-                        destination_x += self.statechart.app.bullet.center_x
-                        destination_y += self.statechart.app.bullet.center_y
+                            # because all of the calculations above were relative, add the bullet position to it.
+                            destination_x += self.statechart.app.bullet.center_x
+                            destination_y += self.statechart.app.bullet.center_y
 
-                        return (destination_x, destination_y)
+                            return (destination_x, destination_y)
 
-                    def check_deflector_collision(self, deflector):
-                        # Here we have a collision Bullet <--> Deflector-bounding-box. But that doesn't mean
-                        # that there's a collision with the deflector LINE yet. So here's some math stuff
-                        # for the freaks :) It includes vector calculations, distance problems and trigonometry
+                        def check_deflector_collision(self, deflector):
+                            # Here we have a collision Bullet <--> Deflector-bounding-box. But that doesn't mean
+                            # that there's a collision with the deflector LINE yet. So here's some math stuff
+                            # for the freaks :) It includes vector calculations, distance problems and trigonometry
 
-                        # first thing to do is: we need a vector describing the bullet. Length isn't important.
-                        bullet_position = Vector(self.statechart.app.bullet.center)
-                        bullet_direction = Vector(1, 0).rotate(self.statechart.app.bullet.angle * 360 / (2 * pi))
-                        deflector_point1 = Vector(deflector.to_parent(deflector.point1.center[0], deflector.point1.center[1]))
-                        deflector_point2 = Vector(deflector.to_parent(deflector.point2.center[0], deflector.point2.center[1]))
+                            # first thing to do is: we need a vector describing the bullet. Length isn't important.
+                            bullet_position = Vector(self.statechart.app.bullet.center)
+                            bullet_direction = Vector(1, 0).rotate(self.statechart.app.bullet.angle * 360 / (2 * pi))
+                            deflector_point1 = Vector(deflector.to_parent(deflector.point1.center[0], deflector.point1.center[1]))
+                            deflector_point2 = Vector(deflector.to_parent(deflector.point2.center[0], deflector.point2.center[1]))
 
-                        # then we need a vector describing the deflector line.
-                        deflector_vector = Vector(deflector_point2 - deflector_point1)
+                            # then we need a vector describing the deflector line.
+                            deflector_vector = Vector(deflector_point2 - deflector_point1)
 
-                        # now we do a line intersection with the deflector line:
-                        intersection = Vector.line_intersection(bullet_position, bullet_position + bullet_direction, deflector_point1, deflector_point2)
+                            # now we do a line intersection with the deflector line:
+                            intersection = Vector.line_intersection(bullet_position, bullet_position + bullet_direction, deflector_point1, deflector_point2)
 
-                        # now we want to proof if the bullet comes from the 'right' side.
-                        # Because it's possible that the bullet is colliding with the deflectors bounding box but
-                        # would miss / has already missed the deflector line.
-                        # We do that by checking if the expected intersection point is BEHIND the bullet position.
-                        # ('behind' means the bullets direction vector points AWAY from the vector
-                        # [bullet -> intersection]. That also means the angle between these two vectors is not 0
-                        # -> due to some math-engine-internal inaccuracies, i have to check if the angle is greater than one:
-                        if abs(bullet_direction.angle(intersection - bullet_position)) > 1:
-                            # if the bullet missed the line already - NO COLLISION
-                            return False
+                            # now we want to proof if the bullet comes from the 'right' side.
+                            # Because it's possible that the bullet is colliding with the deflectors bounding box but
+                            # would miss / has already missed the deflector line.
+                            # We do that by checking if the expected intersection point is BEHIND the bullet position.
+                            # ('behind' means the bullets direction vector points AWAY from the vector
+                            # [bullet -> intersection]. That also means the angle between these two vectors is not 0
+                            # -> due to some math-engine-internal inaccuracies, i have to check if the angle is greater than one:
+                            if abs(bullet_direction.angle(intersection - bullet_position)) > 1:
+                                # if the bullet missed the line already - NO COLLISION
+                                return False
 
-                        # now we finally check if the bullet is close enough to the deflector line:
-                        distance = abs(sin(radians(bullet_direction.angle(deflector_vector)) % (pi / 2))) * Vector(intersection - bullet_position).length()
-                        if distance < (self.statechart.app.bullet.width / 2):
-                            # there is a collision!
-                            # kill the animation!
+                            # now we finally check if the bullet is close enough to the deflector line:
+                            distance = abs(sin(radians(bullet_direction.angle(deflector_vector)) % (pi / 2))) * Vector(intersection - bullet_position).length()
+                            if distance < (self.statechart.app.bullet.width / 2):
+                                # there is a collision!
+                                # kill the animation!
 
-                            # [statechart port] Made function terminate_bullet_animation_to_edge().
-                            self.terminate_bullet_animation_to_edge()
+                                # [statechart port] Made function terminate_bullet_animation_to_edge().
+                                self.terminate_bullet_animation_to_edge()
 
-                            # call the collision handler
-                            self.collide_with_deflector(deflector, deflector_vector)
+                                # call the collision handler
+                                self.collide_with_deflector(deflector, deflector_vector)
 
-                    def termination_bullet_animation_to_edge(self):
-                        self.bullet_animation.unbind(on_complete=self.collide_with_edge)
-                        self.bullet_animation.stop(self)
-
-                    def bullet_pos_callback(self, instance, pos):
-                        if self.statechart.app.bullet is None:
-                            return
-
-                        # check here if the bullet collides with a deflector, an obstacle or the goal
-                        # (edge collision detection is irrelevant - the edge is where the bullet animation ends
-                        # and therefor a callback is raised then)
-
-                        # first check if there's a collision with deflectors:
-                        if not len(self.statechart.app.deflector_list) == 0:
-                            for deflector in self.statechart.app.deflector_list:
-                                if deflector.collide_widget(self.statechart.app.bullet):
-                                    self.check_deflector_collision(deflector)
-                                    return
-
-                        # [statechart port] Moved the check for obstacle before the check for goal.
-
-                        # then check if there's a collision with obstacles:
-                        if not len(self.statechart.app.obstacle_list) == 0:
-                            for obstacle in self.statechart.app.obstacle_list:
-                                if self.statechart.app.bullet.collide_widget(obstacle):
-                                    self.collide_with_obstacle()
-                                    return
-
-                        # then check if there's a collision with the goal:
-                        if not len(self.statechart.app.goal_list) == 0:
-                            for goal in self.statechart.app.goal_list:
-                                if self.statechart.app.bullet.collide_widget(goal):
-                                    self.collide_with_goal()
-                                    return
-
-                    def collide_with_deflector(self, deflector, deflector_vector):
-                        self.statechart.app.sound['deflection'].play()
-
-                        # flash up the deflector
-                        Animation.stop_all(deflector.point1, 'color')
-                        Animation.stop_all(deflector.point2, 'color')
-                        deflector.point1.color = (1, 1, 1, 1)
-                        deflector.point2.color = (1, 1, 1, 1)
-                        animation = Animation(color=(0, 0, 1, 1), duration=3, t='out_expo')
-                        animation.start(deflector.point1)
-                        animation.start(deflector.point2)
-
-                        # calculate deflection angle
-                        impact_angle = (radians(deflector_vector.angle(Vector(1, 0))) % pi) - (self.statechart.app.bullet.angle % pi)
-                        self.statechart.app.bullet.angle = (self.statechart.app.bullet.angle + 2 * impact_angle) % (2 * pi)
-
-                        destination = self.calc_bullet_destination_at_edge(self.statechart.app.bullet.angle)
-                        speed = boundary(self.statechart.app.config.getint('GamePlay', 'BulletSpeed'), 1, 10)
-
-                        self.statechart.app.bullet_animation = self.create_bullet_animation(speed, destination)
-
-                        # start the animation
-                        self.bullet_animation.start(self.statechart.app.bullet)
-                        self.bullet_animation.bind(on_complete=self.collide_with_edge)
-
-                    def collide_with_obstacle(self, *args):
-                        print 'collide_with_obstacle'
-                        self.explode_bullet()
-
-                    def collide_with_edge(self, *args):
-                        print 'collide_with_edge'
-                        self.explode_bullet()
-
-                    def collide_with_goal(self, *args):
-                        print 'collide_with_goal'
-                        # i still have some strange exceptions because of multiple function calls:
-                        if self.statechart.app.game_screen is None:
-                            return
-                        #self.parent.level_accomplished()
-                        self.explode_bullet()
-                        self.gotoState('ShowingLevelAccomplished')
-
-                    def explode_bullet(self):
-                        # [statechart port] Modified defensive check, needed for some reason.
-                        #                   One thing noticed was multiple successive calls from
-                        #                   finish_colliding_with_deflector(), but this could
-                        #                   have to do with problems in deflector touches and
-                        #                   callbacks.
-                        if self.statechart.app.bullet is not None and self.statechart.app.bullet.exploding is False:
-                            self.statechart.app.bullet.exploding = True
-
-                            self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
-
+                        def terminate_bullet_animation_to_edge(self):
                             self.bullet_animation.unbind(on_complete=self.collide_with_edge)
                             self.bullet_animation.stop(self)
 
+                        def bullet_pos_callback(self, instance, pos):
+                            if self.statechart.app.bullet is None:
+                                return
+
+                            # check here if the bullet collides with a deflector, an obstacle or the goal
+                            # (edge collision detection is irrelevant - the edge is where the bullet animation ends
+                            # and therefor a callback is raised then)
+
+                            # first check if there's a collision with deflectors:
+                            if not len(self.statechart.app.deflector_list) == 0:
+                                for deflector in self.statechart.app.deflector_list:
+                                    if deflector.collide_widget(self.statechart.app.bullet):
+                                        self.check_deflector_collision(deflector)
+                                        return
+
+                            # [statechart port] Moved the check for obstacle before the check for goal.
+
+                            # then check if there's a collision with obstacles:
+                            if not len(self.statechart.app.obstacle_list) == 0:
+                                for obstacle in self.statechart.app.obstacle_list:
+                                    if self.statechart.app.bullet.collide_widget(obstacle):
+                                        self.collide_with_obstacle()
+                                        return
+
+                            # then check if there's a collision with the goal:
+                            if not len(self.statechart.app.goal_list) == 0:
+                                for goal in self.statechart.app.goal_list:
+                                    if self.statechart.app.bullet.collide_widget(goal):
+                                        self.collide_with_goal()
+                                        return
+
+                        def collide_with_deflector(self, deflector, deflector_vector):
+                            self.statechart.app.current_deflector_and_vector = (deflector, deflector_vector)
+                            self.gotoState('CollisionWithDeflector')
+
+                        def collide_with_obstacle(self, *args):
+                            print 'collide_with_obstacle'
+                            self.gotoState('CollisionWithObstacle')
+
+                        def collide_with_edge(self, *args):
+                            print 'collide_with_edge'
+                            self.gotoState('CollisionWithEdge')
+
+                        def collide_with_goal(self, *args):
+                            print 'collide_with_goal'
+                            # [statechart port] Hopefully fixed by rearrangements.
+                            # i still have some strange exceptions because of multiple function calls:
+                            #if self.statechart.app.game_screen is None:
+                                #return
+
+                            #self.parent.level_accomplished()
+                            self.gotoState('CollisionWithGoal')
+
+                    # Collision
+                    #
+                    class Collision(State):
+                        bullet_exploding_animation = None
+
+                        def __init__(self, **kwargs):
+                            super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving.Collision, self).__init__(**kwargs)
+
+                        def enterState(self, context=None):
+                            print 'Collision/enterState'
                             self.statechart.app.sound['explosion'].play()
 
-                            # create an animation on the old bullets position:
-                            # bug: gif isn't transparent
-                            #old_pos = self.bullet.center
-                            #self.bullet.anim_delay = 0.1
-                            #self.bullet.size = 96, 96
-                            #self.bullet.center = old_pos
-                            #self.bullet.source = 'graphics/explosion.gif'
-                            #Clock.schedule_once(self.bullet_exploded, 1)
+                        def exitState(self, context=None):
+                            print 'Collision/exitState'
 
-                            self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
-                            self.statechart.app.bullet = None
-                            # or should i write del self.bullet instead?
+                        # [statechart port] The solution used here for CollisionWithObject and substates
+                        #                   CollisionWithEdge and CollisionWithObstacle, is to have these
+                        #                   substates as transitional substates that decide whether there
+                        #                   are lives left to keep_playing_level() or, if not, to
+                        #                   reset_level().
+                        #
+                        #                   Alternatively, through a subclassing scheme, one could have
+                        #                   two states, CollisionWithEdge(CollisionWithObject) and
+                        #                   CollisionWithObstacle(CollisionWithObject), that through a
+                        #                   combination of method overriding could accomplish the same
+                        #                   thing, no? Merits?
 
-                            self.statechart.app.lives -= 1
-                            if self.statechart.app.lives == 0:
-                                #self.parentState.reset_level()
+                        # CollisionWithObject
+                        #
+                        class CollisionWithObject(State):
+                            def __init__(self, **kwargs):
+                                super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving.Collision.CollisionWithObject, self).__init__(**kwargs)
 
-                                # [statechart port] No explicit call to reset_level() now, because by
-                                #                   exiting the current state, ShowingBulletAnimation, the code
-                                #                   in exitState() will do tear-down ops for the bullet,
-                                #                   and, in turn, we will leave ShowingLevel state in
-                                #                   order to re-enter it, so the ShowingLevel.exitState()
-                                #                   will do tear-down for the current level.
+                            def enterState(self, context=None):
+                                print 'CollisionWithObject/enterState'
+                                self.statechart.app.lives -= 1
+
+                            def exitState(self, context=None):
+                                print 'CollisionWithObject/exitState'
+                                self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
+                                self.statechart.app.bullet = None
+
+                            # CollisionWithObjectState(transitional state)
+                            #
+                            class CollisionWithObjectState(State):
+                                def __init__(self, **kwargs):
+                                    super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving.Collision.CollisionWithObject.CollisionWithObjectState, self).__init__(**kwargs)
+
+                                def enterState(self, context=None):
+                                    print 'CollisionWithObjectState/enterState'
+                                    # [statechart port] These should call statechart.sendEvent('some_action'),
+                                    #                   and not self.parentState.some_action() directly, in this
+                                    #                   case, because we want the statechart machinery to figure
+                                    #                   out the sequence of state transitions that should happen
+                                    #                   for the action in the current context.
+                                    #
+                                    # Ah, but, there could be a problem with state transitions fired within an
+                                    # enterState() firing immediately.
+                                    #
+                                    if self.statechart.app.lives == 0:
+                                        #self.statechart.sendEvent('reset_level')
+                                        self.reset_level()
+                                    else:
+                                        #self.statechart.sendEvent('keep_playing_level')
+                                        self.keep_playing_level()
+
+                                def reset_level(self, *args):
+                                    self.gotoState('ResettingLevel')
+
+                                def keep_playing_level(self, *args):
+                                    self.gotoState('WaitingForFire')
+
+                            # CollisionWithEdge (transitional state)
+                            #
+                            class CollisionWithEdge(CollisionWithObjectState):
+                                pass
+
+                            # CollisionWithObstacle (transitional state)
+                            #
+                            class CollisionWithObstacle(CollisionWithObjectState):
+                                pass
+
+                        # CollisionWithDeflector (transitional state)
+                        #
+                        class CollisionWithDeflector(State):
+                            deflector = None
+
+                            def __init__(self, **kwargs):
+                                super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving.Collision.CollisionWithDeflector, self).__init__(**kwargs)
+
+                            def enterState(self, context=None):
+                                print 'CollisionWithDeflector/enterState'
+                                self.statechart.app.sound['deflection'].play()
+
+                                self.deflector,self.deflector_vector = self.statechart.app.current_deflector_and_vector
+
+                                self.flash_deflector()
+
+                                # [statechart port] See note below about sendEvent() vs. direct call.
+                                #self.statechart.sendEvent('change_trajectory')
+                                self.change_trajectory()
+
+                            def flash_deflector(self, *args): 
+                                # flash up the deflector
+                                Animation.stop_all(self.deflector.point1, 'color')
+                                Animation.stop_all(self.deflector.point2, 'color')
+                                self.deflector.point1.color = (1, 1, 1, 1)
+                                self.deflector.point2.color = (1, 1, 1, 1)
+                                animation = Animation(color=(0, 0, 1, 1), duration=3, t='out_expo')
+                                animation.start(self.deflector.point1)
+                                animation.start(self.deflector.point2)
+
+                            def exitState(self, context=None):
+                                print 'CollisionWithDeflector/exitState'
+
+                                # Do not remove the bullet widget nor set bullet = None here.
+                                # (Bullet only changes trajectory).
+
+                            def change_trajectory(self, *args):
+                                self.gotoState('ChangingTrajectory')
+
+                        # CollisionWithGoal (transitional state)
+                        #
+                        class CollisionWithGoal(State):
+                            def __init__(self, **kwargs):
+                                super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving.Collision.CollisionWithGoal, self).__init__(**kwargs)
+
+                            def enterState(self, context=None):
+                                print 'CollisionWithGoal/enterState'
+
+                                # [statechart port] Direct call to self.show_level_accomplished() OK here?
+                                #                   Or is it a bad habit to ever call gotoState() from
+                                #                   enterState() or exitState()? Efficiency of action lookup
+                                #                   a factor, no? Could show_level_accomplished() live in
                                 #
-                                #                   But check this... [TODO]
-                                #
-                                self.statechart.app.sound['reset'].play()
+                                #self.statechart.sendEvent('show_level_accomplished')
+                                self.show_level_accomplished()
 
-                                # [statechart port] Allowed?
-                                self.exitState()
+                            def exitState(self, context=None):
+                                print 'CollisionWithObject/exitState'
+                                self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
+                                self.statechart.app.bullet = None
+
+                            def show_level_accomplished(self, *args):
+                                self.gotoState('ShowingLevelAccomplished')
+
 
 class GameScreen(Widget):
     app = ObjectProperty(None)
@@ -1219,7 +1320,11 @@ class Deflectouch(App):
     sound = {}
     music = None
 
+    # [statechart port] These are akin to object controllers linked to
+    #                   list controllers. Maybe this should be formalized
+    #                   with new class types?
     current_level = NumericProperty(0)
+    current_deflector_and_vector = None
 
     def build(self):
         # print the application informations
@@ -1241,6 +1346,28 @@ class Deflectouch(App):
         config.adddefaultsection('GamePlay')
         config.setdefault('GamePlay', 'BulletSpeed', '10')
         config.setdefault('GamePlay', 'Levels', '0000000000000000000000000000000000000000')
+
+    def recalculate_stock(self, *args):
+        # this function is called every time a deflector size is changing
+        # first sum up all the deflectors on screen
+        length_sum = 0
+
+        if not len(self.deflector_list) == 0:
+            for deflector in self.deflector_list:
+                length_sum += deflector.length
+
+        self.stockbar.width = self.max_stock - length_sum
+
+        if self.stockbar.width < MIN_DEFLECTOR_LENGTH:
+            # if the stock material doesn't suffice for a new deflector, disable new deflectors
+            self.stockbar.source = 'graphics/deflector_red.png'
+            self.new_deflectors_allowed = False
+        elif self.stockbar.width <= 0:
+            # if all the stock material was used up, disable new deflectors
+            self.new_deflectors_allowed = False
+        else:
+            self.stockbar.source = 'graphics/deflector_blue.png'
+            self.new_deflectors_allowed = True
 
     def on_start(self):
         self.statechart = AppStatechart(app=self)
