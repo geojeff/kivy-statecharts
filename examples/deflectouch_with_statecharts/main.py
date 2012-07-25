@@ -865,7 +865,7 @@ class AppStatechart(StatechartManager):
                     if self.statechart.app.sound['deflector_up'].status != 'play':
                         self.statechart.app.sound['deflector_up'].play()
 
-                # WaitingForFire (transitional state)
+                # WaitingForFire
                 #
                 class WaitingForFire(State):
                     def __init__(self, **kwargs):
@@ -893,11 +893,15 @@ class AppStatechart(StatechartManager):
                     def enterState(self, context=None):
                         print 'BulletMoving/enterState'
                         self.statechart.app.sound['bullet_start'].play()
+                        self.statechart.app.bullet = Bullet()
+                        self.statechart.app.game_screen.add_widget(self.statechart.app.bullet)
 
                     def exitState(self, context=None):
                         print 'BulletMoving/exitState'
+                        self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
+                        self.statechart.app.bullet = None
 
-                  # EstablishingTrajectory (transitional state)
+                    # EstablishingTrajectory (transitional state)
                     #
                     class EstablishingTrajectory(State):
                         def __init__(self, **kwargs):
@@ -910,8 +914,7 @@ class AppStatechart(StatechartManager):
                             tower_position = self.statechart.app.game_screen.tank.pos
                             bullet_position = (tower_position[0] + 48 + cos(tower_angle) * 130, tower_position[1] + 70 + sin(tower_angle) * 130)
 
-                            # Create the bullet.
-                            self.statechart.app.bullet = Bullet(angle=tower_angle)
+                            self.statechart.app.bullet.angle = tower_angle
                             self.statechart.app.bullet.center = bullet_position
 
                             self.statechart.gotoState('OnTrajectory')
@@ -951,7 +954,6 @@ class AppStatechart(StatechartManager):
 
                         def enterState(self, context=None):
                             print 'OnTrajectory/enterState'
-                            self.statechart.app.game_screen.add_widget(self.statechart.app.bullet)
 
                             # start the animation
                             destination = self.calc_bullet_destination_at_edge(self.statechart.app.bullet.angle)
@@ -1070,18 +1072,7 @@ class AppStatechart(StatechartManager):
                             # now we finally check if the bullet is close enough to the deflector line:
                             distance = abs(sin(radians(bullet_direction.angle(deflector_vector)) % (pi / 2))) * Vector(intersection - bullet_position).length()
                             if distance < (self.statechart.app.bullet.width / 2):
-                                # there is a collision!
-                                # kill the animation!
-
-                                # [statechart port] Made function terminate_bullet_animation_to_edge().
-                                self.terminate_bullet_animation_to_edge()
-
-                                # call the collision handler
                                 self.collide_with_deflector(deflector, deflector_vector)
-
-                        def terminate_bullet_animation_to_edge(self):
-                            self.bullet_animation.unbind(on_complete=self.collide_with_edge)
-                            self.bullet_animation.stop(self)
 
                         def bullet_pos_callback(self, instance, pos):
                             if self.statechart.app.bullet is None:
@@ -1175,8 +1166,6 @@ class AppStatechart(StatechartManager):
 
                             def exitState(self, context=None):
                                 print 'CollisionWithObject/exitState'
-                                self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
-                                self.statechart.app.bullet = None
 
                             # CollisionWithObjectState(transitional state)
                             #
@@ -1276,8 +1265,6 @@ class AppStatechart(StatechartManager):
 
                             def exitState(self, context=None):
                                 print 'CollisionWithObject/exitState'
-                                self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
-                                self.statechart.app.bullet = None
 
                             def show_level_accomplished(self, *args):
                                 self.gotoState('ShowingLevelAccomplished')
