@@ -619,7 +619,7 @@ class AppStatechart(StatechartManager):
                 def dismiss(self, *args):
                     self.gotoState('ShowingLevel')
 
-            # ShowingLevelAccomplished
+            # ShowingLevelAccomplished (transitional state)
             #
             class ShowingLevelAccomplished(State):
                 animation = None
