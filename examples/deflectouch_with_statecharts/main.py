@@ -301,15 +301,6 @@ class Deflector(Scatter):
             or point2_parent[0] - GRAB_RADIUS <= x <= point2_parent[0] + GRAB_RADIUS and point2_parent[1] - GRAB_RADIUS <= y <= point2_parent[1] + GRAB_RADIUS
 
 
-    # [statechart port] ******************* NOTE ********************
-    #
-    #                   If the return super() calls for on_touch_down
-    #                   and on_touch_up are commented out, the action
-    #                   on multitouch, for the deflector is much
-    #                   better, but still something is off.
-    #
-    #                   *********************************************
-    
     def on_touch_down(self, touch):
         self.statechart.sendEvent('deflector_down')
         return super(Deflector, self).on_touch_down(touch)
