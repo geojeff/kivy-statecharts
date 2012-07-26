@@ -612,7 +612,7 @@ class AppStatechart(StatechartManager):
                 def dismiss(self, *args):
                     self.gotoState('ShowingLevel')
 
-            # ShowingLevelAccomplished (transitional state)
+            # ShowingLevelAccomplished (transient state)
             #
             class ShowingLevelAccomplished(State):
                 animation = None
@@ -894,7 +894,7 @@ class AppStatechart(StatechartManager):
                         self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
                         self.statechart.app.bullet = None
 
-                    # EstablishingTrajectory (transitional state)
+                    # EstablishingTrajectory (transient state)
                     #
                     class EstablishingTrajectory(State):
                         def __init__(self, **kwargs):
@@ -915,7 +915,7 @@ class AppStatechart(StatechartManager):
                         def exitState(self, context=None):
                             print 'EstablishingTrajectory/exitState'
 
-                    # ChangingTrajectory (transitional state)
+                    # ChangingTrajectory (transient state)
                     #
                     class ChangingTrajectory(State):
                         deflector_vector = None
@@ -1137,7 +1137,7 @@ class AppStatechart(StatechartManager):
 
                         # [statechart port] The solution used here for CollisionWithObject and substates
                         #                   CollisionWithEdge and CollisionWithObstacle, is to have these
-                        #                   substates as transitional substates that decide whether there
+                        #                   substates as transient substates that decide whether there
                         #                   are lives left to keep_playing_level() or, if not, to
                         #                   reset_level().
                         #
@@ -1160,7 +1160,7 @@ class AppStatechart(StatechartManager):
                             def exitState(self, context=None):
                                 print 'CollisionWithObject/exitState'
 
-                            # CollisionWithObjectState(transitional state)
+                            # CollisionWithObjectState(transient state)
                             #
                             class CollisionWithObjectState(State):
                                 def __init__(self, **kwargs):
@@ -1190,17 +1190,17 @@ class AppStatechart(StatechartManager):
                                 def keep_playing_level(self, *args):
                                     self.gotoState('WaitingForFire')
 
-                            # CollisionWithEdge (transitional state)
+                            # CollisionWithEdge (transient state)
                             #
                             class CollisionWithEdge(CollisionWithObjectState):
                                 pass
 
-                            # CollisionWithObstacle (transitional state)
+                            # CollisionWithObstacle (transient state)
                             #
                             class CollisionWithObstacle(CollisionWithObjectState):
                                 pass
 
-                        # CollisionWithDeflector (transitional state)
+                        # CollisionWithDeflector (transient state)
                         #
                         class CollisionWithDeflector(State):
                             deflector = None
@@ -1239,7 +1239,7 @@ class AppStatechart(StatechartManager):
                             def change_trajectory(self, *args):
                                 self.gotoState('ChangingTrajectory')
 
-                        # CollisionWithGoal (transitional state)
+                        # CollisionWithGoal (transient state)
                         #
                         class CollisionWithGoal(State):
                             def __init__(self, **kwargs):
