@@ -20,10 +20,12 @@ if the app had been developed with statecharts in the first place,
 and examining the code to see how it would be shifted around, 
 accordingly. "Coordinating" code was moved from widgets to the
 enter and exit functions of new states, and to specialized functions
-and action functions, leaving the widgets, and their associated kv
-definitions, as simpler, a goal of coding the "mediating" controller
-part of an app. The user interface consists of Tank, the Tank's tower
-("gun barrel"), Deflector, buttons, and the Background widge for
+and action functions of the states, leaving the widgets, and their
+associated kv definitions, as simpler, a goal of coding the
+"mediating" controller part of an app.
+
+The user interface consists of Tank, the Tank's tower
+("gun barrel"), Deflector, buttons, and the Background widget for
 receiving touch events. Code was moved from these to the statechart.
 Tank and Deflector remained with more code, because they work, in part,
 as autonomous user interface elements. Deflector still has code that
@@ -32,21 +34,21 @@ down, separate source files were collapsed to main.py, with the kv
 file remaining largely unmodified.
 
 The statechart drawing changed quite a bit in an incremental fashion,
-with retreatment happening as the two books about statecharts in hand
+with refactoring happening as two books about statecharts on hand
 were consulted (Harel and Politi, 1998, "Modeling Reactive Systems
-With Statecharts : The Statemate Approach" and Horrocks, 1999,
+With Statecharts: The Statemate Approach" and Horrocks, 1999,
 "Constructing the User Interface with Statecharts"). Learning the
-graphics program used to draw the statechart, yEd, was also important,
-because it does not have a dedicated "statechart" menu of graphics
+graphics program used to draw the statechart, yEd, was also important.
+yEd does not have a dedicated "statechart" menu of graphics
 drawing elements, but does have a menu of general "flowchart" drawing
 features and several menus that are close in application: UML and
 BPMN (Business Process Modeling Notation). From these, an assortment
 of rounded rectangle, double-bordered rectangle, arrow, circle, and
 annotation drawing objects were used. This assortment could be made
 into a menu for statechart drawing, after the dust settles on the
-notation preferred -- some "invention" of new notation was done in
-the course of work on this project, but it remains essentially
-experimental. See the drawing and please express likes and dislikes.
+notation preferred. Some invention of new notation was done in
+the course of work on this project. View the statechart drawing
+and please express likes and dislikes.
 
 Using statecharts brings to the forefront the "art of programming,"
 where thinking in the abstract and imagination are important. You can
@@ -73,18 +75,21 @@ more than one way to arrange states in an app. As development
 proceeds, more "correct" arrangements are discovered. More "correct"
 involves notions of simplicity and effectiveness -- dare we say, it
 equates to "more parsimonius." Refinement is an apt term used for the
-statechart programming process. In establishing the hierarchy, the
-similarity to subclassing in object-oriented design may suggest, as,
-for instance, the arrangement of the "collision" section of the
-BulletMoving state is considered. Actual Python subclassing is used
+statechart programming process. 
+
+Through establishing and modifying the hierarchy, the similarity to
+subclassing in object-oriented design may come to mind, as, for
+instance, when considering the arrangement of the "collision" section
+of the BulletMoving state. Actual Python subclassing is used
 in concert, with CollisionWithEdge and CollisionWithObstacle
 subclassing CollisionWithObject. Here the statechart drawing depicts
-the hierarchy, and the code represents both the hierarchy, in the
-way the states are indented as substates, and in the way the states
-are declared as subclasses. There can be tradeoffs, but this is the
-way development proceeded in this case.
+the hierarchy, and the code reflects the hierarchy, in the way the states
+are indented as substates, and in the way the states are declared as
+subclasses. There can be tradeoffs, but this is the way development
+proceeded in this case. Subclassing states may not always be needed,
+or desired.
 
-Another aspect of statechart programming came up, the choice of putting
+Another aspect of statechart programming came up: the choice of putting
 code in action functions vs. creating transient states. After
 experimenting, transient states seemed to offer a more fine-grained
 organization that made drawing the statechart easier. Transient
@@ -98,33 +103,35 @@ yEd Operation
 =============
 
 The statechart drawing was made with yEd, a free cross-platform tool.
-The program was used on MAC OS X.
+The program was used on MAC OS X, in this project.
 
 yEd is a very capable program dedicated to the task of drawing diagrams
 like statecharts, although there is no (yet) dedicated palette for
 statecharts. It is like other vector-drawing programs, generally, but
-has a difference or two that are noteworthy. To move an element, don't
-click and drag it, click it once to select it, then drag it. This is
-to disambiguate click-and-drag ops done for drawing connectors.
+has a difference or two that are noteworthy.
+
+To move an element, don't click and drag it, click it once to select it,
+then drag it. This is to disambiguate click-and-drag ops done for
+drawing connectors.
 
 The connector-handling and labels of connectors is a strong suit of
 yEd. With an arrow object selected from in a menu, e.g., the sequence
-flow arrow under the BPMN palette menu, you click away once to make
-sure nothing is selected, then you drag from state to state to draw
-the connector, hovering over the interior of the target to connect
-to its center, or hovering over one of its borders to connect to a
-border. Use the detailed Properties View at lower right to add a
-label by clicking in the box next to "Text" -- a dialog will pop up.
-After adding text for the label, click or double-click the label to
-change it. Click to fire the dialog again if you prefer. Click once
-to select the label, then drag it to one of six positions, by
-default, that dynamically appear for the label drag. There are
-several choices for label positioning -- resort to "Smartfree:
-Anywhere" when you need special placement.
+flow arrow under the BPMN palette menu, you click away from any graphics
+element to make sure nothing is selected, then you drag from one state
+to another to draw the connector, hovering over the interior of the
+target state to connect to its center, or hovering over one of its
+borders to connect to a border. Use the detailed Properties View at
+lower right in the yEd display to add a label, by clicking in the box
+next to "Text" -- a dialog will pop up. After adding text for the label,
+click or double-click the label to change it. Click to fire the dialog
+again if you prefer. Click once to select the label, then drag it to one
+of six positions, by default, that dynamically appear for the label drag.
+There are several choices for label positioning -- resort to "Smartfree:
+Anywhere" when you need special label placement.
 
-Complicated selection, as with any vector-drawing tool, takes some
-fanagling to combine single-click ops with the shift and control keys,
-along with marquee selection with the mouse. 
+Complicated selection, as with any vector-drawing tool, can be a bit
+fiddly. Combine single-click ops with the shift and control keys, along
+with marquee selection with the mouse. 
 
 Statechart Notation Notes
 =========================
@@ -137,10 +144,10 @@ Connection Symbology: State Transitions
 
 "Edges," in the sense of a graph, are shown in the statechart drawing
 as arrows connecting states. These represent state transitions that
-happen when certain events occur, and entail the "action" to be done
-and the triggering event. These state transition "edges" have a label
-with the action first and a description of the event (a trigger, a
-requirement, a guard condition, etc.) shown in parentheses, e.g.
+happen when certain events occur, and are labeled with the "action" to
+be performed and the triggering event. These state transition "edge"
+labels have the action first and a description of the event (a trigger,
+a requirement, a guard condition, etc.) shown in parentheses, e.g.
 show_level_accomplished (goal hit). The action names are the names
 of the actual Python functions in the states. This notation follows
 the style in the Horrocks book. In the Harel and Politi book,
@@ -154,17 +161,15 @@ Double Borders: "States with Substates"
 
 A double-bordered rectangle is used for ShowingGameScreen and
 ShowingLevel states, which is consistent with the style for
-representing "a state with substates." The double-border usage is
-not seen in either the Harel and Politi or Horrocks books, but can
-be seen treatments described on various websites, with some
-inconsistency. The "state with substates" condition would be
-apparent, just by looking at the encapsulation of shapes within
-shapes, so there should be some additional meaning. Here, double
-bordered states are "major" states, but the usage is arbitary --
-should BulletMoving also be considered a "major" state? Why use
-double borders at all? Shading can also be used to draw attention
-to a composite state, as they are sometimes called. (Use of this
-notation needs review).
+representing "a state with substates" seen on some websites and
+examples. The double-border usage is not seen in either the Harel
+and Politi or Horrocks books. The "state with substates" arrangement
+should be apparent, just by looking at the encapsulation of shapes
+within shapes, so there should be some additional meaning. For this
+project, double bordered states are "major" states, but the usage is
+arbitary -- should BulletMoving also be considered a "major" state?
+Why use double borders at all? Shading can also be used to draw
+attention to a composite state, as they are sometimes called.
 
 Dashed Borders: Transient States
 --------------------------------
@@ -172,20 +177,22 @@ Dashed Borders: Transient States
 Transient states are marked on the statechart drawing by dashed
 borders. Neither the Harel and Politi nor the Horrocks books use
 the dashed border notation, but it is used in other statechart
-treatments, and is visually meaningful. The term transient, as
+treatments, and is visually appropriate. The term transient, as
 used by Horrocks, is preferred over the term transitional,
 because of connotation and to lessen confusion with the general
-use of "state transition" in discussion. Transient states can
-fire to the next state for a variety of reasons and means of
-descision:
+use of "state transition" in discussion.
 
-  -- immediate transition (Perhaps the state is a substate of an
-     "or-state" in the sense of Harel; See substates of the
-     Collision state.)
+Transient states can fire to the next state for a variety of
+reasons and means of decision:
+
+  -- immediate transition (Can be an isolated "stand alone" state
+     (See ChangingTrajectory or ShowingLevelAccomplished states),
+     or perhaps the state is a substate of an "or-state" in the
+     sense of Harel: See substates of the Collision state.)
 
   -- transition after a bit of conditional logic (Effectively,
      this is what the structure of the CollisionWithObject state
-     and its two substates does. Contrast with what could be done
+     and its two substates do. Contrast this with what could be done
      in a single state with an if statement in its enterState.
      Having discrete CollisionWithEdge and CollisionWithObstacle
      states, however, offers a clearer picture, pardon the pun.)
@@ -193,8 +200,8 @@ descision:
   -- transition after a call to a database (Horrocks uses this as
      an example. Consider that at the time of the event causing the
      database call, the next state transition can perhaps not be
-     known until information has been gathered by the call, e.g.
-     the status of a record.)
+     known. Only after information has been gathered by the call, e.g.
+     for the status of a record, can the next state be decided.)
 
   -- transition after a substantial processing sequence (This item
      is added here to emphasize that transient states, anti the
