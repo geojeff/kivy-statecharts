@@ -37,6 +37,8 @@ along with Deflectouch.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
+import sys, os; sys.path += [os.path.join(os.path.dirname(__file__), 'lib')]
+
 import kivy
 kivy.require('1.0.9')
 
@@ -310,7 +312,7 @@ class Deflector(Scatter):
     
     def on_touch_down(self, touch):
         self.statechart.sendEvent('deflector_down')
-        #return super(Deflector, self).on_touch_down(touch)
+        return super(Deflector, self).on_touch_down(touch)
     
     def on_touch_up(self, touch):
         # if the deflector want's to be removed (touches too close to each other):
@@ -324,7 +326,7 @@ class Deflector(Scatter):
         if self.parent != None and self.collide_grab_point(*touch.pos):
             self.statechart.sendEvent('deflector_up')
         
-        #return super(Deflector, self).on_touch_up(touch)
+        return super(Deflector, self).on_touch_up(touch)
 
 
 ############################
@@ -1275,6 +1277,7 @@ class GameScreen(Widget):
 
     def __init__(self, **kwargs):
         super(GameScreen, self).__init__(**kwargs)
+
 
 Factory.register("Tank", Tank)
 Factory.register("Background", Background)
