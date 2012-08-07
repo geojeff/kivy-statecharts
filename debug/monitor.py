@@ -6,7 +6,7 @@
 
 from kivy.event import EventDispatcher
 from kivy.properties import ListProperty, NumericProperty, ObjectProperty
-from kivy_statechart.debug.sequence_matcher import StatechartSequenceMatcher
+from kivy_statecharts.debug.sequence_matcher import StatechartSequenceMatcher
 
 class StatechartMonitor(EventDispatcher):
     statechart = ObjectProperty(None)

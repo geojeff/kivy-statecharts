@@ -9,9 +9,9 @@ counter = 0
 
 from kivy.app import App
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty
-from kivy_statechart.system.state import State
-from kivy_statechart.system.statechart import StatechartManager
-from kivy_statechart.private.state_path_matcher import StatePathMatcher
+from kivy_statecharts.system.state import State
+from kivy_statecharts.system.statechart import StatechartManager
+from kivy_statecharts.private.state_path_matcher import StatePathMatcher
 
 import os, inspect
 

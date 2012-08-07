@@ -5,12 +5,12 @@
 # ================================================================================
 
 from kivy.event import EventDispatcher
-from kivy_statechart.debug.monitor import StatechartMonitor
-from kivy_statechart.system.async import Async
-from kivy_statechart.system.state import State
-from kivy_statechart.system.history_state import HistoryState
-from kivy_statechart.system.empty_state import EmptyState
-from kivy_statechart.mixins.statechart_delegate import StatechartDelegate
+from kivy_statecharts.debug.monitor import StatechartMonitor
+from kivy_statecharts.system.async import Async
+from kivy_statecharts.system.state import State
+from kivy_statecharts.system.history_state import HistoryState
+from kivy_statecharts.system.empty_state import EmptyState
+from kivy_statecharts.mixins.statechart_delegate import StatechartDelegate
 from kivy.properties import BooleanProperty, ListProperty, NumericProperty, ObjectProperty, StringProperty
 from kivy.logger import Logger
 

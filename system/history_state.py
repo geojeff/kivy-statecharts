@@ -5,7 +5,7 @@
 # ================================================================================
 
 from kivy.properties import BooleanProperty, ObjectProperty, StringProperty
-from kivy_statechart.system.state import State
+from kivy_statecharts.system.state import State
 
 """
   @class

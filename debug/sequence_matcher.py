@@ -4,7 +4,7 @@
 # Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
 # ================================================================================
 
-from kivy_statechart.system.state import State
+from kivy_statecharts.system.state import State
 from kivy.properties import BooleanProperty
 
 MISMATCH = {}

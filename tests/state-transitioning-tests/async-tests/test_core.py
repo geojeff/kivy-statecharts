@@ -6,7 +6,7 @@ Statechart tests, transitioning, async, core
 import unittest
 
 from kivy.properties import ObjectProperty, BooleanProperty
-from kivy_statechart.system.async import Async
+from kivy_statecharts.system.async import Async
 
 import os, inspect
 

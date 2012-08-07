@@ -4,8 +4,8 @@
 # ================================================================================
 
 from kivy.event import EventDispatcher
-from kivy_statechart.private.state_path_matcher import StatePathMatcher
-from kivy_statechart.system.async import AsyncMixin
+from kivy_statecharts.private.state_path_matcher import StatePathMatcher
+from kivy_statecharts.system.async import AsyncMixin
 from kivy.properties import BooleanProperty, ListProperty, ObjectProperty, StringProperty
 from collections import deque
 
@@ -342,7 +342,7 @@ class State(EventDispatcher):
     
         if hasattr(self, 'InitialSubstate'):
             initialSubstateClass = getattr(self, 'InitialSubstate')
-            from kivy_statechart.system.history_state import HistoryState
+            from kivy_statecharts.system.history_state import HistoryState
             if initialSubstateClass is not None:
                 if issubclass(initialSubstateClass, HistoryState):
                     historyState = self.createSubstate(initialSubstateClass)
@@ -514,7 +514,7 @@ class State(EventDispatcher):
 
     """ @private """
     def _addEmptyInitialSubstateIfNeeded(self):
-        from kivy_statechart.system.empty_state import EmptyState
+        from kivy_statecharts.system.empty_state import EmptyState
 
         if self.initialSubstateKey or self.substatesAreConcurrent:
             return None
