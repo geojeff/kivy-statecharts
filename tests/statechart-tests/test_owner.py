@@ -245,7 +245,7 @@ class StatechartOwnerTestCase(unittest.TestCase):
         self.assertEqual(state_F.owner, owner_3)
   
         # [PORT] The javascript version had a dynamic system of observing the property with the
-        #        name given by the value of statechartOwnerKey. However, in kivy-statechart, as of now,
+        #        name given by the value of statechartOwnerKey. However, in kivy-statecharts, as of now,
         #        you can't just change fooOwner (it isn't being observed), you have to reset the
         #        statechartOwnerKey to trigger an update.
         #

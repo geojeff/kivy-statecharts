@@ -1,4 +1,4 @@
-kivy-statechart is a port of the Ki/SproutCore statechart framework to Python for use in Kivy projects.
+kivy-statecharts is a port of the Ki/SproutCore statechart framework to Python for use in Kivy projects.
 
 Original repos: [Ki](https://github.com/frozenCanuck/ki) and [SC.Statechart](https://github.com/sproutcore/sproutcore/tree/master/frameworks/statechart)
 
@@ -7,9 +7,9 @@ SC.Statechart was used as the basis for this port to Python and Kivy.
 Installation
 ------------
 
-kivy-statechart is a standalone Python module that you may wish to put alongside your local clone of Kivy if you are doing development. For development, consider the following setup:
+kivy-statecharts is a standalone Python module that you may wish to put alongside your local clone of Kivy if you are doing development. For development, consider the following setup:
 
-~/Development/kivy/kivy, for a Kivy clone, and ~/Development/kivy/kivy_statechart, for a kivy-statechart clone. Both were added to PYTHONPATH in
+~/Development/kivy/kivy, for a Kivy clone, and ~/Development/kivy/kivy_statechart, for a kivy-statecharts clone. Both were added to PYTHONPATH in
 ~/.profile so imports would work during development, as:
 
     export PYTHONPATH=$PYTHONPATH:/Users/geojeff/Development/kivy/kivy:/Users/geojeff/Development/kivy 
@@ -109,4 +109,4 @@ Code in Kivy that plays the "coordinating controller" role can be found in speci
 
 The code in the DeflecTouch level_button_pressed() function could just as well be put in a "ShowingMainScreen" state, in a "show_levels" action function. Rewriting DeflecTouch with statecharts would simply entail moving such code into discrete states, and to action functions that respond to events such as "show levels." And, in the process, benefit from the formalization and especially from the clarity that drawing an app statechart would bring.
 
-Although good examples are starting to appear in the kivy-statechart framework, a version of DeflecTouch with statecharts will be highly illustrative... Stay tuned...
+Although good examples are starting to appear in the kivy-statecharts framework, a version of DeflecTouch with statecharts will be highly illustrative... Stay tuned...
