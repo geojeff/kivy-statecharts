@@ -16,7 +16,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scatter import ScatterPlane
 from kivy.config import Config 
-from listview import ListAdapter, ListView
+#from listview import ListAdapter, ListView
 
 from kivy_statechart.system.state import State
 from kivy_statechart.system.statechart import Statechart

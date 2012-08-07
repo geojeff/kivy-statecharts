@@ -81,6 +81,11 @@ from random import randint
 from kivy_statechart.system.state import State
 from kivy_statechart.system.statechart import StatechartManager
 
+# For debugging memory leaks and other investigations:
+#
+#import gc
+#import objgraph
+
 #
 #  Constants
 #
@@ -327,7 +332,7 @@ class Deflector(Scatter):
 class AppStatechart(StatechartManager):
     def __init__(self, app, **kw):
         self.app = app
-        self.trace = True
+        #self.trace = True
         self.rootStateClass = self.RootState
         super(AppStatechart, self).__init__(**kw)
 
@@ -382,6 +387,7 @@ class AppStatechart(StatechartManager):
                 self.statechart.app.sound['deflection'] = SoundLoader.load('sound/deflection.ogg')
 
                 sound_volume = self.statechart.app.config.getint('General', 'Sound') / 100.0
+                print 'sound_volume is', sound_volume
                 for item in self.statechart.app.sound:
                     self.statechart.app.sound[item].volume = sound_volume
 
@@ -725,6 +731,10 @@ class AppStatechart(StatechartManager):
 
                 def enterState(self, context=None):
                     print 'ShowingLevel/enterState'
+                    #print gc.get_count()
+                    #print gc.get_objects()
+                    #print gc.get_referrers(gc.get_objects())
+                    #objgraph.show_backrefs([self], filename='showing-level-backrefs.png')
                     BRICK_WIDTH = self.statechart.app.game_screen.height / 17.73
                     LEVEL_OFFSET = [self.statechart.app.game_screen.center_x - (LEVEL_WIDTH / 2) * BRICK_WIDTH, self.statechart.app.game_screen.height / 12.5]
 
