@@ -4,9 +4,9 @@ from kivy.factory import Factory
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
-from kivy_statechart.system.state import State
-from kivy_statechart.system.statechart import Statechart
-from kivy_statechart.system.statechart import StatechartManager
+from kivy_statecharts.system.state import State
+from kivy_statecharts.system.statechart import Statechart
+from kivy_statecharts.system.statechart import StatechartManager
 
 import os, inspect
 

@@ -10,9 +10,9 @@ from kivy.uix.floatlayout import FloatLayout
 
 from random import randint, random
 
-from kivy_statechart.system.state import State
-from kivy_statechart.system.statechart import Statechart
-from kivy_statechart.system.statechart import StatechartManager
+from kivy_statecharts.system.state import State
+from kivy_statecharts.system.statechart import Statechart
+from kivy_statecharts.system.statechart import StatechartManager
 
 class Paddle(Widget):
     parent = ObjectProperty(None)

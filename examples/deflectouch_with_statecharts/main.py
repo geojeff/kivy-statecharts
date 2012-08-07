@@ -10,7 +10,7 @@ See Cyril Stoller's Deflectouch repo for the original code:
 
     https://github.com/stocyr/Deflectouch
 
-As of July 18, 2012, this port is a work-in-progress ...
+As of August 7, 2012, this port is a work-in-progress ...
 -----------------------------------------------------------------
 
 Deflectouch
@@ -36,8 +36,9 @@ You should have received a copy of the GNU General Public License
 along with Deflectouch.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
-import sys, os; sys.path += [os.path.join(os.path.dirname(__file__), 'lib')]
+# For including for ios, etc.
+#
+#import sys, os; sys.path += [os.path.join(os.path.dirname(__file__), 'lib')]
 
 import kivy
 kivy.require('1.0.9')
@@ -78,8 +79,8 @@ from math import atan2
 
 from random import randint
 
-from kivy_statechart.system.state import State
-from kivy_statechart.system.statechart import StatechartManager
+from kivy_statecharts.system.state import State
+from kivy_statecharts.system.statechart import StatechartManager
 
 # For debugging memory leaks and other investigations:
 #

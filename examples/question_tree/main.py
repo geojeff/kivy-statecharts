@@ -18,9 +18,9 @@ from kivy.uix.scatter import ScatterPlane
 from kivy.config import Config 
 #from listview import ListAdapter, ListView
 
-from kivy_statechart.system.state import State
-from kivy_statechart.system.statechart import Statechart
-from kivy_statechart.system.statechart import StatechartManager
+from kivy_statecharts.system.state import State
+from kivy_statecharts.system.statechart import Statechart
+from kivy_statecharts.system.statechart import StatechartManager
 
 # TreesApp shows several trees in tab panels.
 
