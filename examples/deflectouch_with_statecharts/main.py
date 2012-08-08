@@ -117,6 +117,7 @@ class Background(Image):
                 # pass the touch to the deflector scatter
                 return super(Background, self).on_touch_down(touch)
 
+        print 'background clicked'
         self.parent.app.statechart.sendEvent('background_touched', touch)
 
         # [statechart port] There is no return True here anymore. Does it matter?
@@ -333,7 +334,7 @@ class Deflector(Scatter):
 class AppStatechart(StatechartManager):
     def __init__(self, app, **kw):
         self.app = app
-        #self.trace = True
+        self.trace = True
         self.rootStateClass = self.RootState
         super(AppStatechart, self).__init__(**kw)
 
@@ -425,23 +426,6 @@ class AppStatechart(StatechartManager):
             def sound_replay(self, instance):
                 if self.statechart.app.music.status != 'play':
                     self.statechart.app.music.play()
-
-            def show_levels(self, *args):
-                self.statechart.app.sound['switch'].play()
-                self.gotoState('ShowingLevelsPopup')
-
-            def show_settings(self, *args):
-                self.statechart.app.sound['switch'].play()
-                self.gotoState('ShowingSettingsPopup')
-
-            def show_help_first_time(self, *args):
-                self.gotoState('ShowingWelcomePopup')
-
-            def show_help(self, *args):
-                self.gotoState('ShowingHelpPopup')
-
-            def stop(self, *args):
-                self.statechart.app.stop()
 
             # ShowingLevelsPopup
             #
@@ -662,55 +646,6 @@ class AppStatechart(StatechartManager):
                 def exitState(self, context):
                     print 'ShowingLevelAccomplished/exitState'
 
-            @State.eventHandler(['background_touched']) 
-            def background_touch_handler(self, event, touch, context):
-                ud = touch.ud
-
-                # if i didn't wanted to move / scale a deflector and but rather create a new one:
-                # search for other 'lonely' touches
-
-                for search_touch in EventLoop.touches[:]:
-                    if 'lonely' in search_touch.ud:
-                        del search_touch.ud['lonely']
-                        # so here we have a second touch: try to create a deflector:
-                        if self.statechart.app.new_deflectors_allowed is True:
-                            length = Vector(search_touch.pos).distance(touch.pos)
-                            # create only a new one if he's not too big and not too small
-                            if MIN_DEFLECTOR_LENGTH <= length <= self.statechart.app.stockbar.width:
-                                self.statechart.app.sound['deflector_new'].play()
-                                deflector = Deflector(statechart=self.statechart,
-                                                      touch1=search_touch,
-                                                      touch2=touch,
-                                                      length=length)
-                                self.statechart.app.deflector_list.append(deflector)
-                                self.statechart.app.game_screen.add_widget(deflector)
-                
-                                self.new_deflector(length)
-                            else:
-                                self.statechart.app.sound['no_deflector'].play()
-                        else:
-                            self.statechart.app.sound['no_deflector'].play()
-
-                        return
-
-                # if no second touch was found: tag the current one as a 'lonely' touch
-                ud['lonely'] = True
-
-            @State.eventHandler(['delete_deflector']) 
-            def delete_deflector_handler(self, event, deflector, context):
-                self.statechart.app.sound['deflector_delete'].play()
-                self.deflector_deleted(deflector.length)
-
-                self.statechart.app.game_screen.remove_widget(deflector)
-                self.statechart.app.deflector_list.remove(deflector)
-
-            def new_deflector(self, length):
-                # is called when a new deflector is created.
-                self.statechart.app.stockbar.width -= length
-
-            def deflector_deleted(self, length):
-                self.statechart.app.stockbar.width += length
-
             # ResettingLevel
             #
             class ResettingLevel(State):
@@ -727,7 +662,7 @@ class AppStatechart(StatechartManager):
             #
             class ShowingLevel(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'WaitingForFire'
+                    kwargs['initialSubstateKey'] = 'WaitingForTouches'
                     super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel, self).__init__(**kwargs)
 
                 def enterState(self, context=None):
@@ -796,8 +731,9 @@ class AppStatechart(StatechartManager):
                                               size = (BRICK_WIDTH, BRICK_WIDTH),
                                               allow_stretch = True)
                                 self.statechart.app.obstacle_list.append(image)
+                                # These two lines were commented out in the original:
                                 # the actual widget adding is done in build_level()
-                                self.statechart.app.game_screen.background.add_widget(image)
+                                #self.statechart.app.game_screen.background.add_widget(image)
 
                             elif color == [0, 0, 1]:
                                 # create a goal brick on blue pixels
@@ -807,16 +743,17 @@ class AppStatechart(StatechartManager):
                                               size = (BRICK_WIDTH, BRICK_WIDTH),
                                               allow_stretch = True)
                                 self.statechart.app.goal_list.append(image)
+                                # These two lines were commented out in the original:
                                 # the actual widget adding is done in build_level()
-                                self.statechart.app.game_screen.background.add_widget(image)
+                                #self.statechart.app.game_screen.background.add_widget(image)
 
                     # but in the lowermost row there is also stored the value for the maximum stock
                     for x in range(LEVEL_WIDTH):
                         color = level_image.read_pixel(x, 0)
+                        color = [int(c) for c in color]
                         if len(color) > 3:
                             # if there was transparency stored in the image, cut it.
                             color.pop()
-
                         if color == [1, 0, 0]:
                             self.statechart.app.max_stock += 1
 
@@ -861,25 +798,17 @@ class AppStatechart(StatechartManager):
                     if self.statechart.app.stockbar is not None:
                         self.statechart.app.recalculate_stock()
 
-                def deflector_down(self, *args):
-                    if self.statechart.app.sound['deflector_down'].status != 'play':
-                        self.statechart.app.sound['deflector_down'].play()
-
-                def deflector_up(self, *args):
-                    if self.statechart.app.sound['deflector_up'].status != 'play':
-                        self.statechart.app.sound['deflector_up'].play()
-
-                # WaitingForFire
+                # WaitingForTouches
                 #
-                class WaitingForFire(State):
+                class WaitingForTouches(State):
                     def __init__(self, **kwargs):
-                        super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.WaitingForFire, self).__init__(**kwargs)
+                        super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.WaitingForTouches, self).__init__(**kwargs)
 
                     def enterState(self, context=None):
-                        print 'WaitingForFire/enterState'
+                        print 'WaitingForTouches/enterState'
 
                     def exitState(self, context=None):
-                        print 'WaitingForFire/exitState'
+                        print 'WaitingForTouches/exitState'
 
                     def fire(self, *args):
                         # If there is already a bullet existing (which means 
@@ -887,6 +816,88 @@ class AppStatechart(StatechartManager):
                         if self.statechart.app.bullet is None:
                             self.gotoState('BulletMoving')
   
+                    def deflector_down(self, *args):
+                        print 'deflector_down'
+                        if self.statechart.app.sound['deflector_down'].status != 'play':
+                            self.statechart.app.sound['deflector_down'].play()
+
+                    def deflector_up(self, *args):
+                        print 'deflector_up'
+                        if self.statechart.app.sound['deflector_up'].status != 'play':
+                            self.statechart.app.sound['deflector_up'].play()
+
+                    def show_levels(self, *args):
+                        self.statechart.app.sound['switch'].play()
+                        self.gotoState('ShowingLevelsPopup')
+
+                    def show_settings(self, *args):
+                        self.statechart.app.sound['switch'].play()
+                        self.gotoState('ShowingSettingsPopup')
+
+                    def show_help_first_time(self, *args):
+                        self.gotoState('ShowingWelcomePopup')
+
+                    def show_help(self, *args):
+                        self.gotoState('ShowingHelpPopup')
+
+                    def stop(self, *args):
+                        self.statechart.app.stop()
+
+                    @State.eventHandler(['background_touched']) 
+                    def background_touch_handler(self, event, touch, context):
+                        ud = touch.ud
+
+                        # if i didn't wanted to move / scale a deflector and but rather create a new one:
+                        # search for other 'lonely' touches
+
+                        for search_touch in EventLoop.touches[:]:
+                            if 'lonely' in search_touch.ud:
+                                print 'lonely'
+                                del search_touch.ud['lonely']
+                                # so here we have a second touch: try to create a deflector:
+                                if self.statechart.app.new_deflectors_allowed is True:
+                                    length = Vector(search_touch.pos).distance(touch.pos)
+                                    print 'MIN_DEFLECTOR_LENGTH', MIN_DEFLECTOR_LENGTH
+                                    print 'length =', length
+                                    print self.statechart.app.stockbar.width
+                                    # create only a new one if he's not too big and not too small
+                                    if MIN_DEFLECTOR_LENGTH <= length <= self.statechart.app.stockbar.width:
+                                        self.statechart.app.sound['deflector_new'].play()
+                                        deflector = Deflector(statechart=self.statechart,
+                                                              touch1=search_touch,
+                                                              touch2=touch,
+                                                              length=length)
+                                        print 'have new deflector', deflector
+                                        self.statechart.app.deflector_list.append(deflector)
+                                        self.statechart.app.game_screen.add_widget(deflector)
+                        
+                                        self.new_deflector(length)
+                                    else:
+                                        self.statechart.app.sound['no_deflector'].play()
+                                else:
+                                    self.statechart.app.sound['no_deflector'].play()
+
+                                return
+
+                        # if no second touch was found: tag the current one as a 'lonely' touch
+                        ud['lonely'] = True
+
+                    @State.eventHandler(['delete_deflector']) 
+                    def delete_deflector_handler(self, event, deflector, context):
+                        self.statechart.app.sound['deflector_delete'].play()
+                        self.deflector_deleted(deflector.length)
+
+                        self.statechart.app.game_screen.remove_widget(deflector)
+                        self.statechart.app.deflector_list.remove(deflector)
+
+                    def new_deflector(self, length):
+                        # is called when a new deflector is created.
+                        print 'new_deflector'
+                        self.statechart.app.stockbar.width -= length
+
+                    def deflector_deleted(self, length):
+                        self.statechart.app.stockbar.width += length
+
                 # BulletMoving
                 #
                 class BulletMoving(State):
@@ -1199,7 +1210,7 @@ class AppStatechart(StatechartManager):
                                     self.gotoState('ResettingLevel')
 
                                 def keep_playing_level(self, *args):
-                                    self.gotoState('WaitingForFire')
+                                    self.gotoState('WaitingForTouches')
 
                             # CollisionWithEdge (transient state)
                             #
