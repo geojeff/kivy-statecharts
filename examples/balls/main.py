@@ -214,9 +214,12 @@ class BallsApp(App):
     def build(self):
         print 'BUILDING'
         self.mainView = BallsView(app=self)
+        return self.mainView
+
+    def on_start(self):
         self.statechart = AppStatechart(app=self)
         self.statechart.initStatechart()
-        return self.mainView
+
 
 if __name__ in ('__android__', '__main__'):
     app = BallsApp()
