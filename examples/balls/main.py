@@ -1,14 +1,16 @@
-import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, StringProperty
+from kivy.properties import (
+    NumericProperty,
+    ReferenceListProperty,
+    ObjectProperty,
+    StringProperty,
+)
 from kivy.vector import Vector
 from kivy.factory import Factory
 from kivy.clock import Clock
 from kivy.core.window import Window
-from random import randint, random
 from kivy_statecharts.system.state import State
-from kivy_statecharts.system.statechart import Statechart
 from kivy_statecharts.system.statechart import StatechartManager
 
 
@@ -16,7 +18,7 @@ class Ball(Widget):
     velocity_x = NumericProperty(0)
     velocity_y = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
-    
+
     def move(self):
         self.pos = Vector(*self.velocity) + self.pos
 
@@ -31,9 +33,15 @@ class BallsView(Widget):
 
     def __init__(self, app):
         self.app = app
-        super(BallsView, self).__init__() 
+        super(BallsView, self).__init__()
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
+
+        self.balls = (self.ball_1,
+                      self.ball_2,
+                      self.ball_3,
+                      self.ball_4,
+                      self.ball_5)
 
     def _keyboard_closed(self):
         print 'My keyboard has been closed!'
@@ -56,25 +64,25 @@ class BallsView(Widget):
         # the system.
         return True
 
-    def serve_balls(self, vel=(4,0)):
-        for ball in (self.ball_1, self.ball_2, self.ball_3, self.ball_4, self.ball_5):
+    def serve_balls(self, vel=(4, 0)):
+        for ball in self.balls:
             ball.center = self.center
             ball.velocity = vel
-        
+
     def update(self, *args):
         # Move balls by their velocities.
-        for ball in (self.ball_1, self.ball_2, self.ball_3, self.ball_4, self.ball_5):
+        for ball in self.balls:
             ball.move()
-        
+
         # Bounce balls off sides.
-        for ball in (self.ball_1, self.ball_2, self.ball_3, self.ball_4, self.ball_5):
+        for ball in self.balls:
             if (ball.y < self.y) or (ball.top > self.top):
                 ball.velocity_y *= -1
             if (ball.x < self.x) or (ball.x > self.right):
                 ball.velocity_x *= -1
 
 
-class MovingBallState(State):
+class MovingBall(State):
     ballKey = StringProperty(None)
     ball = ObjectProperty(None)
     velocity_x = NumericProperty(1)
@@ -84,7 +92,7 @@ class MovingBallState(State):
         self.ball = getattr(self.statechart.app.mainView, self.ballKey)
         self.ball.velocity_x += self.velocity_x
         self.ball.velocity_y += self.velocity_y
-            
+
     def exitState(self, context=None):
         pass
 
@@ -115,18 +123,16 @@ class AppStatechart(StatechartManager):
     # RootState of statechart
     #
     class RootState(State):
-        velocity_x = NumericProperty(1)
-        velocity_y = NumericProperty(1)
-
         def __init__(self, **kwargs):
             kwargs['initialSubstateKey'] = 'ShowingBalls'
             super(AppStatechart.RootState, self).__init__(**kwargs)
-        
+
         def enterState(self, context=None):
             print 'RootState/enterState'
             self.statechart.app.mainView.serve_balls()
-            Clock.schedule_interval(self.statechart.app.mainView.update, 1.0/60.0)
-                        
+            Clock.schedule_interval(self.statechart.app.mainView.update,
+                                    1.0 / 60.0)
+
         def exitState(self, context=None):
             print 'RootState/exitState'
 
@@ -136,52 +142,70 @@ class AppStatechart(StatechartManager):
         class ShowingBalls(State):
             def __init__(self, **kwargs):
                 kwargs['substatesAreConcurrent'] = True
-                super(AppStatechart.RootState.ShowingBalls, self).__init__(**kwargs)
-        
+                super(AppStatechart.
+                      RootState.
+                      ShowingBalls, self).__init__(**kwargs)
+
             def enterState(self, context=None):
                 print 'ShowingBalls/enterState'
-                        
+
             def exitState(self, context=None):
                 print 'ShowingBalls/exitState'
 
-            class Moving_Ball_1(MovingBallState):
+            class Moving_Ball_1(MovingBall):
                 def __init__(self, **kwargs):
                     self.ballKey = 'ball_1'
                     self.velocity_x = 1
                     self.velocity_y = 1
-                    super(AppStatechart.RootState.ShowingBalls.Moving_Ball_1, self).__init__(**kwargs)
+                    super(AppStatechart.
+                          RootState.
+                          ShowingBalls.
+                          Moving_Ball_1, self).__init__(**kwargs)
 
-            class Moving_Ball_2(MovingBallState):
+            class Moving_Ball_2(MovingBall):
                 def __init__(self, **kwargs):
                     self.ballKey = 'ball_2'
                     self.velocity_x = 2
                     self.velocity_y = 2
-                    super(AppStatechart.RootState.ShowingBalls.Moving_Ball_2, self).__init__(**kwargs)
+                    super(AppStatechart.
+                          RootState.
+                          ShowingBalls.
+                          Moving_Ball_2, self).__init__(**kwargs)
 
-            class Moving_Ball_3(MovingBallState):
+            class Moving_Ball_3(MovingBall):
                 def __init__(self, **kwargs):
                     self.ballKey = 'ball_3'
                     self.velocity_x = 3
                     self.velocity_y = 3
-                    super(AppStatechart.RootState.ShowingBalls.Moving_Ball_3, self).__init__(**kwargs)
+                    super(AppStatechart.
+                          RootState.
+                          ShowingBalls.
+                          Moving_Ball_3, self).__init__(**kwargs)
 
-            class Moving_Ball_4(MovingBallState):
+            class Moving_Ball_4(MovingBall):
                 def __init__(self, **kwargs):
                     self.ballKey = 'ball_4'
                     self.velocity_x = 4
                     self.velocity_y = 4
-                    super(AppStatechart.RootState.ShowingBalls.Moving_Ball_4, self).__init__(**kwargs)
+                    super(AppStatechart.
+                          RootState.
+                          ShowingBalls.
+                          Moving_Ball_4, self).__init__(**kwargs)
 
-            class Moving_Ball_5(MovingBallState):
+            class Moving_Ball_5(MovingBall):
                 def __init__(self, **kwargs):
                     self.ballKey = 'ball_5'
                     self.velocity_x = 5
                     self.velocity_y = 5
-                    super(AppStatechart.RootState.ShowingBalls.Moving_Ball_5, self).__init__(**kwargs)
+                    super(AppStatechart.
+                          RootState.
+                          ShowingBalls.
+                          Moving_Ball_5, self).__init__(**kwargs)
 
 
 Factory.register("Ball", Ball)
 Factory.register("BallsView", BallsView)
+
 
 class BallsApp(App):
     statechart = ObjectProperty(None)
@@ -197,4 +221,3 @@ class BallsApp(App):
 if __name__ in ('__android__', '__main__'):
     app = BallsApp()
     app.run()
-
