@@ -23,26 +23,25 @@ class HelloWorldView(Widget):
         self._keyboard = None
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
-        letters = 'abcdefghijklmnopqrstuvwxyx'
-        print self._keyboard.keycodes.keys()
-        print keycode[1]
-        for letter in letters:
-            if letter not in self._keyboard.keycodes.keys():
-                print 'MISS', letter
-        if keycode[1] == 'h':
+        if text == 'h':
             self.app.statechart.sendEvent('h')
-        elif keycode[1] == 'e':
+        elif text == 'e':
             self.app.statechart.sendEvent('e')
-        elif keycode[1] == 'l':
+        elif text == 'l':
             self.app.statechart.sendEvent('l')
-        elif keycode[1] == 'o':
+        elif text == 'o':
             self.app.statechart.sendEvent('o')
-        elif keycode[1] == 'w':
+        elif text == 'w':
             self.app.statechart.sendEvent('w')
-        elif keycode[1] == 'r':
+        elif text == 'r':
             self.app.statechart.sendEvent('r')
-        elif keycode[1] == 'd':
+        elif text == 'd':
             self.app.statechart.sendEvent('d')
+
+        # Keycode is composed of an integer + a string
+        # If we hit escape, release the keyboard
+        if keycode[1] == 'escape':
+            keyboard.release()
 
         return True
 
