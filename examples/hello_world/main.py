@@ -23,23 +23,9 @@ class HelloWorldView(Widget):
         self._keyboard = None
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
-        if text == 'h':
-            self.app.statechart.sendEvent('h')
-        elif text == 'e':
-            self.app.statechart.sendEvent('e')
-        elif text == 'l':
-            self.app.statechart.sendEvent('l')
-        elif text == 'o':
-            self.app.statechart.sendEvent('o')
-        elif text == 'w':
-            self.app.statechart.sendEvent('w')
-        elif text == 'r':
-            self.app.statechart.sendEvent('r')
-        elif text == 'd':
-            self.app.statechart.sendEvent('d')
+        if text in ['h', 'e', 'l', 'o', 'w', 'r', 'd']:
+            self.app.statechart.sendEvent(text)
 
-        # Keycode is composed of an integer + a string
-        # If we hit escape, release the keyboard
         if keycode[1] == 'escape':
             keyboard.release()
 
@@ -49,13 +35,14 @@ class HelloWorldView(Widget):
 class LetterButton(Button):
     statechart = ObjectProperty(None)
 
-    def __init__(self, letter, statechart, **kwargs):
-        self.letter = letter
+    def __init__(self, statechart, letter, **kwargs):
         self.statechart = statechart
+        self.letter = letter
         super(LetterButton, self).__init__(**kwargs)
         self.bind(on_press=self.letter_clicked)
 
     def letter_clicked(self, *args):
+        print 'letter clicked', self.letter
         self.statechart.sendEvent(self.letter)
 
 
@@ -84,14 +71,15 @@ class AppStatechart(StatechartManager):
             #
             def add_label(self, letter):
                 width, height = self.statechart.app.hello_world_view.size
-                margin = 40
+                button_size = (20, 20)
 
-                x = random.randint(0, width - margin)
-                y = random.randint(margin, height )
+                x = random.randint(0, width - button_size[0])
+                y = random.randint(0, height - button_size[0])
 
-                self.root.add_widget(Button(pos=(x, y),
-                                            size=(20, 20),
-                                            text=letter))
+                self.root.add_widget(LetterButton(self.statechart, letter,
+                                                  pos=(x, y),
+                                                  size=button_size,
+                                                  text=letter))
 
             # Action methods:
             #
