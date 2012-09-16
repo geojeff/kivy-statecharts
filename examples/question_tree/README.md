@@ -1,3 +1,0 @@
-Oops -- this example needs listview, which is under development on a branch on geojeff.
-
-Stay tuned...
