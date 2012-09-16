@@ -48,13 +48,6 @@ kivy\_statechart directory, run
 
 As of April 2012, most tests were ported.
 
-Example Apps
-------------
-
-The examples directory contains several of the Kivy example apps adapted
-to use statecharts. New examples illustrate specific statechart
-functionality.
-
 In a Nutshell
 =============
 
@@ -75,109 +68,16 @@ app develops.
 For testing, a human-readable table of events and actions can be made
 from the statechart, and test cases made to cover each item.
 
-Background
-==========
+Example Apps
+============
 
-If you are new to statecharts, or want to learn about them, you may
-wish to explore the origins of the concept. We can start with a look at
-the primary source of inspiration for Michael Cohen's Ki project, the
-paper by David Harel, *Statecharts: A Visual Formalism for Complex
-Systems*, Sci. Comput. Programming 8 (1987), 231-274
-`pdf <http://www.wisdom.weizmann.ac.il/~harel/SCANNED.PAPERS/Statecharts.pdf>`_.
-David Harel is a computer scientist at the Weizmann Institute of
-Science, Rehovot, Israel, who has published widely on this and related
-topics in programming. In the list of `David Harel's
-publications <http://www.wisdom.weizmann.ac.il/~harel/papers.html>`_,
-the 1987 paper is #48 on the list, having come from a preliminary
-version published in 1984. If you scan the list for more recent
-offerings, you see some that pertain to statecharts in the pure
-programming sense of style, efficiency, software maintenance, etc.,
-while others highlight the use of statecharts in specific subject areas,
-such as biological modeling. There is a larger literature, and many
-software projects that relate, but this list of Harel's publications
-serves as a good representation and starting point for a survey.
+The examples directory contains several brand new apps and some of the Kivy
+example apps adapted to use statecharts. These examples are presented in
+order of increasing complexity, before turning to theoretical background for
+statecharts.
 
-For an interesting personal account by Harel on the germination of the
-idea of statecharts, see: `Statecharts in the Making: A Personal
-Account <http://www.wisdom.weizmann.ac.il/%7Eharel/papers/Statecharts.History.pdf>`_.
-
-A Wikipedia article on `state
-diagrams <http://en.wikipedia.org/wiki/State_diagram>`_, is good to read
-for the nature of the "Harel statechart" as a formalization of certain
-aspects of modeling the behavior of a system with a state diagram. From
-the article, "With Harel statecharts it is possible to model multiple
-cross-functional state diagrams within the statechart. Each of these
-cross-functional state machines can transition internally without
-affecting the other state machines in the statechart. The current state
-of each cross-functional state machine in the statechart defines the
-state of the system. The Harel statechart is equivalent to a state
-diagram but it improves the readability of the resulting diagram."
-
-Reading the 1987 paper by Harel, you see in the abstract that
-statecharts concern "the notions of hierarchy, concurrency, and
-communication." Statecharts offer formalization to modularize code in a
-hierarchy of states that exist as discrete blocks that can act
-independently or concurrently, and communicate within an event system,
-allowing easier modeling of complexity.
-
-So, statecharts help us build complex systems? Well, yes, but simple
-ones too. Besides, what software application stays simple for very long?
-Not many. Especially systems that involve many interacting parts --
-typical software programs are "reactive" systems in the parlance of the
-1987 Harel paper.
-
-Speaking of the parlance of the Harel paper, here are some terms and
-concepts as used there, paraphrasing from the text:
-
-**reactive system** -- an event-driven system that must react to
-external and internal stimuli driving behavior through sequences of
-changing conditions, relationships, events, and timing contraints.
-
-**transformational system** -- systems in which a relationship between
-input and output is treated by a transformation, a function.
-
-**state diagram** -- simple directed graph of states and transitions,
-with nodes denoting states and arrows denoting transitions, which may be
-labelled with triggering conditions and guarding conditions.
-
-**superstate, "clustering," hierarchy, depth** -- A "cluster" of states
-is related somehow, e.g., "all airborne states." States are arranged
-hierarchically, with the hierarchy containing clusters of related states
-at various "levels." The visual side of statecharts is important, and
-you might prefer to "draw it out," but you should be able to imagine how
-the hierarchy set up in code is like a machine set up to react to
-events.
-
-**orthogonal** -- independent. Contrast this with concurrent.
-
-**concurrent** -- simultaneous. Contrast this with orthogonal, or
-independent.
-
-**broadcast communication** -- event-driven, with the capability to send
-an event that can trigger action across states.
-
-From these terms, perhaps you can appreciate this, also from the Harel paper:
-
-::
-
-    statecharts = state-diagrams + depth + orthogonality + broadcast-communication
-
-(where orthogonality implies functionality for handling concurrency as
-well).
-
-To attempt a paraphrase:
-
-::
-
-    Statecharts add to basic state-diagrams the functionality to arrange
-    states in a hierarchy, specifying which states are independent of one
-    another and which ones are concurrent with each other. Action functions
-    within states respond to events delivered to the statechart. Events
-    firing to the action functions may have broadcast effect across multiple
-    related or concurrent states.
-
-Hello World
-===========
+Hello World Example App
+-----------------------
 
 The hello_world example app has a very simple statechart. With code removed,
 the statechart consists of two states, the root state, and one app-specific
@@ -196,8 +96,7 @@ defined. Here, we only have one state, ShowingHelloWorld, and it is the
 initial substate. When the statechart is instantiated, control will flow
 immediately from the root state to the ShowingHelloWorld state.
 
-Running
--------
+**Running**
 
 Change to the hello_world directory, then run python main.py, and
 you should see the app appear. Type any of the letters in "hello world" and
@@ -205,8 +104,7 @@ you will see buttons for those letters randomly added in the app window.
 Click any of the buttons, and likewise, more buttons will be added. That's
 all it does -- but, pretty fancy for a "hello world" app, eh?
 
-HelloWorldApp, main.py
-----------------------
+**HelloWorldApp, main.py**
 
 There is only one file for the app, main.py:
 
@@ -336,15 +234,11 @@ There is only one file for the app, main.py:
     if __name__ in ('__android__', '__main__'):
         HelloWorldApp().run()
 
-Details
--------
-
-Let's start with the App definition, HelloWorldApp. It has a statechart
-property and a property for the main widget, hello_world_view. The build()
-method instantiates HelloWorldView and returns it -- the widget returned
-from build() is the root widget, available as app.root. The on_start()
-method is called when the app is run. This is when we instantiate the
-statechart. 
+The definition for HelloWorldApp has a statechart property and a property for
+the main widget, hello_world_view. The build() method instantiates
+HelloWorldView and returns it -- the widget returned from build() is the root
+widget, available as app.root. The on_start() method is called when the app is
+run. This is when we instantiate the statechart. 
 
 The app starts when HelloWorldApp().run() is called in main. build()
 happens first, then on_start(), and the app and its statechart are up and
@@ -362,8 +256,7 @@ properties are set.
 The only thing declared in the root state is the inital substate,
 ShowingHelloWorld, which contains the basic functionality for the app.
 
-ShowingHelloWorld, enterState() and exitState()
------------------------------------------------
+**ShowingHelloWorld, enterState() and exitState()**
 
 If enterState() and/or exitState() are defined for a state, these will be
 called automatically at the appropriate times. In a larger app, you would
@@ -372,8 +265,7 @@ showing a dialog in the enterState, and tearing it down in the exit state,
 or any manner of things that could happen. Here, we just print a message on
 enterState() and exitState().
 
-Utility functions
------------------
+**Utility functions**
 
 A state is a normal python class. It can have properties, an __init__(),
 specialized methods, etc. Here we are calling the add_label() method a
@@ -381,8 +273,7 @@ specialized methods, etc. Here we are calling the add_label() method a
 necessary. add_label() creates a randomly located button for a given
 letter in "hello world."
 
-Action functions
-----------------
+**Action functions**
 
 There is nothing special about the type of action functions used in the
 hello_world app. The action functions here, h(), e(), l(), o(), w(), r(), and
@@ -408,8 +299,9 @@ you can use some combination of approaches, often in interation. A statechart
 diagram for hello_world would be:
 
 Before we leave the subject of action functions, there is an alternative to
-having separate action functions, when there is a related set, as we have with
-our hello_world app. We could define a single handler method, as follows:
+having separate action functions, when there is a related set of events to be
+handled, as we have with the letter events in our hello_world app. We could
+define a single handler method, as follows:
 
 ::
 
@@ -421,13 +313,195 @@ This is a case where the eventHandler function approach is a perfect fit. The
 first line is a function decorator on the State class that marks
 letter_event_handler() as a handler for all the events in the list.
 
-Balls
-=====
+**Statechart Diagram**
 
-Balls is a small Kivy app that bounces balls around the screen.  The kv file
-for the program, balls.kv, consists of the Ball class and the BallsView main
-container class. Each ball is 50x50 in size, and begins with a location at
-the center of the parent window.
+If a developer wanted, a full program using statecharts could be written in
+code straight-up, by the established process of writing software "in your
+head." However, using vector drawing programs, we can draw statechart diagrams
+that can really aid the process, especially for more complicated software. As
+this diagram shows, there are conventions we may follow in the drawing:
+
+.. figure::  ../examples/hello_world/design/statechart.png
+   :align:   center
+
+   Statechart diagram for HelloWorldApp
+
+There is a single open circle to mark the root state, and an arrow from that
+to the initial state, ShowingHelloWorld. In this app, this is the only state.
+The ShowingHelloWorld state responds to keyboard events, by creating new
+letter buttons. Once a letter button exists, a click or touch event will also
+fire a "letter event," resulting in the creation of yet another letter button.
+There is also a representation of the app exit, which is triggered by a
+control-C or by closing the app window.
+
+Balls Example App
+-----------------
+
+Balls is a small Kivy app that bounces balls around the screen.  It is like
+pong without the paddles, and with the capacity to send the balls out of
+control. The kv file for the program, balls.kv, consists of the Ball class
+and the BallsView main container class. Each ball is 50x50 in size, and begins
+with a location at the center of the parent window.
+
+The BallsView class has a serve_balls() method, to get the balls moving, and
+an update method that is called on a timer, every 1/60th of a second, to move
+the balls.
+
+The statechart has the same basic setup as HelloWorldApp, but in the
+ShowingBalls state, a new concept for states is introduced. In HelloWorldApp,
+there is only one state within the root state, however in BallsApp, there is
+a ShowingBalls state, and within that five "moving ball" states for each of
+five balls. In many apps, states that are siblings of one another are
+independent (also termed orthogonal) -- one or the other is active at a given
+time. But in some apps, a set of sibling states can all be active at the same
+time. These are called concurrent states. The ShowingBalls state contains five
+concurrent substates, for each of the moving balls. Note the use of the
+boolean property substatesAreConcurrent. If you omit this property for a state
+that contains substates, the substates will be independent of one another
+(orthogonal), but here they are concurrent:
+
+::
+
+    class AppStatechart(StatechartManager):
+        class RootState(State):
+            initialSubstateKey = 'ShowingBalls'
+            class ShowingBalls(State):
+                substatesAreConcurrent = True
+                class MovingBall_1(MovingBall):
+                class MovingBall_2(MovingBall):
+                class MovingBall_3(MovingBall):
+                class MovingBall_4(MovingBall):
+                class MovingBall_5(MovingBall):
+
+The moving ball states each subclass MovingBall, a state which is defined
+separately from the statechart -- recall that states are normal python
+classes, so you may use your imagination for design of state subclassing in
+the construction of state hierarchies. Each moving ball state controls the
+movement of a given ball, and has its own unique velocity, designated simply
+as 1, 2, 3, 4, and 5, respectively, for both velocity_x and velocity_y. Change
+these for interesting effects. The associated between ball and state is
+maintained by a ball_key key.
+
+The balls are sped up by a key press of 'u' and slowed down by a key press of
+'d'. When the 'u' key is pressed, the 'speed_up' event is sent to the
+statechart, and, because each of the moving ball states is a sublass of
+MovingBall, each has an action function named speed_up(), and so will respond
+to that event. Likewise for the 'd' key and the 'slow_down' event, and the
+slow_down() action function.
+
+.. figure::  ../examples/balls/design/statechart.png
+   :align:   center
+
+   Statechart diagram for BallsApp
+
+The combination between velocity adjustments in the enterState() method for
+each moving ball state, and the adjustments made in the speed_up() and 
+slow_down() methods, forms an algorithm for this app that gives an interesting
+effect, with balls moving in all directions, at different velocities. This was
+found by experimenting a bit. The process illustrates how the developer can
+learn to think in the realm of statecharts: what happens on entry, what
+happens for given events, what happens on exit.
+
+Background
+==========
+
+If you are new to statecharts, or want to learn about them, you may
+wish to explore the origins of the concept. We can start with a look at
+the primary source of inspiration for Michael Cohen's Ki project, the
+paper by David Harel, *Statecharts: A Visual Formalism for Complex
+Systems*, Sci. Comput. Programming 8 (1987), 231-274
+`pdf <http://www.wisdom.weizmann.ac.il/~harel/SCANNED.PAPERS/Statecharts.pdf>`_.
+David Harel is a computer scientist at the Weizmann Institute of
+Science, Rehovot, Israel, who has published widely on this and related
+topics in programming. In the list of `David Harel's
+publications <http://www.wisdom.weizmann.ac.il/~harel/papers.html>`_,
+the 1987 paper is #48 on the list, having come from a preliminary
+version published in 1984. If you scan the list for more recent
+offerings, you see some that pertain to statecharts in the pure
+programming sense of style, efficiency, software maintenance, etc.,
+while others highlight the use of statecharts in specific subject areas,
+such as biological modeling. There is a larger literature, and many
+software projects that relate, but this list of Harel's publications
+serves as a good representation and starting point for a survey.
+
+For an interesting personal account by Harel on the germination of the
+idea of statecharts, see: `Statecharts in the Making: A Personal
+Account <http://www.wisdom.weizmann.ac.il/%7Eharel/papers/Statecharts.History.pdf>`_.
+
+A Wikipedia article on `state
+diagrams <http://en.wikipedia.org/wiki/State_diagram>`_, is good to read
+for the nature of the "Harel statechart" as a formalization of certain
+aspects of modeling the behavior of a system with a state diagram. From
+the article, "With Harel statecharts it is possible to model multiple
+cross-functional state diagrams within the statechart. Each of these
+cross-functional state machines can transition internally without
+affecting the other state machines in the statechart. The current state
+of each cross-functional state machine in the statechart defines the
+state of the system. The Harel statechart is equivalent to a state
+diagram but it improves the readability of the resulting diagram."
+
+Reading the 1987 paper by Harel, you see in the abstract that
+statecharts concern "the notions of hierarchy, concurrency, and
+communication." Statecharts offer formalization to modularize code in a
+hierarchy of states that exist as discrete blocks that can act
+independently or concurrently, and communicate within an event system,
+allowing easier modeling of complexity.
+
+So, statecharts help us build complex systems? Well, yes, but simple
+ones too. Besides, what software application stays simple for very long?
+Not many. Especially systems that involve many interacting parts --
+typical software programs are "reactive" systems in the parlance of the
+1987 Harel paper.
+
+Speaking of the parlance of the Harel paper, here are some terms and
+concepts as used there, paraphrasing from the text:
+
+**reactive system** -- an event-driven system that must react to
+external and internal stimuli driving behavior through sequences of
+changing conditions, relationships, events, and timing contraints.
+
+**transformational system** -- systems in which a relationship between
+input and output is treated by a transformation, a function.
+
+**state diagram** -- simple directed graph of states and transitions,
+with nodes denoting states and arrows denoting transitions, which may be
+labelled with triggering conditions and guarding conditions.
+
+**superstate, "clustering," hierarchy, depth** -- A "cluster" of states
+is related somehow, e.g., "all airborne states." States are arranged
+hierarchically, with the hierarchy containing clusters of related states
+at various "levels." The visual side of statecharts is important, and
+you might prefer to "draw it out," but you should be able to imagine how
+the hierarchy set up in code is like a machine set up to react to
+events.
+
+**orthogonal** -- independent. Contrast this with concurrent.
+
+**concurrent** -- simultaneous. Contrast this with orthogonal, or
+independent.
+
+**broadcast communication** -- event-driven, with the capability to send
+an event that can trigger action across states.
+
+From these terms, perhaps you can appreciate this, also from the Harel paper:
+
+::
+
+    statecharts = state-diagrams + depth + orthogonality + broadcast-communication
+
+(where orthogonality implies functionality for handling concurrency as
+well).
+
+To attempt a paraphrase:
+
+::
+
+    Statecharts add to basic state-diagrams the functionality to arrange
+    states in a hierarchy, specifying which states are independent of one
+    another and which ones are concurrent with each other. Action functions
+    within states respond to events delivered to the statechart. Events
+    firing to the action functions may have broadcast effect across multiple
+    related or concurrent states.
 
 
 Statecharts and Terminology in MVA/MVC Systems

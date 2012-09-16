@@ -2,7 +2,7 @@
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
-from kivy_statechart.system.state import State
+from kivy_statecharts.system.state import State
 
 ############################
 # LoadDialog and its state

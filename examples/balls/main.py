@@ -150,7 +150,7 @@ class AppStatechart(StatechartManager):
             def exitState(self, context=None):
                 print 'ShowingBalls/exitState'
 
-            class Moving_Ball_1(MovingBall):
+            class MovingBall_1(MovingBall):
                 def __init__(self, **kwargs):
                     self.ball_key = 'ball_1'
                     self.velocity_x_factor = 1
@@ -158,9 +158,9 @@ class AppStatechart(StatechartManager):
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
-                          Moving_Ball_1, self).__init__(**kwargs)
+                          MovingBall_1, self).__init__(**kwargs)
 
-            class Moving_Ball_2(MovingBall):
+            class MovingBall_2(MovingBall):
                 def __init__(self, **kwargs):
                     self.ball_key = 'ball_2'
                     self.velocity_x_factor = 2
@@ -168,9 +168,9 @@ class AppStatechart(StatechartManager):
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
-                          Moving_Ball_2, self).__init__(**kwargs)
+                          MovingBall_2, self).__init__(**kwargs)
 
-            class Moving_Ball_3(MovingBall):
+            class MovingBall_3(MovingBall):
                 def __init__(self, **kwargs):
                     self.ball_key = 'ball_3'
                     self.velocity_x_factor = 3
@@ -178,9 +178,9 @@ class AppStatechart(StatechartManager):
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
-                          Moving_Ball_3, self).__init__(**kwargs)
+                          MovingBall_3, self).__init__(**kwargs)
 
-            class Moving_Ball_4(MovingBall):
+            class MovingBall_4(MovingBall):
                 def __init__(self, **kwargs):
                     self.ball_key = 'ball_4'
                     self.velocity_x_factor = 4
@@ -188,9 +188,9 @@ class AppStatechart(StatechartManager):
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
-                          Moving_Ball_4, self).__init__(**kwargs)
+                          MovingBall_4, self).__init__(**kwargs)
 
-            class Moving_Ball_5(MovingBall):
+            class MovingBall_5(MovingBall):
                 def __init__(self, **kwargs):
                     self.ball_key = 'ball_5'
                     self.velocity_x_factor = 5
@@ -198,7 +198,7 @@ class AppStatechart(StatechartManager):
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
-                          Moving_Ball_5, self).__init__(**kwargs)
+                          MovingBall_5, self).__init__(**kwargs)
 
 
 Factory.register("Ball", Ball)

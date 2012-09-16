@@ -77,12 +77,6 @@ kivy_statechart directory, run</p>
 </div>
 <p>As of April 2012, most tests were ported.</p>
 </div>
-<div class="section" id="example-apps">
-<h2>Example Apps<a class="headerlink" href="#example-apps" title="Permalink to this headline">¶</a></h2>
-<p>The examples directory contains several of the Kivy example apps adapted
-to use statecharts. New examples illustrate specific statechart
-functionality.</p>
-</div>
 </div>
 <div class="section" id="in-a-nutshell">
 <h1>In a Nutshell<a class="headerlink" href="#in-a-nutshell" title="Permalink to this headline">¶</a></h1>
@@ -100,90 +94,14 @@ app develops.</p>
 <p>For testing, a human-readable table of events and actions can be made
 from the statechart, and test cases made to cover each item.</p>
 </div>
-<div class="section" id="background">
-<h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
-<p>If you are new to statecharts, or want to learn about them, you may
-wish to explore the origins of the concept. We can start with a look at
-the primary source of inspiration for Michael Cohen&#8217;s Ki project, the
-paper by David Harel, <em>Statecharts: A Visual Formalism for Complex
-Systems</em>, Sci. Comput. Programming 8 (1987), 231-274
-<a class="reference external" href="http://www.wisdom.weizmann.ac.il/~harel/SCANNED.PAPERS/Statecharts.pdf">pdf</a>.
-David Harel is a computer scientist at the Weizmann Institute of
-Science, Rehovot, Israel, who has published widely on this and related
-topics in programming. In the list of <a class="reference external" href="http://www.wisdom.weizmann.ac.il/~harel/papers.html">David Harel&#8217;s
-publications</a>,
-the 1987 paper is #48 on the list, having come from a preliminary
-version published in 1984. If you scan the list for more recent
-offerings, you see some that pertain to statecharts in the pure
-programming sense of style, efficiency, software maintenance, etc.,
-while others highlight the use of statecharts in specific subject areas,
-such as biological modeling. There is a larger literature, and many
-software projects that relate, but this list of Harel&#8217;s publications
-serves as a good representation and starting point for a survey.</p>
-<p>For an interesting personal account by Harel on the germination of the
-idea of statecharts, see: <a class="reference external" href="http://www.wisdom.weizmann.ac.il/%7Eharel/papers/Statecharts.History.pdf">Statecharts in the Making: A Personal
-Account</a>.</p>
-<p>A Wikipedia article on <a class="reference external" href="http://en.wikipedia.org/wiki/State_diagram">state
-diagrams</a>, is good to read
-for the nature of the &#8220;Harel statechart&#8221; as a formalization of certain
-aspects of modeling the behavior of a system with a state diagram. From
-the article, &#8220;With Harel statecharts it is possible to model multiple
-cross-functional state diagrams within the statechart. Each of these
-cross-functional state machines can transition internally without
-affecting the other state machines in the statechart. The current state
-of each cross-functional state machine in the statechart defines the
-state of the system. The Harel statechart is equivalent to a state
-diagram but it improves the readability of the resulting diagram.&#8221;</p>
-<p>Reading the 1987 paper by Harel, you see in the abstract that
-statecharts concern &#8220;the notions of hierarchy, concurrency, and
-communication.&#8221; Statecharts offer formalization to modularize code in a
-hierarchy of states that exist as discrete blocks that can act
-independently or concurrently, and communicate within an event system,
-allowing easier modeling of complexity.</p>
-<p>So, statecharts help us build complex systems? Well, yes, but simple
-ones too. Besides, what software application stays simple for very long?
-Not many. Especially systems that involve many interacting parts &#8211;
-typical software programs are &#8220;reactive&#8221; systems in the parlance of the
-1987 Harel paper.</p>
-<p>Speaking of the parlance of the Harel paper, here are some terms and
-concepts as used there, paraphrasing from the text:</p>
-<p><strong>reactive system</strong> &#8211; an event-driven system that must react to
-external and internal stimuli driving behavior through sequences of
-changing conditions, relationships, events, and timing contraints.</p>
-<p><strong>transformational system</strong> &#8211; systems in which a relationship between
-input and output is treated by a transformation, a function.</p>
-<p><strong>state diagram</strong> &#8211; simple directed graph of states and transitions,
-with nodes denoting states and arrows denoting transitions, which may be
-labelled with triggering conditions and guarding conditions.</p>
-<p><strong>superstate, &#8220;clustering,&#8221; hierarchy, depth</strong> &#8211; A &#8220;cluster&#8221; of states
-is related somehow, e.g., &#8220;all airborne states.&#8221; States are arranged
-hierarchically, with the hierarchy containing clusters of related states
-at various &#8220;levels.&#8221; The visual side of statecharts is important, and
-you might prefer to &#8220;draw it out,&#8221; but you should be able to imagine how
-the hierarchy set up in code is like a machine set up to react to
-events.</p>
-<p><strong>orthogonal</strong> &#8211; independent. Contrast this with concurrent.</p>
-<p><strong>concurrent</strong> &#8211; simultaneous. Contrast this with orthogonal, or
-independent.</p>
-<p><strong>broadcast communication</strong> &#8211; event-driven, with the capability to send
-an event that can trigger action across states.</p>
-<p>From these terms, perhaps you can appreciate this, also from the Harel paper:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">statecharts</span> <span class="o">=</span> <span class="n">state</span><span class="o">-</span><span class="n">diagrams</span> <span class="o">+</span> <span class="n">depth</span> <span class="o">+</span> <span class="n">orthogonality</span> <span class="o">+</span> <span class="n">broadcast</span><span class="o">-</span><span class="n">communication</span>
-</pre></div>
-</div>
-<p>(where orthogonality implies functionality for handling concurrency as
-well).</p>
-<p>To attempt a paraphrase:</p>
-<div class="highlight-python"><pre>Statecharts add to basic state-diagrams the functionality to arrange
-states in a hierarchy, specifying which states are independent of one
-another and which ones are concurrent with each other. Action functions
-within states respond to events delivered to the statechart. Events
-firing to the action functions may have broadcast effect across multiple
-related or concurrent states.</pre>
-</div>
-</div>
-<div class="section" id="hello-world">
-<h1>Hello World<a class="headerlink" href="#hello-world" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="example-apps">
+<h1>Example Apps<a class="headerlink" href="#example-apps" title="Permalink to this headline">¶</a></h1>
+<p>The examples directory contains several brand new apps and some of the Kivy
+example apps adapted to use statecharts. These examples are presented in
+order of increasing complexity, before turning to theoretical background for
+statecharts.</p>
+<div class="section" id="hello-world-example-app">
+<h2>Hello World Example App<a class="headerlink" href="#hello-world-example-app" title="Permalink to this headline">¶</a></h2>
 <p>The hello_world example app has a very simple statechart. With code removed,
 the statechart consists of two states, the root state, and one app-specific
 state called ShowingHelloWorld:</p>
@@ -197,16 +115,13 @@ must have an initial substate or substatesAreConcurrent = True explicitly
 defined. Here, we only have one state, ShowingHelloWorld, and it is the
 initial substate. When the statechart is instantiated, control will flow
 immediately from the root state to the ShowingHelloWorld state.</p>
-<div class="section" id="running">
-<h2>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h2>
+<p><strong>Running</strong></p>
 <p>Change to the hello_world directory, then run python main.py, and
 you should see the app appear. Type any of the letters in &#8220;hello world&#8221; and
 you will see buttons for those letters randomly added in the app window.
 Click any of the buttons, and likewise, more buttons will be added. That&#8217;s
 all it does &#8211; but, pretty fancy for a &#8220;hello world&#8221; app, eh?</p>
-</div>
-<div class="section" id="helloworldapp-main-py">
-<h2>HelloWorldApp, main.py<a class="headerlink" href="#helloworldapp-main-py" title="Permalink to this headline">¶</a></h2>
+<p><strong>HelloWorldApp, main.py</strong></p>
 <p>There is only one file for the app, main.py:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">kivy.app</span> <span class="kn">import</span> <span class="n">App</span>
 <span class="kn">from</span> <span class="nn">kivy.core.window</span> <span class="kn">import</span> <span class="n">Window</span>
@@ -333,15 +248,11 @@ all it does &#8211; but, pretty fancy for a &#8220;hello world&#8221; app, eh?</
     <span class="n">HelloWorldApp</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="details">
-<h2>Details<a class="headerlink" href="#details" title="Permalink to this headline">¶</a></h2>
-<p>Let&#8217;s start with the App definition, HelloWorldApp. It has a statechart
-property and a property for the main widget, hello_world_view. The build()
-method instantiates HelloWorldView and returns it &#8211; the widget returned
-from build() is the root widget, available as app.root. The on_start()
-method is called when the app is run. This is when we instantiate the
-statechart.</p>
+<p>The definition for HelloWorldApp has a statechart property and a property for
+the main widget, hello_world_view. The build() method instantiates
+HelloWorldView and returns it &#8211; the widget returned from build() is the root
+widget, available as app.root. The on_start() method is called when the app is
+run. This is when we instantiate the statechart.</p>
 <p>The app starts when HelloWorldApp().run() is called in main. build()
 happens first, then on_start(), and the app and its statechart are up and
 running.</p>
@@ -354,26 +265,20 @@ __init__() method, but here we do, because the trace and rootStateClass
 properties are set.</p>
 <p>The only thing declared in the root state is the inital substate,
 ShowingHelloWorld, which contains the basic functionality for the app.</p>
-</div>
-<div class="section" id="showinghelloworld-enterstate-and-exitstate">
-<h2>ShowingHelloWorld, enterState() and exitState()<a class="headerlink" href="#showinghelloworld-enterstate-and-exitstate" title="Permalink to this headline">¶</a></h2>
+<p><strong>ShowingHelloWorld, enterState() and exitState()</strong></p>
 <p>If enterState() and/or exitState() are defined for a state, these will be
 called automatically at the appropriate times. In a larger app, you would
 think about what needs to happen on enter and exit, such as creating and
 showing a dialog in the enterState, and tearing it down in the exit state,
 or any manner of things that could happen. Here, we just print a message on
 enterState() and exitState().</p>
-</div>
-<div class="section" id="utility-functions">
-<h2>Utility functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h2>
+<p><strong>Utility functions</strong></p>
 <p>A state is a normal python class. It can have properties, an __init__(),
 specialized methods, etc. Here we are calling the add_label() method a
 &#8220;utility&#8221; function, meaning a normal function that does whatever work is
 necessary. add_label() creates a randomly located button for a given
 letter in &#8220;hello world.&#8221;</p>
-</div>
-<div class="section" id="action-functions">
-<h2>Action functions<a class="headerlink" href="#action-functions" title="Permalink to this headline">¶</a></h2>
+<p><strong>Action functions</strong></p>
 <p>There is nothing special about the type of action functions used in the
 hello_world app. The action functions here, h(), e(), l(), o(), w(), r(), and
 d() respond to events of the same names: &#8216;h&#8217;, &#8216;e&#8217;, &#8216;l&#8217;, &#8216;o&#8217;, &#8216;w&#8217;, &#8216;r&#8217;, and
@@ -394,8 +299,9 @@ code only, or you can draw out the statechart in a diagram before coding, or
 you can use some combination of approaches, often in interation. A statechart
 diagram for hello_world would be:</p>
 <p>Before we leave the subject of action functions, there is an alternative to
-having separate action functions, when there is a related set, as we have with
-our hello_world app. We could define a single handler method, as follows:</p>
+having separate action functions, when there is a related set of events to be
+handled, as we have with the letter events in our hello_world app. We could
+define a single handler method, as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="nd">@State.eventHandler</span><span class="p">([</span><span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;l&#39;</span><span class="p">,</span> <span class="s">&#39;o&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">letter_event_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">letter</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
@@ -404,14 +310,165 @@ our hello_world app. We could define a single handler method, as follows:</p>
 <p>This is a case where the eventHandler function approach is a perfect fit. The
 first line is a function decorator on the State class that marks
 letter_event_handler() as a handler for all the events in the list.</p>
+<p><strong>Statechart Diagram</strong></p>
+<p>If a developer wanted, a full program using statecharts could be written in
+code straight-up, by the established process of writing software &#8220;in your
+head.&#8221; However, using vector drawing programs, we can draw statechart diagrams
+that can really aid the process, especially for more complicated software. As
+this diagram shows, there are conventions we may follow in the drawing:</p>
+<div class="figure align-center">
+<img alt="_images/statechart.png" src="_images/statechart.png" />
+<p class="caption">Statechart diagram for HelloWorldApp</p>
+</div>
+<p>There is a single open circle to mark the root state, and an arrow from that
+to the initial state, ShowingHelloWorld. In this app, this is the only state.
+The ShowingHelloWorld state responds to keyboard events, by creating new
+letter buttons. Once a letter button exists, a click or touch event will also
+fire a &#8220;letter event,&#8221; resulting in the creation of yet another letter button.
+There is also a representation of the app exit, which is triggered by a
+control-C or by closing the app window.</p>
+</div>
+<div class="section" id="balls-example-app">
+<h2>Balls Example App<a class="headerlink" href="#balls-example-app" title="Permalink to this headline">¶</a></h2>
+<p>Balls is a small Kivy app that bounces balls around the screen.  It is like
+pong without the paddles, and with the capacity to send the balls out of
+control. The kv file for the program, balls.kv, consists of the Ball class
+and the BallsView main container class. Each ball is 50x50 in size, and begins
+with a location at the center of the parent window.</p>
+<p>The BallsView class has a serve_balls() method, to get the balls moving, and
+an update method that is called on a timer, every 1/60th of a second, to move
+the balls.</p>
+<p>The statechart has the same basic setup as HelloWorldApp, but in the
+ShowingBalls state, a new concept for states is introduced. In HelloWorldApp,
+there is only one state within the root state, however in BallsApp, there is
+a ShowingBalls state, and within that five &#8220;moving ball&#8221; states for each of
+five balls. In many apps, states that are siblings of one another are
+independent (also termed orthogonal) &#8211; one or the other is active at a given
+time. But in some apps, a set of sibling states can all be active at the same
+time. These are called concurrent states. The ShowingBalls state contains five
+concurrent substates, for each of the moving balls. Note the use of the
+boolean property substatesAreConcurrent. If you omit this property for a state
+that contains substates, the substates will be independent of one another
+(orthogonal), but here they are concurrent:</p>
+<div class="highlight-python"><pre>class AppStatechart(StatechartManager):
+    class RootState(State):
+        initialSubstateKey = 'ShowingBalls'
+        class ShowingBalls(State):
+            substatesAreConcurrent = True
+            class MovingBall_1(MovingBall):
+            class MovingBall_2(MovingBall):
+            class MovingBall_3(MovingBall):
+            class MovingBall_4(MovingBall):
+            class MovingBall_5(MovingBall):</pre>
+</div>
+<p>The moving ball states each subclass MovingBall, a state which is defined
+separately from the statechart &#8211; recall that states are normal python
+classes, so you may use your imagination for design of state subclassing in
+the construction of state hierarchies. Each moving ball state controls the
+movement of a given ball, and has its own unique velocity, designated simply
+as 1, 2, 3, 4, and 5, respectively, for both velocity_x and velocity_y. Change
+these for interesting effects. The associated between ball and state is
+maintained by a ball_key key.</p>
+<p>The balls are sped up by a key press of &#8216;u&#8217; and slowed down by a key press of
+&#8216;d&#8217;. When the &#8216;u&#8217; key is pressed, the &#8216;speed_up&#8217; event is sent to the
+statechart, and, because each of the moving ball states is a sublass of
+MovingBall, each has an action function named speed_up(), and so will respond
+to that event. Likewise for the &#8216;d&#8217; key and the &#8216;slow_down&#8217; event, and the
+slow_down() action function.</p>
+<div class="figure align-center">
+<img alt="_images/statechart1.png" src="_images/statechart1.png" />
+<p class="caption">Statechart diagram for BallsApp</p>
+</div>
+<p>The combination between velocity adjustments in the enterState() method for
+each moving ball state, and the adjustments made in the speed_up() and
+slow_down() methods, forms an algorithm for this app that gives an interesting
+effect, with balls moving in all directions, at different velocities. This was
+found by experimenting a bit. The process illustrates how the developer can
+learn to think in the realm of statecharts: what happens on entry, what
+happens for given events, what happens on exit.</p>
 </div>
 </div>
-<div class="section" id="balls">
-<h1>Balls<a class="headerlink" href="#balls" title="Permalink to this headline">¶</a></h1>
-<p>Balls is a small Kivy app that bounces balls around the screen.  The kv file
-for the program, balls.kv, consists of the Ball class and the BallsView main
-container class. Each ball is 50x50 in size, and begins with a location at
-the center of the parent window.</p>
+<div class="section" id="background">
+<h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
+<p>If you are new to statecharts, or want to learn about them, you may
+wish to explore the origins of the concept. We can start with a look at
+the primary source of inspiration for Michael Cohen&#8217;s Ki project, the
+paper by David Harel, <em>Statecharts: A Visual Formalism for Complex
+Systems</em>, Sci. Comput. Programming 8 (1987), 231-274
+<a class="reference external" href="http://www.wisdom.weizmann.ac.il/~harel/SCANNED.PAPERS/Statecharts.pdf">pdf</a>.
+David Harel is a computer scientist at the Weizmann Institute of
+Science, Rehovot, Israel, who has published widely on this and related
+topics in programming. In the list of <a class="reference external" href="http://www.wisdom.weizmann.ac.il/~harel/papers.html">David Harel&#8217;s
+publications</a>,
+the 1987 paper is #48 on the list, having come from a preliminary
+version published in 1984. If you scan the list for more recent
+offerings, you see some that pertain to statecharts in the pure
+programming sense of style, efficiency, software maintenance, etc.,
+while others highlight the use of statecharts in specific subject areas,
+such as biological modeling. There is a larger literature, and many
+software projects that relate, but this list of Harel&#8217;s publications
+serves as a good representation and starting point for a survey.</p>
+<p>For an interesting personal account by Harel on the germination of the
+idea of statecharts, see: <a class="reference external" href="http://www.wisdom.weizmann.ac.il/%7Eharel/papers/Statecharts.History.pdf">Statecharts in the Making: A Personal
+Account</a>.</p>
+<p>A Wikipedia article on <a class="reference external" href="http://en.wikipedia.org/wiki/State_diagram">state
+diagrams</a>, is good to read
+for the nature of the &#8220;Harel statechart&#8221; as a formalization of certain
+aspects of modeling the behavior of a system with a state diagram. From
+the article, &#8220;With Harel statecharts it is possible to model multiple
+cross-functional state diagrams within the statechart. Each of these
+cross-functional state machines can transition internally without
+affecting the other state machines in the statechart. The current state
+of each cross-functional state machine in the statechart defines the
+state of the system. The Harel statechart is equivalent to a state
+diagram but it improves the readability of the resulting diagram.&#8221;</p>
+<p>Reading the 1987 paper by Harel, you see in the abstract that
+statecharts concern &#8220;the notions of hierarchy, concurrency, and
+communication.&#8221; Statecharts offer formalization to modularize code in a
+hierarchy of states that exist as discrete blocks that can act
+independently or concurrently, and communicate within an event system,
+allowing easier modeling of complexity.</p>
+<p>So, statecharts help us build complex systems? Well, yes, but simple
+ones too. Besides, what software application stays simple for very long?
+Not many. Especially systems that involve many interacting parts &#8211;
+typical software programs are &#8220;reactive&#8221; systems in the parlance of the
+1987 Harel paper.</p>
+<p>Speaking of the parlance of the Harel paper, here are some terms and
+concepts as used there, paraphrasing from the text:</p>
+<p><strong>reactive system</strong> &#8211; an event-driven system that must react to
+external and internal stimuli driving behavior through sequences of
+changing conditions, relationships, events, and timing contraints.</p>
+<p><strong>transformational system</strong> &#8211; systems in which a relationship between
+input and output is treated by a transformation, a function.</p>
+<p><strong>state diagram</strong> &#8211; simple directed graph of states and transitions,
+with nodes denoting states and arrows denoting transitions, which may be
+labelled with triggering conditions and guarding conditions.</p>
+<p><strong>superstate, &#8220;clustering,&#8221; hierarchy, depth</strong> &#8211; A &#8220;cluster&#8221; of states
+is related somehow, e.g., &#8220;all airborne states.&#8221; States are arranged
+hierarchically, with the hierarchy containing clusters of related states
+at various &#8220;levels.&#8221; The visual side of statecharts is important, and
+you might prefer to &#8220;draw it out,&#8221; but you should be able to imagine how
+the hierarchy set up in code is like a machine set up to react to
+events.</p>
+<p><strong>orthogonal</strong> &#8211; independent. Contrast this with concurrent.</p>
+<p><strong>concurrent</strong> &#8211; simultaneous. Contrast this with orthogonal, or
+independent.</p>
+<p><strong>broadcast communication</strong> &#8211; event-driven, with the capability to send
+an event that can trigger action across states.</p>
+<p>From these terms, perhaps you can appreciate this, also from the Harel paper:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">statecharts</span> <span class="o">=</span> <span class="n">state</span><span class="o">-</span><span class="n">diagrams</span> <span class="o">+</span> <span class="n">depth</span> <span class="o">+</span> <span class="n">orthogonality</span> <span class="o">+</span> <span class="n">broadcast</span><span class="o">-</span><span class="n">communication</span>
+</pre></div>
+</div>
+<p>(where orthogonality implies functionality for handling concurrency as
+well).</p>
+<p>To attempt a paraphrase:</p>
+<div class="highlight-python"><pre>Statecharts add to basic state-diagrams the functionality to arrange
+states in a hierarchy, specifying which states are independent of one
+another and which ones are concurrent with each other. Action functions
+within states respond to events delivered to the statechart. Events
+firing to the action functions may have broadcast effect across multiple
+related or concurrent states.</pre>
+</div>
 <div class="section" id="statecharts-and-terminology-in-mva-mvc-systems">
 <h2>Statecharts and Terminology in MVA/MVC Systems<a class="headerlink" href="#statecharts-and-terminology-in-mva-mvc-systems" title="Permalink to this headline">¶</a></h2>
 <p>MVA = Model-View-Adapter System</p>
@@ -496,21 +553,15 @@ illustrative... Stay tuned...</p>
 <li><a class="reference internal" href="#">Welcome to kivy-statecharts&#8217;s documentation!</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#tests">Tests</a></li>
-<li><a class="reference internal" href="#example-apps">Example Apps</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#in-a-nutshell">In a Nutshell</a></li>
-<li><a class="reference internal" href="#background">Background</a></li>
-<li><a class="reference internal" href="#hello-world">Hello World</a><ul>
-<li><a class="reference internal" href="#running">Running</a></li>
-<li><a class="reference internal" href="#helloworldapp-main-py">HelloWorldApp, main.py</a></li>
-<li><a class="reference internal" href="#details">Details</a></li>
-<li><a class="reference internal" href="#showinghelloworld-enterstate-and-exitstate">ShowingHelloWorld, enterState() and exitState()</a></li>
-<li><a class="reference internal" href="#utility-functions">Utility functions</a></li>
-<li><a class="reference internal" href="#action-functions">Action functions</a></li>
+<li><a class="reference internal" href="#example-apps">Example Apps</a><ul>
+<li><a class="reference internal" href="#hello-world-example-app">Hello World Example App</a></li>
+<li><a class="reference internal" href="#balls-example-app">Balls Example App</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#balls">Balls</a><ul>
+<li><a class="reference internal" href="#background">Background</a><ul>
 <li><a class="reference internal" href="#statecharts-and-terminology-in-mva-mvc-systems">Statecharts and Terminology in MVA/MVC Systems</a></li>
 <li><a class="reference internal" href="#statecharts-for-kivy">Statecharts for Kivy</a></li>
 </ul>

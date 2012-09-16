@@ -96,8 +96,7 @@ defined. Here, we only have one state, ShowingHelloWorld, and it is the
 initial substate. When the statechart is instantiated, control will flow
 immediately from the root state to the ShowingHelloWorld state.
 
-Running
-~~~~~~~
+**Running**
 
 Change to the hello_world directory, then run python main.py, and
 you should see the app appear. Type any of the letters in "hello world" and
@@ -105,8 +104,7 @@ you will see buttons for those letters randomly added in the app window.
 Click any of the buttons, and likewise, more buttons will be added. That's
 all it does -- but, pretty fancy for a "hello world" app, eh?
 
-HelloWorldApp, main.py
-~~~~~~~~~~~~~~~~~~~~~~
+**HelloWorldApp, main.py**
 
 There is only one file for the app, main.py:
 
@@ -236,15 +234,11 @@ There is only one file for the app, main.py:
     if __name__ in ('__android__', '__main__'):
         HelloWorldApp().run()
 
-Details
-~~~~~~~
-
-Let's start with the App definition, HelloWorldApp. It has a statechart
-property and a property for the main widget, hello_world_view. The build()
-method instantiates HelloWorldView and returns it -- the widget returned
-from build() is the root widget, available as app.root. The on_start()
-method is called when the app is run. This is when we instantiate the
-statechart. 
+The definition for HelloWorldApp has a statechart property and a property for
+the main widget, hello_world_view. The build() method instantiates
+HelloWorldView and returns it -- the widget returned from build() is the root
+widget, available as app.root. The on_start() method is called when the app is
+run. This is when we instantiate the statechart. 
 
 The app starts when HelloWorldApp().run() is called in main. build()
 happens first, then on_start(), and the app and its statechart are up and
@@ -262,8 +256,7 @@ properties are set.
 The only thing declared in the root state is the inital substate,
 ShowingHelloWorld, which contains the basic functionality for the app.
 
-ShowingHelloWorld, enterState() and exitState()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**ShowingHelloWorld, enterState() and exitState()**
 
 If enterState() and/or exitState() are defined for a state, these will be
 called automatically at the appropriate times. In a larger app, you would
@@ -272,20 +265,18 @@ showing a dialog in the enterState, and tearing it down in the exit state,
 or any manner of things that could happen. Here, we just print a message on
 enterState() and exitState().
 
-Utility functions
-~~~~~~~~~~~~~~~~~
+**Utility Methods**
 
 A state is a normal python class. It can have properties, an __init__(),
 specialized methods, etc. Here we are calling the add_label() method a
-"utility" function, meaning a normal function that does whatever work is
+"utility" method, meaning a normal method that does whatever work is
 necessary. add_label() creates a randomly located button for a given
 letter in "hello world."
 
-Action functions
-~~~~~~~~~~~~~~~~
+**Action Methods**
 
-There is nothing special about the type of action functions used in the
-hello_world app. The action functions here, h(), e(), l(), o(), w(), r(), and
+There is nothing special about the type of action methods used in the
+hello_world app. The action methods here, h(), e(), l(), o(), w(), r(), and
 d() respond to events of the same names: 'h', 'e', 'l', 'o', 'w', 'r', and
 'd'. These events happen either from keyboard presses or from mouse clicks or
 touches on letter buttons. When the app first loads, there are no letter
@@ -297,7 +288,7 @@ the terms action and event interchangeably here). You see there that when a
 key press happens, there is a call to statechart.sendEvent(letter), where
 letter is one of the letters in "hello world."
 
-In a larger app, action function names could be anything, but examples tend to
+In a larger app, action method names could be anything, but examples tend to
 have a demonstrative aspect, such as collide_with_barrier(), for a game, or
 load_users() for an admin panel, or delete_comment() for a media app.
 
@@ -307,8 +298,8 @@ code only, or you can draw out the statechart in a diagram before coding, or
 you can use some combination of approaches, often in interation. A statechart
 diagram for hello_world would be:
 
-Before we leave the subject of action functions, there is an alternative to
-having separate action functions, when there is a related set of events to be
+Before we leave the subject of action methods, there is an alternative to
+having separate action methods, when there is a related set of events to be
 handled, as we have with the letter events in our hello_world app. We could
 define a single handler method, as follows:
 
@@ -318,9 +309,30 @@ define a single handler method, as follows:
     def letter_event_handler(self, event, letter, context):
         self.add_label(letter)
 
-This is a case where the eventHandler function approach is a perfect fit. The
+This is a case where the eventHandler method approach is a perfect fit. The
 first line is a function decorator on the State class that marks
 letter_event_handler() as a handler for all the events in the list.
+
+**Statechart Diagram**
+
+If a developer wanted, a full program using statecharts could be written in
+code straight-up, by the established process of writing software "in your
+head." However, using vector drawing programs, we can draw statechart diagrams
+that can really aid the process, especially for more complicated software. As
+this diagram shows, there are conventions we may follow in the drawing:
+
+.. figure::  ../examples/hello_world/design/statechart.png
+   :align:   center
+
+   Statechart diagram for HelloWorldApp
+
+There is a single open circle to mark the root state, and an arrow from that
+to the initial state, ShowingHelloWorld. In this app, this is the only state.
+The ShowingHelloWorld state responds to keyboard events, by creating new
+letter buttons. Once a letter button exists, a click or touch event will also
+fire a "letter event," resulting in the creation of yet another letter button.
+There is also a representation of the app exit, which is triggered by a
+control-C or by closing the app window.
 
 Balls Example App
 -----------------
@@ -355,11 +367,11 @@ that contains substates, the substates will be independent of one another
             initialSubstateKey = 'ShowingBalls'
             class ShowingBalls(State):
                 substatesAreConcurrent = True
-                class Moving_Ball_1(MovingBall):
-                class Moving_Ball_2(MovingBall):
-                class Moving_Ball_3(MovingBall):
-                class Moving_Ball_4(MovingBall):
-                class Moving_Ball_5(MovingBall):
+                class MovingBall_1(MovingBall):
+                class MovingBall_2(MovingBall):
+                class MovingBall_3(MovingBall):
+                class MovingBall_4(MovingBall):
+                class MovingBall_5(MovingBall):
 
 The moving ball states each subclass MovingBall, a state which is defined
 separately from the statechart -- recall that states are normal python
@@ -373,15 +385,20 @@ maintained by a ball_key key.
 The balls are sped up by a key press of 'u' and slowed down by a key press of
 'd'. When the 'u' key is pressed, the 'speed_up' event is sent to the
 statechart, and, because each of the moving ball states is a sublass of
-MovingBall, each has an action function named speed_up(), and so will respond
+MovingBall, each has an action method named speed_up(), and so will respond
 to that event. Likewise for the 'd' key and the 'slow_down' event, and the
-slow_down() action function.
+slow_down() action method.
 
-The combination between velocity adjustments in the enterState() method for
+.. figure::  ../examples/balls/design/statechart.png
+   :align:   center
+
+   Statechart diagram for BallsApp
+
+The combination of velocity adjustments in the enterState() method for
 each moving ball state, and the adjustments made in the speed_up() and 
-slow_down() methods, forms an algorithm for this app that gives an interesting
-effect, with balls moving in all directions, at different velocities. This was
-found by experimenting a bit. The process illustrates how the developer can
+slow_down() methods, forms an algorithm for this app, giving an interesting
+effect, with balls moving in all directions at different velocities. This was
+found by experimentation. The process illustrates how the developer can
 learn to think in the realm of statecharts: what happens on entry, what
 happens for given events, what happens on exit.
 
@@ -481,9 +498,9 @@ To attempt a paraphrase:
 
     Statecharts add to basic state-diagrams the functionality to arrange
     states in a hierarchy, specifying which states are independent of one
-    another and which ones are concurrent with each other. Action functions
+    another and which ones are concurrent with each other. Action methods
     within states respond to events delivered to the statechart. Events
-    firing to the action functions may have broadcast effect across multiple
+    firing to the action methods may have broadcast effect across multiple
     related or concurrent states.
 
 
@@ -552,8 +569,8 @@ is "coordinating controller" code.
 
 The code in the DeflecTouch level\_button\_pressed() function could just
 as well be put in a "ShowingMainScreen" state, in a "show\_levels"
-action function. Rewriting DeflecTouch with statecharts would simply
-entail moving such code into discrete states, and to action functions
+action method. Rewriting DeflecTouch with statecharts would simply
+entail moving such code into discrete states, and to action methods
 that respond to events such as "show levels." And, in the process,
 benefit from the formalization and especially from the clarity that
 drawing an app statechart would bring.
