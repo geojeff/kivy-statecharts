@@ -53,8 +53,10 @@ class BallsView(Widget):
         print ' - text is %r' % text
         print ' - modifiers are %r' % modifiers
 
-        if keycode[1] == 's':
+        if text == 'u':
             self.app.statechart.sendEvent('speed_up')
+        elif text == 'd':
+            self.app.statechart.sendEvent('slow_down')
         elif keycode[1] == 'escape':
             # Keycode is composed of an integer + a string
             # If we hit escape, release the keyboard
@@ -83,30 +85,32 @@ class BallsView(Widget):
 
 
 class MovingBall(State):
-    ballKey = StringProperty(None)
+    ball_key = StringProperty(None)
     ball = ObjectProperty(None)
-    velocity_x = NumericProperty(1)
-    velocity_y = NumericProperty(1)
+    velocity_x_factor = NumericProperty(1)
+    velocity_y_factor = NumericProperty(1)
 
     def enterState(self, context=None):
-        self.ball = getattr(self.statechart.app.mainView, self.ballKey)
-        self.ball.velocity_x += self.velocity_x
-        self.ball.velocity_y += self.velocity_y
+        self.ball = getattr(self.statechart.app.mainView, self.ball_key)
+        self.ball.velocity_x += self.velocity_x_factor
+        self.ball.velocity_y += self.velocity_y_factor
 
     def exitState(self, context=None):
         pass
 
     def speed_up(self, arg1=None, arg2=None):
-        self.velocity_x += 1
-        self.velocity_y += 1
-        self.ball.velocity_x += self.velocity_x
-        self.ball.velocity_y += self.velocity_y
+        self.velocity_x_factor += 1
+        self.velocity_y_factor += 1
+        self.ball.velocity_x *= self.velocity_x_factor
+        self.ball.velocity_y *= self.velocity_y_factor
 
     def slow_down(self, arg1=None, arg2=None):
-        self.velocity_x -= 1
-        self.velocity_y -= 1
-        self.ball.velocity_x += self.velocity_x
-        self.ball.velocity_y += self.velocity_y
+        self.velocity_x_factor -= 1
+        self.velocity_y_factor -= 1
+        if self.velocity_x_factor > 0:
+            self.ball.velocity_x /= self.velocity_x_factor
+        if self.velocity_y_factor > 0:
+            self.ball.velocity_y /= self.velocity_y_factor
 
 
 ##############
@@ -123,9 +127,7 @@ class AppStatechart(StatechartManager):
     # RootState of statechart
     #
     class RootState(State):
-        def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'ShowingBalls'
-            super(AppStatechart.RootState, self).__init__(**kwargs)
+        initialSubstateKey = 'ShowingBalls'
 
         def enterState(self, context=None):
             print 'RootState/enterState'
@@ -140,11 +142,7 @@ class AppStatechart(StatechartManager):
         # ShowingBalls
         #
         class ShowingBalls(State):
-            def __init__(self, **kwargs):
-                kwargs['substatesAreConcurrent'] = True
-                super(AppStatechart.
-                      RootState.
-                      ShowingBalls, self).__init__(**kwargs)
+            substatesAreConcurrent = True
 
             def enterState(self, context=None):
                 print 'ShowingBalls/enterState'
@@ -154,9 +152,9 @@ class AppStatechart(StatechartManager):
 
             class Moving_Ball_1(MovingBall):
                 def __init__(self, **kwargs):
-                    self.ballKey = 'ball_1'
-                    self.velocity_x = 1
-                    self.velocity_y = 1
+                    self.ball_key = 'ball_1'
+                    self.velocity_x_factor = 1
+                    self.velocity_y_factor = 1
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
@@ -164,9 +162,9 @@ class AppStatechart(StatechartManager):
 
             class Moving_Ball_2(MovingBall):
                 def __init__(self, **kwargs):
-                    self.ballKey = 'ball_2'
-                    self.velocity_x = 2
-                    self.velocity_y = 2
+                    self.ball_key = 'ball_2'
+                    self.velocity_x_factor = 2
+                    self.velocity_y_factor = 2
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
@@ -174,9 +172,9 @@ class AppStatechart(StatechartManager):
 
             class Moving_Ball_3(MovingBall):
                 def __init__(self, **kwargs):
-                    self.ballKey = 'ball_3'
-                    self.velocity_x = 3
-                    self.velocity_y = 3
+                    self.ball_key = 'ball_3'
+                    self.velocity_x_factor = 3
+                    self.velocity_y_factor = 3
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
@@ -184,9 +182,9 @@ class AppStatechart(StatechartManager):
 
             class Moving_Ball_4(MovingBall):
                 def __init__(self, **kwargs):
-                    self.ballKey = 'ball_4'
-                    self.velocity_x = 4
-                    self.velocity_y = 4
+                    self.ball_key = 'ball_4'
+                    self.velocity_x_factor = 4
+                    self.velocity_y_factor = 4
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
@@ -194,9 +192,9 @@ class AppStatechart(StatechartManager):
 
             class Moving_Ball_5(MovingBall):
                 def __init__(self, **kwargs):
-                    self.ballKey = 'ball_5'
-                    self.velocity_x = 5
-                    self.velocity_y = 5
+                    self.ball_key = 'ball_5'
+                    self.velocity_x_factor = 5
+                    self.velocity_y_factor = 5
                     super(AppStatechart.
                           RootState.
                           ShowingBalls.
@@ -212,7 +210,6 @@ class BallsApp(App):
     mainView = ObjectProperty(None)
 
     def build(self):
-        print 'BUILDING'
         self.mainView = BallsView(app=self)
         return self.mainView
 

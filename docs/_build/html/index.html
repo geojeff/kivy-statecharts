@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to kivy-statecharts’s documentation! &mdash; kivy-statecharts 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="kivy-statecharts 0.1 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="#">kivy-statecharts 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-kivy-statecharts-s-documentation">
+<h1>Welcome to kivy-statecharts&#8217;s documentation!<a class="headerlink" href="#welcome-to-kivy-statecharts-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<p>kivy-statecharts is a port of the Ki/SproutCore statechart framework to
+Python for use in Kivy projects.</p>
+<p>Original repos: <a class="reference external" href="https://github.com/frozenCanuck/ki">Ki</a> and
+<a class="reference external" href="https://github.com/sproutcore/sproutcore/tree/master/frameworks/statechart">SC.Statechart</a></p>
+<p>SC.Statechart was used as the basis for this port to Python and Kivy.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>kivy-statecharts is a standalone Python module that you may wish to put
+alongside your local clone of Kivy if you are doing development. For
+development, consider the following setup:</p>
+<p>~/Development/kivy/kivy, for a Kivy clone, and
+~/Development/kivy/kivy_statechart, for a kivy-statecharts clone. Both
+were added to PYTHONPATH in ~/.profile so imports would work during
+development, as:</p>
+<div class="highlight-python"><pre>export PYTHONPATH=$PYTHONPATH:/Users/geojeff/Development/kivy/kivy:/Users/geojeff/Development/kivy</pre>
+</div>
+</div>
+<div class="section" id="tests">
+<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
+<p>Unit tests are done with
+<a class="reference external" href="http://readthedocs.org/docs/nose/en/latest/">nose</a>. In the
+kivy_statechart directory, run</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">nosetests</span>
+</pre></div>
+</div>
+<p>As of April 2012, most tests were ported.</p>
+</div>
+<div class="section" id="example-apps">
+<h2>Example Apps<a class="headerlink" href="#example-apps" title="Permalink to this headline">¶</a></h2>
+<p>The examples directory contains several of the Kivy example apps adapted
+to use statecharts. New examples illustrate specific statechart
+functionality.</p>
+</div>
+</div>
+<div class="section" id="in-a-nutshell">
+<h1>In a Nutshell<a class="headerlink" href="#in-a-nutshell" title="Permalink to this headline">¶</a></h1>
+<p>The developer draws a statechart &#8211; on a piece of paper is fine, but
+there are good drawing programs. This process is easy enough to start
+laying out what needs to happen as the app loads, and user interaction
+begins. As each user action is envisioned, it is drawn as a connector
+between states representing different parts of the user interface. More
+is added to the statechart, as details are realized and considered.</p>
+<p>Once the developer has the hang of the simple coding constructs, it is a
+straightforward process to write the code corresponding to states and
+transitions on the statechart.</p>
+<p>Iteration of refining the statechart and writing code goes along as the
+app develops.</p>
+<p>For testing, a human-readable table of events and actions can be made
+from the statechart, and test cases made to cover each item.</p>
+</div>
+<div class="section" id="background">
+<h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
+<p>If you are new to statecharts, or want to learn about them, you may
+wish to explore the origins of the concept. We can start with a look at
+the primary source of inspiration for Michael Cohen&#8217;s Ki project, the
+paper by David Harel, <em>Statecharts: A Visual Formalism for Complex
+Systems</em>, Sci. Comput. Programming 8 (1987), 231-274
+<a class="reference external" href="http://www.wisdom.weizmann.ac.il/~harel/SCANNED.PAPERS/Statecharts.pdf">pdf</a>.
+David Harel is a computer scientist at the Weizmann Institute of
+Science, Rehovot, Israel, who has published widely on this and related
+topics in programming. In the list of <a class="reference external" href="http://www.wisdom.weizmann.ac.il/~harel/papers.html">David Harel&#8217;s
+publications</a>,
+the 1987 paper is #48 on the list, having come from a preliminary
+version published in 1984. If you scan the list for more recent
+offerings, you see some that pertain to statecharts in the pure
+programming sense of style, efficiency, software maintenance, etc.,
+while others highlight the use of statecharts in specific subject areas,
+such as biological modeling. There is a larger literature, and many
+software projects that relate, but this list of Harel&#8217;s publications
+serves as a good representation and starting point for a survey.</p>
+<p>For an interesting personal account by Harel on the germination of the
+idea of statecharts, see: <a class="reference external" href="http://www.wisdom.weizmann.ac.il/%7Eharel/papers/Statecharts.History.pdf">Statecharts in the Making: A Personal
+Account</a>.</p>
+<p>A Wikipedia article on <a class="reference external" href="http://en.wikipedia.org/wiki/State_diagram">state
+diagrams</a>, is good to read
+for the nature of the &#8220;Harel statechart&#8221; as a formalization of certain
+aspects of modeling the behavior of a system with a state diagram. From
+the article, &#8220;With Harel statecharts it is possible to model multiple
+cross-functional state diagrams within the statechart. Each of these
+cross-functional state machines can transition internally without
+affecting the other state machines in the statechart. The current state
+of each cross-functional state machine in the statechart defines the
+state of the system. The Harel statechart is equivalent to a state
+diagram but it improves the readability of the resulting diagram.&#8221;</p>
+<p>Reading the 1987 paper by Harel, you see in the abstract that
+statecharts concern &#8220;the notions of hierarchy, concurrency, and
+communication.&#8221; Statecharts offer formalization to modularize code in a
+hierarchy of states that exist as discrete blocks that can act
+independently or concurrently, and communicate within an event system,
+allowing easier modeling of complexity.</p>
+<p>So, statecharts help us build complex systems? Well, yes, but simple
+ones too. Besides, what software application stays simple for very long?
+Not many. Especially systems that involve many interacting parts &#8211;
+typical software programs are &#8220;reactive&#8221; systems in the parlance of the
+1987 Harel paper.</p>
+<p>Speaking of the parlance of the Harel paper, here are some terms and
+concepts as used there, paraphrasing from the text:</p>
+<p><strong>reactive system</strong> &#8211; an event-driven system that must react to
+external and internal stimuli driving behavior through sequences of
+changing conditions, relationships, events, and timing contraints.</p>
+<p><strong>transformational system</strong> &#8211; systems in which a relationship between
+input and output is treated by a transformation, a function.</p>
+<p><strong>state diagram</strong> &#8211; simple directed graph of states and transitions,
+with nodes denoting states and arrows denoting transitions, which may be
+labelled with triggering conditions and guarding conditions.</p>
+<p><strong>superstate, &#8220;clustering,&#8221; hierarchy, depth</strong> &#8211; A &#8220;cluster&#8221; of states
+is related somehow, e.g., &#8220;all airborne states.&#8221; States are arranged
+hierarchically, with the hierarchy containing clusters of related states
+at various &#8220;levels.&#8221; The visual side of statecharts is important, and
+you might prefer to &#8220;draw it out,&#8221; but you should be able to imagine how
+the hierarchy set up in code is like a machine set up to react to
+events.</p>
+<p><strong>orthogonal</strong> &#8211; independent. Contrast this with concurrent.</p>
+<p><strong>concurrent</strong> &#8211; simultaneous. Contrast this with orthogonal, or
+independent.</p>
+<p><strong>broadcast communication</strong> &#8211; event-driven, with the capability to send
+an event that can trigger action across states.</p>
+<p>From these terms, perhaps you can appreciate this, also from the Harel paper:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">statecharts</span> <span class="o">=</span> <span class="n">state</span><span class="o">-</span><span class="n">diagrams</span> <span class="o">+</span> <span class="n">depth</span> <span class="o">+</span> <span class="n">orthogonality</span> <span class="o">+</span> <span class="n">broadcast</span><span class="o">-</span><span class="n">communication</span>
+</pre></div>
+</div>
+<p>(where orthogonality implies functionality for handling concurrency as
+well).</p>
+<p>To attempt a paraphrase:</p>
+<div class="highlight-python"><pre>Statecharts add to basic state-diagrams the functionality to arrange
+states in a hierarchy, specifying which states are independent of one
+another and which ones are concurrent with each other. Action functions
+within states respond to events delivered to the statechart. Events
+firing to the action functions may have broadcast effect across multiple
+related or concurrent states.</pre>
+</div>
+</div>
+<div class="section" id="hello-world">
+<h1>Hello World<a class="headerlink" href="#hello-world" title="Permalink to this headline">¶</a></h1>
+<p>The hello_world example app has a very simple statechart. With code removed,
+the statechart consists of two states, the root state, and one app-specific
+state called ShowingHelloWorld:</p>
+<div class="highlight-python"><pre>class AppStatechart(StatechartManager):
+    class RootState(State):
+        initialSubstateKey = 'ShowingHelloWorld'
+        class ShowingHelloWorld(State):</pre>
+</div>
+<p>The statechart is defined by the root state and its substates. The root state
+must have an initial substate or substatesAreConcurrent = True explicitly
+defined. Here, we only have one state, ShowingHelloWorld, and it is the
+initial substate. When the statechart is instantiated, control will flow
+immediately from the root state to the ShowingHelloWorld state.</p>
+<div class="section" id="running">
+<h2>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h2>
+<p>Change to the hello_world directory, then run python main.py, and
+you should see the app appear. Type any of the letters in &#8220;hello world&#8221; and
+you will see buttons for those letters randomly added in the app window.
+Click any of the buttons, and likewise, more buttons will be added. That&#8217;s
+all it does &#8211; but, pretty fancy for a &#8220;hello world&#8221; app, eh?</p>
+</div>
+<div class="section" id="helloworldapp-main-py">
+<h2>HelloWorldApp, main.py<a class="headerlink" href="#helloworldapp-main-py" title="Permalink to this headline">¶</a></h2>
+<p>There is only one file for the app, main.py:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">kivy.app</span> <span class="kn">import</span> <span class="n">App</span>
+<span class="kn">from</span> <span class="nn">kivy.core.window</span> <span class="kn">import</span> <span class="n">Window</span>
+<span class="kn">from</span> <span class="nn">kivy.uix.widget</span> <span class="kn">import</span> <span class="n">Widget</span>
+<span class="kn">from</span> <span class="nn">kivy.uix.button</span> <span class="kn">import</span> <span class="n">Button</span>
+
+<span class="kn">from</span> <span class="nn">kivy.properties</span> <span class="kn">import</span> <span class="n">ObjectProperty</span>
+
+<span class="kn">from</span> <span class="nn">kivy_statecharts.system.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">kivy_statecharts.system.statechart</span> <span class="kn">import</span> <span class="n">StatechartManager</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+
+
+<span class="k">class</span> <span class="nc">HelloWorldView</span><span class="p">(</span><span class="n">Widget</span><span class="p">):</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">ObjectProperty</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HelloWorldView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keyboard</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">request_keyboard</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keyboard_closed</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keyboard</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">on_key_down</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_keyboard_down</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_keyboard_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keyboard</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span><span class="n">on_key_down</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_keyboard_down</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keyboard</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">_on_keyboard_down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyboard</span><span class="p">,</span> <span class="n">keycode</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">modifiers</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">text</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;l&#39;</span><span class="p">,</span> <span class="s">&#39;o&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">statechart</span><span class="o">.</span><span class="n">sendEvent</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">keycode</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;escape&#39;</span><span class="p">:</span>
+            <span class="n">keyboard</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">True</span>
+
+
+<span class="k">class</span> <span class="nc">LetterButton</span><span class="p">(</span><span class="n">Button</span><span class="p">):</span>
+    <span class="n">statechart</span> <span class="o">=</span> <span class="n">ObjectProperty</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statechart</span><span class="p">,</span> <span class="n">letter</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statechart</span> <span class="o">=</span> <span class="n">statechart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">letter</span> <span class="o">=</span> <span class="n">letter</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LetterButton</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">on_press</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">letter_clicked</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">letter_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&#39;letter clicked&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">letter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statechart</span><span class="o">.</span><span class="n">sendEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">letter</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">AppStatechart</span><span class="p">(</span><span class="n">StatechartManager</span><span class="p">):</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">ObjectProperty</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trace</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rootStateClass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RootState</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AppStatechart</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">RootState</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+        <span class="n">initialSubstateKey</span> <span class="o">=</span> <span class="s">&#39;ShowingHelloWorld&#39;</span>
+
+        <span class="k">class</span> <span class="nc">ShowingHelloWorld</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">ObjectProperty</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">enterState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                <span class="k">print</span> <span class="s">&#39;ShowingHelloWorld/enterState&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statechart</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">root</span>
+
+            <span class="k">def</span> <span class="nf">exitState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                <span class="k">print</span> <span class="s">&#39;ShowingHelloWorld/exitState&#39;</span>
+
+            <span class="c"># Utility method:</span>
+            <span class="c">#</span>
+            <span class="k">def</span> <span class="nf">add_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">letter</span><span class="p">):</span>
+                <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statechart</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">hello_world_view</span><span class="o">.</span><span class="n">size</span>
+                <span class="n">button_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+
+                <span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="n">button_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height</span> <span class="o">-</span> <span class="n">button_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">add_widget</span><span class="p">(</span><span class="n">LetterButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statechart</span><span class="p">,</span> <span class="n">letter</span><span class="p">,</span>
+                                                  <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
+                                                  <span class="n">size</span><span class="o">=</span><span class="n">button_size</span><span class="p">,</span>
+                                                  <span class="n">text</span><span class="o">=</span><span class="n">letter</span><span class="p">))</span>
+
+            <span class="c"># Action methods:</span>
+            <span class="c">#</span>
+            <span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="s">&#39;h&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">e</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="s">&#39;e&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">l</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="s">&#39;l&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">o</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="s">&#39;o&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">HelloWorldApp</span><span class="p">(</span><span class="n">App</span><span class="p">):</span>
+    <span class="n">statechart</span> <span class="o">=</span> <span class="n">ObjectProperty</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">hello_world_view</span> <span class="o">=</span> <span class="n">ObjectProperty</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hello_world_view</span> <span class="o">=</span> <span class="n">HelloWorldView</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hello_world_view</span>
+
+    <span class="k">def</span> <span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statechart</span> <span class="o">=</span> <span class="n">AppStatechart</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statechart</span><span class="o">.</span><span class="n">initStatechart</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;__android__&#39;</span><span class="p">,</span> <span class="s">&#39;__main__&#39;</span><span class="p">):</span>
+    <span class="n">HelloWorldApp</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="details">
+<h2>Details<a class="headerlink" href="#details" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s start with the App definition, HelloWorldApp. It has a statechart
+property and a property for the main widget, hello_world_view. The build()
+method instantiates HelloWorldView and returns it &#8211; the widget returned
+from build() is the root widget, available as app.root. The on_start()
+method is called when the app is run. This is when we instantiate the
+statechart.</p>
+<p>The app starts when HelloWorldApp().run() is called in main. build()
+happens first, then on_start(), and the app and its statechart are up and
+running.</p>
+<p>We&#8217;ve already seen the basic structure of the statechart, but let&#8217;s take a
+more thorough look.</p>
+<p>First, AppStatechart has an app reference property, for convenience, that is
+passed on instantiation. Any Kivy property defined in the body of a class is
+automatically set if passed as an argument. You don&#8217;t even have to have an
+__init__() method, but here we do, because the trace and rootStateClass
+properties are set.</p>
+<p>The only thing declared in the root state is the inital substate,
+ShowingHelloWorld, which contains the basic functionality for the app.</p>
+</div>
+<div class="section" id="showinghelloworld-enterstate-and-exitstate">
+<h2>ShowingHelloWorld, enterState() and exitState()<a class="headerlink" href="#showinghelloworld-enterstate-and-exitstate" title="Permalink to this headline">¶</a></h2>
+<p>If enterState() and/or exitState() are defined for a state, these will be
+called automatically at the appropriate times. In a larger app, you would
+think about what needs to happen on enter and exit, such as creating and
+showing a dialog in the enterState, and tearing it down in the exit state,
+or any manner of things that could happen. Here, we just print a message on
+enterState() and exitState().</p>
+</div>
+<div class="section" id="utility-functions">
+<h2>Utility functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h2>
+<p>A state is a normal python class. It can have properties, an __init__(),
+specialized methods, etc. Here we are calling the add_label() method a
+&#8220;utility&#8221; function, meaning a normal function that does whatever work is
+necessary. add_label() creates a randomly located button for a given
+letter in &#8220;hello world.&#8221;</p>
+</div>
+<div class="section" id="action-functions">
+<h2>Action functions<a class="headerlink" href="#action-functions" title="Permalink to this headline">¶</a></h2>
+<p>There is nothing special about the type of action functions used in the
+hello_world app. The action functions here, h(), e(), l(), o(), w(), r(), and
+d() respond to events of the same names: &#8216;h&#8217;, &#8216;e&#8217;, &#8216;l&#8217;, &#8216;o&#8217;, &#8216;w&#8217;, &#8216;r&#8217;, and
+&#8216;d&#8217;. These events happen either from keyboard presses or from mouse clicks or
+touches on letter buttons. When the app first loads, there are no letter
+buttons until keyboard presses add some. Then the events could come from
+additional keyboard presses or from the buttons.</p>
+<p>Look at the HelloWorldView class for setup of the keyboard actions (We can use
+the terms action and event interchangeably here). You see there that when a
+key press happens, there is a call to statechart.sendEvent(letter), where
+letter is one of the letters in &#8220;hello world.&#8221;</p>
+<p>In a larger app, action function names could be anything, but examples tend to
+have a demonstrative aspect, such as collide_with_barrier(), for a game, or
+load_users() for an admin panel, or delete_comment() for a media app.</p>
+<p>It is easy to rapidly prototype an app, because of the organization you can do
+with states and their actions, arranged in a hierarchy. You can do this in
+code only, or you can draw out the statechart in a diagram before coding, or
+you can use some combination of approaches, often in interation. A statechart
+diagram for hello_world would be:</p>
+<p>Before we leave the subject of action functions, there is an alternative to
+having separate action functions, when there is a related set, as we have with
+our hello_world app. We could define a single handler method, as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@State.eventHandler</span><span class="p">([</span><span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;l&#39;</span><span class="p">,</span> <span class="s">&#39;o&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">letter_event_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">letter</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is a case where the eventHandler function approach is a perfect fit. The
+first line is a function decorator on the State class that marks
+letter_event_handler() as a handler for all the events in the list.</p>
+</div>
+</div>
+<div class="section" id="balls">
+<h1>Balls<a class="headerlink" href="#balls" title="Permalink to this headline">¶</a></h1>
+<p>Balls is a small Kivy app that bounces balls around the screen.  The kv file
+for the program, balls.kv, consists of the Ball class and the BallsView main
+container class. Each ball is 50x50 in size, and begins with a location at
+the center of the parent window.</p>
+<div class="section" id="statecharts-and-terminology-in-mva-mvc-systems">
+<h2>Statecharts and Terminology in MVA/MVC Systems<a class="headerlink" href="#statecharts-and-terminology-in-mva-mvc-systems" title="Permalink to this headline">¶</a></h2>
+<p>MVA = Model-View-Adapter System</p>
+<p>MVC = Model-View-Controller System</p>
+<p>Kivy seems closer to MVA, but ongoing current work on the framework will
+help to clarify. MVA/MVC terms are mentioned here because you will not
+see the term &#8220;controller&#8221; used much in Kivy, and the term &#8220;adapter&#8221; is
+just now starting to be used.</p>
+<p>Statecharts are applicable to software systems in general, but Kivy,
+like so many other systems, involves a user interface with buttons and
+sliders and lists and custom views, tied to models of record types by
+means of adapters or controllers. Kivy has a sophisticated property
+bindings and observer system that is more similar to MVA design, than to
+MVC systems, generally. Regardless, whatever terminology is used, Kivy
+and other similar systems are &#8220;reactive&#8221; systems, so are amenable to
+statechart treatment.</p>
+<p>Statecharts enhance the traditional MVA/MVC system. Where you may find
+some sort of event and callback system forming &#8220;adapter/controller&#8221;
+functionality, statecharts offer formalization beyond that, helping the
+programmer think more clearly about discrete elements and interactions.</p>
+<p>For learning about &#8220;adapters/controllers&#8221; and terminology, we can read
+blog posts by Michael Cohen (nick: frozencanuck), the original author of
+the statecharts framework ported here from SproutCore. It will help you
+to realize that SproutCore is based on Cocoa. In Cocoa, we see
+differentation between coordinating vs. mediating controllers. Mediating
+controllers are a bit lower-level than coordinating controllers.
+Mediating controllers have some sort of backing content, usually data
+models with record types used in the system, that needs updating per
+user action in user interface views.</p>
+<p>Coordinating controllers are more general than mediating controllers,
+and contain broader level application logic. Differences between these
+types of controllers are subtle and can be confused, a subject addressed
+by Michael Cohen in an important <a class="reference external" href="http://frozencanuck.wordpress.com/2011/03/09/sproutcore-statecharts-vs-controllers/">blog
+post</a>.
+The upshot of the blog post is that the higher level logic blocks in
+controllers will often &#8220;turn into brutish monsters containing many
+if-else or switch-case statements to know what state the application is
+currently in.&#8221;</p>
+</div>
+<div class="section" id="statecharts-for-kivy">
+<h2>Statecharts for Kivy<a class="headerlink" href="#statecharts-for-kivy" title="Permalink to this headline">¶</a></h2>
+<p>Kivy has adapters that are like mediating controllers. Kivy has a
+property and bindings system, whereby a kind of view-mediating adapter
+coupling is built as a custom Widget.</p>
+<p>Kivy does not formally have coordinating controllers.</p>
+<p>Code in Kivy that plays the &#8220;coordinating controller&#8221; role can be found
+in specific functions written to respond to user actions. A great
+example of clean layout for this can be seen in the DeflectTouch game
+that won the first Kivy app competition. For example, look at the
+substantial code in the level_button_pressed() function:
+<a class="reference external" href="https://github.com/stocyr/Deflectouch/blob/master/main.py#L181">https://github.com/stocyr/Deflectouch/blob/master/main.py#L181</a> &#8211; this
+is &#8220;coordinating controller&#8221; code.</p>
+<p>The code in the DeflecTouch level_button_pressed() function could just
+as well be put in a &#8220;ShowingMainScreen&#8221; state, in a &#8220;show_levels&#8221;
+action function. Rewriting DeflecTouch with statecharts would simply
+entail moving such code into discrete states, and to action functions
+that respond to events such as &#8220;show levels.&#8221; And, in the process,
+benefit from the formalization and especially from the clarity that
+drawing an app statechart would bring.</p>
+<p>Although good examples are starting to appear in the kivy-statecharts
+framework, a version of DeflecTouch with statecharts will be highly
+illustrative... Stay tuned...</p>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to kivy-statecharts&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#tests">Tests</a></li>
+<li><a class="reference internal" href="#example-apps">Example Apps</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#in-a-nutshell">In a Nutshell</a></li>
+<li><a class="reference internal" href="#background">Background</a></li>
+<li><a class="reference internal" href="#hello-world">Hello World</a><ul>
+<li><a class="reference internal" href="#running">Running</a></li>
+<li><a class="reference internal" href="#helloworldapp-main-py">HelloWorldApp, main.py</a></li>
+<li><a class="reference internal" href="#details">Details</a></li>
+<li><a class="reference internal" href="#showinghelloworld-enterstate-and-exitstate">ShowingHelloWorld, enterState() and exitState()</a></li>
+<li><a class="reference internal" href="#utility-functions">Utility functions</a></li>
+<li><a class="reference internal" href="#action-functions">Action functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#balls">Balls</a><ul>
+<li><a class="reference internal" href="#statecharts-and-terminology-in-mva-mvc-systems">Statecharts and Terminology in MVA/MVC Systems</a></li>
+<li><a class="reference internal" href="#statecharts-for-kivy">Statecharts for Kivy</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="#">kivy-statecharts 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Jeff Pittman.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
