@@ -109,7 +109,8 @@ class ThrusterGroup(Widget):
 #
 class Viewport(ScatterPlane):
     def __init__(self, **kwargs):
-        kwargs.setdefault('size', (700, 774))
+        #kwargs.setdefault('size', (700, 774))
+        kwargs.setdefault('size', (874, 870))
         kwargs.setdefault('size_hint', (None, None))
         kwargs.setdefault('do_scale', False)
         kwargs.setdefault('do_translation', False)
@@ -597,9 +598,9 @@ class ShuttleControlApp(App):
         super(ShuttleControlApp, self).__init__(**kwargs)
 
     def build(self):
-        Config.set('graphics', 'width', '700') # not working, must be set from command line
-        Config.set('graphics', 'height', '774') # not working, must be set from command line
 
+        #self.root = Viewport(size=(700,774))
+        self.root = Viewport()
         self.root = Viewport(size=(700,774))
 
         # Create top toolbar, and add it to the viewport.
@@ -624,6 +625,10 @@ class ShuttleControlApp(App):
 #  Main
 #
 if __name__ in ('__android__', '__main__'):
+    Config.set('graphics', 'width', '700')
+    Config.set('graphics', 'height', '774')
+    Config.write()
+
     app = ShuttleControlApp()
     app.run()
 
