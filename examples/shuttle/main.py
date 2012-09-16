@@ -109,8 +109,7 @@ class ThrusterGroup(Widget):
 #
 class Viewport(ScatterPlane):
     def __init__(self, **kwargs):
-        #kwargs.setdefault('size', (700, 774))
-        kwargs.setdefault('size', (874, 870))
+        kwargs.setdefault('size', (700, 774))
         kwargs.setdefault('size_hint', (None, None))
         kwargs.setdefault('do_scale', False)
         kwargs.setdefault('do_translation', False)
@@ -145,7 +144,7 @@ class Viewport(ScatterPlane):
         w.size = self.size
 
 
-class TopToolbar(BoxLayout):
+class TopToolbar(Widget):
     pass
 
 
@@ -598,8 +597,6 @@ class ShuttleControlApp(App):
         super(ShuttleControlApp, self).__init__(**kwargs)
 
     def build(self):
-
-        #self.root = Viewport(size=(700,774))
         self.root = Viewport()
         self.root = Viewport(size=(700,774))
 

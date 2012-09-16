@@ -1,33 +1,35 @@
 #:kivy 1.0.9
 
-# AnimatedButton is used as the main toolbar application mode button.
-#
-<AnimatedButton>:
-    canvas.before:
-        Color:
-            rgb: (1, 1, 1)
-        BorderImage:
-            border: root.border if root.border else (16, 16, 16, 16)
-            pos: 0, 714
-            size: 700, 60
-            texture: self.texture_background
+# TopToolbar
+#   pos: 0, 720
+#   size: 700, 48
+# ThrustersListView
+#   size: 100, 714
+#   pos: 0, 0
+# ShuttleControlView
+#   size: 600, 714
+#   pos: 100, 0
 
-# The TopToolbar spans the width of the app, and is 60 pixels in height.
+# The TopToolbar spans the width of the app.
 #
 <TopToolbar>:
-    animated_button: animated_button
-    canvas:
-        Color:
-            rgb: .4, .3, .2
-        Rectangle:
-            pos: 30, 720
-            size: 120, 48
-    AnimatedButton:
-        id: animated_button
-        text: 'Hey!'
-        halign: 'center'
-        background_normal: 'data/images/toolbar-button-background.png'
-        background_down: 'data/images/anim/toolbar-button-background-animated.zip' 
+    BoxLayout:
+        pos: 0, 748
+        size: 700, 24
+        Label:
+            text: 'Space Shuttle Thruster Displays'
+    BoxLayout:
+        pos: 0, 720
+        size: 700, 24
+        padding: 20
+        Label:
+            text: 'List (left)'
+        Label:
+            text: 'By Group (top)'
+        Label:
+            text: 'In Position (center)'
+        Label:
+            text: 'Firing Panel (bottom)'
 
 # Thanks to quanon for how to do the list with a template as a child
 # of another widget. This list of thrusters and pulsation values goes 
