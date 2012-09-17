@@ -61,7 +61,7 @@ thrusters = { 'forward':   {  1: { 'F1F': None, 'F2F': None, 'F3F': None },
                              12: { 'R1U': None, 'R2U': None, 'R4U': None },
                              14: { 'R2D': None, 'R3D': None, 'R4D': None, 'R5D': None }}}
 
-# ThrusterGroup model.
+# ThrusterGroup model. Size, coded in kv, is 10, 10
 #
 class ThrusterGroup(Button):
     statechart = ObjectProperty(None)
@@ -78,21 +78,25 @@ class ThrusterGroup(Button):
     alternator = BooleanProperty(False)
     
     # The pulsation is the amount of size (radius) increase over the normal size. When off,
-    # a thruster's pulsation is zero, and it paints as normal.
+    # a thruster's pulsation is zero, and it paints as normal. Since we pulsate relative
+    # to size, which starts at (10, 10), let 10 be the base for pulsation too.
     pulsation = NumericProperty(10)
     
     def __init__(self, **kwargs):
+        # For labels, this is not needed, but we are a Button, so set transparency to 0.
         kwargs['background_color'] = [1,1,1,0]
         super(ThrusterGroup, self).__init__(**kwargs)
-        self.bind(on_release=self.adjust_thruster)
+        self.bind(on_release=self.adjust_thruster_group)
 
-    def adjust_thruster(self, *args):
+    def adjust_thruster_group(self, *args):
         self.statechart.sendEvent("adjust_group_{0}".format(self.group_number))
 
     def pulsate(self):
         if self.alternator:
-            self.pos = (self.location_x+self.size[0]/2-self.pulsation/2, self.location_y+self.size[1]/2-self.pulsation/2)
-            self.size = (self.pulsation, self.pulsation)
+            self.pos = (self.location_x + (self.size[0] / 2) - (self.pulsation / 2),
+                        self.location_y + (self.size[1] / 2) - (self.pulsation / 2))
+            if self.pulsation > 0:
+                self.size = (self.pulsation, self.pulsation)
             self.alternator = False
         else:
             self.size = (10,10)
@@ -101,12 +105,15 @@ class ThrusterGroup(Button):
 
     def adjust_pulsation(self, mode, thruster_group_id):
         if mode == 'increasing':
-            self.pulsation = self.pulsation+1
+            self.pulsation += 1
         else:
-            self.pulsation = self.pulsation-1 if self.pulsation > self.size[0] else self.size[0]
+            if self.pulsation > 10:
+                self.pulsation -= 1
+
+        # size starts at (10, 10), so always subtract 10 for posting pulsation.
+        new_pulsation = self.pulsation - 10
 
         for thruster_id in thrusters[self.region][thruster_group_id]:
-            new_pulsation = self.pulsation - self.size[0]
             thrusters[self.region][thruster_group_id][thruster_id].pulsation = new_pulsation
             thrusters[self.region][thruster_group_id][thruster_id].thruster_grid_label.text = "{0}:{1}".format(thruster_id[1:], str(new_pulsation))
             thrusters[self.region][thruster_group_id][thruster_id].thruster_list_label.pulsation.text = str(new_pulsation)
@@ -300,8 +307,8 @@ class ShuttleControlView(Widget):
             thruster_group.pulsation = pulsation
 
             # The initial value of location_x and location_y are taken from the pos set in the kv file.
-            thruster_group.location_x = thruster_group.pos[0] - thruster_group.size[0]/2
-            thruster_group.location_y = thruster_group.pos[1] - thruster_group.size[1]/2
+            thruster_group.location_x = thruster_group.pos[0] - thruster_group.size[0] / 2
+            thruster_group.location_y = thruster_group.pos[1] - thruster_group.size[1] / 2
 
             group_number += 1
 
@@ -384,7 +391,8 @@ class AppStatechart(StatechartManager):
                     for thruster_id in thrusters[region][thruster_group_id]:
                         thruster_ids.append(thruster_id)
             self.thruster_ids_sorted = sorted(thruster_ids)
-            self.statechart.app.root.main_view.thrusters_list_view.items = [{ 'thruster_id': t_id, 'pulsation': '0' } for t_id in self.thruster_ids_sorted]
+            self.statechart.app.root.main_view.thrusters_list_view.items = \
+                    [{ 'thruster_id': t_id, 'pulsation': '0' } for t_id in self.thruster_ids_sorted]
     
             # A sorted list of thruster ids is needed for setting grid items.
             #
@@ -401,10 +409,9 @@ class AppStatechart(StatechartManager):
                         list_label = self.statechart.app.root.main_view.thrusters_list_view.children[self.thruster_ids_sorted.index(thruster_id)]
                         thrusters[region][group_id][thruster_id] = Thruster(thruster_id, group_id, grid_label, list_label)
     
-    
             self.statechart.app.root.main_view.initialize_thruster_groups(pulsation=10, statechart=self.statechart)
             self.statechart.app.root.main_view.set_statechart_in_motion_controls(self.statechart)
-            Clock.schedule_interval(self.statechart.app.root.main_view.update, 1.0/60.0)
+            Clock.schedule_interval(self.statechart.app.root.main_view.update, 1.0 / 60.0)
                             
         def exitState(self, context=None):
             print 'RootState/exitState'
