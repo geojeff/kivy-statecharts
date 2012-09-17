@@ -121,6 +121,12 @@ you should see the app appear. Type any of the letters in &#8220;hello world&#82
 you will see buttons for those letters randomly added in the app window.
 Click any of the buttons, and likewise, more buttons will be added. That&#8217;s
 all it does &#8211; but, pretty fancy for a &#8220;hello world&#8221; app, eh?</p>
+<div class="figure align-center">
+<img alt="_images/screencapture.png" src="_images/screencapture.png" />
+<p class="caption">Screen capture of HelloWorldApp</p>
+</div>
+<p>Each of the randomly placed buttons were added either by the keyboard or by
+clicks/touches on any of the buttons.</p>
 <p><strong>HelloWorldApp, main.py</strong></p>
 <p>There is only one file for the app, main.py:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">kivy.app</span> <span class="kn">import</span> <span class="n">App</span>
@@ -272,15 +278,15 @@ think about what needs to happen on enter and exit, such as creating and
 showing a dialog in the enterState, and tearing it down in the exit state,
 or any manner of things that could happen. Here, we just print a message on
 enterState() and exitState().</p>
-<p><strong>Utility functions</strong></p>
+<p><strong>Utility Methods</strong></p>
 <p>A state is a normal python class. It can have properties, an __init__(),
 specialized methods, etc. Here we are calling the add_label() method a
-&#8220;utility&#8221; function, meaning a normal function that does whatever work is
+&#8220;utility&#8221; method, meaning a normal method that does whatever work is
 necessary. add_label() creates a randomly located button for a given
 letter in &#8220;hello world.&#8221;</p>
-<p><strong>Action functions</strong></p>
-<p>There is nothing special about the type of action functions used in the
-hello_world app. The action functions here, h(), e(), l(), o(), w(), r(), and
+<p><strong>Action Methods</strong></p>
+<p>There is nothing special about the type of action methods used in the
+hello_world app. The action methods here, h(), e(), l(), o(), w(), r(), and
 d() respond to events of the same names: &#8216;h&#8217;, &#8216;e&#8217;, &#8216;l&#8217;, &#8216;o&#8217;, &#8216;w&#8217;, &#8216;r&#8217;, and
 &#8216;d&#8217;. These events happen either from keyboard presses or from mouse clicks or
 touches on letter buttons. When the app first loads, there are no letter
@@ -290,7 +296,7 @@ additional keyboard presses or from the buttons.</p>
 the terms action and event interchangeably here). You see there that when a
 key press happens, there is a call to statechart.sendEvent(letter), where
 letter is one of the letters in &#8220;hello world.&#8221;</p>
-<p>In a larger app, action function names could be anything, but examples tend to
+<p>In a larger app, action method names could be anything, but examples tend to
 have a demonstrative aspect, such as collide_with_barrier(), for a game, or
 load_users() for an admin panel, or delete_comment() for a media app.</p>
 <p>It is easy to rapidly prototype an app, because of the organization you can do
@@ -298,8 +304,8 @@ with states and their actions, arranged in a hierarchy. You can do this in
 code only, or you can draw out the statechart in a diagram before coding, or
 you can use some combination of approaches, often in interation. A statechart
 diagram for hello_world would be:</p>
-<p>Before we leave the subject of action functions, there is an alternative to
-having separate action functions, when there is a related set of events to be
+<p>Before we leave the subject of action methods, there is an alternative to
+having separate action methods, when there is a related set of events to be
 handled, as we have with the letter events in our hello_world app. We could
 define a single handler method, as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="nd">@State.eventHandler</span><span class="p">([</span><span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;l&#39;</span><span class="p">,</span> <span class="s">&#39;o&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">])</span>
@@ -307,7 +313,7 @@ define a single handler method, as follows:</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This is a case where the eventHandler function approach is a perfect fit. The
+<p>This is a case where the eventHandler method approach is a perfect fit. The
 first line is a function decorator on the State class that marks
 letter_event_handler() as a handler for all the events in the list.</p>
 <p><strong>Statechart Diagram</strong></p>
@@ -335,6 +341,10 @@ pong without the paddles, and with the capacity to send the balls out of
 control. The kv file for the program, balls.kv, consists of the Ball class
 and the BallsView main container class. Each ball is 50x50 in size, and begins
 with a location at the center of the parent window.</p>
+<div class="figure align-center">
+<img alt="_images/screencapture1.png" src="_images/screencapture1.png" />
+<p class="caption">Screen capture of BallsApp</p>
+</div>
 <p>The BallsView class has a serve_balls() method, to get the balls moving, and
 an update method that is called on a timer, every 1/60th of a second, to move
 the balls.</p>
@@ -372,20 +382,85 @@ maintained by a ball_key key.</p>
 <p>The balls are sped up by a key press of &#8216;u&#8217; and slowed down by a key press of
 &#8216;d&#8217;. When the &#8216;u&#8217; key is pressed, the &#8216;speed_up&#8217; event is sent to the
 statechart, and, because each of the moving ball states is a sublass of
-MovingBall, each has an action function named speed_up(), and so will respond
+MovingBall, each has an action method named speed_up(), and so will respond
 to that event. Likewise for the &#8216;d&#8217; key and the &#8216;slow_down&#8217; event, and the
-slow_down() action function.</p>
+slow_down() action method.</p>
 <div class="figure align-center">
 <img alt="_images/statechart1.png" src="_images/statechart1.png" />
 <p class="caption">Statechart diagram for BallsApp</p>
 </div>
-<p>The combination between velocity adjustments in the enterState() method for
+<p>The combination of velocity adjustments in the enterState() method for
 each moving ball state, and the adjustments made in the speed_up() and
-slow_down() methods, forms an algorithm for this app that gives an interesting
-effect, with balls moving in all directions, at different velocities. This was
-found by experimenting a bit. The process illustrates how the developer can
+slow_down() methods, forms an algorithm for this app, giving an interesting
+effect, with balls moving in all directions at different velocities. This was
+found by experimentation. The process illustrates how the developer can
 learn to think in the realm of statecharts: what happens on entry, what
 happens for given events, what happens on exit.</p>
+</div>
+<div class="section" id="shuttlecontrolapp">
+<h2>ShuttleControlApp<a class="headerlink" href="#shuttlecontrolapp" title="Permalink to this headline">¶</a></h2>
+<p>The ShuttleControlApp example presents a graphical display of the thrusters in
+the Space Shuttle&#8217;s Reaction Control System (RCS), as an overlay of labels and
+buttons on a technical drawing.</p>
+<div class="figure align-center">
+<img alt="_images/screencapture2.png" src="_images/screencapture2.png" />
+<p class="caption">Screen capture of ShuttleControlApp</p>
+</div>
+<p>There are 44 individual thrusters, grouped into 14 thruster groups. Thrusters
+are not fired individually, but as sets, in the 14 groups. The blue buttons
+along the bottom of the display are clicked/touched to fire thrusters in the
+the groups. If you repeatedly fire a group, you will see the thrusters in the
+group begin to pulsate, getting larger with more thrust applied. The list on
+the left and the table display at the top are also updated for individual
+thruster amount. If you want to decrease thrust, toggle the &#8220;more / less&#8221;
+control mode at left center.</p>
+<p>As with previous examples, there is really just one main state,
+ShowingThrusterControls, which contains states for each of the 14 thruster
+groups.</p>
+<div class="figure align-center">
+<img alt="_images/statechart2.png" src="_images/statechart2.png" />
+<p class="caption">Statechart diagram for ShuttleControlApp</p>
+</div>
+<p>The Thruster_Group_x states are concurrent, so multitouch is allowed. If this
+were a real app, say for an astronaut cockpit display, the layout of the RCS
+control buttons (blue) could be rearranged into something more intuitive, but
+this example app just plops a UI on top of a technical drawing.</p>
+</div>
+<div class="section" id="deflectouch-with-statecharts-app">
+<h2>Deflectouch-With-Statecharts App<a class="headerlink" href="#deflectouch-with-statecharts-app" title="Permalink to this headline">¶</a></h2>
+<p>The Deflectouch app was written by Cyril Stoller for a Kivy game competition,
+which it won (<a class="reference external" href="https://github.com/stocyr/Deflectouch">https://github.com/stocyr/Deflectouch</a>). It is modified here to
+adapt for statecharts, without fundamentally changing the design of the game,
+through moving blocks of code around, simplifying where possible, and adding
+necessary bits here and there. The game presents a tank on the left, which
+has a moveable barrel, a game screen with barrier blocks and blue target
+blocks, and a button panel at right. If you have a clear line of sight to a
+target, you can just aim and fire. However, usually the barriers are in the
+way, so you must create deflectors with a two-finger pinch-and-expand action.
+You are limited by the amount of deflector &#8220;stock,&#8221; which is shown in a bottom
+bar graph display. So, you can create more than one deflector, but there is a
+limit to how long the sum-total length of deflectors can be &#8211; sometimes you
+need to do multiple deflections around corners.</p>
+<div class="figure align-center">
+<img alt="_images/screencapture3.png" src="_images/screencapture3.png" />
+<p class="caption">Screen capture of Deflectouch-With-Statecharts App</p>
+</div>
+<p>The statechart diagram for the Delectouch-with-statecharts app shows several
+major areas of concern. There are the main display states at top left, actions
+and states for deflectors toward top right, all that happens when a bullet is
+in flight at bottom right, and the rest as odds and ends at left, and at far
+right, where you see the game level changing action.</p>
+<div class="figure align-center">
+<img alt="_images/statechart3.png" src="_images/statechart3.png" />
+<p class="caption">Statechart diagram for Deflectouch-With-Statecharts App</p>
+</div>
+<p>A new concept is introduced here for states: transient states, which are shown
+by dashed line borders. These states do something in their enterState()
+method, then immediately fire to another state. You also see that the Tank is
+autonomous &#8211; it doesn&#8217;t send events to the statechart, it has internally
+operating bindings between touch events and moving and barrel adjustment
+methods. Deflector has one autonomous function like that, for moving, but the
+other events fire to the statechart.</p>
 </div>
 </div>
 <div class="section" id="background">
@@ -464,9 +539,9 @@ well).</p>
 <p>To attempt a paraphrase:</p>
 <div class="highlight-python"><pre>Statecharts add to basic state-diagrams the functionality to arrange
 states in a hierarchy, specifying which states are independent of one
-another and which ones are concurrent with each other. Action functions
+another and which ones are concurrent with each other. Action methods
 within states respond to events delivered to the statechart. Events
-firing to the action functions may have broadcast effect across multiple
+firing to the action methods may have broadcast effect across multiple
 related or concurrent states.</pre>
 </div>
 <div class="section" id="statecharts-and-terminology-in-mva-mvc-systems">
@@ -513,24 +588,14 @@ currently in.&#8221;</p>
 <p>Kivy has adapters that are like mediating controllers. Kivy has a
 property and bindings system, whereby a kind of view-mediating adapter
 coupling is built as a custom Widget.</p>
-<p>Kivy does not formally have coordinating controllers.</p>
-<p>Code in Kivy that plays the &#8220;coordinating controller&#8221; role can be found
-in specific functions written to respond to user actions. A great
-example of clean layout for this can be seen in the DeflectTouch game
-that won the first Kivy app competition. For example, look at the
-substantial code in the level_button_pressed() function:
-<a class="reference external" href="https://github.com/stocyr/Deflectouch/blob/master/main.py#L181">https://github.com/stocyr/Deflectouch/blob/master/main.py#L181</a> &#8211; this
-is &#8220;coordinating controller&#8221; code.</p>
-<p>The code in the DeflecTouch level_button_pressed() function could just
-as well be put in a &#8220;ShowingMainScreen&#8221; state, in a &#8220;show_levels&#8221;
-action function. Rewriting DeflecTouch with statecharts would simply
-entail moving such code into discrete states, and to action functions
-that respond to events such as &#8220;show levels.&#8221; And, in the process,
-benefit from the formalization and especially from the clarity that
-drawing an app statechart would bring.</p>
-<p>Although good examples are starting to appear in the kivy-statecharts
-framework, a version of DeflecTouch with statecharts will be highly
-illustrative... Stay tuned...</p>
+<p>Kivy does not formally have coordinating controllers, but the events
+system and bindings are great for doing the essentials, and together with
+statecharts, a robust controller system can be built.</p>
+<p>Hopefully, the examples provided will generate more thinking, and perhaps
+we can find effective idioms for app development.</p>
+<p>There is new work on adding selection capabilities to Kivy, along with a good
+set of list view and related classes. This will go hand-and-hand with the
+action of statecharts.</p>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -559,6 +624,8 @@ illustrative... Stay tuned...</p>
 <li><a class="reference internal" href="#example-apps">Example Apps</a><ul>
 <li><a class="reference internal" href="#hello-world-example-app">Hello World Example App</a></li>
 <li><a class="reference internal" href="#balls-example-app">Balls Example App</a></li>
+<li><a class="reference internal" href="#shuttlecontrolapp">ShuttleControlApp</a></li>
+<li><a class="reference internal" href="#deflectouch-with-statecharts-app">Deflectouch-With-Statecharts App</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#background">Background</a><ul>

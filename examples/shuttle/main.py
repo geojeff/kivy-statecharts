@@ -420,9 +420,7 @@ class AppStatechart(StatechartManager):
         # ShowingThrusterControls
         #
         class ShowingThrusterControls(State):
-            def __init__(self, **kwargs):
-                kwargs['substatesAreConcurrent'] = True
-                super(AppStatechart.RootState.ShowingThrusterControls, self).__init__(**kwargs)
+            substatesAreConcurrent = True
         
             def enterState(self, context=None):
                 print 'ShowingThrusterControls/enterState'

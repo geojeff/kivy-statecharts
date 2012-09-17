@@ -104,6 +104,14 @@ you will see buttons for those letters randomly added in the app window.
 Click any of the buttons, and likewise, more buttons will be added. That's
 all it does -- but, pretty fancy for a "hello world" app, eh?
 
+.. figure::  ../examples/hello_world/design/screencapture.png
+   :align:   center
+
+   Screen capture of HelloWorldApp
+
+Each of the randomly placed buttons were added either by the keyboard or by
+clicks/touches on any of the buttons.
+
 **HelloWorldApp, main.py**
 
 There is only one file for the app, main.py:
@@ -343,6 +351,11 @@ control. The kv file for the program, balls.kv, consists of the Ball class
 and the BallsView main container class. Each ball is 50x50 in size, and begins
 with a location at the center of the parent window.
 
+.. figure::  ../examples/balls/design/screencapture.png
+   :align:   center
+
+   Screen capture of BallsApp
+
 The BallsView class has a serve_balls() method, to get the balls moving, and
 an update method that is called on a timer, every 1/60th of a second, to move
 the balls.
@@ -401,6 +414,84 @@ effect, with balls moving in all directions at different velocities. This was
 found by experimentation. The process illustrates how the developer can
 learn to think in the realm of statecharts: what happens on entry, what
 happens for given events, what happens on exit.
+
+ShuttleControlApp
+-----------------
+
+The ShuttleControlApp example presents a graphical display of the thrusters in
+the Space Shuttle's Reaction Control System (RCS), as an overlay of labels and
+buttons on a technical drawing.
+
+.. figure::  ../examples/shuttle/design/screencapture.png
+   :align:   center
+
+   Screen capture of ShuttleControlApp
+
+There are 44 individual thrusters, grouped into 14 thruster groups. Thrusters
+are not fired individually, but as sets, in the 14 groups. The blue buttons
+along the bottom of the display are clicked/touched to fire thrusters in the
+the groups. If you repeatedly fire a group, you will see the thrusters in the
+group begin to pulsate, getting larger with more thrust applied. The list on
+the left and the table display at the top are also updated for individual
+thruster amount. If you want to decrease thrust, toggle the "more / less"
+control mode at left center.
+
+As with previous examples, there is really just one main state,
+ShowingThrusterControls, which contains states for each of the 14 thruster
+groups.
+
+
+.. figure::  ../examples/shuttle/design/statechart.png
+   :align:   center
+
+   Statechart diagram for ShuttleControlApp
+
+The Thruster_Group_x states are concurrent, so multitouch is allowed. If this
+were a real app, say for an astronaut cockpit display, the layout of the RCS
+control buttons (blue) could be rearranged into something more intuitive, but
+this example app just plops a UI on top of a technical drawing.
+
+Deflectouch-With-Statecharts App
+--------------------------------
+
+The Deflectouch app was written by Cyril Stoller for a Kivy game competition,
+which it won (https://github.com/stocyr/Deflectouch). It is modified here to
+adapt for statecharts, without fundamentally changing the design of the game,
+through moving blocks of code around, simplifying where possible, and adding
+necessary bits here and there. The game presents a tank on the left, which
+has a moveable barrel, a game screen with barrier blocks and blue target
+blocks, and a button panel at right. If you have a clear line of sight to a
+target, you can just aim and fire. However, usually the barriers are in the
+way, so you must create deflectors with a two-finger pinch-and-expand action.
+You are limited by the amount of deflector "stock," which is shown in a bottom
+bar graph display. So, you can create more than one deflector, but there is a
+limit to how long the sum-total length of deflectors can be -- sometimes you
+need to do multiple deflections around corners.
+
+.. figure::  ../examples/deflectouch_with_statecharts/design/screencapture.png
+   :align:   center
+
+   Screen capture of Deflectouch-With-Statecharts App
+
+The statechart diagram for the Delectouch-with-statecharts app shows several
+major areas of concern. There are the main display states at top left, actions
+and states for deflectors toward top right, all that happens when a bullet is
+in flight at bottom right, and the rest as odds and ends at left, and at far
+right, where you see the game level changing action.
+
+.. figure::  ../examples/deflectouch_with_statecharts/design/statechart.png
+   :align:   center
+
+   Statechart diagram for Deflectouch-With-Statecharts App
+
+A new concept is introduced here for states: transient states, which are shown
+by dashed line borders. These states do something in their enterState()
+method, then immediately fire to another state. You also see that the Tank is
+autonomous -- it doesn't send events to the statechart, it has internally
+operating bindings between touch events and moving and barrel adjustment
+methods. Deflector has one autonomous function like that, for moving, but the
+other events fire to the statechart.
+
 
 Background
 ==========
@@ -557,27 +648,16 @@ Kivy has adapters that are like mediating controllers. Kivy has a
 property and bindings system, whereby a kind of view-mediating adapter
 coupling is built as a custom Widget.
 
-Kivy does not formally have coordinating controllers.
+Kivy does not formally have coordinating controllers, but the events
+system and bindings are great for doing the essentials, and together with
+statecharts, a robust controller system can be built.
 
-Code in Kivy that plays the "coordinating controller" role can be found
-in specific functions written to respond to user actions. A great
-example of clean layout for this can be seen in the DeflectTouch game
-that won the first Kivy app competition. For example, look at the
-substantial code in the level\_button\_pressed() function:
-https://github.com/stocyr/Deflectouch/blob/master/main.py#L181 -- this
-is "coordinating controller" code.
+Hopefully, the examples provided will generate more thinking, and perhaps
+we can find effective idioms for app development.
 
-The code in the DeflecTouch level\_button\_pressed() function could just
-as well be put in a "ShowingMainScreen" state, in a "show\_levels"
-action method. Rewriting DeflecTouch with statecharts would simply
-entail moving such code into discrete states, and to action methods
-that respond to events such as "show levels." And, in the process,
-benefit from the formalization and especially from the clarity that
-drawing an app statechart would bring.
-
-Although good examples are starting to appear in the kivy-statecharts
-framework, a version of DeflecTouch with statecharts will be highly
-illustrative... Stay tuned...
+There is new work on adding selection capabilities to Kivy, along with a good
+set of list view and related classes. This will go hand-and-hand with the
+action of statecharts.
 
 Indices and tables
 ==================
