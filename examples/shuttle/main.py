@@ -2,6 +2,7 @@ import kivy
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.widget import Widget
+from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
@@ -21,7 +22,6 @@ from kivy_statecharts.system.statechart import StatechartManager
 
 import inspect
 
-from uix.custom_button import AnimatedButton
 
 #################
 #
@@ -63,7 +63,11 @@ thrusters = { 'forward':   {  1: { 'F1F': None, 'F2F': None, 'F3F': None },
 
 # ThrusterGroup model.
 #
-class ThrusterGroup(Widget):
+class ThrusterGroup(Button):
+    statechart = ObjectProperty(None)
+
+    group_number = NumericProperty(0)
+
     location_x = NumericProperty(0)
     location_y = NumericProperty(0)
 
@@ -77,6 +81,14 @@ class ThrusterGroup(Widget):
     # a thruster's pulsation is zero, and it paints as normal.
     pulsation = NumericProperty(10)
     
+    def __init__(self, **kwargs):
+        kwargs['background_color'] = [1,1,1,0]
+        super(ThrusterGroup, self).__init__(**kwargs)
+        self.bind(on_release=self.adjust_thruster)
+
+    def adjust_thruster(self, *args):
+        self.statechart.sendEvent("adjust_group_{0}".format(self.group_number))
+
     def pulsate(self):
         if self.alternator:
             self.pos = (self.location_x+self.size[0]/2-self.pulsation/2, self.location_y+self.size[1]/2-self.pulsation/2)
@@ -278,14 +290,20 @@ class ShuttleControlView(Widget):
         # Return True to accept the key. Otherwise, it will be used by the system.
         return True
 
-    def initialize_thruster_groups(self, pulsation=10):
+    def initialize_thruster_groups(self, pulsation=10, statechart=None):
+        group_number = 0
         for thruster_group in (self.thruster_group_1, self.thruster_group_2, self.thruster_group_3, self.thruster_group_4, self.thruster_group_5, self.thruster_group_6, self.thruster_group_7, self.thruster_group_8, self.thruster_group_9, self.thruster_group_10, self.thruster_group_11, self.thruster_group_12, self.thruster_group_13, self.thruster_group_14):
+            thruster_group.statechart = statechart
+            thruster_group.group_number = group_number + 1
+
             # Set a default pulsation value.
             thruster_group.pulsation = pulsation
 
             # The initial value of location_x and location_y are taken from the pos set in the kv file.
             thruster_group.location_x = thruster_group.pos[0] - thruster_group.size[0]/2
             thruster_group.location_y = thruster_group.pos[1] - thruster_group.size[1]/2
+
+            group_number += 1
 
     def set_statechart_in_motion_controls(self, statechart):
         controls = { 'yaw_plus': self.yaw_plus, 
@@ -384,7 +402,7 @@ class AppStatechart(StatechartManager):
                         thrusters[region][group_id][thruster_id] = Thruster(thruster_id, group_id, grid_label, list_label)
     
     
-            self.statechart.app.root.main_view.initialize_thruster_groups()
+            self.statechart.app.root.main_view.initialize_thruster_groups(pulsation=10, statechart=self.statechart)
             self.statechart.app.root.main_view.set_statechart_in_motion_controls(self.statechart)
             Clock.schedule_interval(self.statechart.app.root.main_view.update, 1.0/60.0)
                             
@@ -415,6 +433,9 @@ class AppStatechart(StatechartManager):
                     #import pudb; pudb.set_trace()
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
+                def adjust_group_1(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
             class ThrusterGroup_2(State):
                 def __init__(self, **kwargs):
                     super(AppStatechart.RootState.ShowingThrusterControls.ThrusterGroup_2, self).__init__(**kwargs)
@@ -426,6 +447,9 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
                 def translate_y_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
+                def adjust_group_2(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
             class ThrusterGroup_3(State):
@@ -440,6 +464,9 @@ class AppStatechart(StatechartManager):
                 def translate_y_minus(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
+                def adjust_group_3(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
             class ThrusterGroup_4(State):
                 def __init__(self, **kwargs):
                     super(AppStatechart.RootState.ShowingThrusterControls.ThrusterGroup_4, self).__init__(**kwargs)
@@ -450,6 +477,9 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
                 def translate_z_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
+                def adjust_group_4(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
             class ThrusterGroup_5(State):
@@ -464,6 +494,9 @@ class AppStatechart(StatechartManager):
                 def translate_z_minus(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
+                def adjust_group_5(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
             class ThrusterGroup_6(State):
                 def __init__(self, **kwargs):
                     super(AppStatechart.RootState.ShowingThrusterControls.ThrusterGroup_6, self).__init__(**kwargs)
@@ -474,6 +507,9 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
                 def translate_z_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
+                def adjust_group_6(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
             class ThrusterGroup_7(State):
@@ -488,6 +524,9 @@ class AppStatechart(StatechartManager):
                 def translate_x_plus(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
+                def adjust_group_7(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
             class ThrusterGroup_8(State):
                 def __init__(self, **kwargs):
                     super(AppStatechart.RootState.ShowingThrusterControls.ThrusterGroup_8, self).__init__(**kwargs)
@@ -498,6 +537,9 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
                 def translate_x_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
+                def adjust_group_8(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
             class ThrusterGroup_9(State):
@@ -512,6 +554,9 @@ class AppStatechart(StatechartManager):
                 def translate_y_plus(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
+                def adjust_group_9(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
             class ThrusterGroup_10(State):
                 def __init__(self, **kwargs):
                     super(AppStatechart.RootState.ShowingThrusterControls.ThrusterGroup_10, self).__init__(**kwargs)
@@ -522,6 +567,9 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
                 def translate_y_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
+                def adjust_group_10(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
             class ThrusterGroup_11(State):
@@ -539,6 +587,9 @@ class AppStatechart(StatechartManager):
                 def translate_z_plus(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
+                def adjust_group_11(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
             class ThrusterGroup_12(State):
                 def __init__(self, **kwargs):
                     super(AppStatechart.RootState.ShowingThrusterControls.ThrusterGroup_12, self).__init__(**kwargs)
@@ -552,6 +603,9 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
                 def translate_z_plus(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
+                def adjust_group_12(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
             class ThrusterGroup_13(State):
@@ -569,6 +623,9 @@ class AppStatechart(StatechartManager):
                 def translate_z_minus(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
+                def adjust_group_13(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
             class ThrusterGroup_14(State):
                 def __init__(self, **kwargs):
                     super(AppStatechart.RootState.ShowingThrusterControls.ThrusterGroup_14, self).__init__(**kwargs)
@@ -582,6 +639,9 @@ class AppStatechart(StatechartManager):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
                 def translate_z_minus(self, arg1=None, arg2=None):
+                    self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
+
+                def adjust_group_14(self, arg1=None, arg2=None):
                     self.thruster_group.adjust_pulsation(self.statechart.app.root.main_view.thruster_control_mode, self.group_id)
 
 
