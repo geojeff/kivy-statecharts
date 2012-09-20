@@ -388,6 +388,9 @@ class AppStatechart(StatechartManager):
                 else:
                     self.gotoState('ShowingLevel')
 
+            def show_help_first_time(self, *args):
+                self.gotoState('ShowingWelcomePopup')
+
             def exitState(self, context=None):
                 print 'ShowingGameScreen/exitState'
 
@@ -794,9 +797,6 @@ class AppStatechart(StatechartManager):
                     def show_settings(self, *args):
                         self.statechart.app.sound['switch'].play()
                         self.gotoState('ShowingSettingsPopup')
-
-                    def show_help_first_time(self, *args):
-                        self.gotoState('ShowingWelcomePopup')
 
                     def show_help(self, *args):
                         self.gotoState('ShowingHelpPopup')
