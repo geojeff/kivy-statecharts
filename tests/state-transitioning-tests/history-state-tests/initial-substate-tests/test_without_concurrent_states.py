@@ -17,13 +17,13 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootStateClass'] = self.RootState
-        kwargs['monitorIsActive'] = True
+        kwargs['root_state_class'] = self.RootState
+        kwargs['monitor_is_active'] = True
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'A'
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
         class A(State):
@@ -32,12 +32,12 @@ class Statechart_1(StatechartManager):
 
             class InitialSubstate(HistoryState):
                 def __init__(self, **kwargs):
-                    kwargs['defaultState'] = 'C'
+                    kwargs['default_state'] = 'C'
                     super(Statechart_1.RootState.A.InitialSubstate, self).__init__(**kwargs)
 
             class C(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'G'
+                    kwargs['initial_substate_key'] = 'G'
                     super(Statechart_1.RootState.A.C, self).__init__(**kwargs)
 
                 class G(State):
@@ -50,7 +50,7 @@ class Statechart_1(StatechartManager):
 
             class D(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'I'
+                    kwargs['initial_substate_key'] = 'I'
                     super(Statechart_1.RootState.A.D, self).__init__(**kwargs)
 
                 class I(State):
@@ -67,13 +67,13 @@ class Statechart_1(StatechartManager):
         
             class InitialSubstate(HistoryState):
                 def __init__(self, **kwargs):
-                    kwargs['isRecursive'] = True
-                    kwargs['defaultState'] = 'E'
+                    kwargs['is_recursive'] = True
+                    kwargs['default_state'] = 'E'
                     super(Statechart_1.RootState.B.InitialSubstate, self).__init__(**kwargs)
 
             class E(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'K'
+                    kwargs['initial_substate_key'] = 'K'
                     super(Statechart_1.RootState.B.E, self).__init__(**kwargs)
 
                 class K(State):
@@ -86,7 +86,7 @@ class Statechart_1(StatechartManager):
 
             class F(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'M'
+                    kwargs['initial_substate_key'] = 'M'
                     super(Statechart_1.RootState.B.F, self).__init__(**kwargs)
 
                 class M(State):
@@ -100,7 +100,7 @@ class Statechart_1(StatechartManager):
 class StateTransitioningHistoryInitialSubstateWithoutConcurrentTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
-        global rootState_1
+        global root_state_1
         global monitor_1
         global state_A
         global state_B
@@ -116,54 +116,54 @@ class StateTransitioningHistoryInitialSubstateWithoutConcurrentTestCase(unittest
         global state_L
         global state_M
         global state_N
-        global initialSubstate_A
-        global initialSubstate_B
+        global initial_substate_A
+        global initial_substate_B
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootStateInstance
+        statechart_1.init_statechart()
+        root_state_1 = statechart_1.root_state_instance
         monitor_1 = statechart_1.monitor
-        state_A = statechart_1.getState('A')
-        state_B = statechart_1.getState('B')
-        state_C = statechart_1.getState('C')
-        state_D = statechart_1.getState('D')
-        state_E = statechart_1.getState('E')
-        state_F = statechart_1.getState('F')
-        state_G = statechart_1.getState('G')
-        state_H = statechart_1.getState('H')
-        state_I = statechart_1.getState('I')
-        state_J = statechart_1.getState('J')
-        state_K = statechart_1.getState('K')
-        state_L = statechart_1.getState('L')
-        state_M = statechart_1.getState('M')
-        state_N = statechart_1.getState('N')
-        initialSubstate_A = getattr(state_A, 'InitialSubstate')
-        initialSubstate_B = getattr(state_B, 'InitialSubstate')
+        state_A = statechart_1.get_state('A')
+        state_B = statechart_1.get_state('B')
+        state_C = statechart_1.get_state('C')
+        state_D = statechart_1.get_state('D')
+        state_E = statechart_1.get_state('E')
+        state_F = statechart_1.get_state('F')
+        state_G = statechart_1.get_state('G')
+        state_H = statechart_1.get_state('H')
+        state_I = statechart_1.get_state('I')
+        state_J = statechart_1.get_state('J')
+        state_K = statechart_1.get_state('K')
+        state_L = statechart_1.get_state('L')
+        state_M = statechart_1.get_state('M')
+        state_N = statechart_1.get_state('N')
+        initial_substate_A = getattr(state_A, 'InitialSubstate')
+        initial_substate_B = getattr(state_B, 'InitialSubstate')
 
     # Check initial statechart after statechart init
     def test_initial_statechart_after_statechart_init(self):
         self.assertEqual(monitor_1.length, 4)
-        self.assertTrue(monitor_1.matchSequence().begin().entered(rootState_1, state_A, state_C, state_G).end())
+        self.assertTrue(monitor_1.match_sequence().begin().entered(root_state_1, state_A, state_C, state_G).end())
       
-        self.assertEqual(rootState_1.initialSubstateKey, 'A')
-        self.assertEqual(state_C.initialSubstateKey, 'G')
-        self.assertEqual(state_D.initialSubstateKey, 'I')
-        self.assertEqual(state_E.initialSubstateKey, 'K')
-        self.assertEqual(state_F.initialSubstateKey, 'M')
+        self.assertEqual(root_state_1.initial_substate_key, 'A')
+        self.assertEqual(state_C.initial_substate_key, 'G')
+        self.assertEqual(state_D.initial_substate_key, 'I')
+        self.assertEqual(state_E.initial_substate_key, 'K')
+        self.assertEqual(state_F.initial_substate_key, 'M')
 
-        self.assertTrue(isinstance(initialSubstate_A, HistoryState))
-        self.assertFalse(initialSubstate_A.isRecursive)
-        self.assertEqual(initialSubstate_A.defaultState, 'C')
-        self.assertEqual(initialSubstate_A.statechart, statechart_1)
-        self.assertEqual(initialSubstate_A.parentState, state_A)
-        self.assertEqual(initialSubstate_A.state(), state_C)
+        self.assertTrue(isinstance(initial_substate_A, HistoryState))
+        self.assertFalse(initial_substate_A.is_recursive)
+        self.assertEqual(initial_substate_A.default_state, 'C')
+        self.assertEqual(initial_substate_A.statechart, statechart_1)
+        self.assertEqual(initial_substate_A.parent_state, state_A)
+        self.assertEqual(initial_substate_A.state(), state_C)
 
-        self.assertTrue(isinstance(initialSubstate_B, HistoryState))
-        self.assertTrue(initialSubstate_B.isRecursive)
-        self.assertEqual(initialSubstate_B.defaultState, 'E')
-        self.assertEqual(initialSubstate_B.statechart, statechart_1)
-        self.assertEqual(initialSubstate_B.parentState, state_B)
-        self.assertEqual(initialSubstate_B.state(), state_E)
+        self.assertTrue(isinstance(initial_substate_B, HistoryState))
+        self.assertTrue(initial_substate_B.is_recursive)
+        self.assertEqual(initial_substate_B.default_state, 'E')
+        self.assertEqual(initial_substate_B.statechart, statechart_1)
+        self.assertEqual(initial_substate_B.parent_state, state_B)
+        self.assertEqual(initial_substate_B.state(), state_E)
   
-        self.assertEqual(state_A.historyState, state_C)
-        self.assertIsNone(state_B.historyState)
+        self.assertEqual(state_A.history_state, state_C)
+        self.assertIsNone(state_B.history_state)

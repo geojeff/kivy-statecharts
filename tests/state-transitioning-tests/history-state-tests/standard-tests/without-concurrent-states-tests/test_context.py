@@ -15,32 +15,32 @@ from kivy_statecharts.system.statechart import StatechartManager
 import os, inspect
 
 class TestState(State):
-    enterStateContext = ObjectProperty(None)
-    exitStateContext = ObjectProperty(None)
+    enter_stateContext = ObjectProperty(None)
+    exit_stateContext = ObjectProperty(None)
       
     def __init__(self, **kwargs):
         super(TestState, self).__init__(**kwargs)
 
-    def enterState(self, context):
-        self.enterStateContext = context
+    def enter_state(self, context):
+        self.enter_stateContext = context
       
-    def exitState(self, context):
-        self.exitStateContext = context
+    def exit_state(self, context):
+        self.exit_stateContext = context
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootStateClass'] = self.RootState
-        kwargs['monitorIsActive'] = True
+        kwargs['root_state_class'] = self.RootState
+        kwargs['monitor_is_active'] = True
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(TestState):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'A'
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
         class A(TestState):
             def __init__(self, **kwargs):
-                kwargs['initialSubstateKey'] = 'C'
+                kwargs['initial_substate_key'] = 'C'
                 super(Statechart_1.RootState.A, self).__init__(**kwargs)
 
             class C(TestState):
@@ -53,7 +53,7 @@ class Statechart_1(StatechartManager):
 
         class B(TestState):
             def __init__(self, **kwargs):
-                kwargs['initialSubstateKey'] = 'E'
+                kwargs['initial_substate_key'] = 'E'
                 super(Statechart_1.RootState.B, self).__init__(**kwargs)
 
             class E(TestState):
@@ -67,7 +67,7 @@ class Statechart_1(StatechartManager):
 class StateTransitioningHistoryStandardContextWithoutConcurrentTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
-        global rootState_1
+        global root_state_1
         global monitor_1
         global state_A
         global state_B
@@ -81,100 +81,100 @@ class StateTransitioningHistoryStandardContextWithoutConcurrentTestCase(unittest
         context = { 'foo': 100 }
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootStateInstance
+        statechart_1.init_statechart()
+        root_state_1 = statechart_1.root_state_instance
         monitor_1 = statechart_1.monitor
-        state_A = statechart_1.getState('A')
-        state_B = statechart_1.getState('B')
-        state_C = statechart_1.getState('C')
-        state_D = statechart_1.getState('D')
-        state_E = statechart_1.getState('E')
-        state_F = statechart_1.getState('F')
+        state_A = statechart_1.get_state('A')
+        state_B = statechart_1.get_state('B')
+        state_C = statechart_1.get_state('C')
+        state_D = statechart_1.get_state('D')
+        state_E = statechart_1.get_state('E')
+        state_F = statechart_1.get_state('F')
 
-        statechart_1.gotoState('D')
+        statechart_1.go_to_state('D')
 
     # Check statechart initializaton
     def test_statechart_initializaton(self):
-        self.assertIsNone(rootState_1.enterStateContext)
-        self.assertIsNone(state_A.enterStateContext)
-        self.assertIsNone(state_D.enterStateContext)
+        self.assertIsNone(root_state_1.enter_stateContext)
+        self.assertIsNone(state_A.enter_stateContext)
+        self.assertIsNone(state_D.enter_stateContext)
 
     # Pass no context when going to state a's history state using statechart
     def test_pass_no_context_when_going_to_state_f_then_state_a_history_state_using_statechart(self):
-        statechart_1.gotoState('F')
-        statechart_1.gotoHistoryState('A')
-        self.assertTrue(state_D.isCurrentState())
-        self.assertIsNone(state_D.enterStateContext)
-        self.assertIsNone(state_A.enterStateContext)
-        self.assertIsNone(state_B.exitStateContext)
-        self.assertIsNone(state_F.exitStateContext)
+        statechart_1.go_to_state('F')
+        statechart_1.go_to_history_state('A')
+        self.assertTrue(state_D.is_current_state())
+        self.assertIsNone(state_D.enter_stateContext)
+        self.assertIsNone(state_A.enter_stateContext)
+        self.assertIsNone(state_B.exit_stateContext)
+        self.assertIsNone(state_F.exit_stateContext)
 
     # Pass no context when going to state a's history state using state
     def test_pass_no_context_when_going_to_state_f_then_state_a_history_state_using_state(self):
-        state_D.gotoState('F')
-        state_F.gotoHistoryState('A')
-        self.assertTrue(state_D.isCurrentState())
-        self.assertIsNone(state_D.enterStateContext)
-        self.assertIsNone(state_A.enterStateContext)
-        self.assertIsNone(state_B.exitStateContext)
-        self.assertIsNone(state_F.exitStateContext)
+        state_D.go_to_state('F')
+        state_F.go_to_history_state('A')
+        self.assertTrue(state_D.is_current_state())
+        self.assertIsNone(state_D.enter_stateContext)
+        self.assertIsNone(state_A.enter_stateContext)
+        self.assertIsNone(state_B.exit_stateContext)
+        self.assertIsNone(state_F.exit_stateContext)
 
-    # Pass context when going to state a history state using statechart - gotoHistoryState('f', context)
-    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_context(self):
-        statechart_1.gotoState('F')
-        statechart_1.gotoHistoryState('A', context=context)
-        self.assertTrue(state_D.isCurrentState())
-        self.assertEqual(state_D.enterStateContext, context)
-        self.assertEqual(state_A.enterStateContext, context)
-        self.assertEqual(state_B.exitStateContext, context)
-        self.assertEqual(state_F.exitStateContext, context)
+    # Pass context when going to state a history state using statechart - go_to_history_state('f', context)
+    def test_pass_context_when_going_to_state_a_history_state_using_statechart_go_to_state_f_context(self):
+        statechart_1.go_to_state('F')
+        statechart_1.go_to_history_state('A', context=context)
+        self.assertTrue(state_D.is_current_state())
+        self.assertEqual(state_D.enter_stateContext, context)
+        self.assertEqual(state_A.enter_stateContext, context)
+        self.assertEqual(state_B.exit_stateContext, context)
+        self.assertEqual(state_F.exit_stateContext, context)
 
-    # Pass context when going to state a history state using state - gotoHistoryState('f', context)
-    def test_pass_context_when_going_to_state_f_using_state_gotoState_f_context(self):
-        statechart_1.gotoState('F')
-        state_F.gotoHistoryState('A', context=context)
-        self.assertTrue(state_D.isCurrentState())
-        self.assertEqual(state_D.enterStateContext, context)
-        self.assertEqual(state_A.enterStateContext, context)
-        self.assertEqual(state_B.exitStateContext, context)
-        self.assertEqual(state_F.exitStateContext, context)
+    # Pass context when going to state a history state using state - go_to_history_state('f', context)
+    def test_pass_context_when_going_to_state_f_using_state_go_to_state_f_context(self):
+        statechart_1.go_to_state('F')
+        state_F.go_to_history_state('A', context=context)
+        self.assertTrue(state_D.is_current_state())
+        self.assertEqual(state_D.enter_stateContext, context)
+        self.assertEqual(state_A.enter_stateContext, context)
+        self.assertEqual(state_B.exit_stateContext, context)
+        self.assertEqual(state_F.exit_stateContext, context)
 
-    # Pass context when going to state a history state using statechart - gotoState('f', state_F, context)
-    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_state_C_context(self):
-        statechart_1.gotoState('F')
-        statechart_1.gotoHistoryState('A', fromCurrentState=state_F, context=context)
-        self.assertTrue(state_D.isCurrentState())
-        self.assertEqual(state_D.enterStateContext, context)
-        self.assertEqual(state_A.enterStateContext, context)
-        self.assertEqual(state_B.exitStateContext, context)
-        self.assertEqual(state_F.exitStateContext, context)
+    # Pass context when going to state a history state using statechart - go_to_state('f', state_F, context)
+    def test_pass_context_when_going_to_state_a_history_state_using_statechart_go_to_state_f_state_C_context(self):
+        statechart_1.go_to_state('F')
+        statechart_1.go_to_history_state('A', from_current_state=state_F, context=context)
+        self.assertTrue(state_D.is_current_state())
+        self.assertEqual(state_D.enter_stateContext, context)
+        self.assertEqual(state_A.enter_stateContext, context)
+        self.assertEqual(state_B.exit_stateContext, context)
+        self.assertEqual(state_F.exit_stateContext, context)
 
-    # Pass context when going to state a history state using statechart - gotoState('f', true, context)
-    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_true_context(self):
-        statechart_1.gotoState('F')
-        statechart_1.gotoHistoryState('A', recursive=True, context=context)
-        self.assertTrue(state_D.isCurrentState())
-        self.assertEqual(state_D.enterStateContext, context)
-        self.assertEqual(state_A.enterStateContext, context)
-        self.assertEqual(state_B.exitStateContext, context)
-        self.assertEqual(state_F.exitStateContext, context)
+    # Pass context when going to state a history state using statechart - go_to_state('f', true, context)
+    def test_pass_context_when_going_to_state_a_history_state_using_statechart_go_to_state_f_true_context(self):
+        statechart_1.go_to_state('F')
+        statechart_1.go_to_history_state('A', recursive=True, context=context)
+        self.assertTrue(state_D.is_current_state())
+        self.assertEqual(state_D.enter_stateContext, context)
+        self.assertEqual(state_A.enter_stateContext, context)
+        self.assertEqual(state_B.exit_stateContext, context)
+        self.assertEqual(state_F.exit_stateContext, context)
 
-    # Pass context when going to state a history state using statechart - gotoState('f', state_F, true, context)
-    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_state_f_true_context(self):
-        statechart_1.gotoState('F')
-        statechart_1.gotoHistoryState('A', fromCurrentState=state_F, recursive=True, context=context)
-        self.assertTrue(state_D.isCurrentState())
-        self.assertEqual(state_D.enterStateContext, context)
-        self.assertEqual(state_A.enterStateContext, context)
-        self.assertEqual(state_B.exitStateContext, context)
-        self.assertEqual(state_F.exitStateContext, context)
+    # Pass context when going to state a history state using statechart - go_to_state('f', state_F, true, context)
+    def test_pass_context_when_going_to_state_a_history_state_using_statechart_go_to_state_f_state_f_true_context(self):
+        statechart_1.go_to_state('F')
+        statechart_1.go_to_history_state('A', from_current_state=state_F, recursive=True, context=context)
+        self.assertTrue(state_D.is_current_state())
+        self.assertEqual(state_D.enter_stateContext, context)
+        self.assertEqual(state_A.enter_stateContext, context)
+        self.assertEqual(state_B.exit_stateContext, context)
+        self.assertEqual(state_F.exit_stateContext, context)
 
-    # Pass context when going to state a history state using statechart - gotoState('f', true, context)
-    def test_pass_context_when_going_to_state_a_history_state_using_statechart_gotoState_f_true_context(self):
-        statechart_1.gotoState('F')
-        state_F.gotoHistoryState('A', recursive=True, context=context)
-        self.assertTrue(state_D.isCurrentState())
-        self.assertEqual(state_D.enterStateContext, context)
-        self.assertEqual(state_A.enterStateContext, context)
-        self.assertEqual(state_B.exitStateContext, context)
-        self.assertEqual(state_F.exitStateContext, context)
+    # Pass context when going to state a history state using statechart - go_to_state('f', true, context)
+    def test_pass_context_when_going_to_state_a_history_state_using_statechart_go_to_state_f_true_context(self):
+        statechart_1.go_to_state('F')
+        state_F.go_to_history_state('A', recursive=True, context=context)
+        self.assertTrue(state_D.is_current_state())
+        self.assertEqual(state_D.enter_stateContext, context)
+        self.assertEqual(state_A.enter_stateContext, context)
+        self.assertEqual(state_B.exit_stateContext, context)
+        self.assertEqual(state_F.exit_stateContext, context)

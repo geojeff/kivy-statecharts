@@ -24,6 +24,6 @@ class EmptyState(State):
         kwargs['name'] = EMPTY_STATE_NAME
         super(EmptyState, self).__init__(**kwargs)
   
-    def enterState(self, context=None):
+    def enter_state(self, context=None):
         msg = "No initial substate was defined for state {0}. Entering default empty state"
-        self.stateLogWarning(msg.format(self.parentState))
+        self.state_log_warning(msg.format(self.parent_state))

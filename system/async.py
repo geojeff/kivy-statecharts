@@ -12,18 +12,18 @@ import inspect
 class AsyncMixin:
 
     """
-      Call in either a state's enterState or exitState method when you
+      Call in either a state's enter_state or exit_state method when you
       want a state to perform an asynchronous action, such as an animation.
 
       Examples:
 
         State.extend({
 
-          enterState: function() {
+          enter_state: function() {
             return Async.perform('foo');
           },
 
-          exitState: function() {
+          exit_state: function() {
             return Async.perform('bar', 100);
           }
 
@@ -60,7 +60,7 @@ class Async(AsyncMixin):
     """ @private
       Called by the statechart
     """
-    def tryToPerform(self, state):
+    def try_to_perform(self, state):
         if isinstance(self.func, basestring):
             if hasattr(state, self.func):
               getattr(state, self.func)(self.arg1, self.arg2)

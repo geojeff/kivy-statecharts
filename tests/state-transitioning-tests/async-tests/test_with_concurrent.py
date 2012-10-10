@@ -19,26 +19,26 @@ class AsyncState(State):
     
     def foo(self, arg1, arg2):
         self.counter += 1
-        self.resumeGotoState()
+        self.resume_go_to_state()
       
-    def enterState(self, context):
+    def enter_state(self, context):
         print 'calling foo'
-        return self.performAsync('foo')
+        return self.perform_async('foo')
       
-    def exitState(self, context):
+    def exit_state(self, context):
         def func(self, arg1, arg2):
             self.foo(arg1, arg2)
-        return self.performAsync(func)
+        return self.perform_async(func)
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootStateClass'] = self.RootState
-        kwargs['monitorIsActive'] = True
+        kwargs['root_state_class'] = self.RootState
+        kwargs['monitor_is_active'] = True
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'A'
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
         class A(State):
@@ -47,7 +47,7 @@ class Statechart_1(StatechartManager):
 
         class B(State):
             def __init__(self, **kwargs):
-                kwargs['substatesAreConcurrent'] = True
+                kwargs['substates_are_concurrent'] = True
                 super(Statechart_1.RootState.B, self).__init__(**kwargs)
 
             class C(AsyncState):
@@ -61,7 +61,7 @@ class Statechart_1(StatechartManager):
 class StateStateTransitioningAsyncWithConcurrentTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
-        global rootState_1
+        global root_state_1
         global monitor_1
         global state_A
         global state_B
@@ -69,36 +69,36 @@ class StateStateTransitioningAsyncWithConcurrentTestCase(unittest.TestCase):
         global state_D
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootStateInstance
+        statechart_1.init_statechart()
+        root_state_1 = statechart_1.root_state_instance
         monitor_1 = statechart_1.monitor
-        state_A = statechart_1.getState('A')
-        state_B = statechart_1.getState('B')
-        state_C = statechart_1.getState('C')
-        state_D = statechart_1.getState('D')
+        state_A = statechart_1.get_state('A')
+        state_B = statechart_1.get_state('B')
+        state_C = statechart_1.get_state('C')
+        state_D = statechart_1.get_state('D')
 
     # Go to state B
     def test_go_to_state_B(self):
         monitor_1.reset()
 
-        self.assertFalse(statechart_1.gotoStateActive)
-        self.assertFalse(statechart_1.gotoStateSuspended)
+        self.assertFalse(statechart_1.go_to_state_active)
+        self.assertFalse(statechart_1.go_to_state_suspended)
 
-        self.assertTrue(state_A.isCurrentState())
-        self.assertFalse(state_B.isCurrentState())
-        self.assertFalse(state_C.isCurrentState())
-        self.assertFalse(state_D.isCurrentState())
+        self.assertTrue(state_A.is_current_state())
+        self.assertFalse(state_B.is_current_state())
+        self.assertFalse(state_C.is_current_state())
+        self.assertFalse(state_D.is_current_state())
 
-        state_A.gotoState('B')
+        state_A.go_to_state('B')
 
-        self.assertFalse(statechart_1.gotoStateActive)
-        self.assertFalse(statechart_1.gotoStateSuspended)
+        self.assertFalse(statechart_1.go_to_state_active)
+        self.assertFalse(statechart_1.go_to_state_suspended)
 
-        self.assertEqual(monitor_1.matchSequence().begin().exited('A').entered('B').beginConcurrent().entered('C', 'D').endConcurrent().end(), True)
+        self.assertEqual(monitor_1.match_sequence().begin().exited('A').entered('B').begin_concurrent().entered('C', 'D').end_concurrent().end(), True)
 
-        self.assertEqual(len(statechart_1.currentStates), 2)
-        self.assertTrue(state_C.isCurrentState())
-        self.assertTrue(state_D.isCurrentState())
+        self.assertEqual(len(statechart_1.current_states), 2)
+        self.assertTrue(state_C.is_current_state())
+        self.assertTrue(state_D.is_current_state())
         self.assertEqual(state_C.counter, 1)
         self.assertEqual(state_D.counter, 1)
 
@@ -106,29 +106,29 @@ class StateStateTransitioningAsyncWithConcurrentTestCase(unittest.TestCase):
     def test_go_to_state_B_then_back_to_A(self):
         monitor_1.reset()
 
-        self.assertFalse(statechart_1.gotoStateActive)
-        self.assertFalse(statechart_1.gotoStateSuspended)
+        self.assertFalse(statechart_1.go_to_state_active)
+        self.assertFalse(statechart_1.go_to_state_suspended)
 
-        self.assertTrue(state_A.isCurrentState())
-        self.assertFalse(state_B.isCurrentState())
-        self.assertFalse(state_C.isCurrentState())
-        self.assertFalse(state_D.isCurrentState())
+        self.assertTrue(state_A.is_current_state())
+        self.assertFalse(state_B.is_current_state())
+        self.assertFalse(state_C.is_current_state())
+        self.assertFalse(state_D.is_current_state())
 
-        state_A.gotoState('B')
+        state_A.go_to_state('B')
 
         monitor_1.reset()
 
-        state_C.gotoState('A')
+        state_C.go_to_state('A')
 
-        self.assertFalse(statechart_1.gotoStateActive)
-        self.assertFalse(statechart_1.gotoStateSuspended)
+        self.assertFalse(statechart_1.go_to_state_active)
+        self.assertFalse(statechart_1.go_to_state_suspended)
 
-        self.assertEqual(monitor_1.matchSequence().begin().exited('C', 'D', 'B').entered('A').end(), True)
+        self.assertEqual(monitor_1.match_sequence().begin().exited('C', 'D', 'B').entered('A').end(), True)
 
-        self.assertEqual(len(statechart_1.currentStates), 1)
-        self.assertTrue(state_A.isCurrentState())
-        self.assertFalse(state_C.isCurrentState())
-        self.assertFalse(state_D.isCurrentState())
+        self.assertEqual(len(statechart_1.current_states), 1)
+        self.assertTrue(state_A.is_current_state())
+        self.assertFalse(state_C.is_current_state())
+        self.assertFalse(state_D.is_current_state())
         self.assertEqual(state_C.counter, 2)
         self.assertEqual(state_D.counter, 2)
 

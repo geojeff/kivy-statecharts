@@ -96,7 +96,7 @@ organization that made drawing the statechart easier. Transient
 states are marked with dashed lines in the statechart drawing. They
 might have some processing code, or not, and this code can be
 substantial, involving several utility functions in the body of the
-state, but there is a gotoState() call at the end of enterState() to
+state, but there is a go_to_state() call at the end of enter_state() to
 move control directly to another state.
 
 yEd Operation
@@ -193,7 +193,7 @@ reasons and means of decision:
   -- transition after a bit of conditional logic (Effectively,
      this is what the structure of the CollisionWithObject state
      and its two substates do. Contrast this with what could be done
-     in a single state with an if statement in its enterState.
+     in a single state with an if statement in its enter_state.
      Having discrete CollisionWithEdge and CollisionWithObstacle
      states, however, offers a clearer picture, pardon the pun.)
 

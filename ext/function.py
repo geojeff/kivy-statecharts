@@ -5,7 +5,7 @@
 # ================================================================================
 
 """
-  Extends the JS Function object with the handleEvents method that
+  Extends the JS Function object with the handle_events method that
   will provide more advanced event handling capabilities when constructing
   your statechart's states.
   
@@ -26,28 +26,28 @@
   In some situations, it may be advantageous to use one method that can react to 
   multiple events instead of having multiple methods that essentially all do the
   same thing. In order to set a method to handle more than one event you use
-  the handleEvents method which can be supplied a list of string and/or regular
-  expressions. The following example demonstrates the use of handleEvents:
+  the handle_events method which can be supplied a list of string and/or regular
+  expressions. The following example demonstrates the use of handle_events:
   
   {{{
   
     state = State.extend({
     
-      eventHandlerA: function(event, sender, context) {
+      event_handlerA: function(event, sender, context) {
       
-      }.handleEvents('foo', 'bar'),
+      }.handle_events('foo', 'bar'),
       
-      eventHandlerB: function(event, sender, context) {
+      event_handlerB: function(event, sender, context) {
       
-      }.handleEvents(/num\d/, 'decimal')
+      }.handle_events(/num\d/, 'decimal')
     
     })
   
   }}}
   
-  Whenever events 'foo' and 'bar' are sent to the state, the method eventHandlerA
+  Whenever events 'foo' and 'bar' are sent to the state, the method event_handlerA
   will be invoked. When there is an event that matches the regular expression
-  /num\d/ or the event is 'decimal' then eventHandlerB is invoked. In both 
+  /num\d/ or the event is 'decimal' then event_handlerB is invoked. In both 
   cases, the name of the event will be supplied to the event handler. 
   
   It should be noted that the use of regular expressions may impact performance
@@ -56,8 +56,8 @@
   
   @param {(String|RegExp)...} args
 """
-#Function.prototype.handleEvents = function() {
-#  self.isEventHandler = YES;
+#Function.prototype.handle_events = function() {
+#  self.is_event_handler = YES;
 #  self.events = arguments;
 #  return this;
 #};
@@ -113,7 +113,7 @@
   @param {String...} args
 """
 #Function.prototype.stateObserves = function() { # [TODO] how to do this in python? extend Object?
-#  self.isStateObserveHandler = YES;
+#  self.is_state_observe_handler = YES;
 #  self.args = A(arguments);
 #  return this;
 #};

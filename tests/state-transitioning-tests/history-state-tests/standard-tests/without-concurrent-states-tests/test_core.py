@@ -16,23 +16,23 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootStateClass'] = self.RootState
-        kwargs['monitorIsActive'] = True
+        kwargs['root_state_class'] = self.RootState
+        kwargs['monitor_is_active'] = True
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'A'
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
         class A(State):
             def __init__(self, **kwargs):
-                kwargs['initialSubstateKey'] = 'C'
+                kwargs['initial_substate_key'] = 'C'
                 super(Statechart_1.RootState.A, self).__init__(**kwargs)
 
             class C(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'G'
+                    kwargs['initial_substate_key'] = 'G'
                     super(Statechart_1.RootState.A.C, self).__init__(**kwargs)
 
                 class G(State):
@@ -45,7 +45,7 @@ class Statechart_1(StatechartManager):
 
             class D(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'I'
+                    kwargs['initial_substate_key'] = 'I'
                     super(Statechart_1.RootState.A.D, self).__init__(**kwargs)
 
                 class I(State):
@@ -58,12 +58,12 @@ class Statechart_1(StatechartManager):
 
         class B(State):
             def __init__(self, **kwargs):
-                kwargs['initialSubstateKey'] = 'E'
+                kwargs['initial_substate_key'] = 'E'
                 super(Statechart_1.RootState.B, self).__init__(**kwargs)
 
             class E(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'K'
+                    kwargs['initial_substate_key'] = 'K'
                     super(Statechart_1.RootState.B.E, self).__init__(**kwargs)
 
                 class K(State):
@@ -76,7 +76,7 @@ class Statechart_1(StatechartManager):
 
             class F(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'M'
+                    kwargs['initial_substate_key'] = 'M'
                     super(Statechart_1.RootState.B.F, self).__init__(**kwargs)
 
                 class M(State):
@@ -90,7 +90,7 @@ class Statechart_1(StatechartManager):
 class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
-        global rootState_1
+        global root_state_1
         global monitor_1
         global state_A
         global state_B
@@ -108,143 +108,143 @@ class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.Te
         global state_N
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootStateInstance
+        statechart_1.init_statechart()
+        root_state_1 = statechart_1.root_state_instance
         monitor_1 = statechart_1.monitor
-        state_A = statechart_1.getState('A')
-        state_B = statechart_1.getState('B')
-        state_C = statechart_1.getState('C')
-        state_D = statechart_1.getState('D')
-        state_E = statechart_1.getState('E')
-        state_F = statechart_1.getState('F')
-        state_G = statechart_1.getState('G')
-        state_H = statechart_1.getState('H')
-        state_I = statechart_1.getState('I')
-        state_J = statechart_1.getState('J')
-        state_K = statechart_1.getState('K')
-        state_L = statechart_1.getState('L')
-        state_M = statechart_1.getState('M')
-        state_N = statechart_1.getState('N')
+        state_A = statechart_1.get_state('A')
+        state_B = statechart_1.get_state('B')
+        state_C = statechart_1.get_state('C')
+        state_D = statechart_1.get_state('D')
+        state_E = statechart_1.get_state('E')
+        state_F = statechart_1.get_state('F')
+        state_G = statechart_1.get_state('G')
+        state_H = statechart_1.get_state('H')
+        state_I = statechart_1.get_state('I')
+        state_J = statechart_1.get_state('J')
+        state_K = statechart_1.get_state('K')
+        state_L = statechart_1.get_state('L')
+        state_M = statechart_1.get_state('M')
+        state_N = statechart_1.get_state('N')
 
     # Check initial statechart history state objects
     def test_initial_statechart_history_state_objects(self):
-        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('A'))
+        self.assertEqual(statechart_1.root_state_instance.history_state, statechart_1.get_state('A'))
 
-        self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('C'))
-        self.assertEqual(statechart_1.getState('C').historyState, statechart_1.getState('G'))
-        self.assertIsNone(statechart_1.getState('G').historyState)
+        self.assertEqual(statechart_1.get_state('A').history_state, statechart_1.get_state('C'))
+        self.assertEqual(statechart_1.get_state('C').history_state, statechart_1.get_state('G'))
+        self.assertIsNone(statechart_1.get_state('G').history_state)
 
-        self.assertIsNone(statechart_1.getState('H').historyState)
-        self.assertIsNone(statechart_1.getState('D').historyState)
+        self.assertIsNone(statechart_1.get_state('H').history_state)
+        self.assertIsNone(statechart_1.get_state('D').history_state)
 
-        self.assertIsNone(statechart_1.getState('B').historyState)
-        self.assertIsNone(statechart_1.getState('E').historyState)
-        self.assertIsNone(statechart_1.getState('F').historyState)
+        self.assertIsNone(statechart_1.get_state('B').history_state)
+        self.assertIsNone(statechart_1.get_state('E').history_state)
+        self.assertIsNone(statechart_1.get_state('F').history_state)
 
     # Check go to state h and check history states
     def test_go_to_h_and_check_history_states(self):
         monitor_1.reset()
 
-        statechart_1.gotoState('H')
+        statechart_1.go_to_state('H')
 
-        self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('C'))
-        self.assertEqual(statechart_1.getState('C').historyState, statechart_1.getState('H'))
-        self.assertIsNone(statechart_1.getState('H').historyState)
-        self.assertIsNone(statechart_1.getState('G').historyState)
+        self.assertEqual(statechart_1.get_state('A').history_state, statechart_1.get_state('C'))
+        self.assertEqual(statechart_1.get_state('C').history_state, statechart_1.get_state('H'))
+        self.assertIsNone(statechart_1.get_state('H').history_state)
+        self.assertIsNone(statechart_1.get_state('G').history_state)
 
-        self.assertIsNone(statechart_1.getState('D').historyState)
-        self.assertIsNone(statechart_1.getState('B').historyState)
+        self.assertIsNone(statechart_1.get_state('D').history_state)
+        self.assertIsNone(statechart_1.get_state('B').history_state)
 
     # Check go to state d and check history states
     def test_go_to_d_and_check_history_states(self):
         monitor_1.reset()
 
-        statechart_1.gotoState('D')
+        statechart_1.go_to_state('D')
 
-        self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('D'))
-        self.assertEqual(statechart_1.getState('D').historyState, statechart_1.getState('I'))
-        self.assertEqual(statechart_1.getState('C').historyState, statechart_1.getState('G'))
-        self.assertIsNone(statechart_1.getState('H').historyState)
-        self.assertIsNone(statechart_1.getState('G').historyState)
-        self.assertIsNone(statechart_1.getState('I').historyState)
-        self.assertIsNone(statechart_1.getState('J').historyState)
+        self.assertEqual(statechart_1.get_state('A').history_state, statechart_1.get_state('D'))
+        self.assertEqual(statechart_1.get_state('D').history_state, statechart_1.get_state('I'))
+        self.assertEqual(statechart_1.get_state('C').history_state, statechart_1.get_state('G'))
+        self.assertIsNone(statechart_1.get_state('H').history_state)
+        self.assertIsNone(statechart_1.get_state('G').history_state)
+        self.assertIsNone(statechart_1.get_state('I').history_state)
+        self.assertIsNone(statechart_1.get_state('J').history_state)
 
-        self.assertIsNone(statechart_1.getState('B').historyState)
+        self.assertIsNone(statechart_1.get_state('B').history_state)
 
     # Check go to state b and check history states
     def test_go_to_b_and_check_history_states(self):
         monitor_1.reset()
 
-        statechart_1.gotoState('B')
-        self.assertTrue(monitor_1.matchSequence().begin().exited('G', 'C', 'A').entered('B', 'E', 'K').end())
+        statechart_1.go_to_state('B')
+        self.assertTrue(monitor_1.match_sequence().begin().exited('G', 'C', 'A').entered('B', 'E', 'K').end())
 
-        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('B'))
-        self.assertEqual(statechart_1.getState('B').historyState, statechart_1.getState('E'))
-        self.assertEqual(statechart_1.getState('E').historyState, statechart_1.getState('K'))
-        self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('C'))
-        self.assertEqual(statechart_1.getState('C').historyState, statechart_1.getState('G'))
+        self.assertEqual(statechart_1.root_state_instance.history_state, statechart_1.get_state('B'))
+        self.assertEqual(statechart_1.get_state('B').history_state, statechart_1.get_state('E'))
+        self.assertEqual(statechart_1.get_state('E').history_state, statechart_1.get_state('K'))
+        self.assertEqual(statechart_1.get_state('A').history_state, statechart_1.get_state('C'))
+        self.assertEqual(statechart_1.get_state('C').history_state, statechart_1.get_state('G'))
 
 
     # Check go to state j, then state m, then go to state a's history state (non-recursive)
     def test_to_j_then_to_m_then_to_state_a_history_state_non_recursive(self):
-        statechart_1.gotoState('J')
-        statechart_1.gotoState('M')
+        statechart_1.go_to_state('J')
+        statechart_1.go_to_state('M')
 
         monitor_1.reset()
-        statechart_1.gotoHistoryState('A')
+        statechart_1.go_to_history_state('A')
   
         self.assertEqual(monitor_1.length, 6)
-        self.assertTrue(monitor_1.matchSequence().begin().exited('M', 'F', 'B').entered('A', 'D', 'I').end())
-        self.assertEqual(len(statechart_1.currentStates), 1)
-        self.assertTrue(statechart_1.stateIsCurrentState('I'))
-        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('A'))
-        self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('D'))
-        self.assertEqual(statechart_1.getState('D').historyState, statechart_1.getState('I'))
+        self.assertTrue(monitor_1.match_sequence().begin().exited('M', 'F', 'B').entered('A', 'D', 'I').end())
+        self.assertEqual(len(statechart_1.current_states), 1)
+        self.assertTrue(statechart_1.state_is_current_state('I'))
+        self.assertEqual(statechart_1.root_state_instance.history_state, statechart_1.get_state('A'))
+        self.assertEqual(statechart_1.get_state('A').history_state, statechart_1.get_state('D'))
+        self.assertEqual(statechart_1.get_state('D').history_state, statechart_1.get_state('I'))
 
 # [PORT] Failure on J
 
 #    # Check go to state j, then state m, then go to state a's history state (recursive)
 #    def test_to_j_then_to_m_then_to_state_a_history_state_recursive(self):
-#        statechart_1.gotoState('J')
-#        statechart_1.gotoState('M')
+#        statechart_1.go_to_state('J')
+#        statechart_1.go_to_state('M')
 #
 #        monitor_1.reset()
-#        statechart_1.gotoHistoryState('A', fromCurrentState=None, recursive=True)
+#        statechart_1.go_to_history_state('A', from_current_state=None, recursive=True)
 #  
 #        self.assertEqual(monitor_1.length, 6)
-#        self.assertTrue(monitor_1.matchSequence().begin().exited('M', 'F', 'B').entered('A', 'D', 'J').end())
-#        self.assertEqual(len(statechart_1.currentStates), 1)
-#        self.assertTrue(statechart_1.stateIsCurrentState('J'))
-#        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('A'))
-#        self.assertEqual(statechart_1.getState('A').historyState, statechart_1.getState('D'))
-#        self.assertEqual(statechart_1.getState('D').historyState, statechart_1.getState('I'))
+#        self.assertTrue(monitor_1.match_sequence().begin().exited('M', 'F', 'B').entered('A', 'D', 'J').end())
+#        self.assertEqual(len(statechart_1.current_states), 1)
+#        self.assertTrue(statechart_1.state_is_current_state('J'))
+#        self.assertEqual(statechart_1.root_state_instance.history_state, statechart_1.get_state('A'))
+#        self.assertEqual(statechart_1.get_state('A').history_state, statechart_1.get_state('D'))
+#        self.assertEqual(statechart_1.get_state('D').history_state, statechart_1.get_state('I'))
 
     # Check go to state b's history state (non-recursive)
     def test_go_to_state_b_history_state_non_recursive(self):
         monitor_1.reset()
 
-        statechart_1.gotoHistoryState('B')
+        statechart_1.go_to_history_state('B')
   
         self.assertEqual(monitor_1.length, 6)
-        self.assertTrue(monitor_1.matchSequence().begin().exited('G', 'C', 'A').entered('B', 'E', 'K').end())
-        self.assertEqual(len(statechart_1.currentStates), 1)
-        self.assertTrue(statechart_1.stateIsCurrentState('K'))
-        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('B'))
-        self.assertEqual(statechart_1.getState('B').historyState, statechart_1.getState('E'))
-        self.assertEqual(statechart_1.getState('E').historyState, statechart_1.getState('K'))
+        self.assertTrue(monitor_1.match_sequence().begin().exited('G', 'C', 'A').entered('B', 'E', 'K').end())
+        self.assertEqual(len(statechart_1.current_states), 1)
+        self.assertTrue(statechart_1.state_is_current_state('K'))
+        self.assertEqual(statechart_1.root_state_instance.history_state, statechart_1.get_state('B'))
+        self.assertEqual(statechart_1.get_state('B').history_state, statechart_1.get_state('E'))
+        self.assertEqual(statechart_1.get_state('E').history_state, statechart_1.get_state('K'))
 
 
     # Check go to state b's history state (recursive)
     def test_go_to_state_b_history_state_recursive(self):
         monitor_1.reset()
 
-        statechart_1.gotoHistoryState('B', fromCurrentState=None, recursive=True)
+        statechart_1.go_to_history_state('B', from_current_state=None, recursive=True)
   
         self.assertEqual(monitor_1.length, 6)
-        self.assertTrue(monitor_1.matchSequence().begin().exited('G', 'C', 'A').entered('B', 'E', 'K').end())
-        self.assertEqual(len(statechart_1.currentStates), 1)
-        self.assertTrue(statechart_1.stateIsCurrentState('K'))
-        self.assertEqual(statechart_1.rootStateInstance.historyState, statechart_1.getState('B'))
-        self.assertEqual(statechart_1.getState('B').historyState, statechart_1.getState('E'))
-        self.assertEqual(statechart_1.getState('E').historyState, statechart_1.getState('K'))
+        self.assertTrue(monitor_1.match_sequence().begin().exited('G', 'C', 'A').entered('B', 'E', 'K').end())
+        self.assertEqual(len(statechart_1.current_states), 1)
+        self.assertTrue(statechart_1.state_is_current_state('K'))
+        self.assertEqual(statechart_1.root_state_instance.history_state, statechart_1.get_state('B'))
+        self.assertEqual(statechart_1.get_state('B').history_state, statechart_1.get_state('E'))
+        self.assertEqual(statechart_1.get_state('E').history_state, statechart_1.get_state('K'))
 

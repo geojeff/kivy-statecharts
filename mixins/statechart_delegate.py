@@ -18,7 +18,7 @@
 class StatechartDelegate:
     def __init__(self):
         # Walk like a duck
-        self.isStatechartDelegate = True
+        self.is_statechart_delegate = True
   
     # Route Handling Management
   
@@ -32,7 +32,7 @@ class StatechartDelegate:
       @param {String|Hash} location the new location 
       @param {State} state the state requesting the location update
     """
-    def statechartUpdateLocationForState(self, statechart, location, state): # [TODO] routes was SC.routes, so a system global
+    def statechart_update_location_for_state(self, statechart, location, state): # [TODO] routes was SC.routes, so a system global
         routes.location = location
   
     """
@@ -42,7 +42,7 @@ class StatechartDelegate:
       @param {State} state the state requesting the location
       @returns {String} the location 
     """
-    def statechartAcquireLocationForState(self, statechart, state):
+    def statechart_acquire_location_for_state(self, statechart, state):
         return routes.location
     
     """
@@ -52,7 +52,7 @@ class StatechartDelegate:
       The statechart and states remain completely independent of how the underlying 
       routing mechanism works thereby providing a looser coupling and more flexibility 
       in how routing is to work. Given this flexiblity, it is important that a route
-      assigned (using the {@link State#representRoute} property) to a state strictly 
+      assigned (using the {@link State#represented_route} property) to a state strictly 
       conforms to the underlying routing mechanism's criteria in order for the given 
       handler to be properly invoked.
       
@@ -65,16 +65,16 @@ class StatechartDelegate:
       @param {Function|String} handler the method on the state to be invoked when the route
         gets triggered.
         
-      @see State#representRoute
+      @see State#represented_route
     """
-    def statechartBindStateToRoute(self, statechart, state, route, handler):
+    def statechart_bind_state_to_route(self, statechart, state, route, handler):
         routes.add(route, state, handler)
     
     """
       Invoked by a state that has been notified to handle a triggered route. The state
       asks if it should go ahead an actually handle the triggered route. If no then
       the state's handler will no longer continue and finish by calling this delegate's
-      `statechartStateCancelledHandlingTriggeredRoute` method. If yes then the state will 
+      `statechart_state_cancelled_handling_triggered_route` method. If yes then the state will 
       continue with handling the triggered route.
       
       By default `YES` is returned.
@@ -84,9 +84,9 @@ class StatechartDelegate:
       @param {StateRouteHandlerContext} routeContext contextual information about the handling 
         of a route
       
-      @see #statechartStateCancelledHandlingTriggeredRoute
+      @see #statechart_state_cancelled_handling_triggered_route
     """
-    def statechartShouldStateHandleTriggeredRoute(self, statechart, state, context):
+    def statechart_should_state_handle_triggered_route(self, statechart, state, context):
         return True
   
     """
@@ -98,7 +98,7 @@ class StatechartDelegate:
       @param {StateRouteHandlerContext} routeContext contextual information about the handling 
         of a route
       
-      @see #statechartShouldStateHandleTriggeredRoute
+      @see #statechart_should_state_handle_triggered_route
     """
-    def statechartStateCancelledHandlingTriggeredRoute(self, statechart, state, context):
+    def statechart_state_cancelled_handling_triggered_route(self, statechart, state, context):
         pass

@@ -37,8 +37,8 @@ import inspect
   The following example shows how states are nested within a statechart:
   
       MyApp.Statechart = Object.extend(StatechartManager, {
-        rootState: State.design({
-          initialSubstateKey: 'stateA',
+        root_state: State.design({
+          initial_substate_key: 'stateA',
 
           stateA: State.design({
             # ... can continue to nest further states
@@ -58,7 +58,7 @@ import inspect
   by the mixin and make the states on the object substates of the root state. As an example:
   
       MyApp.Statechart = Object.extend(StatechartManager, {
-        initialStateKey: 'stateA',
+        initial_state_key: 'stateA',
 
         stateA: State.design({
           # ... can continue to nest further states
@@ -70,8 +70,8 @@ import inspect
       });
   
   If you specified a class that should be used as the root state but used the above method to defined
-  states, you can set the rootStateExampleClass property with a class that extends from State. If the 
-  rootStateExampleClass property is not explicitly assigned the then default class used will be State.
+  states, you can set the root_state_example_class property with a class that extends from State. If the 
+  root_state_example_class property is not explicitly assigned the then default class used will be State.
   
   To provide your statechart with orthogonality, you use concurrent states. If you use concurrent states,
   then your statechart will have multiple current states. That is because each concurrent state represents an
@@ -79,8 +79,8 @@ import inspect
   statechart with concurrent states:
   
       MyApp.Statechart = Object.extend(StatechartManager, {
-        rootState: State.design({
-          substatesAreConcurrent: True,
+        root_state: State.design({
+          substates_are_concurrent: True,
 
           stateA: State.design({
             # ... can continue to nest further states
@@ -92,7 +92,7 @@ import inspect
         })
       });
   
-  Above, to indicate that a state's substates are concurrent, you just have to set the substatesAreConcurrent to 
+  Above, to indicate that a state's substates are concurrent, you just have to set the substates_are_concurrent to 
   True. Once done, then stateA and stateB will be independent of each other and each will manage their
   own current substates. The root state will then have more then one current substate.
   
@@ -100,7 +100,7 @@ import inspect
   following:
   
       MyApp.Statechart = Object.extend(StatechartManager, {
-        statesAreConcurrent: True,
+        states_are_concurrent: True,
 
         stateA: State.design({
           # ... can continue to nest further states
@@ -115,11 +115,11 @@ import inspect
   create as complex of statecharts that suite your needs. Here is an example of a mixed state structure:
   
       MyApp.Statechart = Object.extend(StatechartManager, {
-        rootState: State.design({
-          initialSubstateKey: 'stateA',
+        root_state: State.design({
+          initial_substate_key: 'stateA',
 
           stateA: State.design({
-            substatesAreConcurrent: True,
+            substates_are_concurrent: True,
 
             stateM: State.design({ ... })
             stateN: State.design({ ... })
@@ -127,7 +127,7 @@ import inspect
           }),
         
           stateB: State.design({
-            initialSubstateKey: 'stateX',
+            initial_substate_key: 'stateX',
 
             stateX: State.design({ ... })
             stateY: State.desgin({ ... })
@@ -143,7 +143,7 @@ import inspect
       # state_a.js
 
       MyApp.StateA = State.extend({
-        substatesAreConcurrent: True,
+        substates_are_concurrent: True,
 
         stateM: State.design({ ... })
         stateN: State.design({ ... })
@@ -153,7 +153,7 @@ import inspect
       # state_b.js
 
       MyApp.StateB = State.extend({
-        substatesAreConcurrent: True,
+        substates_are_concurrent: True,
 
         stateM: State.design({ ... })
         stateN: State.design({ ... })
@@ -163,8 +163,8 @@ import inspect
       # statechart.js
 
       MyApp.Statechart = Object.extend(StatechartManager, {
-        rootState: State.design({
-          initialSubstateKey: 'stateA',
+        root_state: State.design({
+          initial_substate_key: 'stateA',
           stateA: State.plugin('MyApp.StateA'),
           stateB: State.plugin('MyApp.StateB')
         })
@@ -185,29 +185,29 @@ class StatechartManager(EventDispatcher):
       @see StatechartDelegate
       @see #delegate
     """
-    statechartDelegate = ObjectProperty(None)
+    statechart_delegate = ObjectProperty(None)
 
-    currentStates = ListProperty([])
-    gotoStateLocked = BooleanProperty(False)
-    gotoStateActive = BooleanProperty(True)
-    gotoStateSuspendedPoint = ObjectProperty(None, allownone=True)
-    gotoStateSuspended = BooleanProperty(False)
-    statechartLogPrefix = StringProperty(None)
-    allowStatechartTracing = BooleanProperty(True)
+    current_states = ListProperty([])
+    go_to_state_locked = BooleanProperty(False)
+    go_to_state_active = BooleanProperty(True)
+    go_to_state_suspended_point = ObjectProperty(None, allownone=True)
+    go_to_state_suspended = BooleanProperty(False)
+    statechart_log_prefix = StringProperty(None)
+    allow_statechart_tracing = BooleanProperty(True)
     details = ObjectProperty(None)
 
     # Walk like a duck
-    isResponderContext = BooleanProperty(True)
+    is_responder_context = BooleanProperty(True)
 
     # Walk like a duck
-    isStatechart = BooleanProperty(True)
+    is_statechart = BooleanProperty(True)
 
     """
       Indicates if this statechart has been initialized
   
       @property {Boolean}
     """
-    statechartIsInitialized = BooleanProperty(False)
+    statechart_is_initialized = BooleanProperty(False)
 
     """
       Optional name you can provide the statechart. If set this will be included
@@ -220,61 +220,61 @@ class StatechartManager(EventDispatcher):
       The root state of this statechart. All statecharts must have a root state.
       
       If this property is left unassigned, then when the statechart is initialized
-      it will use the rootStateExampleClass, initialStateKey, and statesAreConcurrent
+      it will use the root_state_example_class, initial_state_key, and states_are_concurrent
       properties to construct a root state.
       
-      @see #rootStateExampleClass
-      @see #initialStateKey
-      @see #statesAreConcurrent
+      @see #root_state_example_class
+      @see #initial_state_key
+      @see #states_are_concurrent
       
       @property {State}
     """
-    rootStateClass = ObjectProperty(None)
-    rootStateInstance = ObjectProperty(None, allownone=True)
+    root_state_class = ObjectProperty(None)
+    root_state_instance = ObjectProperty(None, allownone=True)
     
     """ 
       Represents the state used to construct a class that will be the root state for
       this statechart. The class must derive from State. 
       
-      This property will only be used if the rootState property is not assigned.
+      This property will only be used if the root_state property is not assigned.
     
-      @see #rootState
+      @see #root_state
     
       @property {State}
     """
-    rootStateExampleClass = ObjectProperty(None)
+    root_state_example_class = ObjectProperty(None)
     
     """ 
       Indicates what state should be the initial state of this statechart. The value
       assigned must be the name of a property on this object that represents a state.
-      As well, the statesAreConcurrent must be set to False.
+      As well, the states_are_concurrent must be set to False.
       
-      This property will only be used if the rootState property is not assigned.
+      This property will only be used if the root_state property is not assigned.
 
-      [PORT] This is a String in the original javascript, despite a conditional in initStatechart
-             that sets it to the actual state in rootState, and despite a test that compares it
+      [PORT] This is a String in the original javascript, despite a conditional in init_statechart
+             that sets it to the actual state in root_state, and despite a test that compares it
              to actual class objects. Here it is kept a String, and the conditional commented out,
-             and the tests changed to check against strings, when either statechart.initialStateKey
-             or state.initialSubstateKey are used.
+             and the tests changed to check against strings, when either statechart.initial_state_key
+             or state.initial_substate_key are used.
     
-      @see #rootState
+      @see #root_state
     
       @property {String} 
     """
-    initialStateKey = StringProperty('')
+    initial_state_key = StringProperty('')
     
     """ 
       Indicates if properties on this object representing states are concurrent to each other.
       If True then they are concurrent, otherwise they are not. If True, then the
-      initialStateKey property must not be assigned.
+      initial_state_key property must not be assigned.
       
-      This property will only be used if the rootState property is not assigned.
+      This property will only be used if the root_state property is not assigned.
     
-      @see #rootState
+      @see #root_state
     
       @property {Boolean}
     """
-    statesAreConcurrent = BooleanProperty(False)
+    states_are_concurrent = BooleanProperty(False)
     
     """ 
       Indicates whether to use a monitor for the statechart's activities. If true then
@@ -283,11 +283,11 @@ class StatechartManager(EventDispatcher):
       
       @property {Boolean}
     """
-    monitorIsActive = BooleanProperty(False)
+    monitor_is_active = BooleanProperty(False)
     
     """
       A statechart monitor that can be used to monitor this statechart. Useful for debugging purposes.
-      A monitor will only be used if monitorIsActive is true.
+      A monitor will only be used if monitor_is_active is true.
       
       @property {StatechartMonitor}
     """
@@ -299,13 +299,13 @@ class StatechartManager(EventDispatcher):
   
       @property {String}
     """
-    statechartTraceKey = StringProperty('trace')
+    statechart_trace_key = StringProperty('trace')
   
     """
       Indicates whether to trace the statecharts activities. If true then the statechart will output
       its activites to the browser's JS console. Useful for debugging purposes.
   
-      @see #statechartTraceKey
+      @see #statechart_trace_key
   
       @property {Boolean}
     """
@@ -317,13 +317,13 @@ class StatechartManager(EventDispatcher):
   
       @property {String}
     """
-    statechartOwnerKey = StringProperty('owner')
+    statechart_owner_key = StringProperty('owner')
   
     """
       Sets who the owner is of this statechart. If None then the owner is this object otherwise
       the owner is the assigned object. 
   
-      @see #statechartOwnerKey
+      @see #statechart_owner_key
   
       @property {Object}
     """
@@ -331,12 +331,12 @@ class StatechartManager(EventDispatcher):
   
     """ 
       Indicates if the statechart should be automatically initialized by this
-      object after it has been created. If True then initStatechart will be
+      object after it has been created. If True then init_statechart will be
       called automatically, otherwise it will not.
     
       @property {Boolean}
     """
-    autoInitStatechart = BooleanProperty(True)
+    auto_init_statechart = BooleanProperty(True)
     
     """
       If yes, any warning messages produced by the statechart or any of its states will
@@ -347,7 +347,7 @@ class StatechartManager(EventDispatcher):
       
       @property {Boolean}
     """
-    suppressStatechartWarnings = BooleanProperty(False)
+    suppress_statechart_warnings = BooleanProperty(False)
     
     """
       A statechart delegate used by the statechart and the states that the statechart 
@@ -360,139 +360,139 @@ class StatechartManager(EventDispatcher):
     delegate = ObjectProperty(None)
 
     def __init__(self, **kw):
-        #self.bind(currentStates=self._currentStates)
-        self.bind(monitorIsActive=self._monitorIsActiveDidChange)
-        self.bind(statechartTraceKey=self._statechartTraceDidChange)
-        self.bind(delegate=self._statechartDelegate)
-        #self.bind(rootState=self._currentStates) # [PORT] Added currentStates property -- moved this to the bottom of initStatechart().
-        self.bind(statechartOwnerKey=self._ownerDidChange) # [PORT] Added, to use top-down updating approach in kivy.
-        self.bind(owner=self._ownerDidChange) # [PORT] Added, to use top-down updating approach in kivy.
-        self.bind(gotoStateLocked=self._gotoStateActive)
-        self.bind(gotoStateLocked=self._gotoStateSuspended)
-        self.bind(gotoStateSuspendedPoint=self._gotoStateSuspended)
+        #self.bind(current_states=self._current_states)
+        self.bind(monitor_is_active=self._monitor_is_active_did_change)
+        self.bind(statechart_trace_key=self._statechart_trace_did_change)
+        self.bind(delegate=self._statechart_delegate)
+        #self.bind(root_state=self._current_states) # [PORT] Added current_states property -- moved this to the bottom of init_statechart().
+        self.bind(statechart_owner_key=self._owner_did_change) # [PORT] Added, to use top-down updating approach in kivy.
+        self.bind(owner=self._owner_did_change) # [PORT] Added, to use top-down updating approach in kivy.
+        self.bind(go_to_state_locked=self._go_to_state_active)
+        self.bind(go_to_state_locked=self._go_to_state_suspended)
+        self.bind(go_to_state_suspended_point=self._go_to_state_suspended)
 
         for k,v in kw.items():
-            if k == 'allowStatechartTracing': # [PORT] hack to set self.trace -- why is there also allowStatechartTracing? limit to one or other.
+            if k == 'allow_statechart_tracing': # [PORT] hack to set self.trace -- why is there also allow_statechart_tracing? limit to one or other.
                 setattr(self, 'trace', v)
             setattr(self, k, v)
 
-        # [PORT] NOTE: The binding, self.bind(rootStateInstance=self._currentStates) is set at the
-        #              bottom of initStatechart(), after instantiation.
+        # [PORT] NOTE: The binding, self.bind(root_state_instance=self._current_states) is set at the
+        #              bottom of init_statechart(), after instantiation.
 
         super(StatechartManager, self).__init__(**kw)
 
-        if self.autoInitStatechart == True:
-            self.initStatechart()
+        if self.auto_init_statechart == True:
+            self.init_statechart()
         
-    def _ownerDidChange(self, *l):
-        if self.rootStateInstance: # [PORT] rootState can be None
-            self.rootStateInstance.statechartOwnerDidChange()
+    def _owner_did_change(self, *l):
+        if self.root_state_instance: # [PORT] root_state can be None
+            self.root_state_instance.statechart_owner_did_change()
 
-    def _statechartDelegate(self):
-        self.statechartDelegate = self.delegateFor('isStatechartDelegate', self.delegate);
+    def _statechart_delegate(self):
+        self.statechart_delegate = self.delegateFor('is_statechart_delegate', self.delegate);
         
-    def destroyMixin(self):
-        self.unbind(statechartTraceKey=_statechartTraceDidChange)
-        self.rootStateInstance.destroy();
-        self.rootStateInstance = None
+    def destroy_mixin(self):
+        self.unbind(statechart_trace_key=_statechart_trace_did_change)
+        self.root_state_instance.destroy();
+        self.root_state_instance = None
       
     """
       Initializes the statechart. By initializing the statechart, it will create all the states and register
       them with the statechart. Once complete, the statechart can be used to go to states and send events to.
     """
-    def initStatechart(self):
-        if self.statechartIsInitialized:
+    def init_statechart(self):
+        if self.statechart_is_initialized:
             return
           
-        self.gotoStateLocked = False
-        self._sendEventLocked = False
-        self._pendingStateTransitions = deque()
-        self._pendingSentEvents = deque()
+        self.go_to_state_locked = False
+        self._send_event_locked = False
+        self._pending_state_transitions = deque()
+        self._pending_sent_events = deque()
           
-        self.sendAction = self.sendEvent
+        self.send_action = self.send_event
           
-        if self.monitorIsActive:
+        if self.monitor_is_active:
             self.monitor = StatechartMonitor(statechart=self)
       
-        self._statechartTraceDidChange() # [PORT] this call needed for kivy?
+        self._statechart_trace_did_change() # [PORT] this call needed for kivy?
       
-        trace = self.allowStatechartTracing
-        rootStateClass = self.rootStateClass # [PORT] Clarify in docs that rootState is None or is a class.
+        trace = self.allow_statechart_tracing
+        root_state_class = self.root_state_class # [PORT] Clarify in docs that root_state is None or is a class.
         msg = ''
           
         if trace:
-            self.statechartLogTrace("BEGIN initialize statechart")
+            self.statechart_log_trace("BEGIN initialize statechart")
           
         # If no root state was explicitly defined then try to construct a root state class
-        if not rootStateClass:
-            rootStateClass = self._constructRootStateClass()
+        if not root_state_class:
+            root_state_class = self._construct_root_state_class()
           
         # [PORT] plugin system in javascript version removed in python version. States are classes, declared
         #        either in the source file with the statechart, or imported from individual files.
 
-        if inspect.isclass(rootStateClass) and not issubclass(rootStateClass, State):
+        if inspect.isclass(root_state_class) and not issubclass(root_state_class, State):
             msg = "Unable to initialize statechart. Root state must be a state class"
-            self.statechartLogError(msg)
+            self.statechart_log_error(msg)
             raise Exception(msg)
           
-        # Instantiate the rootState class.
-        rootStateInstance = self.createRootState(rootStateClass, ROOT_STATE_NAME)
+        # Instantiate the root_state class.
+        root_state_instance = self.create_root_state(root_state_class, ROOT_STATE_NAME)
           
-        # Set self.rootStateInstance to be the instantiated object.
-        self.rootStateInstance = rootStateInstance
+        # Set self.root_state_instance to be the instantiated object.
+        self.root_state_instance = root_state_instance
 
-        rootStateInstance.initState()
+        root_state_instance.init_state()
           
-        # The initialState of rootState must be a real state -- can't be the EmptyState.
-        problemWithInitialRootState = False
-        if hasattr(rootStateInstance, 'initialSubstateKey') and rootStateInstance.initialSubstateKey:
-            initialRootState = rootStateInstance.initialSubstateObject
-            if initialRootState is None:
-                problemWithInitialRootState = True
-            elif isinstance(initialRootState, EmptyState):
-                problemWithInitialRootState = True
-        elif not hasattr(rootStateInstance, 'substatesAreConcurrent') or not rootStateInstance.substatesAreConcurrent:
-            problemWithInitialRootState = True
+        # The initialState of root_state must be a real state -- can't be the EmptyState.
+        problem_with_initial_root_state = False
+        if hasattr(root_state_instance, 'initial_substate_key') and root_state_instance.initial_substate_key:
+            initial_root_state = root_state_instance.initial_substate_object
+            if initial_root_state is None:
+                problem_with_initial_root_state = True
+            elif isinstance(initial_root_state, EmptyState):
+                problem_with_initial_root_state = True
+        elif not hasattr(root_state_instance, 'substates_are_concurrent') or not root_state_instance.substates_are_concurrent:
+            problem_with_initial_root_state = True
 
-        if problemWithInitialRootState:
-            msg = "Unable to initialize statechart. Root state must have an initial substate or substatesAreConcurrent explicitly defined."
-            self.statechartLogError(msg)
+        if problem_with_initial_root_state:
+            msg = "Unable to initialize statechart. Root state must have an initial substate or substates_are_concurrent explicitly defined."
+            self.statechart_log_error(msg)
             raise Exception(msg)
 
-    #if (SC.kindOf(rootState.get('initialSubstate'), SC.EmptyState)) {
+    #if (SC.kindOf(root_state.get('initial_substate'), SC.EmptyState)) {
       #msg = "Unable to initialize statechart. Root state must have an initial substate explicilty defined";
-      #this.statechartLogError(msg);
+      #this.statechart_log_error(msg);
       #throw msg;
     #}
     #
     ##if (!SC.empty(this.get('initialState'))) {
       #var key = 'initialState';
-      #this.set(key, rootState.get(this.get(key)));
+      #this.set(key, root_state.get(this.get(key)));
     #} 
           
         # In the original javascript, an if here did this:
         #
-        #     If the initialStateKey here is set (a string), reset it to the actual state by that name in rootState
+        #     If the initial_state_key here is set (a string), reset it to the actual state by that name in root_state
         #
-        # This is not consistent with initialStateKey defined as a String, but it is consistent with tests that check initialStateKey
+        # This is not consistent with initial_state_key defined as a String, but it is consistent with tests that check initial_state_key
         # against actual class objects. Here we will leave it as a String, and skip this set.
         #
-        #if self.initialStateKey:
-            #self.initialStateKey = getattr(rootState, str(self.initialStateKey))
+        #if self.initial_state_key:
+            #self.initial_state_key = getattr(root_state, str(self.initial_state_key))
           
-        self.statechartIsInitialized = True
+        self.statechart_is_initialized = True
 
-        self.bind(rootStateInstance=self._currentStates)
+        self.bind(root_state_instance=self._current_states)
 
-        self.gotoState(rootStateInstance)
+        self.go_to_state(root_state_instance)
           
         if trace:
-            self.statechartLogTrace("END initialize statechart")
+            self.statechart_log_trace("END initialize statechart")
         
     """
       Will create a root state for the statechart
     """
-    def createRootState(self, state, name):
+    def create_root_state(self, state, name):
         return state(statechart=self, name=name)
         
     #"""
@@ -500,8 +500,8 @@ class StatechartManager(EventDispatcher):
       #
       #@returns {Array} the current states
     #"""
-    def _currentStates(self, *l):
-        self.currentStates = self.rootStateInstance.currentSubstates
+    def _current_states(self, *l):
+        self.current_states = self.root_state_instance.current_substates
 
     """
       Checks if a given state is a current state of this statechart. 
@@ -509,8 +509,8 @@ class StatechartManager(EventDispatcher):
       @param state {State|String} the state to check
       @returns {Boolean} true if the state is a current state, otherwise fals is returned
     """
-    def stateIsCurrentState(self, state):
-        return self.rootStateInstance.stateIsCurrentSubstate(state)
+    def state_is_current_state(self, state):
+        return self.root_state_instance.state_is_current_substate(state)
         
     """
       Returns an array of all the states that are currently entered for
@@ -518,8 +518,8 @@ class StatechartManager(EventDispatcher):
       
       @returns {Array} the currently entered states
     """
-    def enteredStates(self):
-        return self.rootStateInstance.enteredSubstates
+    def entered_states(self):
+        return self.root_state_instance.entered_substates
 
     """
       Checks if a given state is a currently entered state of this statechart.
@@ -527,8 +527,8 @@ class StatechartManager(EventDispatcher):
       @param state {State|String} the state to check
       @returns {Boolean} true if the state is a currently entered state, otherwise false is returned
     """
-    def stateIsEntered(self, state):
-        return self.rootStateInstance.stateIsEnteredSubstate(state)
+    def state_is_entered(self, state):
+        return self.root_state_instance.state_is_entered_substate(state)
         
     """
       Checks if the given value represents a state is this statechart
@@ -536,8 +536,8 @@ class StatechartManager(EventDispatcher):
       @param value {State|String} either a state object or the name of a state
       @returns {Boolean} true if the state does belong ot the statechart, otherwise false is returned
     """
-    def doesContainState(self, value):
-        return self.getState(value) is not None
+    def does_contain_state(self, value):
+        return self.get_state(value) is not None
         
     """
       Gets a state from the statechart that matches the given value
@@ -545,11 +545,11 @@ class StatechartManager(EventDispatcher):
       @param value {State|String} either a state object or the name of a state
       @returns {State} if a match then the matching state is returned, otherwise None is returned 
     """
-    def getState(self, state):
+    def get_state(self, state):
         if isinstance(state, basestring):
-            return self.rootStateInstance if self.rootStateInstance.name == state else self.rootStateInstance.getSubstate(state)
+            return self.root_state_instance if self.root_state_instance.name == state else self.root_state_instance.get_substate(state)
         else:
-            return self.rootStateInstance if self.rootStateInstance is state else self.rootStateInstance.getSubstate(state)
+            return self.root_state_instance if self.root_state_instance is state else self.root_state_instance.get_substate(state)
       
     """
       When called, the statechart will proceed with making state transitions in the statechart starting from 
@@ -575,300 +575,300 @@ class StatechartManager(EventDispatcher):
       Method can be called in the following ways:
       
           # With one argument. 
-          gotoState(<state>)
+          go_to_state(<state>)
             
           # With two arguments.
-          gotoState(<state>, <state | boolean | hash>)
+          go_to_state(<state>, <state | boolean | hash>)
         
           # With three arguments.
-          gotoState(<state>, <state>, <boolean | hash>)
-          gotoState(<state>, <boolean>, <hash>)
+          go_to_state(<state>, <state>, <boolean | hash>)
+          go_to_state(<state>, <boolean>, <hash>)
         
           # With four arguments.
-          gotoState(<state>, <state>, <boolean>, <hash>)
+          go_to_state(<state>, <state>, <boolean>, <hash>)
       
       where <state> is either a State object or a string and <hash> is a regular JS hash object.
       
       @param state {State|String} the state to go to (may not be the final state in the transition process)
-      @param fromCurrentState {State|String} Optional. The current state to start the transition process from.
-      @param useHistory {Boolean} Optional. Indicates whether to include using history states in the transition process
+      @param from_current_state {State|String} Optional. The current state to start the transition process from.
+      @param use_history {Boolean} Optional. Indicates whether to include using history states in the transition process
       @param context {Hash} Optional. A context object that will be passed to all exited and entered states
     """
-    def gotoState(self, state, fromCurrentState=None, useHistory=None, context=None):
-        if not self.statechartIsInitialized:
-            self.statechartLogError("can not go to state {0}. statechart has not yet been initialized".format(state))
+    def go_to_state(self, state, from_current_state=None, use_history=None, context=None):
+        if not self.statechart_is_initialized:
+            self.statechart_log_error("can not go to state {0}. statechart has not yet been initialized".format(state))
             return
           
         # [PORT] Removed isDestroyed check -- but this is a punt for a later time...
         #if self.isDestroyed:
-            #self.statechartLogError("can not go to state {0}. statechart is destroyed".format(this))
+            #self.statechart_log_error("can not go to state {0}. statechart is destroyed".format(this))
             #return
           
-        pivotState = None
-        exitStates = deque()
-        enterStates = deque()
-        trace = self.allowStatechartTracing
-        paramState = state
-        paramFromCurrentState = fromCurrentState
+        pivot_state = None
+        exit_states = deque()
+        enter_states = deque()
+        trace = self.allow_statechart_tracing
+        param_state = state
+        param_from_current_state = from_current_state
           
-        state = self.getState(state)
+        state = self.get_state(state)
           
         if state is None:
-            self.statechartLogError("Can not to goto state {0}. Not a recognized state in statechart".format(paramState))
+            self.statechart_log_error("Can not to goto state {0}. Not a recognized state in statechart".format(param_state))
             return
           
-        if self.gotoStateLocked:
+        if self.go_to_state_locked:
             # There is a state transition currently happening. Add this requested state
             # transition to the queue of pending state transitions. The request will
             # be invoked after the current state transition is finished.
-            self._pendingStateTransitions.append({
+            self._pending_state_transitions.append({
               'state': state,
-              'fromCurrentState': fromCurrentState,
-              'useHistory': useHistory,
+              'from_current_state': from_current_state,
+              'use_history': use_history,
               'context': context
             })
             return
           
         # Lock the current state transition so that no other requested state transition 
         # interferes. 
-        self.gotoStateLocked = True
+        self.go_to_state_locked = True
           
-        if fromCurrentState is not None:
+        if from_current_state is not None:
             # Check to make sure the current state given is actually a current state of this statechart
-            fromCurrentState = self.getState(fromCurrentState)
-            if fromCurrentState is None or not fromCurrentState.isCurrentState():
+            from_current_state = self.get_state(from_current_state)
+            if from_current_state is None or not from_current_state.is_current_state():
                 msg = "Can not to goto state {0}. {1} is not a recognized current state in statechart"
-                self.statechartLogError(msg.format(paramState, paramFromCurrentState))
-                self.gotoStateLocked = False
+                self.statechart_log_error(msg.format(param_state, param_from_current_state))
+                self.go_to_state_locked = False
                 return
         else:
             # No explicit current state to start from; therefore, need to find a current state
             # to transition from.
-            fromCurrentState = state.findFirstRelativeCurrentState()
-            if fromCurrentState is None:
-                fromCurrentState = self.currentStates[0] if self.currentStates else None
+            from_current_state = state.find_first_relative_current_state()
+            if from_current_state is None:
+                from_current_state = self.current_states[0] if self.current_states else None
               
         if trace:
-            self.statechartLogTrace("BEGIN gotoState: {0}".format(state))
+            self.statechart_log_trace("BEGIN go_to_state: {0}".format(state))
             msg = "starting from current state: {0}"
-            msg = msg.format(fromCurrentState if fromCurrentState else '---')
-            self.statechartLogTrace(msg)
+            msg = msg.format(from_current_state if from_current_state else '---')
+            self.statechart_log_trace(msg)
             msg = "current states before: {0}"
-            msg = msg.format(self.currentStates if self.currentStates else '---')
-            self.statechartLogTrace(msg)
+            msg = msg.format(self.current_states if self.current_states else '---')
+            self.statechart_log_trace(msg)
       
         # If there is a current state to start the transition process from, then determine what
         # states are to be exited
-        if fromCurrentState is not None:
-            exitStates = self._createStateChain(fromCurrentState)
+        if from_current_state is not None:
+            exit_states = self._create_state_chain(from_current_state)
           
         # Now determine the initial states to be entered
-        enterStates = self._createStateChain(state)
+        enter_states = self._create_state_chain(state)
           
         # Get the pivot state to indicate when to go from exiting states to entering states
-        pivotState = self._findPivotState(exitStates, enterStates)
+        pivot_state = self._find_pivot_state(exit_states, enter_states)
       
-        if pivotState is not None:
+        if pivot_state is not None:
             if trace:
-                self.statechartLogTrace("pivot state = {0}".format(pivotState))
-            if pivotState.substatesAreConcurrent and pivotState is not state:
+                self.statechart_log_trace("pivot state = {0}".format(pivot_state))
+            if pivot_state.substates_are_concurrent and pivot_state is not state:
                 msg = "Can not go to state {0} from {1}. Pivot state {2} has concurrent substates."
-                self.statechartLogError(msg.format(state, fromCurrentState, pivotState))
-                self.gotoStateLocked = False
+                self.statechart_log_error(msg.format(state, from_current_state, pivot_state))
+                self.go_to_state_locked = False
                 return
           
         # Collect what actions to perform for the state transition process
-        gotoStateActions = []
+        go_to_state_actions = []
 
         # Go ahead and find states that are to be exited
-        self._traverseStatesToExit(exitStates.popleft() if exitStates else None, exitStates, pivotState, gotoStateActions)
+        self._traverse_states_to_exit(exit_states.popleft() if exit_states else None, exit_states, pivot_state, go_to_state_actions)
           
         # Now go find states that are to be entered
-        if pivotState is not state:
-            self._traverseStatesToEnter(enterStates.pop(), enterStates, pivotState, useHistory, gotoStateActions)
+        if pivot_state is not state:
+            self._traverse_states_to_enter(enter_states.pop(), enter_states, pivot_state, use_history, go_to_state_actions)
         else:
-            self._traverseStatesToExit(pivotState, deque(), None, gotoStateActions)
-            self._traverseStatesToEnter(pivotState, None, None, useHistory, gotoStateActions)
+            self._traverse_states_to_exit(pivot_state, deque(), None, go_to_state_actions)
+            self._traverse_states_to_enter(pivot_state, None, None, use_history, go_to_state_actions)
           
         # Collected all the state transition actions to be performed. Now execute them.
-        self._gotoStateActions = gotoStateActions
-        self._executeGotoStateActions(state, gotoStateActions, None, context)
+        self._go_to_state_actions = go_to_state_actions
+        self._execute_go_to_state_actions(state, go_to_state_actions, None, context)
         
     """
       Indicates if the statechart is in an active goto state process
     """
-    def _gotoStateActive(self, *l):
-        self.gotoStateActive = self.gotoStateLocked
+    def _go_to_state_active(self, *l):
+        self.go_to_state_active = self.go_to_state_locked
 
     """
       Indicates if the statechart is in an active goto state process
       that has been suspended
     """
-    def _gotoStateSuspended(self, *l):
-        self.gotoStateSuspended = self.gotoStateLocked and self.gotoStateSuspendedPoint is not None # [PORT] this was !!self.gotoStateSuspendedPoint -- boolean force?
+    def _go_to_state_suspended(self, *l):
+        self.go_to_state_suspended = self.go_to_state_locked and self.go_to_state_suspended_point is not None # [PORT] this was !!self.go_to_state_suspended_point -- boolean force?
         
     """
       Resumes an active goto state transition process that has been suspended.
     """
-    def resumeGotoState(self):
-        if not self.gotoStateSuspended:
-            self.statechartLogError("Can not resume goto state since it has not been suspended")
+    def resume_go_to_state(self):
+        if not self.go_to_state_suspended:
+            self.statechart_log_error("Can not resume goto state since it has not been suspended")
             return
           
-        point = self.gotoStateSuspendedPoint
-        self._executeGotoStateActions(point['gotoState'], point['actions'], point['marker'], point['context'])
+        point = self.go_to_state_suspended_point
+        self._execute_go_to_state_actions(point['go_to_state'], point['actions'], point['marker'], point['context'])
         
     """ @private """
-    def _executeGotoStateActions(self, gotoState, actions, marker, context):
+    def _execute_go_to_state_actions(self, go_to_state, actions, marker, context):
         action = None
-        actionResult = None
+        action_result = None
             
         marker = 0 if marker is None else marker
           
-        numberOfActions = len(actions)
-        while marker < numberOfActions:
+        number_of_actions = len(actions)
+        while marker < number_of_actions:
             action = actions[marker]
-            self._currentGotoStateAction = action
+            self._current_go_to_state_action = action
             if action['action'] == EXIT_STATE:
-                actionResult = self._exitState(action['state'], context)
+                action_result = self._exit_state(action['state'], context)
             elif action['action'] == ENTER_STATE:
-                actionResult = self._enterState(action['state'], action['currentState'], context)
+                action_result = self._enter_state(action['state'], action['current_state'], context)
             
             # Check if the state wants to perform an asynchronous action during
             # the state transition process. If so, then we need to first
             # suspend the state transition process and then invoke the 
             # asynchronous action. Once called, it is then up to the state or something 
             # else to resume this statechart's state transition process by calling the
-            # statechart's resumeGotoState method.
+            # statechart's resume_go_to_state method.
             #
-            #if actionResult and inspect.isclass(actionResult) and issubclass(actionResult, Async):
-            if actionResult and isinstance(actionResult, Async):
-                self.gotoStateSuspendedPoint = {
-                    'gotoState': gotoState,
+            #if action_result and inspect.isclass(action_result) and issubclass(action_result, Async):
+            if action_result and isinstance(action_result, Async):
+                self.go_to_state_suspended_point = {
+                    'go_to_state': go_to_state,
                     'actions': actions,
                     'marker': marker + 1,
                     'context': context
                 }
               
-                actionResult.tryToPerform(self.getState(action['state'])) # [PORT] state arg must be object, not string key
+                action_result.try_to_perform(self.get_state(action['state'])) # [PORT] state arg must be object, not string key
                 return
 
             marker += 1
           
         #self.beginPropertyChanges()
-        #self.notifyPropertyChange('currentStates') # [PORT] notify needed here in kivy?
+        #self.notifyPropertyChange('current_states') # [PORT] notify needed here in kivy?
         #self.endPropertyChanges()
-        self._currentStates()
+        self._current_states()
           
-        if self.allowStatechartTracing:
-            self.statechartLogTrace("current states after: {0}".format(self.currentStates))
-            self.statechartLogTrace("END gotoState: {0}".format(gotoState))
+        if self.allow_statechart_tracing:
+            self.statechart_log_trace("current states after: {0}".format(self.current_states))
+            self.statechart_log_trace("END go_to_state: {0}".format(go_to_state))
           
-        self._cleanupStateTransition()
+        self._clean_up_state_transition()
         
     """ @private """
-    def _cleanupStateTransition(self):
-        self._currentGotoStateAction = None
-        self.gotoStateSuspendedPoint = None
-        self._gotoStateActions = None
-        self.gotoStateLocked = False
-        if self._pendingStateTransitions: # [PORT] There is an error check in the function that this if now skips. But isn't it ok to be empty?
-            self._flushPendingStateTransition()
+    def _clean_up_state_transition(self):
+        self._current_go_to_state_action = None
+        self.go_to_state_suspended_point = None
+        self._go_to_state_actions = None
+        self.go_to_state_locked = False
+        if self._pending_state_transitions: # [PORT] There is an error check in the function that this if now skips. But isn't it ok to be empty?
+            self._flush_pending_state_transition()
         
     """ @private """
-    def _exitState(self, state, context):
-        parentState = None
+    def _exit_state(self, state, context):
+        parent_state = None
           
-        if state in state.currentSubstates:
-            parentState = state.parentState
-            while parentState is not None:
-                parentState.currentSubstates.remove(state)
-                parentState = parentState.parentState
+        if state in state.current_substates:
+            parent_state = state.parent_state
+            while parent_state is not None:
+                parent_state.current_substates.remove(state)
+                parent_state = parent_state.parent_state
           
-        parentState = state;
-        while parentState is not None:
-            if state in parentState.enteredSubstates:
-                parentState.enteredSubstates.remove(state)
-            parentState = parentState.parentState
+        parent_state = state;
+        while parent_state is not None:
+            if state in parent_state.entered_substates:
+                parent_state.entered_substates.remove(state)
+            parent_state = parent_state.parent_state
             
-        if self.allowStatechartTracing:
-            self.statechartLogTrace("<-- exiting state: {0}".format(state))
+        if self.allow_statechart_tracing:
+            self.statechart_log_trace("<-- exiting state: {0}".format(state))
           
-        state.currentSubstates = []
+        state.current_substates = []
           
-        state.stateWillBecomeExited(context)
-        result = self.exitState(state, context)
-        state.stateDidBecomeExited(context)
+        state.state_will_become_exited(context)
+        result = self.exit_state(state, context)
+        state.state_did_become_exited(context)
           
-        if self.monitorIsActive:
-            self.monitor.appendExitedState(state)
+        if self.monitor_is_active:
+            self.monitor.append_exited_state(state)
           
-        setattr(state, '_traverseStatesToExit_skipState', False)
+        setattr(state, '_traverse_states_to_exit_skip_state', False)
           
         return result
         
     """
-      What will actually invoke a state's exitState method.
+      What will actually invoke a state's exit_state method.
         
-      Called during the state transition process whenever the gotoState method is
+      Called during the state transition process whenever the go_to_state method is
       invoked.
       
-      @param state {State} the state whose enterState method is to be invoked
-      @param context {Hash} a context hash object to provide the enterState method
+      @param state {State} the state whose enter_state method is to be invoked
+      @param context {Hash} a context hash object to provide the enter_state method
     """
-    def exitState(self, state, context):
-        return state.exitState(context)
+    def exit_state(self, state, context):
+        return state.exit_state(context)
         
     """ @private """
-    def _enterState(self, state, current, context):
-        state = self.getState(state) # [PORT] Insure this is an obj and not a string.
-        parentState = state.parentState
-        if parentState and not state.isConcurrentState():
-            parentState.historyState = state
+    def _enter_state(self, state, current, context):
+        state = self.get_state(state) # [PORT] Insure this is an obj and not a string.
+        parent_state = state.parent_state
+        if parent_state and not state.is_concurrent_state():
+            parent_state.history_state = state
           
         if current:
-            parentState = state
-            while parentState is not None:
-                parentState.currentSubstates.append(state)
-                parentState = parentState.parentState
+            parent_state = state
+            while parent_state is not None:
+                parent_state.current_substates.append(state)
+                parent_state = parent_state.parent_state
           
-        parentState = state;
-        while parentState is not None:
-            parentState.enteredSubstates.append(state)
-            parentState = parentState.parentState
+        parent_state = state;
+        while parent_state is not None:
+            parent_state.entered_substates.append(state)
+            parent_state = parent_state.parent_state
           
-        if self.allowStatechartTracing:
-             self.statechartLogTrace("--> entering state: {0}".format(state))
+        if self.allow_statechart_tracing:
+             self.statechart_log_trace("--> entering state: {0}".format(state))
           
-        state.stateWillBecomeEntered(context)
-        result = self.enterState(state, context)
-        state.stateDidBecomeEntered(context)
+        state.state_will_become_entered(context)
+        result = self.enter_state(state, context)
+        state.state_did_become_entered(context)
           
-        if self.monitorIsActive:
-            self.monitor.appendEnteredState(state)
+        if self.monitor_is_active:
+            self.monitor.append_entered_state(state)
           
         return result
         
     """
-      What will actually invoke a state's enterState method.
+      What will actually invoke a state's enter_state method.
     
-      Called during the state transition process whenever the gotoState method is
+      Called during the state transition process whenever the go_to_state method is
       invoked.
       
       If the context provided is a state route context object 
-      ({@link StateRouteContext}), then if the given state has a enterStateByRoute 
-      method, that method will be invoked, otherwise the state's enterState method 
+      ({@link StateRouteContext}), then if the given state has a enter_state_by_route 
+      method, that method will be invoked, otherwise the state's enter_state method 
       will be invoked by default. The state route context object will be supplied to 
       both enter methods in either case.
       
-      @param state {State} the state whose enterState method is to be invoked
-      @param context {Hash} a context hash object to provide the enterState method
+      @param state {State} the state whose enter_state method is to be invoked
+      @param context {Hash} a context hash object to provide the enter_state method
     """
-    def enterState(self, state, context):
-        if hasattr(state, 'enterStateByRoute') and issubclass(context, StateRouteHandlerContext):
-            return state.enterStateByRoute(context)
+    def enter_state(self, state, context):
+        if hasattr(state, 'enter_state_by_route') and issubclass(context, StateRouteHandlerContext):
+            return state.enter_state_by_route(context)
         else:
-            return state.enterState(context)
+            return state.enter_state(context)
         
     """
       When called, the statechart will proceed to make transitions to the given state then follow that
@@ -889,104 +889,104 @@ class StatechartManager(EventDispatcher):
       Method can be called in the following ways:
       
           # With one arguments. 
-          gotoHistoryState(<state>)
+          go_to_history_state(<state>)
         
           # With two arguments. 
-          gotoHistoryState(<state>, <state | boolean | hash>)
+          go_to_history_state(<state>, <state | boolean | hash>)
         
           # With three arguments.
-          gotoHistoryState(<state>, <state>, <boolean | hash>)
-          gotoHistoryState(<state>, <boolean>, <hash>)
+          go_to_history_state(<state>, <state>, <boolean | hash>)
+          go_to_history_state(<state>, <boolean>, <hash>)
         
           # With four argumetns
-          gotoHistoryState(<state>, <state>, <boolean>, <hash>)
+          go_to_history_state(<state>, <state>, <boolean>, <hash>)
       
       where <state> is either a State object or a string and <hash> is a regular JS hash object.
       
       @param state {State|String} the state to go to and follow it's history state
-      @param fromCurrentState {State|String} Optional. the current state to start the state transition process from
+      @param from_current_state {State|String} Optional. the current state to start the state transition process from
       @param recursive {Boolean} Optional. whether to follow history states recursively.
     """
-    def gotoHistoryState(self, state, fromCurrentState=None, recursive=None, context=None):
-        if not self.statechartIsInitialized:
-            self.statechartLogError("can not go to state {0}'s history state. Statechart has not yet been initialized".format(state))
+    def go_to_history_state(self, state, from_current_state=None, recursive=None, context=None):
+        if not self.statechart_is_initialized:
+            self.statechart_log_error("can not go to state {0}'s history state. Statechart has not yet been initialized".format(state))
             return
           
         # [PORT] Assumming that in python argument handling will suffice.
-        #args = self._processGotoStateArgs(arguments)
+        #args = self._process_go_to_state_args(arguments)
           
         #state = args.state
-        #fromCurrentState = args.fromCurrentState
-        #recursive = args.useHistory
+        #from_current_state = args.from_current_state
+        #recursive = args.use_history
         #context = args.context
           
-        state = self.getState(state)
+        state = self.get_state(state)
         
         if state is None:
-            self.statechartLogError("Can not to goto state {0}'s history state. Not a recognized state in statechart".format(state))
+            self.statechart_log_error("Can not to goto state {0}'s history state. Not a recognized state in statechart".format(state))
             return
           
-        historyState = state.historyState
+        history_state = state.history_state
           
         if not recursive:
-            if historyState is not None:
-                self.gotoState(state=historyState, fromCurrentState=fromCurrentState, context=context)
+            if history_state is not None:
+                self.go_to_state(state=history_state, from_current_state=from_current_state, context=context)
             else:
-                self.gotoState(state=state, fromCurrentState=fromCurrentState, context=context)
+                self.go_to_state(state=state, from_current_state=from_current_state, context=context)
         else:
-            self.gotoState(state=state, fromCurrentState=fromCurrentState, useHistory=True, context=context)
+            self.go_to_state(state=state, from_current_state=from_current_state, use_history=True, context=context)
 
     """ 
       @private 
-      Will process the arguments supplied to the gotoState method.
+      Will process the arguments supplied to the go_to_state method.
     
       TODO: Come back to this and refactor the code. It works, but it
             could certainly be improved
 
-      [PORT] Instead of this, made args optional, and made gotoState and gotoHistoryState 
+      [PORT] Instead of this, made args optional, and made go_to_state and go_to_history_state 
              calls with explicit args
     """
-    def _processGotoStateArgs(self, args):
-        processedArgs = { 
+    def _process_go_to_state_args(self, args):
+        processed_args = { 
             'state': None, 
-            'fromCurrentState': None, 
-            'useHistory': False, 
+            'from_current_state': None, 
+            'use_history': False, 
             'context': None 
         }
           
         args = (arg for arg in args if arg)
       
         if (len(args) < 1):
-            return processedArgs
+            return processed_args
       
-        processedArgs['state'] = args[0]
+        processed_args['state'] = args[0]
     
         if (len(args) == 2):
             value = args[1]
             if isinstance(value, bool):
-                processedArgs['useHistory'] = value
+                processed_args['use_history'] = value
             elif (isinstance(value, dict) or isinstance(value, object)) and not isinstance(value, State):
-                processedArgs['context'] = value
+                processed_args['context'] = value
             else:
-                processedArgs['fromCurrentState'] = value
+                processed_args['from_current_state'] = value
         elif (len(args) == 3):
             value = args[1]
             if isinstance(value, bool):
-                processedArgs['useHistory'] = value
-                processedArgs['context'] = args[2]
+                processed_args['use_history'] = value
+                processed_args['context'] = args[2]
             else:
-                processedArgs['fromCurrentState'] = value
+                processed_args['from_current_state'] = value
                 value = args[2]
                 if isinstance(value, bool):
-                    processedArgs['useHistory'] = value
+                    processed_args['use_history'] = value
                 else:
-                    processedArgs['context'] = value
+                    processed_args['context'] = value
         else:
-            processedArgs['fromCurrentState'] = args[1]
-            processedArgs['useHistory'] = args[2]
-            processedArgs['context'] = args[3]
+            processed_args['from_current_state'] = args[1]
+            processed_args['use_history'] = args[2]
+            processed_args['context'] = args[3]
       
-        return processedArgs
+        return processed_args
  
     """
       Sends a given event to all the statechart's current states.
@@ -1003,27 +1003,27 @@ class StatechartManager(EventDispatcher):
       @param arg2 {Object} optional argument
       @returns {Responder} the responder that handled it or None
       
-      @see #stateWillTryToHandleEvent
-      @see #stateDidTryToHandleEvent
+      @see #state_will_try_to_handle_event
+      @see #state_did_try_to_handle_event
     """
-    def sendEvent(self, event, arg1=None, arg2=None):
+    def send_event(self, event, arg1=None, arg2=None):
         # [PORT] Removed isDestroyed check -- but this is a punt for a later time...
         #if self.isDestroyed:
-            #self.statechartLogError("can send event {0}. statechart is destroyed".format(event))
+            #self.statechart_log_error("can send event {0}. statechart is destroyed".format(event))
             #return
 
-        statechartHandledEvent = False
-        eventHandled = False
-        currentStatesCopy = self.currentStates[:]
-        checkedStates = {}
+        statechart_handled_event = False
+        event_handled = False
+        current_states_copy = self.current_states[:]
+        checked_states = {}
         state = None
-        trace = self.allowStatechartTracing
+        trace = self.allow_statechart_tracing
           
-        if self._sendEventLocked or self.gotoStateLocked:
+        if self._send_event_locked or self.go_to_state_locked:
             # Want to prevent any actions from being processed by the states until 
             # they have had a chance to handle the most immediate action or completed 
             # a state transition
-            self._pendingSentEvents.append({
+            self._pending_sent_events.append({
                 'event': event,
                 'arg1': arg1,
                 'arg2': arg2
@@ -1031,36 +1031,36 @@ class StatechartManager(EventDispatcher):
       
             return
           
-        self._sendEventLocked = True
+        self._send_event_locked = True
           
         if trace:
-            self.statechartLogTrace("BEGIN sendEvent: '{0}'".format(event))
+            self.statechart_log_trace("BEGIN send_event: '{0}'".format(event))
           
-        for state in currentStatesCopy:
-            eventHandled = False
-            if not state.isCurrentState():
+        for state in current_states_copy:
+            event_handled = False
+            if not state.is_current_state():
                 continue
-            while not eventHandled and state is not None:
-                if not state.fullPath in checkedStates:
-                    eventHandled = state.tryToHandleEvent(event, arg1, arg2)
-                    checkedStates[state.fullPath] = True
-                if not eventHandled:
-                    state = state.parentState
+            while not event_handled and state is not None:
+                if not state.full_path in checked_states:
+                    event_handled = state.try_to_handle_event(event, arg1, arg2)
+                    checked_states[state.full_path] = True
+                if not event_handled:
+                    state = state.parent_state
                 else:
-                    statechartHandledEvent = True
+                    statechart_handled_event = True
           
         # Now that all the states have had a chance to process the 
         # first event, we can go ahead and flush any pending sent events.
-        self._sendEventLocked = False
+        self._send_event_locked = False
           
         if trace:
-            if not statechartHandledEvent:
-                self.statechartLogTrace("No state was able handle event {0}".format(event))
-            self.statechartLogTrace("END sendEvent: '{0}'".format(event))
+            if not statechart_handled_event:
+                self.statechart_log_trace("No state was able handle event {0}".format(event))
+            self.statechart_log_trace("END send_event: '{0}'".format(event))
           
-        result = self._flushPendingSentEvents()
+        result = self._flush_pending_sent_events()
           
-        return self if statechartHandledEvent else (self if result else None)
+        return self if statechart_handled_event else (self if result else None)
         
     """
       Used to notify the statechart that a state will try to handle event that has been passed
@@ -1070,8 +1070,8 @@ class StatechartManager(EventDispatcher):
       @param {String} event the event the state will try to handle
       @param {String} handler the name of the method on the state that will try to handle the event 
     """
-    def stateWillTryToHandleEvent(self, state, event, handler):
-        self._stateHandleEventInfo = {
+    def state_will_try_to_handle_event(self, state, event, handler):
+        self._state_handle_event_info = {
             'state': state,
             'event': event,
             'handler': handler
@@ -1086,20 +1086,20 @@ class StatechartManager(EventDispatcher):
       @param {String} handler the name of the method on the state that did try to handle the event
       @param {Boolean} handled indicates if the handler was able to handle the event 
     """
-    def stateDidTryToHandleEvent(self, state, event, handler, handled):
-        self._stateHandleEventInfo = None
+    def state_did_try_to_handle_event(self, state, event, handler, handled):
+        self._state_handle_event_info = None
       
     """ @private
     
       Creates a chain of states from the given state to the greatest ancestor state (the root state). Used
       when perform state transitions.
     """
-    def _createStateChain(self, state):
+    def _create_state_chain(self, state):
         chain = deque()
           
         while state is not None:
             chain.append(state)
-            state = state.parentState
+            state = state.parent_state
           
         return chain
         
@@ -1109,12 +1109,12 @@ class StatechartManager(EventDispatcher):
       go from being exited to states being entered during the state transition process. The value 
       returned is the fist matching state between the two given state chains. 
     """
-    def _findPivotState(self, stateChain1, stateChain2):
-        if len(stateChain1) == 0 or len(stateChain2) == 0:
+    def _find_pivot_state(self, state_chain_1, state_chain_2):
+        if len(state_chain_1) == 0 or len(state_chain_2) == 0:
             return None
           
-        for state in stateChain1:
-            if state in stateChain2:
+        for state in state_chain_1:
+            if state in state_chain_2:
                 return state
 
     """ @private
@@ -1124,28 +1124,28 @@ class StatechartManager(EventDispatcher):
       states have been reached based on a given exit path or when a stop state has been reached.
           
       @param state {State} the state to be exited
-      @param exitStatePath {collections.deque} a deque representing a path of states that are to be exited
+      @param exit_state_path {collections.deque} a deque representing a path of states that are to be exited
       @param stopState {State} an explicit state in which to stop the exiting process
     """
-    def _traverseStatesToExit(self, state, exitStatePath, stopState, gotoStateActions):
+    def _traverse_states_to_exit(self, state, exit_state_path, stopState, go_to_state_actions):
         if state is None or state is stopState:
             return
           
-        trace = self.allowStatechartTracing
+        trace = self.allow_statechart_tracing
           
         # This state has concurrent substates. Therefore we have to make sure we
         # exit them up to this state before we can go any further up the exit chain.
-        if state.substatesAreConcurrent:
-            for currentState in state.currentSubstates:
-                if hasattr(currentState, '_traverseStatesToExit_skipState') and currentState._traverseStatesToExit_skipState == True:
+        if state.substates_are_concurrent:
+            for current_state in state.current_substates:
+                if hasattr(current_state, '_traverse_states_to_exit_skip_state') and current_state._traverse_states_to_exit_skip_state == True:
                     continue
-                chain = self._createStateChain(currentState)
-                self._traverseStatesToExit(chain.popleft() if chain else None, chain, state, gotoStateActions)
+                chain = self._create_state_chain(current_state)
+                self._traverse_states_to_exit(chain.popleft() if chain else None, chain, state, go_to_state_actions)
           
-        gotoStateActions.append({ 'action': EXIT_STATE, 'state': state })
-        if state.isCurrentState():
-            setattr(state, '_traverseStatesToExit_skipState', True)
-        self._traverseStatesToExit(exitStatePath.popleft() if exitStatePath else None, exitStatePath, stopState, gotoStateActions)
+        go_to_state_actions.append({ 'action': EXIT_STATE, 'state': state })
+        if state.is_current_state():
+            setattr(state, '_traverse_states_to_exit_skip_state', True)
+        self._traverse_states_to_exit(exit_state_path.popleft() if exit_state_path else None, exit_state_path, stopState, go_to_state_actions)
         
     """ @private
         
@@ -1156,66 +1156,66 @@ class StatechartManager(EventDispatcher):
       followed; when none of those condition are met then the enter process is done.
           
       @param state {State} the sate to be entered
-      @param enterStatePath {collection.deque} a deque representing an initial path of states that are to be entered
-      @param pivotState {State} The state pivoting when to go from exiting states to entering states
-      @param useHistory {Boolean} indicates whether to recursively follow history states 
+      @param enter_state_path {collection.deque} a deque representing an initial path of states that are to be entered
+      @param pivot_state {State} The state pivoting when to go from exiting states to entering states
+      @param use_history {Boolean} indicates whether to recursively follow history states 
     """
-    def _traverseStatesToEnter(self, state, enterStatePath, pivotState, useHistory, gotoStateActions):
+    def _traverse_states_to_enter(self, state, enter_state_path, pivot_state, use_history, go_to_state_actions):
         if not state:
             return
           
-        trace = self.allowStatechartTracing
+        trace = self.allow_statechart_tracing
           
         # We do not want to enter states in the enter path until the pivot state has been reached. After
         # the pivot state has been reached, then we can go ahead and actually enter states.
-        if pivotState:
-            if state is not pivotState:
-                self._traverseStatesToEnter(enterStatePath.pop(), enterStatePath, pivotState, useHistory, gotoStateActions) # [PORT] pop, now on deque
+        if pivot_state:
+            if state is not pivot_state:
+                self._traverse_states_to_enter(enter_state_path.pop(), enter_state_path, pivot_state, use_history, go_to_state_actions) # [PORT] pop, now on deque
             else:
-                self._traverseStatesToEnter(enterStatePath.pop(), enterStatePath, None, useHistory, gotoStateActions) # [PORT] pop, now on deque
+                self._traverse_states_to_enter(enter_state_path.pop(), enter_state_path, None, use_history, go_to_state_actions) # [PORT] pop, now on deque
           
         # If no more explicit enter path instructions, then default to enter states based on 
         # other criteria
-        elif not enterStatePath or len(enterStatePath) == 0:
-            gotoStateAction = { 'action': ENTER_STATE, 'state': state, 'currentState': False }
-            gotoStateActions.append(gotoStateAction)
+        elif not enter_state_path or len(enter_state_path) == 0:
+            go_to_state_action = { 'action': ENTER_STATE, 'state': state, 'current_state': False }
+            go_to_state_actions.append(go_to_state_action)
             
-            initialSubstateKey = state.initialSubstateKey if hasattr(state, 'initialSubstateKey') else ''
-            historyState = state.historyState
+            initial_substate_key = state.initial_substate_key if hasattr(state, 'initial_substate_key') else ''
+            history_state = state.history_state
             
             # State has concurrent substates. Need to enter all of the substates
-            stateObj = self.getState(state)
-            if stateObj.substatesAreConcurrent:
-                self._traverseConcurrentStatesToEnter(stateObj.substates, None, useHistory, gotoStateActions)
+            state_obj = self.get_state(state)
+            if state_obj.substates_are_concurrent:
+                self._traverse_concurrent_states_to_enter(state_obj.substates, None, use_history, go_to_state_actions)
             
             # State has substates and we are instructed to recursively follow the state's
             # history state if it has one.
-            elif stateObj.substates > 0 and historyState and useHistory:
-                self._traverseStatesToEnter(historyState, None, None, useHistory, gotoStateActions)
+            elif state_obj.substates > 0 and history_state and use_history:
+                self._traverse_states_to_enter(history_state, None, None, use_history, go_to_state_actions)
             
             # State has an initial substate to enter
-            elif initialSubstateKey:
-                initialSubstateObj = getattr(state, initialSubstateKey)
-                if initialSubstateObj is not None and isinstance(initialSubstateObj, HistoryState):
-                    if not useHistory:
-                        useHistory = initialSubstateObj.isRecursive
-                self._traverseStatesToEnter(initialSubstateObj, None, None, useHistory, gotoStateActions)
+            elif initial_substate_key:
+                initial_substate_obj = getattr(state, initial_substate_key)
+                if initial_substate_obj is not None and isinstance(initial_substate_obj, HistoryState):
+                    if not use_history:
+                        use_history = initial_substate_obj.is_recursive
+                self._traverse_states_to_enter(initial_substate_obj, None, None, use_history, go_to_state_actions)
                 
             # Looks like we hit the end of the road. Therefore the state has now become
             # a current state of the statechart.
             else:
-                gotoStateAction['currentState'] = True
+                go_to_state_action['current_state'] = True
           
         # Still have an explicit enter path to follow, so keep moving through the path.
-        elif len(enterStatePath) > 0:
-            gotoStateActions.append({ 'action': ENTER_STATE, 'state': state, 'currentState': False })
-            nextState = enterStatePath.pop() # [PORT] pop, now on deque
-            self._traverseStatesToEnter(nextState, enterStatePath, None, useHistory, gotoStateActions)
+        elif len(enter_state_path) > 0:
+            go_to_state_actions.append({ 'action': ENTER_STATE, 'state': state, 'current_state': False })
+            next_state = enter_state_path.pop() # [PORT] pop, now on deque
+            self._traverse_states_to_enter(next_state, enter_state_path, None, use_history, go_to_state_actions)
             
             # We hit a state that has concurrent substates. Must go through each of the substates
             # and enter them
-            if state.substatesAreConcurrent:
-                self._traverseConcurrentStatesToEnter(state.substates, nextState, useHistory, gotoStateActions)
+            if state.substates_are_concurrent:
+                self._traverse_concurrent_states_to_enter(state.substates, next_state, use_history, go_to_state_actions)
         
     """ @override
         
@@ -1225,12 +1225,12 @@ class StatechartManager(EventDispatcher):
       @param event {String} the property name to check
       @returns {Boolean}
     """
-    def respondsTo(self, event):
-        for state in self.currentStates:
+    def responds_to(self, event):
+        for state in self.current_states:
             while state is not None:
-                if (state.respondsToEvent(event)):
+                if (state.responds_to_event(event)):
                     return True
-                state = state.parentState
+                state = state.parent_state
           
         # None of the current states can respond. Now check the statechart itself
         if not hasattr(self, event):
@@ -1249,8 +1249,8 @@ class StatechartManager(EventDispatcher):
       @param arg2 {Object} Optional
       @returns {Boolean} True if handled, False if not handled
     """
-    def tryToPerform(self, event, arg1=None, arg2=None):
-        if not self.respondsTo(event):
+    def try_to_perform(self, event, arg1=None, arg2=None):
+        if not self.responds_to(event):
             return False
       
         if hasattr(self, event) and inspect.ismethod(getattr(self, event)):
@@ -1258,7 +1258,7 @@ class StatechartManager(EventDispatcher):
             if result != None:
                 return True
           
-        return self.sendEvent(event, arg1, arg2) is not None
+        return self.send_event(event, arg1, arg2) is not None
         
     """
       Used to invoke a method on current states. If the method can not be executed
@@ -1267,9 +1267,9 @@ class StatechartManager(EventDispatcher):
           
       A few notes: 
           
-       1. Calling this is not the same as calling sendEvent or sendAction.
+       1. Calling this is not the same as calling send_event or send_action.
           Rather, this should be seen as calling normal methods on a state that 
-          will *not* call gotoState or gotoHistoryState.
+          will *not* call go_to_state or go_to_history_state.
        2. A state will only ever be invoked once per call. So if there are two 
           or more current states that have the same parent state, then that parent 
           state will only be invoked once if none of the current states are able
@@ -1278,7 +1278,7 @@ class StatechartManager(EventDispatcher):
       When calling this method, you are able to supply zero ore more arguments
       that can be pass onto the method called on the states. As an example
           
-          invokeStateMethod('render', context, firstTime);
+          invoke_state_method('render', context, firstTime);
       
       The above call will invoke the render method on the current states
       and supply the context and firstTime arguments to the method. 
@@ -1289,7 +1289,7 @@ class StatechartManager(EventDispatcher):
       we want to call a calculate method on the current states where the method
       will return a value when invoked. We can handle the returned values like so:
           
-          invokeStateMethod('calculate', value, function(state, result) {
+          invoke_state_method('calculate', value, function(state, result) {
             # .. handle the result returned from calculate that was invoked
             #    on the given state
           })
@@ -1299,10 +1299,10 @@ class StatechartManager(EventDispatcher):
       a callback function is given, it must be the last value supplied to this
       method.
           
-      invokeStateMethod will return a value if only one state was able to have 
+      invoke_state_method will return a value if only one state was able to have 
       the given method invoked on it, otherwise no value is returned. 
           
-      @param methodName {String} methodName a method name
+      @param method_name {String} method_name a method name
       @param args {Object...} Optional. any additional arguments
       @param func {Function} Optional. a callback function. Must be the last
              value supplied if provided.
@@ -1311,76 +1311,76 @@ class StatechartManager(EventDispatcher):
                is returned. The value is the result of the method that got invoked
                on a state.
     """
-    def invokeStateMethod(self, methodName, *args):
-        if methodName == 'unknownEvent':
-            self.statechartLogError("can not invoke method unkownEvent")
+    def invoke_state_method(self, method_name, *args):
+        if method_name == 'unknown_event':
+            self.statechart_log_error("can not invoke method unkownEvent")
             return
           
         callback = None
-        checkedStates = {}
-        calledStates = 0
+        checked_states = {}
+        called_states = 0
           
         # If last arg is a callback function, set it, popping it off args.
         args = list(args) if args else None
         if args and (inspect.isfunction(args[-1]) or inspect.ismethod(args[-1])):
             callback = args.pop()
 
-        # Search current states for methods matching methodName, call the method on each,
+        # Search current states for methods matching method_name, call the method on each,
         # and fire the callback on each, if it exists.
-        for state in self.currentStates:
+        for state in self.current_states:
             while state is not None:
-                if state.fullPath in checkedStates:
+                if state.full_path in checked_states:
                     break
-                checkedStates[state.fullPath] = True
-                method = getattr(state, methodName) if hasattr(state, methodName) else None
-                if method and inspect.ismethod(method) and not (hasattr(method, 'isEventHandler') and not method.isEventHandler):
+                checked_states[state.full_path] = True
+                method = getattr(state, method_name) if hasattr(state, method_name) else None
+                if method and inspect.ismethod(method) and not (hasattr(method, 'is_event_handler') and not method.is_event_handler):
                     result = method(*tuple(args if args else []))
                     if callback is not None:
                         callback(state, result)
-                    calledStates += 1
+                    called_states += 1
                     break
-                state = state.parentState
+                state = state.parent_state
           
-        return result if calledStates == 1 else None
+        return result if called_states == 1 else None
         
     """ @private
         
       Iterate over all the given concurrent states and enter them
     """
-    def _traverseConcurrentStatesToEnter(self, states, exclude, useHistory, gotoStateActions):
+    def _traverse_concurrent_states_to_enter(self, states, exclude, use_history, go_to_state_actions):
         for i in range(len(states)):
             state = states[i]
             if state is not exclude:
-                self._traverseStatesToEnter(state, None, None, useHistory, gotoStateActions)
+                self._traverse_states_to_enter(state, None, None, use_history, go_to_state_actions)
         
     """ @private
         
-      Called by gotoState to flush a pending state transition at the front of the 
+      Called by go_to_state to flush a pending state transition at the front of the 
       pending queue.
     """
-    def _flushPendingStateTransition(self):
-        if not self._pendingStateTransitions:
-            self.statechartLogError("Unable to flush pending state transition. _pendingStateTransitions is invalid.")
+    def _flush_pending_state_transition(self):
+        if not self._pending_state_transitions:
+            self.statechart_log_error("Unable to flush pending state transition. _pending_state_transitions is invalid.")
             return
-        pending = self._pendingStateTransitions.popleft() if self._pendingStateTransitions else None
+        pending = self._pending_state_transitions.popleft() if self._pending_state_transitions else None
         if not pending:
             return
-        self.gotoState(state=pending['state'], fromCurrentState=pending['fromCurrentState'], useHistory=pending['useHistory'], context=pending['context'])
+        self.go_to_state(state=pending['state'], from_current_state=pending['from_current_state'], use_history=pending['use_history'], context=pending['context'])
         
     """ @private
       
-      Called by sendEvent to flush a pending actions at the front of the pending
+      Called by send_event to flush a pending actions at the front of the pending
       queue
     """
-    def _flushPendingSentEvents(self):
-        pending = self._pendingSentEvents.popleft() if self._pendingSentEvents else None
+    def _flush_pending_sent_events(self):
+        pending = self._pending_sent_events.popleft() if self._pending_sent_events else None
         if not pending:
             return None
-        return self.sendEvent(pending['event'], pending['arg1'], pending['arg2'])
+        return self.send_event(pending['event'], pending['arg1'], pending['arg2'])
         
     """ @private """
-    def _monitorIsActiveDidChange(self, *l):
-        if self.monitorIsActive and self.monitor is None:
+    def _monitor_is_active_did_change(self, *l):
+        if self.monitor_is_active and self.monitor is None:
             self.monitor = StatechartMonitor(self)
         
     """ @private 
@@ -1389,27 +1389,27 @@ class StatechartManager(EventDispatcher):
       it based on properties found on this state that derive from a State class. For the
       root state to be successfully built, the following much be met:
           
-       - The rootStateExampleClass property must be defined with a class that derives from State
-       - Either the initialStateKey or statesAreConcurrent property must be set, but not both
+       - The root_state_example_class property must be defined with a class that derives from State
+       - Either the initial_state_key or states_are_concurrent property must be set, but not both
        - There must be one or more states that can be added to the root state
             
     """
-    def _constructRootStateClass(self):
-        stateCount = 0
+    def _construct_root_state_class(self):
+        state_count = 0
         attrs = {}
           
-        if inspect.isclass(self.rootStateExampleClass) and not issubclass(self.rootStateExampleClass, State):
-            self._logStatechartCreationError("Invalid root state example")
+        if inspect.isclass(self.root_state_example_class) and not issubclass(self.root_state_example_class, State):
+            self._log_statechart_creation_error("Invalid root state example")
             return None
           
-        if self.statesAreConcurrent and self.initialStateKey:
-            self._logStatechartCreationError("Can not assign an initial state when states are concurrent")
-        elif self.statesAreConcurrent:
-            attrs['substatesAreConcurrent'] = True
-        elif self.initialStateKey:
-            attrs['initialSubstateKey'] = self.initialStateKey
+        if self.states_are_concurrent and self.initial_state_key:
+            self._log_statechart_creation_error("Can not assign an initial state when states are concurrent")
+        elif self.states_are_concurrent:
+            attrs['substates_are_concurrent'] = True
+        elif self.initial_state_key:
+            attrs['initial_substate_key'] = self.initial_state_key
         else:
-            self._logStatechartCreationError("Must either define initial state or assign states as concurrent")
+            self._log_statechart_creation_error("Must either define initial state or assign states as concurrent")
             return None
           
         # Find the states:
@@ -1417,7 +1417,7 @@ class StatechartManager(EventDispatcher):
             if key == '__class__':
                 continue
 
-            if key == 'rootStateExampleClass':
+            if key == 'root_state_example_class':
                 continue
             
             value = getattr(self, key)
@@ -1432,48 +1432,48 @@ class StatechartManager(EventDispatcher):
             
             #if isinstance(value, State) and inspect.isclass(value) and self[key] is not self.__init__:
             if inspect.isclass(value) and issubclass(value, State): # [PORT] Compare to same usage in state.py. Same here?
-                if key != 'initialStateKey': # [PORT] Don't set this. rootState will only have initialSubstateKey, not initialStateKey.
+                if key != 'initial_state_key': # [PORT] Don't set this. root_state will only have initial_substate_key, not initial_state_key.
                     attrs[key] = value
-                stateCount += 1
+                state_count += 1
 
-        if stateCount == 0:
-            self._logStatechartCreationError("Must define one or more states")
+        if state_count == 0:
+            self._log_statechart_creation_error("Must define one or more states")
             return None
           
         # [PORT] Using python type to make a new class...
 
-        if self.rootStateExampleClass is None:
+        if self.root_state_example_class is None:
             return type("RootState", (State,), attrs)
         else:
-            return type("RootState", (self.rootStateExampleClass, ), attrs)
+            return type("RootState", (self.root_state_example_class, ), attrs)
 
     """ @private """
-    def _logStatechartCreationError(self, msg):
+    def _log_statechart_creation_error(self, msg):
         #Logger.debug("Unable to create statechart for {0}: {1}.".format(self, msg)) # [PORT] Where does debug go in Kivy?
         Logger.info("Unable to create statechart for {0}: {1}.".format(self, msg))
         
     """ 
       Used to log a statechart trace message
     """
-    def statechartLogTrace(self, msg):
-        Logger.info("{0}: {1}".format(self.statechartLogPrefix, msg))
+    def statechart_log_trace(self, msg):
+        Logger.info("{0}: {1}".format(self.statechart_log_prefix, msg))
         
     """
       Used to log a statechart error message
     """
-    def statechartLogError(self, msg):
-        Logger.info("ERROR {0}: {1}".format(self.statechartLogPrefix, msg)) # [PORT] ditto?
+    def statechart_log_error(self, msg):
+        Logger.info("ERROR {0}: {1}".format(self.statechart_log_prefix, msg)) # [PORT] ditto?
         
     """ 
       Used to log a statechart warning message
     """
-    def statechartLogWarning(self, msg):
-        if self.suppressStatechartWarnings:
+    def statechart_log_warning(self, msg):
+        if self.suppress_statechart_warnings:
             return
-        Logger.info("WARN {0}: {1}".format(self.statechartLogPrefix, msg))
+        Logger.info("WARN {0}: {1}".format(self.statechart_log_prefix, msg))
         
     """ @property """
-    def _statechartLogPrefix(self):
+    def _statechart_log_prefix(self):
         className = self.__name__
         name = self.name, prefix;
               
@@ -1482,17 +1482,17 @@ class StatechartManager(EventDispatcher):
         else:
             prefix = "{0}<{1}, {2}>".format(className, name, guidFor(self))
           
-        self.statechartLogPrefix = prefix
+        self.statechart_log_prefix = prefix
       
     """ @private @property """
-    def _allowStatechartTracing(self):
-        self.allowStatechartTracing = getattr(self, self.statechartTraceKey)
+    def _allow_statechart_tracing(self):
+        self.allow_statechart_tracing = getattr(self, self.statechart_trace_key)
       
     """ @private """
-    def _statechartTraceDidChange(self):
-        #self.notifyPropertyChange('allowStatechartTracing')
+    def _statechart_trace_did_change(self):
+        #self.notifyPropertyChange('allow_statechart_tracing')
         #pass # [PORT] notify needed here in kivy?
-        self._allowStatechartTracing()
+        self._allow_statechart_tracing()
         
     """
       @property
@@ -1512,38 +1512,38 @@ class StatechartManager(EventDispatcher):
       @returns {Hash}
     """
     def details(self):
-        details = { 'initialized': self.statechartIsInitialized }
+        details = { 'initialized': self.statechart_is_initialized }
           
         if self.name:
             details['name'] = getattr(self, 'name')
           
-        if not self.statechartIsInitialized:
+        if not self.statechart_is_initialized:
             return details
           
         details['current-states'] = []
-        for state in self.currentStates:
-            details['current-states'].append(state.fullPath)
+        for state in self.current_states:
+            details['current-states'].append(state.full_path)
           
-        stateTransition = { 'active': self.gotoStateActive, 'suspended': self.gotoStateSuspended }
+        state_transition = { 'active': self.go_to_state_active, 'suspended': self.go_to_state_suspended }
       
-        if self._gotoStateActions:
-            stateTransition['transition-sequence'] = []
+        if self._go_to_state_actions:
+            state_transition['transition-sequence'] = []
                 
-            for action in self.gotoStateActions:
+            for action in self.go_to_state_actions:
                 actionName = "enter" if action['action'] == ENTER_STATE else "exit"
-                actionName = "{0} {1}".format(actionName, action['state'].fullPath)
-                stateTransition['transition-sequence'].append(actionName)
+                actionName = "{0} {1}".format(actionName, action['state'].full_path)
+                state_transition['transition-sequence'].append(actionName)
             
-            actionName = "enter" if self._currentGotoStateAction['action'] == ENTER_STATE else "exit"
-            actionName = "{0} {1}".format(actionName, self._currentGotoStateAction['state'].fullPath)
-            stateTransition['current-transition'] = actionName
+            actionName = "enter" if self._current_go_to_state_action['action'] == ENTER_STATE else "exit"
+            actionName = "{0} {1}".format(actionName, self._current_go_to_state_action['state'].full_path)
+            state_transition['current-transition'] = actionName
           
-        details['state-transition'] = stateTransition
+        details['state-transition'] = state_transition
           
-        if self._stateHandleEventInfo:
-            info = self._stateHandleEventInfo
+        if self._state_handle_event_info:
+            info = self._state_handle_event_info
             details['handling-event'] = {
-              'state': info.state.fullPath,
+              'state': info.state.full_path,
               'event': info.event,
               'handler': info.handler
             }
@@ -1560,44 +1560,44 @@ class StatechartManager(EventDispatcher):
           
       @see #details
     """
-    def toStringWithDetails(self):
+    def to_string_with_details(self):
         str = ""
         header = self.toString()
         details = self.details
           
         str += header + "\n"
-        str += self._hashToString(details, 2)
+        str += self._hash_to_string(details, 2)
           
         return str;
       
     """ @private """
-    def _hashToString(self, hashToConvert, indent):
-        hashAsString = ''
-        for key in hashToConvert:
-            value = hashToConvert[key]
+    def _hash_to_string(self, hash_to_convert, indent):
+        hash_as_string = ''
+        for key in hash_to_convert:
+            value = hash_to_convert[key]
             if isinstance(value, Array):
-                hashAsString += self._arrayToString(key, value, indent) + "\n";
+                hash_as_string += self._array_to_string(key, value, indent) + "\n";
             elif isinstance(value, Object):
-                hashAsString += "{0}{1}:\n".format(' ' * indent, key)
-                hashAsString += self._hashToString(value, indent + 2)
+                hash_as_string += "{0}{1}:\n".format(' ' * indent, key)
+                hash_as_string += self._hash_to_string(value, indent + 2)
             else:
-                hashAsString += "{0}{1}: {2}\n".format(' ' * indent, key, value)
+                hash_as_string += "{0}{1}: {2}\n".format(' ' * indent, key, value)
           
-        return hashAsString
+        return hash_as_string
         
     """ @private """
-    def _arrayToString(self, key, array, indent):
+    def _array_to_string(self, key, array, indent):
         if len(array) == 0:
             return "{0}{1}: []".format(' ' * indent, key)
           
-        arrayAsString = "{0}{1}: [\n".format(' ' * indent, key)
+        array_as_string = "{0}{1}: [\n".format(' ' * indent, key)
           
         for item, idx in array:
-            arrayAsString += "{0}{1}\n".format(' ' * indent + 2, item)
+            array_as_string += "{0}{1}\n".format(' ' * indent + 2, item)
           
-        arrayAsString += ' ' * indent + "]"
+        array_as_string += ' ' * indent + "]"
           
-        return arrayAsString
+        return array_as_string
       
 class StatechartMixin(StatechartManager, StatechartDelegate): # [PORT] also sublassed here was DelegateSupport, from SC
     pass
@@ -1618,6 +1618,6 @@ ENTER_STATE = 1
 """
 class Statechart(StatechartManager):
     def __init__(self, **kw):
-        kw['autoInitStatechart'] = False
+        kw['auto_init_statechart'] = False
         super(Statechart, self).__init__(**kw)
         #StatechartManager.__init__(self)

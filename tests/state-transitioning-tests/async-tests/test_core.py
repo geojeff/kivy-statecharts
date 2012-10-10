@@ -12,12 +12,12 @@ import os, inspect
 
 class Obj:
     def __init__(self):
-        self.fooInvoked = False
+        self.foo_invoked = False
         self.arg1 = None
         self.arg2 = None
 
     def foo(self, arg1, arg2):
-        self.fooInvoked = True
+        self.foo_invoked = True
         self.arg1 = arg1
         self.arg2 = arg2
 
@@ -35,8 +35,8 @@ class StateTransitioningAsyncCore(unittest.TestCase):
         self.assertEqual(async.arg1, None)
         self.assertEqual(async.arg2, None)
 
-        async.tryToPerform(obj)
-        self.assertEqual(obj.fooInvoked, True)
+        async.try_to_perform(obj)
+        self.assertEqual(obj.foo_invoked, True)
         self.assertEqual(async.arg1, None)
         self.assertEqual(async.arg2, None)
 
@@ -48,8 +48,8 @@ class StateTransitioningAsyncCore(unittest.TestCase):
         self.assertEqual(async.arg2, 'world')
 
         obj = Obj()
-        async.tryToPerform(obj)
-        self.assertEqual(obj.fooInvoked, True)
+        async.try_to_perform(obj)
+        self.assertEqual(obj.foo_invoked, True)
         self.assertEqual(async.arg1, 'hello')
         self.assertEqual(async.arg2, 'world')
 
@@ -63,8 +63,8 @@ class StateTransitioningAsyncCore(unittest.TestCase):
         self.assertEqual(async.arg2, None)
 
         obj = Obj()
-        async.tryToPerform(obj)
-        self.assertEqual(obj.fooInvoked, True)
+        async.try_to_perform(obj)
+        self.assertEqual(obj.foo_invoked, True)
         self.assertEqual(async.arg1, None)
         self.assertEqual(async.arg2, None)
 
@@ -78,8 +78,8 @@ class StateTransitioningAsyncCore(unittest.TestCase):
         self.assertEqual(async.arg2, 'bbb')
 
         obj = Obj()
-        async.tryToPerform(obj)
-        self.assertEqual(obj.fooInvoked, True)
+        async.try_to_perform(obj)
+        self.assertEqual(obj.foo_invoked, True)
         self.assertEqual(async.arg1, 'aaa')
         self.assertEqual(async.arg2, 'bbb')
 
@@ -90,5 +90,5 @@ class StateTransitioningAsyncCore(unittest.TestCase):
 
         self.assertEqual(async.func, 'bar')
 
-        async.tryToPerform(obj)
-        self.assertEqual(obj.fooInvoked, False)
+        async.try_to_perform(obj)
+        self.assertEqual(obj.foo_invoked, False)

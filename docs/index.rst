@@ -87,11 +87,11 @@ state called ShowingHelloWorld:
 
     class AppStatechart(StatechartManager):
         class RootState(State):
-            initialSubstateKey = 'ShowingHelloWorld'
+            initial_substate_key = 'ShowingHelloWorld'
             class ShowingHelloWorld(State):
 
 The statechart is defined by the root state and its substates. The root state
-must have an initial substate or substatesAreConcurrent = True explicitly
+must have an initial substate or substates_are_concurrent = True explicitly
 defined. Here, we only have one state, ShowingHelloWorld, and it is the
 initial substate. When the statechart is instantiated, control will flow
 immediately from the root state to the ShowingHelloWorld state.
@@ -145,7 +145,7 @@ There is only one file for the app, main.py:
 
         def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
             if text in ['h', 'e', 'l', 'o', 'w', 'r', 'd']:
-                self.app.statechart.sendEvent(text)
+                self.app.statechart.send_event(text)
 
             if keycode[1] == 'escape':
                 keyboard.release()
@@ -164,7 +164,7 @@ There is only one file for the app, main.py:
 
         def letter_clicked(self, *args):
             print 'letter clicked', self.letter
-            self.statechart.sendEvent(self.letter)
+            self.statechart.send_event(self.letter)
 
 
     class AppStatechart(StatechartManager):
@@ -172,21 +172,21 @@ There is only one file for the app, main.py:
 
         def __init__(self, **kw):
             self.trace = True
-            self.rootStateClass = self.RootState
+            self.root_state_class = self.RootState
             super(AppStatechart, self).__init__(**kw)
 
         class RootState(State):
-            initialSubstateKey = 'ShowingHelloWorld'
+            initial_substate_key = 'ShowingHelloWorld'
 
             class ShowingHelloWorld(State):
                 root = ObjectProperty(None)
 
-                def enterState(self, context=None):
-                    print 'ShowingHelloWorld/enterState'
+                def enter_state(self, context=None):
+                    print 'ShowingHelloWorld/enter_state'
                     self.root = self.statechart.app.root
 
-                def exitState(self, context=None):
-                    print 'ShowingHelloWorld/exitState'
+                def exit_state(self, context=None):
+                    print 'ShowingHelloWorld/exit_state'
 
                 # Utility method:
                 #
@@ -236,7 +236,7 @@ There is only one file for the app, main.py:
 
         def on_start(self):
             self.statechart = AppStatechart(app=self)
-            self.statechart.initStatechart()
+            self.statechart.init_statechart()
 
 
     if __name__ in ('__android__', '__main__'):
@@ -258,20 +258,20 @@ more thorough look.
 First, AppStatechart has an app reference property, for convenience, that is
 passed on instantiation. Any Kivy property defined in the body of a class is
 automatically set if passed as an argument. You don't even have to have an
-__init__() method, but here we do, because the trace and rootStateClass
+__init__() method, but here we do, because the trace and root_state_class
 properties are set.
 
 The only thing declared in the root state is the inital substate,
 ShowingHelloWorld, which contains the basic functionality for the app.
 
-**ShowingHelloWorld, enterState() and exitState()**
+**ShowingHelloWorld, enter_state() and exit_state()**
 
-If enterState() and/or exitState() are defined for a state, these will be
+If enter_state() and/or exit_state() are defined for a state, these will be
 called automatically at the appropriate times. In a larger app, you would
 think about what needs to happen on enter and exit, such as creating and
-showing a dialog in the enterState, and tearing it down in the exit state,
+showing a dialog in the enter_state, and tearing it down in the exit state,
 or any manner of things that could happen. Here, we just print a message on
-enterState() and exitState().
+enter_state() and exit_state().
 
 **Utility Methods**
 
@@ -293,7 +293,7 @@ additional keyboard presses or from the buttons.
 
 Look at the HelloWorldView class for setup of the keyboard actions (We can use
 the terms action and event interchangeably here). You see there that when a
-key press happens, there is a call to statechart.sendEvent(letter), where
+key press happens, there is a call to statechart.send_event(letter), where
 letter is one of the letters in "hello world."
 
 In a larger app, action method names could be anything, but examples tend to
@@ -313,11 +313,11 @@ define a single handler method, as follows:
 
 ::
 
-    @State.eventHandler(['h', 'e', 'l', 'o', 'w', 'r', 'd']) 
+    @State.event_handler(['h', 'e', 'l', 'o', 'w', 'r', 'd']) 
     def letter_event_handler(self, event, letter, context):
         self.add_label(letter)
 
-This is a case where the eventHandler method approach is a perfect fit. The
+This is a case where the event_handler method approach is a perfect fit. The
 first line is a function decorator on the State class that marks
 letter_event_handler() as a handler for all the events in the list.
 
@@ -369,7 +369,7 @@ independent (also termed orthogonal) -- one or the other is active at a given
 time. But in some apps, a set of sibling states can all be active at the same
 time. These are called concurrent states. The ShowingBalls state contains five
 concurrent substates, for each of the moving balls. Note the use of the
-boolean property substatesAreConcurrent. If you omit this property for a state
+boolean property substates_are_concurrent. If you omit this property for a state
 that contains substates, the substates will be independent of one another
 (orthogonal), but here they are concurrent:
 
@@ -377,9 +377,9 @@ that contains substates, the substates will be independent of one another
 
     class AppStatechart(StatechartManager):
         class RootState(State):
-            initialSubstateKey = 'ShowingBalls'
+            initial_substate_key = 'ShowingBalls'
             class ShowingBalls(State):
-                substatesAreConcurrent = True
+                substates_are_concurrent = True
                 class MovingBall_1(MovingBall):
                 class MovingBall_2(MovingBall):
                 class MovingBall_3(MovingBall):
@@ -407,7 +407,7 @@ slow_down() action method.
 
    Statechart diagram for BallsApp
 
-The combination of velocity adjustments in the enterState() method for
+The combination of velocity adjustments in the enter_state() method for
 each moving ball state, and the adjustments made in the speed_up() and 
 slow_down() methods, forms an algorithm for this app, giving an interesting
 effect, with balls moving in all directions at different velocities. This was
@@ -485,7 +485,7 @@ right, where you see the game level changing action.
    Statechart diagram for Deflectouch-With-Statecharts App
 
 A new concept is introduced here for states: transient states, which are shown
-by dashed line borders. These states do something in their enterState()
+by dashed line borders. These states do something in their enter_state()
 method, then immediately fire to another state. You also see that the Tank is
 autonomous -- it doesn't send events to the statechart, it has internally
 operating bindings between touch events and moving and barrel adjustment

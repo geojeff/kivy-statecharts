@@ -17,13 +17,13 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['monitorIsActive'] = True
-        kwargs['rootStateClass'] = self.RootState
+        kwargs['monitor_is_active'] = True
+        kwargs['root_state_class'] = self.RootState
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'A'
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
         class A(State):
@@ -37,23 +37,23 @@ class Statechart_1(StatechartManager):
 class StateIsCurrentStateTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
-        global rootState_1
+        global root_state_1
         global monitor_1
         global state_A
         global state_B
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootStateInstance
+        statechart_1.init_statechart()
+        root_state_1 = statechart_1.root_state_instance
         monitor_1 = statechart_1.monitor
-        state_A = statechart_1.getState('A')
-        state_B = statechart_1.getState('B')
+        state_A = statechart_1.get_state('A')
+        state_B = statechart_1.get_state('B')
         
-    # check binding to isCurrentState"
-    def test_check_binding_to_isCurrentState_statechart_1(self):
+    # check binding to is_current_state"
+    def test_check_binding_to_is_current_state_statechart_1(self):
         class o(object):
             def __init__(self):
                 self.value = None
-                #self.bind(value, state_A.isCurrentState) # [PORT] Won't work in kivy. Plus, isCurrentState() is now a method.
+                #self.bind(value, state_A.is_current_state) # [PORT] Won't work in kivy. Plus, is_current_state() is now a method.
 
-        self.assertEqual(rootState_1.initialSubstateKey, state_A.name)
+        self.assertEqual(root_state_1.initial_substate_key, state_A.name)

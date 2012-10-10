@@ -16,23 +16,23 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootStateClass'] = self.RootState
-        kwargs['monitorIsActive'] = True
+        kwargs['root_state_class'] = self.RootState
+        kwargs['monitor_is_active'] = True
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'X'
+            kwargs['initial_substate_key'] = 'X'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
         class X(State):
             def __init__(self, **kwargs):
-                kwargs['substatesAreConcurrent'] = True
+                kwargs['substates_are_concurrent'] = True
                 super(Statechart_1.RootState.X, self).__init__(**kwargs)
     
             class A(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'C'
+                    kwargs['initial_substate_key'] = 'C'
                     super(Statechart_1.RootState.X.A, self).__init__(**kwargs)
     
                 class C(State):
@@ -45,7 +45,7 @@ class Statechart_1(StatechartManager):
     
             class B(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'E'
+                    kwargs['initial_substate_key'] = 'E'
                     super(Statechart_1.RootState.X.B, self).__init__(**kwargs)
     
                 class E(State):
@@ -63,7 +63,7 @@ class Statechart_1(StatechartManager):
 class StateTransitioningHistoryStandardWithConcurrentTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
-        global rootState_1
+        global root_state_1
         global monitor_1
         global state_A
         global state_B
@@ -75,38 +75,38 @@ class StateTransitioningHistoryStandardWithConcurrentTestCase(unittest.TestCase)
         global state_Z
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootStateInstance
+        statechart_1.init_statechart()
+        root_state_1 = statechart_1.root_state_instance
         monitor_1 = statechart_1.monitor
-        state_A = statechart_1.getState('A')
-        state_B = statechart_1.getState('B')
-        state_C = statechart_1.getState('C')
-        state_D = statechart_1.getState('D')
-        state_E = statechart_1.getState('E')
-        state_F = statechart_1.getState('F')
-        state_X = statechart_1.getState('X')
-        state_Z = statechart_1.getState('Z')
+        state_A = statechart_1.get_state('A')
+        state_B = statechart_1.get_state('B')
+        state_C = statechart_1.get_state('C')
+        state_D = statechart_1.get_state('D')
+        state_E = statechart_1.get_state('E')
+        state_F = statechart_1.get_state('F')
+        state_X = statechart_1.get_state('X')
+        state_Z = statechart_1.get_state('Z')
   
     # Send event event_A
     def test_initial_statechart_history_state_objects(self):
-        state_C.gotoState('D')
-        state_E.gotoState('F')
+        state_C.go_to_state('D')
+        state_E.go_to_state('F')
 
-        self.assertEqual(state_A.historyState, state_D)
-        self.assertEqual(state_B.historyState, state_F)
-        self.assertTrue(state_D.isCurrentState())
-        self.assertTrue(state_F.isCurrentState())
-        self.assertFalse(state_E.isCurrentState())
+        self.assertEqual(state_A.history_state, state_D)
+        self.assertEqual(state_B.history_state, state_F)
+        self.assertTrue(state_D.is_current_state())
+        self.assertTrue(state_F.is_current_state())
+        self.assertFalse(state_E.is_current_state())
 
         monitor_1.reset()
   
-        state_D.gotoState('Z');
-        self.assertTrue(state_Z.isCurrentState())
+        state_D.go_to_state('Z');
+        self.assertTrue(state_Z.is_current_state())
  
-        state_Z.gotoHistoryState('A')
+        state_Z.go_to_history_state('A')
 
-        self.assertEqual(state_A.historyState, state_D)
-        self.assertEqual(state_B.historyState, state_E)
-        self.assertTrue(state_D.isCurrentState())
-        self.assertFalse(state_F.isCurrentState())
-        self.assertTrue(state_E.isCurrentState())
+        self.assertEqual(state_A.history_state, state_D)
+        self.assertEqual(state_B.history_state, state_E)
+        self.assertTrue(state_D.is_current_state())
+        self.assertFalse(state_F.is_current_state())
+        self.assertTrue(state_E.is_current_state())

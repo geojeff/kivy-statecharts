@@ -15,18 +15,18 @@ from kivy_statecharts.system.statechart import StatechartManager
 import os, inspect
 
 class TestState(State):
-    testInvoked = BooleanProperty(False)
-    testInvokedCount = NumericProperty(0)
-    returnValue = NumericProperty(None)
+    test_invoked = BooleanProperty(False)
+    test_invoked_count = NumericProperty(0)
+    return_value = NumericProperty(None)
     arg1 = StringProperty(None)
     arg2 = StringProperty(None)
       
     def __init__(self, **kwargs):
-        self.bind(testInvokedCount=self._testInvokedCountChanged)
+        self.bind(test_invoked_count=self._test_invoked_countChanged)
         super(TestState, self).__init__(**kwargs)
 
-    def _testInvokedCountChanged(self, *l):
-        self.testInvoked = True if self.testInvokedCount > 0 else False
+    def _test_invoked_countChanged(self, *l):
+        self.test_invoked = True if self.test_invoked_count > 0 else False
 
     def test(self, *args):
         arg1 = None
@@ -38,12 +38,12 @@ class TestState(State):
             arg2 = args[1]
         setattr(self, 'arg1', arg1)
         setattr(self, 'arg2', arg2)
-        setattr(self, 'testInvokedCount', getattr(self, 'testInvokedCount') + 1)
-        return self.returnValue if self.returnValue else None
+        setattr(self, 'test_invoked_count', getattr(self, 'test_invoked_count') + 1)
+        return self.return_value if self.return_value else None
       
 class RootStateExample_1(TestState):
     def __init__(self, **kwargs):
-        kwargs['initialSubstateKey'] = 'A'
+        kwargs['initial_substate_key'] = 'A'
         super(RootStateExample_1, self).__init__(**kwargs)
 
     def testX(self, *args):
@@ -59,13 +59,13 @@ class RootStateExample_1(TestState):
             setattr(self, 'arg1', arg1)
         if arg2:
             setattr(self, 'arg2', arg2)
-        setattr(self, 'testInvokedCount', getattr(self, 'testInvokedCount') + 1)
-        return self.returnValue if self.returnValue else None
+        setattr(self, 'test_invoked_count', getattr(self, 'test_invoked_count') + 1)
+        return self.return_value if self.return_value else None
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['initialStateKey'] = 'A'
-        kwargs['rootStateExampleClass'] = RootStateExample_1
+        kwargs['initial_state_key'] = 'A'
+        kwargs['root_state_example_class'] = RootStateExample_1
         kwargs['A'] = self.A
         kwargs['B'] = self.B
         super(Statechart_1, self).__init__(**kwargs)
@@ -80,7 +80,7 @@ class Statechart_1(StatechartManager):
 
 class RootStateExample_2(TestState):
     def __init__(self, **kwargs):
-        kwargs['substatesAreConcurrent'] = True
+        kwargs['substates_are_concurrent'] = True
         super(RootStateExample_2, self).__init__(**kwargs)
 
     def testX(self, *args):
@@ -96,13 +96,13 @@ class RootStateExample_2(TestState):
             setattr(self, 'arg1', arg1)
         if arg2:
             setattr(self, 'arg2', arg2)
-        setattr(self, 'testInvokedCount', getattr(self, 'testInvokedCount') + 1)
-        return self.returnValue if self.returnValue else None
+        setattr(self, 'test_invoked_count', getattr(self, 'test_invoked_count') + 1)
+        return self.return_value if self.return_value else None
 
 class Statechart_2(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['statesAreConcurrent'] = True
-        kwargs['rootStateExampleClass'] = RootStateExample_2
+        kwargs['states_are_concurrent'] = True
+        kwargs['root_state_example_class'] = RootStateExample_2
         kwargs['C'] = self.C
         kwargs['D'] = self.D
         super(Statechart_2, self).__init__(**kwargs)
@@ -117,148 +117,148 @@ class Statechart_2(StatechartManager):
 
 class CallbackManager_1:
     def __init__(self):
-        self.callbackState = None
-        self.callbackResult = None
+        self.callback_state = None
+        self.callback_result = None
 
-    def callbackFunc(self, state, result):
-        self.callbackState = state
-        self.callbackResult = result
+    def callback_func(self, state, result):
+        self.callback_state = state
+        self.callback_result = result
 
 class CallbackManager_2:
     def __init__(self):
-        self.numCallbacks = 0
-        self.callbackInfo = {}
+        self.num_callbacks = 0
+        self.callback_info = {}
 
-    def callbackFunc(self, state, result):
-        self.numCallbacks += 1
-        self.callbackInfo['state{0}'.format(self.numCallbacks)] = state
-        self.callbackInfo['result{0}'.format(self.numCallbacks)] = result
+    def callback_func(self, state, result):
+        self.num_callbacks += 1
+        self.callback_info['state{0}'.format(self.num_callbacks)] = state
+        self.callback_info['result{0}'.format(self.num_callbacks)] = result
 
 class StatechartInvokeStateMethodTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
         global statechart_2
-        global rootState_1
-        global rootState_2
+        global root_state_1
+        global root_state_2
         global state_A
         global state_B
         global state_C
         global state_D
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootStateInstance
-        state_A = statechart_1.getState('A')
-        state_B = statechart_1.getState('B')
+        statechart_1.init_statechart()
+        root_state_1 = statechart_1.root_state_instance
+        state_A = statechart_1.get_state('A')
+        state_B = statechart_1.get_state('B')
         statechart_2 = Statechart_2()
-        statechart_2.initStatechart()
-        rootState_2 = statechart_2.rootStateInstance
-        state_C = statechart_2.getState('C')
-        state_D = statechart_2.getState('D')
+        statechart_2.init_statechart()
+        root_state_2 = statechart_2.root_state_instance
+        state_C = statechart_2.get_state('C')
+        state_D = statechart_2.get_state('D')
         
     # invoke method test1
     def test_invoke_method_test1_statechart_1(self):
-        result = statechart_1.invokeStateMethod('test1')
-        self.assertFalse(rootState_1.testInvoked)
-        self.assertFalse(state_A.testInvoked)
-        self.assertFalse(state_B.testInvoked)
+        result = statechart_1.invoke_state_method('test1')
+        self.assertFalse(root_state_1.test_invoked)
+        self.assertFalse(state_A.test_invoked)
+        self.assertFalse(state_B.test_invoked)
 
     # invoke method test, current state A, no args, no return value
     def test_invoke_method_test_state_A_no_args_no_return_statechart_1(self):
-        result = statechart_1.invokeStateMethod('test')
-        self.assertEqual(state_A.testInvokedCount, 1)
+        result = statechart_1.invoke_state_method('test')
+        self.assertEqual(state_A.test_invoked_count, 1)
         self.assertIsNone(state_A.arg1)
         self.assertIsNone(state_A.arg2)
         self.assertIsNone(result)
-        self.assertFalse(rootState_1.testInvoked)
-        self.assertFalse(state_B.testInvoked)
+        self.assertFalse(root_state_1.test_invoked)
+        self.assertFalse(state_B.test_invoked)
 
     # invoke method test, current state A, one args, no return value
     def test_invoke_method_test_state_A_one_args_no_return_statechart_1(self):
-        result = statechart_1.invokeStateMethod('test', 'frozen')
-        self.assertTrue(state_A.testInvoked)
+        result = statechart_1.invoke_state_method('test', 'frozen')
+        self.assertTrue(state_A.test_invoked)
         self.assertEqual(state_A.arg1, 'frozen')
         self.assertIsNone(state_A.arg2)
-        self.assertFalse(rootState_1.testInvoked)
-        self.assertFalse(state_B.testInvoked)
+        self.assertFalse(root_state_1.test_invoked)
+        self.assertFalse(state_B.test_invoked)
 
     # check obj1 - invoke method test, current state A, two args, no return value
     def test_invoke_method_test_state_A_two_args_no_return_statechart_1(self):
-        result = statechart_1.invokeStateMethod('test', 'frozen', 'canuck')
-        self.assertTrue(state_A.testInvoked)
+        result = statechart_1.invoke_state_method('test', 'frozen', 'canuck')
+        self.assertTrue(state_A.test_invoked)
         self.assertEqual(state_A.arg1, 'frozen')
         self.assertEqual(state_A.arg2, 'canuck')
-        self.assertFalse(rootState_1.testInvoked)
-        self.assertFalse(state_B.testInvoked)
+        self.assertFalse(root_state_1.test_invoked)
+        self.assertFalse(state_B.test_invoked)
 
     # check obj1 - invoke method test, current state A, no args, return value
     def test_invoke_method_test_state_A_no_args_return_statechart_1(self):
-        setattr(state_A, 'returnValue', 100)
-        result = statechart_1.invokeStateMethod('test')
-        self.assertTrue(state_A.testInvoked)
-        self.assertFalse(rootState_1.testInvoked)
-        self.assertFalse(state_B.testInvoked)
+        setattr(state_A, 'return_value', 100)
+        result = statechart_1.invoke_state_method('test')
+        self.assertTrue(state_A.test_invoked)
+        self.assertFalse(root_state_1.test_invoked)
+        self.assertFalse(state_B.test_invoked)
 
     # check obj1 - invoke method test, current state B, two args, return value
     def test_invoke_method_test_state_B_two_args_return_statechart_1(self):
-        setattr(state_B, 'returnValue', 100)
-        statechart_1.gotoState('B')
-        self.assertTrue(state_B.isCurrentState())
-        result = statechart_1.invokeStateMethod('test', 'frozen', 'canuck')
-        self.assertFalse(state_A.testInvoked)
-        self.assertEqual(state_B.testInvokedCount, 1)
+        setattr(state_B, 'return_value', 100)
+        statechart_1.go_to_state('B')
+        self.assertTrue(state_B.is_current_state())
+        result = statechart_1.invoke_state_method('test', 'frozen', 'canuck')
+        self.assertFalse(state_A.test_invoked)
+        self.assertEqual(state_B.test_invoked_count, 1)
         self.assertEqual(state_B.arg1, 'frozen')
         self.assertEqual(state_B.arg2, 'canuck')
         self.assertEqual(result, 100)
-        self.assertFalse(rootState_1.testInvoked)
+        self.assertFalse(root_state_1.test_invoked)
 
     # check obj1 - invoke method test, current state A, use callback
     def test_invoke_method_test_state_A_use_callback_statechart_1(self):
-        callbackManager = CallbackManager_1()
+        callback_manager = CallbackManager_1()
 
-        result = statechart_1.invokeStateMethod('test', callbackManager.callbackFunc)
-        self.assertTrue(state_A.testInvoked)
-        self.assertFalse(state_B.testInvoked)
-        self.assertEqual(callbackManager.callbackState, state_A)
-        self.assertIsNone(callbackManager.callbackResult)
-        self.assertFalse(rootState_1.testInvoked)
+        result = statechart_1.invoke_state_method('test', callback_manager.callback_func)
+        self.assertTrue(state_A.test_invoked)
+        self.assertFalse(state_B.test_invoked)
+        self.assertEqual(callback_manager.callback_state, state_A)
+        self.assertIsNone(callback_manager.callback_result)
+        self.assertFalse(root_state_1.test_invoked)
 
     # check obj1- invoke method test, current state B, use callback
     def test_invoke_method_test_state_B_use_callback_statechart_1(self):
-        statechart_1.gotoState('B')
-        setattr(state_B, 'returnValue', 100)
+        statechart_1.go_to_state('B')
+        setattr(state_B, 'return_value', 100)
 
-        callbackManager = CallbackManager_1()
+        callback_manager = CallbackManager_1()
 
-        result = statechart_1.invokeStateMethod('test', callbackManager.callbackFunc)
-        self.assertFalse(state_A.testInvoked)
-        self.assertTrue(state_B.testInvoked)
-        self.assertEqual(callbackManager.callbackState, state_B)
-        self.assertEqual(callbackManager.callbackResult, 100)
-        self.assertFalse(rootState_1.testInvoked)
+        result = statechart_1.invoke_state_method('test', callback_manager.callback_func)
+        self.assertFalse(state_A.test_invoked)
+        self.assertTrue(state_B.test_invoked)
+        self.assertEqual(callback_manager.callback_state, state_B)
+        self.assertEqual(callback_manager.callback_result, 100)
+        self.assertFalse(root_state_1.test_invoked)
 
     # check obj1 - invoke method testX
     def test_invoke_method_testX_statechart_1(self):
-        setattr(rootState_1, 'returnValue', 100)
-        result = statechart_1.invokeStateMethod('testX')
-        self.assertEqual(rootState_1.testInvokedCount, 1)
+        setattr(root_state_1, 'return_value', 100)
+        result = statechart_1.invoke_state_method('testX')
+        self.assertEqual(root_state_1.test_invoked_count, 1)
         self.assertEqual(result, 100)
-        self.assertFalse(state_A.testInvoked)
-        self.assertFalse(state_B.testInvoked)
+        self.assertFalse(state_A.test_invoked)
+        self.assertFalse(state_B.test_invoked)
 
     # check obj2 - invoke method test1
     def test_invoke_method_test1_statechart_2(self):
-        result = statechart_2.invokeStateMethod('test1')
-        self.assertFalse(rootState_2.testInvoked)
-        self.assertFalse(state_C.testInvoked)
-        self.assertFalse(state_D.testInvoked)
+        result = statechart_2.invoke_state_method('test1')
+        self.assertFalse(root_state_2.test_invoked)
+        self.assertFalse(state_C.test_invoked)
+        self.assertFalse(state_D.test_invoked)
 
     # check obj2 - invoke test, no args, no return value
     def test_invoke_method_test_no_args_no_return_statechart_2(self):
-        result = statechart_2.invokeStateMethod('test')
-        self.assertEqual(state_C.testInvokedCount, 1)
-        self.assertEqual(state_D.testInvokedCount, 1)
-        self.assertFalse(rootState_2.testInvoked)
+        result = statechart_2.invoke_state_method('test')
+        self.assertEqual(state_C.test_invoked_count, 1)
+        self.assertEqual(state_D.test_invoked_count, 1)
+        self.assertFalse(root_state_2.test_invoked)
         self.assertIsNone(state_C.arg1)
         self.assertIsNone(state_C.arg2)
         self.assertIsNone(state_D.arg1)
@@ -267,16 +267,16 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
 
     # check obj2 - invoke test, two args, return value, callback
     def test_invoke_method_test_two_args_return_value_use_callback_statechart_2(self):
-        setattr(state_C, 'returnValue', 100)
-        setattr(state_D, 'returnValue', 200)
+        setattr(state_C, 'return_value', 100)
+        setattr(state_D, 'return_value', 200)
 
-        callbackManager = CallbackManager_2()
+        callback_manager = CallbackManager_2()
 
-        result = statechart_2.invokeStateMethod('test', 'frozen', 'canuck', callbackManager.callbackFunc)
+        result = statechart_2.invoke_state_method('test', 'frozen', 'canuck', callback_manager.callback_func)
 
-        self.assertFalse(rootState_2.testInvoked)
-        self.assertEqual(state_C.testInvokedCount, 1)
-        self.assertEqual(state_D.testInvokedCount, 1)
+        self.assertFalse(root_state_2.test_invoked)
+        self.assertEqual(state_C.test_invoked_count, 1)
+        self.assertEqual(state_D.test_invoked_count, 1)
 
         self.assertEqual(state_C.arg1, 'frozen')
         self.assertEqual(state_C.arg2, 'canuck')
@@ -284,20 +284,20 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         self.assertEqual(state_D.arg1, 'frozen')
         self.assertEqual(state_D.arg2, 'canuck')
 
-        self.assertEqual(callbackManager.numCallbacks, 2)
-        self.assertEqual(callbackManager.callbackInfo['state1'], state_C)
-        self.assertEqual(callbackManager.callbackInfo['result1'], 100)
-        self.assertEqual(callbackManager.callbackInfo['state2'], state_D)
-        self.assertEqual(callbackManager.callbackInfo['result2'], 200)
+        self.assertEqual(callback_manager.num_callbacks, 2)
+        self.assertEqual(callback_manager.callback_info['state1'], state_C)
+        self.assertEqual(callback_manager.callback_info['result1'], 100)
+        self.assertEqual(callback_manager.callback_info['state2'], state_D)
+        self.assertEqual(callback_manager.callback_info['result2'], 200)
 
         self.assertIsNone(result)
 
     def test_invoke_method_testX_statechart_2(self):
-        setattr(rootState_2, 'returnValue', 100)
-        result = statechart_2.invokeStateMethod('testX')
-        self.assertEqual(rootState_2.testInvokedCount, 1)
+        setattr(root_state_2, 'return_value', 100)
+        result = statechart_2.invoke_state_method('testX')
+        self.assertEqual(root_state_2.test_invoked_count, 1)
         self.assertEqual(result, 100)
-        self.assertFalse(state_C.testInvoked)
-        self.assertFalse(state_D.testInvoked)
+        self.assertFalse(state_C.test_invoked)
+        self.assertFalse(state_D.test_invoked)
 
 

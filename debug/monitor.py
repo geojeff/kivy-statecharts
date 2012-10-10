@@ -28,25 +28,25 @@ class StatechartMonitor(EventDispatcher):
     def _length(self, *l):
         self.length = len(self.sequence)
   
-    def appendEnteredState(self, state):
+    def append_entered_state(self, state):
         #self.propertyWillChange('length') #[PORT]
         self.sequence.append({ 'action': 'entered', 'state': state })
         #self.propertyDidChange('length') #[PORT]
         self._length() # [PORT] length has changed
   
-    def appendExitedState(self, state):
+    def append_exited_state(self, state):
         #self.propertyWillChange('length') #[PORT]
         self.sequence.append({ 'action': 'exited', 'state': state })
         #self.propertyDidChange('length') #[PORT]
         self._length() # [PORT] length has changed
   
-    def matchSequence(self):
-        return StatechartSequenceMatcher(self) # [PORT] call was ({ statechartMonitor: self }), but __init__ on SSM was changed to take monitor
+    def match_sequence(self):
+        return StatechartSequenceMatcher(self) # [PORT] call was ({ statechart_monitor: self }), but __init__ on SSM was changed to take monitor
   
     # [PORT] Check how arguments is used in the call. 
-    def matchEnteredStates(self, *arguments):
+    def match_entered_states(self, *arguments):
         expected = arguments[0] if len(arguments) == 1 else arguments # [PORT] arguments, in javascript. so *arguments was added here
-        actual = self.statechart.enteredStates()
+        actual = self.statechart.entered_states()
         matched = 0
     
         if len(expected) != len(actual):
@@ -54,10 +54,10 @@ class StatechartMonitor(EventDispatcher):
     
         for item in expected:
             if isinstance(item, basestring):
-                item = self.statechart.getState(item)
+                item = self.statechart.get_state(item)
             if item is None:
                 return False
-            if self.statechart.stateIsEntered(item) and item.isEnteredState():
+            if self.statechart.state_is_entered(item) and item.is_entered_state():
                 matched += 1
     
         return matched == len(actual)
@@ -71,7 +71,7 @@ class StatechartMonitor(EventDispatcher):
 
         for i in range(len(self.sequence)):
             item = self.sequence[i]
-            seq += "{0} {1}".format(item.action, item.state.fullPath)
+            seq += "{0} {1}".format(item.action, item.state.full_path)
             if i < len(self.sequence)-1:
                 seq += ", "
 

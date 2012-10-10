@@ -1,5 +1,5 @@
 '''
-Statechart tests, getState
+Statechart tests, get_state
 ===========
 '''
 
@@ -16,12 +16,12 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootStateClass'] = self.RootState
+        kwargs['root_state_class'] = self.RootState
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'A'
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
         class A(State):
@@ -36,18 +36,18 @@ class Statechart_1(StatechartManager):
 
 class Statechart_2(StatechartManager):
     def __init__(self, **kwargs):
-        self.rootStateClass = self.RootState
+        self.root_state_class = self.RootState
         super(Statechart_2, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            self.initialSubstateKey = 'A'
+            self.initial_substate_key = 'A'
             super(Statechart_2.RootState, self).__init__(**kwargs)
 
         class A(State):
             def __init__(self, **kwargs):
                 kwargs['value'] = 'state A'
-                self.initialSubstateKey = 'C'
+                self.initial_substate_key = 'C'
                 super(Statechart_2.RootState.A, self).__init__(**kwargs)
 
             class C(State):
@@ -63,7 +63,7 @@ class Statechart_2(StatechartManager):
         class B(State):
             def __init__(self, **kwargs):
                 kwargs['value'] = 'state B'
-                self.initialSubstateKey = 'E'
+                self.initial_substate_key = 'E'
                 super(Statechart_2.RootState.B, self).__init__(**kwargs)
 
             class E(State):
@@ -78,12 +78,12 @@ class Statechart_2(StatechartManager):
 
 class Statechart_3(StatechartManager):
     def __init__(self, **kwargs):
-        self.rootStateClass = self.RootState
+        self.root_state_class = self.RootState
         super(Statechart_3, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            self.initialSubstateKey = 'A'
+            self.initial_substate_key = 'A'
             super(Statechart_3.RootState, self).__init__(**kwargs)
 
         class A(State):
@@ -94,7 +94,7 @@ class Statechart_3(StatechartManager):
         class B(State):
             def __init__(self, **kwargs):
                 kwargs['value'] = 'state B'
-                self.initialSubstateKey = 'A'
+                self.initial_substate_key = 'A'
                 super(Statechart_3.RootState.B, self).__init__(**kwargs)
 
             class A(State):
@@ -105,7 +105,7 @@ class Statechart_3(StatechartManager):
             class C(State):
                 def __init__(self, **kwargs):
                     kwargs['value'] = 'state C'
-                    self.initialSubstateKey = 'A'
+                    self.initial_substate_key = 'A'
                     super(Statechart_3.RootState.B.C, self).__init__(**kwargs)
 
                 class A(State):
@@ -120,18 +120,18 @@ class Statechart_3(StatechartManager):
 
 class Statechart_4(StatechartManager):
     def __init__(self, **kwargs):
-        self.rootStateClass = self.RootState
+        self.root_state_class = self.RootState
         super(Statechart_4, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            self.initialSubstateKey = 'A'
+            self.initial_substate_key = 'A'
             super(Statechart_4.RootState, self).__init__(**kwargs)
 
         class A(State):
             def __init__(self, **kwargs):
                 kwargs['value'] = 'state A'
-                self.initialSubstateKey = 'X'
+                self.initial_substate_key = 'X'
                 super(Statechart_4.RootState.A, self).__init__(**kwargs)
 
             class X(State):
@@ -147,7 +147,7 @@ class Statechart_4(StatechartManager):
         class B(State):
             def __init__(self, **kwargs):
                 kwargs['value'] = 'state B'
-                self.initialSubstateKey = 'X'
+                self.initial_substate_key = 'X'
                 super(Statechart_4.RootState.B, self).__init__(**kwargs)
 
             class X(State):
@@ -168,115 +168,115 @@ class StatechartGetStateTestCase(unittest.TestCase):
         global statechart_4
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
+        statechart_1.init_statechart()
         statechart_2 = Statechart_2()
-        statechart_2.initStatechart()
+        statechart_2.init_statechart()
         statechart_3 = Statechart_3()
-        statechart_3.initStatechart()
+        statechart_3.init_statechart()
         statechart_4 = Statechart_4()
-        statechart_4.initStatechart()
+        statechart_4.init_statechart()
         
     def test_access_states_statechart_1(self):
-        state = statechart_1.getState('A')
+        state = statechart_1.get_state('A')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state A') 
 
-        state = statechart_1.getState('B')
+        state = statechart_1.get_state('B')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state B') 
 
     def test_access_states_statechart_2(self):
-        state = statechart_2.getState('A')
+        state = statechart_2.get_state('A')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state A') 
 
-        state = statechart_2.getState('B')
+        state = statechart_2.get_state('B')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state B') 
 
-        state = statechart_2.getState('C')
+        state = statechart_2.get_state('C')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state C') 
 
-        state = statechart_2.getState('D')
+        state = statechart_2.get_state('D')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state D') 
 
-        state = statechart_2.getState('E')
+        state = statechart_2.get_state('E')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state E') 
 
-        state = statechart_2.getState('F')
+        state = statechart_2.get_state('F')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state F') 
 
-        state = statechart_2.getState('A.C')
+        state = statechart_2.get_state('A.C')
         self.assertIsNotNone(state)
-        self.assertEqual(state, statechart_2.getState('C'))
+        self.assertEqual(state, statechart_2.get_state('C'))
         self.assertEqual(state.value, 'state C')
 
-        state = statechart_2.getState('A.D')
+        state = statechart_2.get_state('A.D')
         self.assertIsNotNone(state)
-        self.assertEqual(state, statechart_2.getState('D'))
+        self.assertEqual(state, statechart_2.get_state('D'))
         self.assertEqual(state.value, 'state D')
 
-        state = statechart_2.getState('B.E')
+        state = statechart_2.get_state('B.E')
         self.assertIsNotNone(state)
-        self.assertEqual(state, statechart_2.getState('E'))
+        self.assertEqual(state, statechart_2.get_state('E'))
         self.assertEqual(state.value, 'state E')
 
-        state = statechart_2.getState('B.F')
+        state = statechart_2.get_state('B.F')
         self.assertIsNotNone(state)
-        self.assertEqual(state, statechart_2.getState('F'))
+        self.assertEqual(state, statechart_2.get_state('F'))
         self.assertEqual(state.value, 'state F')
 
     def test_access_states_statechart_3(self):
-        state = statechart_3.getState('A')
+        state = statechart_3.get_state('A')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state A') 
 
-        state = statechart_3.getState('B.A')
+        state = statechart_3.get_state('B.A')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state B.A') 
 
-        state = statechart_3.getState('B.C.A')
+        state = statechart_3.get_state('B.C.A')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state B.C.A') 
 
     def test_access_states_statechart_4(self):
-        state_A = statechart_4.getState('A')
-        state_B = statechart_4.getState('B')
+        state_A = statechart_4.get_state('A')
+        state_B = statechart_4.get_state('B')
       
-        state = statechart_4.getState('A')
+        state = statechart_4.get_state('A')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state A') 
   
-        state = statechart_4.getState('A.X')
+        state = statechart_4.get_state('A.X')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state A.X') 
   
-        state = statechart_4.getState('A.Y')
+        state = statechart_4.get_state('A.Y')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state A.Y') 
   
-        state = statechart_4.getState('B')
+        state = statechart_4.get_state('B')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state B') 
   
-        state = statechart_4.getState('B.X')
+        state = statechart_4.get_state('B.X')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state B.X') 
   
-        state = statechart_4.getState('B.Y')
+        state = statechart_4.get_state('B.Y')
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state B.Y') 
   
         print 'expecting to get an error message...'
-        state = statechart_4.getState('X')
+        state = statechart_4.get_state('X')
         self.assertIsNone(state)
   
         print 'expecting to get an error message...'
-        state = statechart_4.getState('Y')
+        state = statechart_4.get_state('Y')
         self.assertIsNone(state)
 
 

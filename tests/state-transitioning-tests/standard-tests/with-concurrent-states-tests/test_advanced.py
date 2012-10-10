@@ -16,23 +16,23 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['rootStateClass'] = self.RootState
-        kwargs['monitorIsActive'] = True
+        kwargs['root_state_class'] = self.RootState
+        kwargs['monitor_is_active'] = True
         super(Statechart_1, self).__init__(**kwargs)
 
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'A'
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
         class A(State):
             def __init__(self, **kwargs):
-                kwargs['substatesAreConcurrent'] = True
+                kwargs['substates_are_concurrent'] = True
                 super(Statechart_1.RootState.A, self).__init__(**kwargs)
 
             class B(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'D'
+                    kwargs['initial_substate_key'] = 'D'
                     super(Statechart_1.RootState.A.B, self).__init__(**kwargs)
 
                 class D(State):
@@ -45,17 +45,17 @@ class Statechart_1(StatechartManager):
 
             class C(State):
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'F'
+                    kwargs['initial_substate_key'] = 'F'
                     super(Statechart_1.RootState.A.C, self).__init__(**kwargs)
 
                 class F(State):
                     def __init__(self, **kwargs):
-                        kwargs['substatesAreConcurrent'] = True
+                        kwargs['substates_are_concurrent'] = True
                         super(Statechart_1.RootState.A.C.F, self).__init__(**kwargs)
 
                     class H(State):
                         def __init__(self, **kwargs):
-                            kwargs['initialSubstateKey'] = 'L'
+                            kwargs['initial_substate_key'] = 'L'
                             super(Statechart_1.RootState.A.C.F.H, self).__init__(**kwargs)
 
                         class L(State):
@@ -68,7 +68,7 @@ class Statechart_1(StatechartManager):
 
                     class I(State):
                         def __init__(self, **kwargs):
-                            kwargs['initialSubstateKey'] = 'N'
+                            kwargs['initial_substate_key'] = 'N'
                             super(Statechart_1.RootState.A.C.F.I, self).__init__(**kwargs)
 
                         class N(State):
@@ -81,12 +81,12 @@ class Statechart_1(StatechartManager):
 
                 class G(State):
                     def __init__(self, **kwargs):
-                        kwargs['substatesAreConcurrent'] = True
+                        kwargs['substates_are_concurrent'] = True
                         super(Statechart_1.RootState.A.C.G, self).__init__(**kwargs)
 
                     class J(State):
                         def __init__(self, **kwargs):
-                            kwargs['initialSubstateKey'] = 'P'
+                            kwargs['initial_substate_key'] = 'P'
                             super(Statechart_1.RootState.A.C.G.J, self).__init__(**kwargs)
 
                         class P(State):
@@ -99,7 +99,7 @@ class Statechart_1(StatechartManager):
 
                     class K(State):
                         def __init__(self, **kwargs):
-                            kwargs['initialSubstateKey'] = 'R'
+                            kwargs['initial_substate_key'] = 'R'
                             super(Statechart_1.RootState.A.C.G.K, self).__init__(**kwargs)
 
                         class R(State):
@@ -117,7 +117,7 @@ class Statechart_1(StatechartManager):
 class StateTransitioningStandardAdvancedWithConcurrentTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
-        global rootState_1
+        global root_state_1
         global monitor_1
         global state_A
         global state_B
@@ -141,141 +141,141 @@ class StateTransitioningStandardAdvancedWithConcurrentTestCase(unittest.TestCase
         global state_Z
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootStateInstance
+        statechart_1.init_statechart()
+        root_state_1 = statechart_1.root_state_instance
         monitor_1 = statechart_1.monitor
-        state_A = statechart_1.getState('A')
-        state_B = statechart_1.getState('B')
-        state_C = statechart_1.getState('C')
-        state_D = statechart_1.getState('D')
-        state_E = statechart_1.getState('E')
-        state_F = statechart_1.getState('F')
-        state_G = statechart_1.getState('G')
-        state_H = statechart_1.getState('H')
-        state_I = statechart_1.getState('I')
-        state_J = statechart_1.getState('J')
-        state_K = statechart_1.getState('K')
-        state_L = statechart_1.getState('L')
-        state_M = statechart_1.getState('M')
-        state_N = statechart_1.getState('N')
-        state_O = statechart_1.getState('O')
-        state_P = statechart_1.getState('P')
-        state_Q = statechart_1.getState('Q')
-        state_R = statechart_1.getState('R')
-        state_S = statechart_1.getState('S')
-        state_Z = statechart_1.getState('Z')
+        state_A = statechart_1.get_state('A')
+        state_B = statechart_1.get_state('B')
+        state_C = statechart_1.get_state('C')
+        state_D = statechart_1.get_state('D')
+        state_E = statechart_1.get_state('E')
+        state_F = statechart_1.get_state('F')
+        state_G = statechart_1.get_state('G')
+        state_H = statechart_1.get_state('H')
+        state_I = statechart_1.get_state('I')
+        state_J = statechart_1.get_state('J')
+        state_K = statechart_1.get_state('K')
+        state_L = statechart_1.get_state('L')
+        state_M = statechart_1.get_state('M')
+        state_N = statechart_1.get_state('N')
+        state_O = statechart_1.get_state('O')
+        state_P = statechart_1.get_state('P')
+        state_Q = statechart_1.get_state('Q')
+        state_R = statechart_1.get_state('R')
+        state_S = statechart_1.get_state('S')
+        state_Z = statechart_1.get_state('Z')
 
     # Test statechart initialization
     def test_statechart_initialization(self):
         self.assertEqual(monitor_1.length, 10)
-        self.assertTrue(monitor_1.matchSequence().begin().entered(rootState_1, 'A').beginConcurrent().beginSequence().entered('B', 'D').endSequence().beginSequence().entered('C', 'F').beginConcurrent().beginSequence().entered('H', 'L').endSequence().beginSequence().entered('I', 'N').endSequence().endConcurrent().endSequence().endConcurrent().entered().end())
+        self.assertTrue(monitor_1.match_sequence().begin().entered(root_state_1, 'A').begin_concurrent().begin_sequence().entered('B', 'D').end_sequence().begin_sequence().entered('C', 'F').begin_concurrent().begin_sequence().entered('H', 'L').end_sequence().begin_sequence().entered('I', 'N').end_sequence().end_concurrent().end_sequence().end_concurrent().entered().end())
   
-        self.assertEqual(len(statechart_1.currentStates), 3)
-        self.assertTrue(statechart_1.stateIsCurrentState('D'))
-        self.assertTrue(statechart_1.stateIsCurrentState('L'))
-        self.assertTrue(statechart_1.stateIsCurrentState('N'))
+        self.assertEqual(len(statechart_1.current_states), 3)
+        self.assertTrue(statechart_1.state_is_current_state('D'))
+        self.assertTrue(statechart_1.state_is_current_state('L'))
+        self.assertTrue(statechart_1.state_is_current_state('N'))
   
-        self.assertFalse(statechart_1.stateIsCurrentState('H'))
-        self.assertFalse(statechart_1.stateIsCurrentState('I'))
-        self.assertFalse(statechart_1.stateIsCurrentState('P'))
-        self.assertFalse(statechart_1.stateIsCurrentState('Q'))
-        self.assertFalse(statechart_1.stateIsCurrentState('R'))
-        self.assertFalse(statechart_1.stateIsCurrentState('S'))
+        self.assertFalse(statechart_1.state_is_current_state('H'))
+        self.assertFalse(statechart_1.state_is_current_state('I'))
+        self.assertFalse(statechart_1.state_is_current_state('P'))
+        self.assertFalse(statechart_1.state_is_current_state('Q'))
+        self.assertFalse(statechart_1.state_is_current_state('R'))
+        self.assertFalse(statechart_1.state_is_current_state('S'))
   
-        self.assertEqual(len(state_A.currentSubstates), 3)
-        self.assertTrue(state_A.stateIsCurrentSubstate('D'))
-        self.assertTrue(state_A.stateIsCurrentSubstate('L'))
-        self.assertTrue(state_A.stateIsCurrentSubstate('N'))
+        self.assertEqual(len(state_A.current_substates), 3)
+        self.assertTrue(state_A.state_is_current_substate('D'))
+        self.assertTrue(state_A.state_is_current_substate('L'))
+        self.assertTrue(state_A.state_is_current_substate('N'))
   
-        self.assertEqual(len(state_C.currentSubstates), 2)
-        self.assertTrue(state_C.stateIsCurrentSubstate('L'))
-        self.assertTrue(state_C.stateIsCurrentSubstate('N'))
+        self.assertEqual(len(state_C.current_substates), 2)
+        self.assertTrue(state_C.state_is_current_substate('L'))
+        self.assertTrue(state_C.state_is_current_substate('N'))
   
-        self.assertEqual(len(state_F.currentSubstates), 2)
-        self.assertTrue(state_F.stateIsCurrentSubstate('L'))
-        self.assertTrue(state_F.stateIsCurrentSubstate('N'))
+        self.assertEqual(len(state_F.current_substates), 2)
+        self.assertTrue(state_F.state_is_current_substate('L'))
+        self.assertTrue(state_F.state_is_current_substate('N'))
   
-        self.assertEqual(len(state_G.currentSubstates), 0)
+        self.assertEqual(len(state_G.current_substates), 0)
   
-        self.assertIsNotNone(monitor_1.matchEnteredStates(rootState_1, 'A', 'B', 'D', 'C', 'F', 'H', 'I', 'L', 'N'))
+        self.assertIsNotNone(monitor_1.match_entered_states(root_state_1, 'A', 'B', 'D', 'C', 'F', 'H', 'I', 'L', 'N'))
 
 
     # Test from state L to state G
     def test_from_l_to_g(self):
         monitor_1.reset()
-        state_L.gotoState('G')
+        state_L.go_to_state('G')
   
         self.assertEqual(monitor_1.length, 10)
-        self.assertTrue(monitor_1.matchSequence().begin().beginConcurrent().beginSequence().exited('L', 'H').endSequence().beginSequence().exited('N', 'I').endSequence().endConcurrent().exited('F').entered('G').beginConcurrent().beginSequence().entered('J', 'P').endSequence().beginSequence().entered('K', 'R').endSequence().endConcurrent().end())
+        self.assertTrue(monitor_1.match_sequence().begin().begin_concurrent().begin_sequence().exited('L', 'H').end_sequence().begin_sequence().exited('N', 'I').end_sequence().end_concurrent().exited('F').entered('G').begin_concurrent().begin_sequence().entered('J', 'P').end_sequence().begin_sequence().entered('K', 'R').end_sequence().end_concurrent().end())
   
-        self.assertEqual(len(statechart_1.currentStates), 3)
-        self.assertTrue(statechart_1.stateIsCurrentState('D'))
-        self.assertFalse(statechart_1.stateIsCurrentState('L'))
-        self.assertFalse(statechart_1.stateIsCurrentState('N'))
-        self.assertTrue(statechart_1.stateIsCurrentState('P'))
-        self.assertTrue(statechart_1.stateIsCurrentState('R'))
+        self.assertEqual(len(statechart_1.current_states), 3)
+        self.assertTrue(statechart_1.state_is_current_state('D'))
+        self.assertFalse(statechart_1.state_is_current_state('L'))
+        self.assertFalse(statechart_1.state_is_current_state('N'))
+        self.assertTrue(statechart_1.state_is_current_state('P'))
+        self.assertTrue(statechart_1.state_is_current_state('R'))
   
-        self.assertEqual(len(state_A.currentSubstates), 3)
-        self.assertTrue(state_A.stateIsCurrentSubstate('D'))
-        self.assertTrue(state_A.stateIsCurrentSubstate('P'))
-        self.assertTrue(state_A.stateIsCurrentSubstate('R'))
+        self.assertEqual(len(state_A.current_substates), 3)
+        self.assertTrue(state_A.state_is_current_substate('D'))
+        self.assertTrue(state_A.state_is_current_substate('P'))
+        self.assertTrue(state_A.state_is_current_substate('R'))
   
-        self.assertEqual(len(state_C.currentSubstates), 2)
-        self.assertTrue(state_C.stateIsCurrentSubstate('P'))
-        self.assertTrue(state_C.stateIsCurrentSubstate('R'))
+        self.assertEqual(len(state_C.current_substates), 2)
+        self.assertTrue(state_C.state_is_current_substate('P'))
+        self.assertTrue(state_C.state_is_current_substate('R'))
   
-        self.assertEqual(len(state_F.currentSubstates), 0)
+        self.assertEqual(len(state_F.current_substates), 0)
   
-        self.assertEqual(len(state_G.currentSubstates), 2)
-        self.assertTrue(state_G.stateIsCurrentSubstate('P'))
-        self.assertTrue(state_G.stateIsCurrentSubstate('R'))
+        self.assertEqual(len(state_G.current_substates), 2)
+        self.assertTrue(state_G.state_is_current_substate('P'))
+        self.assertTrue(state_G.state_is_current_substate('R'))
   
-        self.assertIsNotNone(monitor_1.matchEnteredStates(rootState_1, 'A', 'B', 'D', 'C', 'G', 'J', 'K', 'P', 'R'))
+        self.assertIsNotNone(monitor_1.match_entered_states(root_state_1, 'A', 'B', 'D', 'C', 'G', 'J', 'K', 'P', 'R'))
 
     # Test from state L to state Z
     def test_from_l_to_z(self):
         monitor_1.reset()
-        state_L.gotoState('Z')
+        state_L.go_to_state('Z')
   
         self.assertEqual(monitor_1.length, 10)
 
-        self.assertTrue(monitor_1.matchSequence().begin().exited('L', 'H', 'N', 'I', 'F', 'C', 'D', 'B', 'A').entered('Z').end())
+        self.assertTrue(monitor_1.match_sequence().begin().exited('L', 'H', 'N', 'I', 'F', 'C', 'D', 'B', 'A').entered('Z').end())
          
-        self.assertEqual(len(statechart_1.currentStates), 1)
-        self.assertTrue(statechart_1.stateIsCurrentState('Z'))
-        self.assertFalse(statechart_1.stateIsCurrentState('L'))
-        self.assertFalse(statechart_1.stateIsCurrentState('N'))
-        self.assertFalse(statechart_1.stateIsCurrentState('D'))
+        self.assertEqual(len(statechart_1.current_states), 1)
+        self.assertTrue(statechart_1.state_is_current_state('Z'))
+        self.assertFalse(statechart_1.state_is_current_state('L'))
+        self.assertFalse(statechart_1.state_is_current_state('N'))
+        self.assertFalse(statechart_1.state_is_current_state('D'))
    
-        self.assertEqual(len(state_A.currentSubstates), 0)
-        self.assertEqual(len(state_B.currentSubstates), 0)
-        self.assertEqual(len(state_C.currentSubstates), 0)
-        self.assertEqual(len(state_F.currentSubstates), 0)
-        self.assertEqual(len(state_G.currentSubstates), 0)
+        self.assertEqual(len(state_A.current_substates), 0)
+        self.assertEqual(len(state_B.current_substates), 0)
+        self.assertEqual(len(state_C.current_substates), 0)
+        self.assertEqual(len(state_F.current_substates), 0)
+        self.assertEqual(len(state_G.current_substates), 0)
    
-        self.assertIsNotNone(monitor_1.matchEnteredStates(rootState_1, 'Z'))
+        self.assertIsNotNone(monitor_1.match_entered_states(root_state_1, 'Z'))
 
     # Test from state L to state Z, and then to S
     def test_from_l_to_z_to_s(self):
-        state_L.gotoState('Z')
+        state_L.go_to_state('Z')
   
         monitor_1.reset()
-        state_Z.gotoState('S')
+        state_Z.go_to_state('S')
 
         self.assertEqual(monitor_1.length, 10)
 
-        self.assertTrue(monitor_1.matchSequence().begin().exited('Z').entered('A', 'C', 'G', 'K', 'S', 'J', 'P', 'B', 'D').end())
+        self.assertTrue(monitor_1.match_sequence().begin().exited('Z').entered('A', 'C', 'G', 'K', 'S', 'J', 'P', 'B', 'D').end())
          
-        self.assertEqual(len(statechart_1.currentStates), 3)
-        self.assertFalse(statechart_1.stateIsCurrentState('Z'))
-        self.assertTrue(statechart_1.stateIsCurrentState('S'))
-        self.assertTrue(statechart_1.stateIsCurrentState('P'))
-        self.assertTrue(statechart_1.stateIsCurrentState('D'))
+        self.assertEqual(len(statechart_1.current_states), 3)
+        self.assertFalse(statechart_1.state_is_current_state('Z'))
+        self.assertTrue(statechart_1.state_is_current_state('S'))
+        self.assertTrue(statechart_1.state_is_current_state('P'))
+        self.assertTrue(statechart_1.state_is_current_state('D'))
    
-        self.assertEqual(len(state_A.currentSubstates), 3)
-        self.assertEqual(len(state_B.currentSubstates), 1)
-        self.assertEqual(len(state_C.currentSubstates), 2)
-        self.assertEqual(len(state_F.currentSubstates), 0)
-        self.assertEqual(len(state_G.currentSubstates), 2)
+        self.assertEqual(len(state_A.current_substates), 3)
+        self.assertEqual(len(state_B.current_substates), 1)
+        self.assertEqual(len(state_C.current_substates), 2)
+        self.assertEqual(len(state_F.current_substates), 0)
+        self.assertEqual(len(state_G.current_substates), 2)
    
-        self.assertIsNotNone(monitor_1.matchEnteredStates(rootState_1, 'A', 'B', 'D', 'C', 'G', 'J', 'K', 'P', 'S'))
+        self.assertIsNotNone(monitor_1.match_entered_states(root_state_1, 'A', 'B', 'D', 'C', 'G', 'J', 'K', 'P', 'S'))

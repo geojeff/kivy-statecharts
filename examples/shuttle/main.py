@@ -89,7 +89,7 @@ class ThrusterGroup(Button):
         self.bind(on_release=self.adjust_thruster_group)
 
     def adjust_thruster_group(self, *args):
-        self.statechart.sendEvent("adjust_group_{0}".format(self.group_number))
+        self.statechart.send_event("adjust_group_{0}".format(self.group_number))
 
     def pulsate(self):
         if self.alternator:
@@ -217,7 +217,7 @@ class MotionControlWidget(Widget):
     def on_touch_up(self, touch):
         if touch.grab_current is self:
             touch.ungrab(self)
-            self.statechart.sendEvent(self.control_id)
+            self.statechart.send_event(self.control_id)
             return True
 
 
@@ -288,7 +288,7 @@ class ShuttleControlView(Widget):
         print ' - modifiers are %r' % modifiers
 
         if keycode[1] == 's':
-            self.app.statechart.sendEvent('pulsate')
+            self.app.statechart.send_event('pulsate')
         elif keycode[1] == 'escape':
             # Keycode is composed of an integer + a string
             # If we hit escape, release the keyboard
@@ -368,7 +368,7 @@ class AppStatechart(StatechartManager):
     def __init__(self, app, **kw):
         self.app = app
         self.trace = True
-        self.rootStateClass = self.RootState
+        self.root_state_class = self.RootState
         super(AppStatechart, self).__init__(**kw)
 
     ###########################
@@ -376,11 +376,11 @@ class AppStatechart(StatechartManager):
     #
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'ShowingThrusterControls'
+            kwargs['initial_substate_key'] = 'ShowingThrusterControls'
             super(AppStatechart.RootState, self).__init__(**kwargs)
         
-        def enterState(self, context=None):
-            print 'RootState/enterState'
+        def enter_state(self, context=None):
+            print 'RootState/enter_state'
             # Initialize list items, which are dynamically created via the kv machinery.
             # The last line, where the list's items are set will trigger a method that
             # calls the kv view template code for each list item.
@@ -413,20 +413,20 @@ class AppStatechart(StatechartManager):
             self.statechart.app.root.main_view.set_statechart_in_motion_controls(self.statechart)
             Clock.schedule_interval(self.statechart.app.root.main_view.update, 1.0 / 60.0)
                             
-        def exitState(self, context=None):
-            print 'RootState/exitState'
+        def exit_state(self, context=None):
+            print 'RootState/exit_state'
 
         ##############################
         # ShowingThrusterControls
         #
         class ShowingThrusterControls(State):
-            substatesAreConcurrent = True
+            substates_are_concurrent = True
         
-            def enterState(self, context=None):
-                print 'ShowingThrusterControls/enterState'
+            def enter_state(self, context=None):
+                print 'ShowingThrusterControls/enter_state'
                         
-            def exitState(self, context=None):
-                print 'ShowingThrusterControls/exitState'
+            def exit_state(self, context=None):
+                print 'ShowingThrusterControls/exit_state'
 
             class ThrusterGroup_1(State):
                 def __init__(self, **kwargs):
@@ -679,7 +679,7 @@ class ShuttleControlApp(App):
 
     def on_start(self):
         self.statechart = AppStatechart(app=self)
-        self.statechart.initStatechart()
+        self.statechart.init_statechart()
 
 
 ##########

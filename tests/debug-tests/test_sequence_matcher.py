@@ -17,7 +17,7 @@ import os, inspect
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
-        kwargs['initialStateKey'] = 'A'
+        kwargs['initial_state_key'] = 'A'
         super(Statechart_1, self).__init__(**kwargs)
 
     class A(State):
@@ -67,7 +67,7 @@ class Statechart_1(StatechartManager):
 class StateSequenceMatcherTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
-        global rootState_1
+        global root_state_1
         global monitor_1
         global state_A
         global state_B
@@ -82,26 +82,26 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
         global state_Y
 
         statechart_1 = Statechart_1()
-        statechart_1.initStatechart()
-        rootState_1 = statechart_1.rootStateInstance
+        statechart_1.init_statechart()
+        root_state_1 = statechart_1.root_state_instance
         monitor_1 = StatechartMonitor(statechart_1)
-        state_A = statechart_1.getState('A')
-        state_B = statechart_1.getState('B')
-        state_C = statechart_1.getState('C')
-        state_D = statechart_1.getState('D')
-        state_E = statechart_1.getState('E')
-        state_M = statechart_1.getState('M')
-        state_N = statechart_1.getState('N')
-        state_O = statechart_1.getState('O')
-        state_P = statechart_1.getState('P')
-        state_X = statechart_1.getState('X')
-        state_Y = statechart_1.getState('Y')
+        state_A = statechart_1.get_state('A')
+        state_B = statechart_1.get_state('B')
+        state_C = statechart_1.get_state('C')
+        state_D = statechart_1.get_state('D')
+        state_E = statechart_1.get_state('E')
+        state_M = statechart_1.get_state('M')
+        state_N = statechart_1.get_state('N')
+        state_O = statechart_1.get_state('O')
+        state_P = statechart_1.get_state('P')
+        state_X = statechart_1.get_state('X')
+        state_Y = statechart_1.get_state('Y')
 
     # Match against sequence entered A
     def test_match_against_sequence_entered_A(self):
-        monitor_1.appendEnteredState(state_A)
+        monitor_1.append_entered_state(state_A)
 
-        matcher = monitor_1.matchSequence()
+        matcher = monitor_1.match_sequence()
 
         self.assertTrue(matcher.begin().entered(state_A).end())
         self.assertTrue(matcher.begin().entered('A').end())
@@ -113,9 +113,9 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
 
     # Match against sequence exited A
     def test_match_against_sequence_exited_A(self):
-        monitor_1.appendExitedState(state_A)
+        monitor_1.append_exited_state(state_A)
   
-        matcher = monitor_1.matchSequence()
+        matcher = monitor_1.match_sequence()
 
         self.assertTrue(matcher.begin().exited(state_A).end())
         self.assertTrue(matcher.begin().exited('A').end())
@@ -127,10 +127,10 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
 
     # Match against sequence entered A, entered B
     def test_match_against_sequence_entered_A_entered_B(self):
-        monitor_1.appendEnteredState(state_A)
-        monitor_1.appendEnteredState(state_B)
+        monitor_1.append_entered_state(state_A)
+        monitor_1.append_entered_state(state_B)
   
-        matcher = monitor_1.matchSequence()
+        matcher = monitor_1.match_sequence()
 
         self.assertTrue(matcher.begin().entered(state_A, state_B).end())
         self.assertTrue(matcher.begin().entered('A', 'B').end())
@@ -146,10 +146,10 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
 
     # Match against sequence exited A, exited B
     def test_match_against_sequence_exited_A_exited_B(self):
-        monitor_1.appendExitedState(state_A)
-        monitor_1.appendExitedState(state_B)
+        monitor_1.append_exited_state(state_A)
+        monitor_1.append_exited_state(state_B)
   
-        matcher = monitor_1.matchSequence()
+        matcher = monitor_1.match_sequence()
 
         self.assertTrue(matcher.begin().exited(state_A, state_B).end())
         self.assertTrue(matcher.begin().exited('A', 'B').end())
@@ -165,10 +165,10 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
 
     # Match against sequence exited A, entered B
     def test_match_against_sequence_exited_A_entered_B(self):
-        monitor_1.appendExitedState(state_A)
-        monitor_1.appendEnteredState(state_B)
+        monitor_1.append_exited_state(state_A)
+        monitor_1.append_entered_state(state_B)
   
-        matcher = monitor_1.matchSequence()
+        matcher = monitor_1.match_sequence()
 
         self.assertTrue(matcher.begin().exited(state_A).entered(state_B).end())
         self.assertTrue(matcher.begin().exited('A').entered('B').end())
@@ -181,117 +181,117 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
 
     # Match against sequence seq(enter A), seq(enter B)
     def test_match_against_seq_enter_A_seq_enter_B(self):
-        monitor_1.appendEnteredState(state_A)
-        monitor_1.appendEnteredState(state_B)
+        monitor_1.append_entered_state(state_A)
+        monitor_1.append_entered_state(state_B)
   
-        matcher = monitor_1.matchSequence()
+        matcher = monitor_1.match_sequence()
 
-        matcher.begin().beginSequence().entered(state_A).endSequence().beginSequence().entered(state_B).endSequence().end()
-        self.assertTrue(matcher.match)
-
-        matcher.begin().beginSequence().entered(state_A).entered(state_B).endSequence().end()
-        self.assertTrue(matcher.match)
-  
-        matcher.begin().beginSequence().entered(state_A).entered(state_B).endSequence().end()
-        self.assertTrue(matcher.match)
-  
-        matcher.begin().beginSequence().entered(state_A, state_B).endSequence().end()
+        matcher.begin().begin_sequence().entered(state_A).end_sequence().begin_sequence().entered(state_B).end_sequence().end()
         self.assertTrue(matcher.match)
 
-        matcher.begin().beginSequence().entered(state_A).endSequence().end()
+        matcher.begin().begin_sequence().entered(state_A).entered(state_B).end_sequence().end()
+        self.assertTrue(matcher.match)
+  
+        matcher.begin().begin_sequence().entered(state_A).entered(state_B).end_sequence().end()
+        self.assertTrue(matcher.match)
+  
+        matcher.begin().begin_sequence().entered(state_A, state_B).end_sequence().end()
+        self.assertTrue(matcher.match)
+
+        matcher.begin().begin_sequence().entered(state_A).end_sequence().end()
         self.assertFalse(matcher.match)
   
-        matcher.begin().beginSequence().entered(state_A).endSequence().beginSequence().entered(state_C).endSequence().end()
+        matcher.begin().begin_sequence().entered(state_A).end_sequence().begin_sequence().entered(state_C).end_sequence().end()
         self.assertFalse(matcher.match)
   
-        matcher.begin().beginSequence().entered(state_A).endSequence().beginSequence().entered(state_B).endSequence().beginSequence().entered(state_C).endSequence().end()
+        matcher.begin().begin_sequence().entered(state_A).end_sequence().begin_sequence().entered(state_B).end_sequence().begin_sequence().entered(state_C).end_sequence().end()
         self.assertFalse(matcher.match)
 
     # Match against sequence con(entered A)
     def test_match_against_seq_con_entered_A(self):
-        monitor_1.appendEnteredState(state_A)
+        monitor_1.append_entered_state(state_A)
   
-        matcher = monitor_1.matchSequence()
+        matcher = monitor_1.match_sequence()
 
-        matcher.begin().beginConcurrent().entered(state_A).endConcurrent().end() 
+        matcher.begin().begin_concurrent().entered(state_A).end_concurrent().end() 
         self.assertTrue(matcher.match)
 
-        matcher.begin().beginConcurrent().beginSequence().entered(state_A).endSequence().endConcurrent().end()
+        matcher.begin().begin_concurrent().begin_sequence().entered(state_A).end_sequence().end_concurrent().end()
         self.assertTrue(matcher.match)
 
-        matcher.begin().beginConcurrent().entered(state_B).endConcurrent().end()
+        matcher.begin().begin_concurrent().entered(state_B).end_concurrent().end()
         self.assertFalse(matcher.match)
    
-        matcher.begin().beginConcurrent().exited(state_A).endConcurrent().end()
+        matcher.begin().begin_concurrent().exited(state_A).end_concurrent().end()
         self.assertFalse(matcher.match)
   
-        matcher.begin().beginConcurrent().entered(state_A).entered(state_B).endConcurrent().end()
+        matcher.begin().begin_concurrent().entered(state_A).entered(state_B).end_concurrent().end()
         self.assertFalse(matcher.match)
   
-        matcher.begin().beginConcurrent().entered(state_B).entered(state_A).endConcurrent().end()
+        matcher.begin().begin_concurrent().entered(state_B).entered(state_A).end_concurrent().end()
         self.assertFalse(matcher.match)
 
     # Match against sequence con(entered A entered B)
     def test_match_against_seq_con_entered_A_entered_B(self):
-        monitor_1.appendEnteredState(state_A)
-        monitor_1.appendEnteredState(state_B)
+        monitor_1.append_entered_state(state_A)
+        monitor_1.append_entered_state(state_B)
   
-        matcher = monitor_1.matchSequence()
+        matcher = monitor_1.match_sequence()
 
-        matcher.begin().beginConcurrent().entered(state_A).entered(state_B).endConcurrent().end()
+        matcher.begin().begin_concurrent().entered(state_A).entered(state_B).end_concurrent().end()
         self.assertTrue(matcher.match)
    
-        matcher.begin().beginConcurrent().entered(state_B).entered(state_A).endConcurrent().end()
+        matcher.begin().begin_concurrent().entered(state_B).entered(state_A).end_concurrent().end()
         self.assertTrue(matcher.match)
    
-        matcher.begin().beginConcurrent().beginSequence().entered(state_A).endSequence().entered(state_B).endConcurrent().end()
+        matcher.begin().begin_concurrent().begin_sequence().entered(state_A).end_sequence().entered(state_B).end_concurrent().end()
         self.assertTrue(matcher.match)
   
-        matcher.begin().beginConcurrent().beginSequence().entered(state_A).endSequence().beginSequence().entered(state_B).endSequence().endConcurrent().end()
+        matcher.begin().begin_concurrent().begin_sequence().entered(state_A).end_sequence().begin_sequence().entered(state_B).end_sequence().end_concurrent().end()
         self.assertTrue(matcher.match)
    
-        matcher.begin().beginConcurrent().entered(state_A, state_B).endConcurrent().end()
+        matcher.begin().begin_concurrent().entered(state_A, state_B).end_concurrent().end()
         self.assertTrue(matcher.match)
   
-        matcher.begin().beginConcurrent().beginSequence().entered(state_A).entered(state_B).endSequence().endConcurrent().end()
+        matcher.begin().begin_concurrent().begin_sequence().entered(state_A).entered(state_B).end_sequence().end_concurrent().end()
         self.assertTrue(matcher.match)
    
-        matcher.begin().beginConcurrent().entered(state_A).endConcurrent().end()
+        matcher.begin().begin_concurrent().entered(state_A).end_concurrent().end()
         self.assertFalse(matcher.match)
   
-        matcher.begin().beginConcurrent().entered(state_A).entered(state_C).endConcurrent().end()
+        matcher.begin().begin_concurrent().entered(state_A).entered(state_C).end_concurrent().end()
         self.assertFalse(matcher.match)
    
-        matcher.begin().beginConcurrent().entered(state_A).entered(state_B).entered(state_C).endConcurrent().end()
+        matcher.begin().begin_concurrent().entered(state_A).entered(state_B).entered(state_C).end_concurrent().end()
         self.assertFalse(matcher.match)
    
     # Match against sequence con(entered A entered B) 2
     def test_match_against_seq_con_entered_A_entered_B_2(self):
-        monitor_1.appendEnteredState(state_A)
-        monitor_1.appendEnteredState(state_B)
-        monitor_1.appendEnteredState(state_X)
-        monitor_1.appendEnteredState(state_M)
-        monitor_1.appendEnteredState(state_N)
-        monitor_1.appendEnteredState(state_Y)
-        monitor_1.appendEnteredState(state_O)
-        monitor_1.appendEnteredState(state_P)
-        monitor_1.appendEnteredState(state_C)
+        monitor_1.append_entered_state(state_A)
+        monitor_1.append_entered_state(state_B)
+        monitor_1.append_entered_state(state_X)
+        monitor_1.append_entered_state(state_M)
+        monitor_1.append_entered_state(state_N)
+        monitor_1.append_entered_state(state_Y)
+        monitor_1.append_entered_state(state_O)
+        monitor_1.append_entered_state(state_P)
+        monitor_1.append_entered_state(state_C)
   
-        matcher = monitor_1.matchSequence()
+        matcher = monitor_1.match_sequence()
   
-        matcher.begin().entered(state_A).entered(state_B).beginConcurrent().beginSequence().entered(state_X, state_M, state_N).endSequence().beginSequence().entered(state_Y, state_O, state_P).endSequence().endConcurrent().entered(state_C).end()
+        matcher.begin().entered(state_A).entered(state_B).begin_concurrent().begin_sequence().entered(state_X, state_M, state_N).end_sequence().begin_sequence().entered(state_Y, state_O, state_P).end_sequence().end_concurrent().entered(state_C).end()
         self.assertTrue(matcher.match)
   
-        matcher.begin().entered(state_A).entered(state_B).beginConcurrent().beginSequence().entered(state_Y, state_O, state_P).endSequence().beginSequence().entered(state_X, state_M, state_N).endSequence().endConcurrent().entered(state_C).end()
+        matcher.begin().entered(state_A).entered(state_B).begin_concurrent().begin_sequence().entered(state_Y, state_O, state_P).end_sequence().begin_sequence().entered(state_X, state_M, state_N).end_sequence().end_concurrent().entered(state_C).end()
         self.assertTrue(matcher.match)
 
-        matcher.begin().entered(state_A).entered(state_B).beginConcurrent().beginSequence().entered(state_X, state_M).endSequence().beginSequence().entered(state_Y, state_O, state_P).endSequence().endConcurrent().entered(state_C).end()
+        matcher.begin().entered(state_A).entered(state_B).begin_concurrent().begin_sequence().entered(state_X, state_M).end_sequence().begin_sequence().entered(state_Y, state_O, state_P).end_sequence().end_concurrent().entered(state_C).end()
         self.assertFalse(matcher.match)
     
-        matcher.begin().entered(state_A).entered(state_B).beginConcurrent().beginSequence().entered(state_X, state_M, state_N).endSequence().beginSequence().entered(state_Y, state_O).endSequence().endConcurrent().entered(state_C).end()
+        matcher.begin().entered(state_A).entered(state_B).begin_concurrent().begin_sequence().entered(state_X, state_M, state_N).end_sequence().begin_sequence().entered(state_Y, state_O).end_sequence().end_concurrent().entered(state_C).end()
         self.assertFalse(matcher.match)
 
-        matcher.begin().entered(state_A).entered(state_B).beginConcurrent().beginSequence().entered(state_X, state_M, state_N).endSequence().beginSequence().entered(state_Y, state_O, state_P).endSequence().entered(state_E).endConcurrent().entered(state_C).end()
+        matcher.begin().entered(state_A).entered(state_B).begin_concurrent().begin_sequence().entered(state_X, state_M, state_N).end_sequence().begin_sequence().entered(state_Y, state_O, state_P).end_sequence().entered(state_E).end_concurrent().entered(state_C).end()
         self.assertFalse(matcher.match)
 
 
