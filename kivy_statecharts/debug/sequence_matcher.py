@@ -127,35 +127,33 @@ class StatechartSequenceMatcher:
         match = False
         monitor = self.statechart_monitor
         
-        if not values:
-            return marker
-    
         if marker > len(monitor.sequence):
             return MISMATCH
     
         # values is hierarchical, so that it is: {values: [{ values: [{ values: ... , token_type: 'sequence'}
         # and actions are list items in values lists, with token_type as the second key/value pair in the dicts.
-        while len(values) > 0:
-            for val in values:
-                if 'token_type' in val:
-                    if val['token_type'] == 'sequence':
-                        temp_marker = self._match_sequence(val, marker)
-                    elif val['token_type'] == 'concurrent':
-                        temp_marker = self._match_concurrent(val, marker)
-                elif marker > len(self.statechart_monitor.sequence)-1 or not self._match_items(val, monitor.sequence[marker]):
-                    temp_marker = MISMATCH
-                else:
-                    temp_marker = marker + 1
-      
-                if temp_marker != MISMATCH:
-                    break
-      
-            if temp_marker == MISMATCH:
-                return MISMATCH
-
-            values.remove(val)
-              
-            marker = temp_marker
+        if values:
+            while len(values) > 0:
+                for val in values:
+                    if 'token_type' in val:
+                        if val['token_type'] == 'sequence':
+                            temp_marker = self._match_sequence(val, marker)
+                        elif val['token_type'] == 'concurrent':
+                            temp_marker = self._match_concurrent(val, marker)
+                    elif marker > len(self.statechart_monitor.sequence)-1 or not self._match_items(val, monitor.sequence[marker]):
+                        temp_marker = MISMATCH
+                    else:
+                        temp_marker = marker + 1
+          
+                    if temp_marker != MISMATCH:
+                        break
+          
+                if temp_marker == MISMATCH:
+                    return MISMATCH
+    
+                values.remove(val)
+                  
+                marker = temp_marker
     
         return marker
   
