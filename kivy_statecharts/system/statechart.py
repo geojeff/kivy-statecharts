@@ -1561,14 +1561,7 @@ class StatechartManager(EventDispatcher):
       @see #details
     """
     def to_string_with_details(self):
-        str = ""
-        header = self.toString()
-        details = self.details
-          
-        str += header + "\n"
-        str += self._hash_to_string(details, 2)
-          
-        return str;
+        return "{0}\n{1}".format(self, self._hash_to_string(self.details, 2))
       
     """ @private """
     def _hash_to_string(self, hash_to_convert, indent):

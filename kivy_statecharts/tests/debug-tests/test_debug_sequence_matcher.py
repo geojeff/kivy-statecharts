@@ -306,3 +306,7 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
   
         self.assertTrue(monitor_1.match_entered_states(root_state_1, state_A))
         self.assertTrue(monitor_1.match_entered_states(root_state_1, 'A'))
+
+        self.assertFalse(monitor_1.match_entered_states(root_state_1, state_A, state_B))
+        self.assertFalse(monitor_1.match_entered_states(root_state_1, 'A', 'B'))
+        self.assertFalse(monitor_1.match_entered_states(root_state_1, 'A', None))

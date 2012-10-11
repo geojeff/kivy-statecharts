@@ -15,3 +15,4 @@ TODO
   in live reporting during development (See kotti_software tests for the dc()
   method).
 - Are the installation docs in the readme OK?
+- Review  # pragma: no cover tags.

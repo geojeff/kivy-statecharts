@@ -1433,7 +1433,7 @@ class State(EventDispatcher):
         else:
             self.full_path = self.path_relative_to(root)
 
-    def toString(self):
+    def __str__(self):
         return self.full_path
 
     """ @private """

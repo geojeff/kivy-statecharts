@@ -24,8 +24,8 @@ class StatechartSequenceMatcher:
     def end(self):
         self.end_sequence()
     
-        if len(self._stack) > 0:
-            raise "can not match sequence. sequence matcher has been left in an invalid state"
+        if len(self._stack) > 0:  # pragma: no cover
+            raise "Can not match sequence. Sequence matcher has been left in an invalid state"
     
         result = False
         

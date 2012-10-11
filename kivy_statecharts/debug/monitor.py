@@ -67,7 +67,7 @@ class StatechartMonitor(EventDispatcher):
     
         return matched == len(actual)
   
-    def toString(self):
+    def __str__(self):
         seq = ""
         i = 0
         item = null
