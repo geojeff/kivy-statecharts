@@ -1,0 +1,17 @@
+TODO
+====
+
+- Settle the testing question: py.test, nose, or both?
+- Add an example featuring history states.
+- Simplify the coding of states by using get_running_app(), and/or by adding
+  references to app and/or statechart.
+- Change long paths in super() calls to wrap across lines -- is there a way to
+  do this without the explicit paths?
+- Document the need to an __init__() for states, or not, in relation to Kivy
+  properties.
+- Document the use of memory mapping tools used in the attempt to get the
+  Deflectouch_with_statecharts example working on iOS.
+- Generate a state diagram in outline form, perhaps to /tmp/out.html for use
+  in live reporting during development (See kotti_software tests for the dc()
+  method).
+- Are the installation docs in the readme OK?

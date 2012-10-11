@@ -726,10 +726,20 @@ class State(EventDispatcher):
         path = self.name
         parent = self.parent_state
 
-        print self, self.name, self.parent_state
+        # [PORT] Bindings related problem. In the original SC, _fullPath is a
+        # computed property updated when name or parent changes. Here,
+        # path_relative_to() is called when the name initially changes, at
+        # which time the parent_state has not yet been set, and then just
+        # after is another call when the parent_state changes (See the binding
+        # setup in __init__.py). So, for now, just return the path to avoid
+        # the log message below.
+        if parent is None:
+            return path
 
         #while parent is not None and parent is not state and state != type(self):
         #while parent is not None and parent is not state:
+        # [PORT] != versions, here and in the if below, seem to be correct,
+        # because the check is against instances.
         while parent and parent != state:
             path = "{0}.{1}".format(parent.name, path)
             parent = parent.parent_state
