@@ -1,6 +1,8 @@
 TODO
 ====
 
+- Replace jquery and other js files that have been undoubtedly trashed during
+  search and replace operations.
 - Settle the testing question: py.test, nose, or both?
 - Add an example featuring history states.
 - Simplify the coding of states by using get_running_app(), and/or by adding

@@ -83,7 +83,7 @@ class StatechartSequenceMatcher:
     def _match_sequence(self, sequence, marker):
         values = sequence['values']
         
-        if not values:
+        if values is None:
             return marker
 
         if marker > len(self.statechart_monitor.sequence):

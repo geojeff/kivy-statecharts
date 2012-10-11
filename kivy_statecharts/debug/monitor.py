@@ -46,11 +46,8 @@ class StatechartMonitor(EventDispatcher):
   
     # [PORT] Check how arguments is used in the call. 
     # [PORT] arguments, in javascript. so *arguments was added here
+    # [PORT] Removed check for None arg in expected, as None args are removed
     def match_entered_states(self, *expected):
-        #if isinstance(arguments, collections.Sequence):
-            #expected = arguments
-        #else:
-            #expected = [arguments]
         actual = self.statechart.entered_states()
         matched = 0
     
@@ -60,26 +57,12 @@ class StatechartMonitor(EventDispatcher):
         for item in expected:
             if isinstance(item, basestring):
                 item = self.statechart.get_state(item)
-            if item is None:
-                return False
             if self.statechart.state_is_entered(item) and item.is_entered_state():
                 matched += 1
     
         return matched == len(actual)
   
     def __str__(self):
-        seq = ""
-        i = 0
-        item = null
-    
-        seq += "["
-
-        for i in range(len(self.sequence)):
-            item = self.sequence[i]
-            seq += "{0} {1}".format(item.action, item.state.full_path)
-            if i < len(self.sequence)-1:
-                seq += ", "
-
-        seq += "]"
-
-        return seq;
+        return '[' + ', '.join(["{0} {1}".format(item['action'],
+                                                 item['state'].full_path)
+                                for item in self.sequence]) + ']'
