@@ -311,3 +311,6 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
         self.assertFalse(monitor_1.match_entered_states(root_state_1, 'A', 'B'))
 
         self.assertEqual(str(monitor_1), '[entered A]')
+
+        # Test for MISMATCH:
+        self.assertEqual(matcher.begin()._match_sequence(matcher._start, 5), {})
