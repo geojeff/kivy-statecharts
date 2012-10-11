@@ -314,3 +314,14 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
 
         # Test for MISMATCH:
         self.assertEqual(matcher.begin()._match_sequence(matcher._start, 5), {})
+
+        # Test for MISMATCH:
+        self.assertEqual(matcher.begin()._match_concurrent(matcher._start, 5), {})
+
+        # Test for MISMATCH:
+        matcher.begin_concurrent().entered(state_A)
+        self.assertTrue(type(matcher._stack[-1]) == dict)
+        self.assertTrue(type(matcher._stack[-1]['values']) == list)
+        self.assertEqual(len(matcher._stack[-1]['values']), 1)
+        self.assertEqual(matcher._stack[-1]['values'][0]['state'], state_A)
+        self.assertEqual(matcher.begin_concurrent()._match_concurrent(matcher._start, 1), {})
