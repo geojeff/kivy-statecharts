@@ -83,27 +83,25 @@ class StatechartSequenceMatcher:
     def _match_sequence(self, sequence, marker):
         values = sequence['values']
         
-        if values is None:
-            return marker
-
         if marker > len(self.statechart_monitor.sequence):
             return MISMATCH
         
         # values is hierarchical, so that it is: {values: [{ values: [{ values: ...
         # and actions are mixed in there.
-        for val in values:
-            if 'token_type' in val:
-                if val['token_type'] == 'sequence':
-                    marker = self._match_sequence(val, marker)
-                elif val['token_type'] == 'concurrent':
-                    marker = self._match_concurrent(val, marker)
-            elif marker > len(self.statechart_monitor.sequence)-1 or not self._match_items(val, self.statechart_monitor.sequence[marker]):
-                return MISMATCH
-            else:
-                marker += 1
-      
-            if marker == MISMATCH:
-                return MISMATCH
+        if values:
+            for val in values:
+                if 'token_type' in val:
+                    if val['token_type'] == 'sequence':
+                        marker = self._match_sequence(val, marker)
+                    elif val['token_type'] == 'concurrent':
+                        marker = self._match_concurrent(val, marker)
+                elif marker > len(self.statechart_monitor.sequence)-1 or not self._match_items(val, self.statechart_monitor.sequence[marker]):
+                    return MISMATCH
+                else:
+                    marker += 1
+          
+                if marker == MISMATCH:
+                    return MISMATCH
     
         return marker
 
