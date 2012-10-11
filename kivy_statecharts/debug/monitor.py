@@ -4,6 +4,7 @@
 # Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
 # ================================================================================
 
+import collections
 from kivy.event import EventDispatcher
 from kivy.properties import ListProperty, NumericProperty, ObjectProperty
 from kivy_statecharts.debug.sequence_matcher import StatechartSequenceMatcher
@@ -44,8 +45,12 @@ class StatechartMonitor(EventDispatcher):
         return StatechartSequenceMatcher(self) # [PORT] call was ({ statechart_monitor: self }), but __init__ on SSM was changed to take monitor
   
     # [PORT] Check how arguments is used in the call. 
-    def match_entered_states(self, *arguments):
-        expected = arguments[0] if len(arguments) == 1 else arguments # [PORT] arguments, in javascript. so *arguments was added here
+    # [PORT] arguments, in javascript. so *arguments was added here
+    def match_entered_states(self, *expected):
+        #if isinstance(arguments, collections.Sequence):
+            #expected = arguments
+        #else:
+            #expected = [arguments]
         actual = self.statechart.entered_states()
         matched = 0
     

@@ -295,7 +295,14 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
         self.assertFalse(matcher.match)
 
 
+    # Call match_entered_states() with incorrect arguments
+    def test_match_entered_states_with_incorrect_arguments(self):
+        monitor_1.append_entered_state(state_A)
 
+        matcher = monitor_1.match_sequence()
 
-
-
+        self.assertTrue(matcher.begin().entered(state_A).end())
+        self.assertTrue(len(statechart_1.entered_states()), 1)
+  
+        self.assertTrue(monitor_1.match_entered_states(root_state_1, state_A))
+        self.assertTrue(monitor_1.match_entered_states(root_state_1, 'A'))
