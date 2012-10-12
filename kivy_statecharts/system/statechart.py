@@ -251,7 +251,7 @@ class StatechartManager(EventDispatcher):
     
       @property {String} 
     """
-    initial_state_key = StringProperty('')
+    initial_state_key = StringProperty(None, allownone=True)
     
     """ 
       Indicates if properties on this object representing states are concurrent to each other.

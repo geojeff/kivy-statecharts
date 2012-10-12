@@ -147,8 +147,8 @@ class StatechartTestCase(unittest.TestCase):
         self.assertTrue(isinstance(root_state_2, State))
         self.assertTrue(root_state_2.substates_are_concurrent)
 
-        self.assertEqual(statechart_2.initial_state_key, '')
-        self.assertEqual(root_state_2.initial_substate_key, '')
+        self.assertEqual(statechart_2.initial_state_key, None)
+        self.assertEqual(root_state_2.initial_substate_key, None)
         self.assertEqual(state_C, root_state_2.get_substate('C'))
         self.assertEqual(state_D, root_state_2.get_substate('D'))
         

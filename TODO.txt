@@ -18,3 +18,5 @@ TODO
   method).
 - Are the installation docs in the readme OK?
 - Review  # pragma: no cover tags.
+- If initial_substate_key is None, use initial_substate_object (needs coding),
+  and document usages for intitial substates set as string keys vs. objects.

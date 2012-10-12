@@ -98,9 +98,9 @@ class State(EventDispatcher):
       
       @property {String|State}
     """
-    initial_substate_key = StringProperty('')
+    initial_substate_key = StringProperty(None, allownone=True)
 
-    initial_substate_object = ObjectProperty(None)
+    initial_substate_object = ObjectProperty(None, allownone=True)
 
     """
       Used to indicates if this state's immediate substates are to be
@@ -199,9 +199,10 @@ class State(EventDispatcher):
                     self.initial_substate_key = v
                 else: 
                     name = v.name if hasattr(v, 'name') else None
-                    if not name:
-                        name = v.__name__ if hasattr(v, '__name__') else None
-                    self.initial_substate_key = name if name else None
+                    if name:
+                        self.initial_substate_key = name
+                    else:
+                        self.initial_substate_object = v
             else:
                 setattr(self, k, v)
 
@@ -320,7 +321,8 @@ class State(EventDispatcher):
                 #        having a simple initial_substate_key defined, vs. the use of a HistoryState as the
                 #        initial_substate.
                 if key == self.initial_substate_key and history_state is None:
-                    self.initial_substate_key = state if isinstance(state, basestring) else state.name # [PORT] Needs to always be a string.
+                    # [PORT] Needs to always be a string.
+                    self.initial_substate_key = state if isinstance(state, basestring) else state.name
                     self.initial_substate_object = state
                     matched_initial_substate = True
                 elif history_state and history_state.default_state == key:
@@ -364,13 +366,17 @@ class State(EventDispatcher):
 
         state = self.create_substate(EmptyState)
 
-        self.initial_substate_key = state.name if state.name else state.__class__.__name__
+        # EmptyState has name set to "__EMPTY_STATE__"
+        self.initial_substate_key = state.name
 
-        self.substates.append(state)
-
+        # The EmptyState's name, "__EMPTY_STATE__" is used as a
+        # property name, whose value is the empty state object
         setattr(self, state.name, state)
 
+        # [PORT] Why would this be set, if initial_substate_key is set?
         self.initial_substate_object = state
+
+        self.substates.append(state)
 
         state.init_state()
 

@@ -84,8 +84,9 @@ class StateAddSubstateTestCase(unittest.TestCase):
     # Add a substate to state A
     def test_add_substate_to_state_A_statechart_1(self):
         self.assertIsNone(state_A.get_substate('Z'))
-        # In [PORT], EmptyState is created only for states with substates, and no initial_substate set. Correct?
-        self.assertEqual(state_A.initial_substate_key, '')
+        # [PORT] EmptyState is created only for states with substates,
+        #        and no initial_substate set. Correct?
+        self.assertEqual(state_A.initial_substate_key, None)
 
         state = state_A.add_substate('Z')
 
@@ -119,7 +120,7 @@ class StateAddSubstateTestCase(unittest.TestCase):
         self.assertFalse(state.is_entered_state())
         self.assertFalse(state.is_current_state())
         self.assertFalse(state_B.is_current_state())
-        self.assertEqual(state_B.initial_substate_key, '')
+        self.assertEqual(state_B.initial_substate_key, None)
         self.assertTrue(state_B.is_entered_state())
         self.assertEqual(len(state_B.current_substates), 2)
 

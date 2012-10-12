@@ -80,7 +80,7 @@ class StatechartTestCase(unittest.TestCase):
         self.assertTrue(app.statechart.statechart_is_initialized)
         self.assertEqual(app.statechart.root_state_instance.name, '__ROOT_STATE__')
         self.assertTrue(isinstance(app.statechart.root_state_instance, State))
-        self.assertEqual(app.statechart.initial_state_key, '')
+        self.assertEqual(app.statechart.initial_state_key, None)
 
         self.assertTrue(app.statechart.get_state('A').is_current_state())
         self.assertFalse(app.statechart.get_state('B').is_current_state())
