@@ -355,8 +355,10 @@ class State(EventDispatcher):
 
         if self.initial_substate_key and not matched_initial_substate:
             msg = ("Unable to set initial substate {0} since it did not match "
-                   "any of state {1}'s substates")
-            self.state_log_error(msg.format(self.initial_substate_key, self))
+                   "any of state {1}'s substates").format(
+                           self.initial_substate_key, self)
+            self.state_log_error(msg)
+            raise AttributeError(msg)
 
         if len(self.substates) == 0:
             if self.initial_substate_key:

@@ -91,3 +91,21 @@ class StateAddSubstateTestCase(unittest.TestCase):
         the_exception = cm.exception
         self.assertEqual(str(the_exception),
                          'Cannot init_state() an unnamed state.')
+
+    def test_init_for_nonexistent_initial_substate(self):
+        state_O = State(name='O')
+        state_P = State(name='P')
+        state_Q = State(name='Q')
+
+        state_P.parent_state = state_O
+        state_Q.parent_state = state_O
+
+        state_O.initial_substate_key = 'I do not exist'
+
+        msg = ("Unable to set initial substate {0} since it did not match "
+               "any of state {1}'s substates").format("I do not exist",
+                                                      state_O)
+        with self.assertRaises(AttributeError) as cm:
+            state_O.init_state()
+
+        self.assertEqual(str(cm.exception), msg)
