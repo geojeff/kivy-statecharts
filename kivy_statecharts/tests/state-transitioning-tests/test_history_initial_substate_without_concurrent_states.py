@@ -175,7 +175,7 @@ class StateTransitioningHistoryInitialSubstateWithoutConcurrentTestCase(unittest
         state_P = State(name='P')
         state_P.InitialSubstate = HistoryState
 
-        with self.assertRaises(NameError) as cm:
+        with self.assertRaises(Exception) as cm:
             state_P.init_state()
 
         self.assertEqual(str(cm.exception), msg)

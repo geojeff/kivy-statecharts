@@ -44,6 +44,26 @@ class Statechart_1(StatechartManager):
                 def __init__(self, **kwargs):
                     super(Statechart_1.RootState.B.Y, self).__init__(**kwargs)
 
+
+# name has to be set as kwargs for this to work.
+class O(State):
+    def __init__(self, **kwargs):
+        kwargs['name'] = 'O'
+        kwargs['initial_substate_key'] = 'P'
+        super(O, self).__init__(**kwargs)
+
+    def do_not_tread_on_me(self):
+        pass
+
+    class P(State):
+        def __init__(self, **kwargs):
+            super(O.P, self).__init__(**kwargs)
+
+    class Q(State):
+        def __init__(self, **kwargs):
+            super(O.Q, self).__init__(**kwargs)
+
+
 class StateAddSubstateTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
@@ -131,4 +151,28 @@ class StateAddSubstateTestCase(unittest.TestCase):
         self.assertTrue(state_B.is_entered_state())
         self.assertEqual(len(state_B.current_substates), 3)
 
+    def test_adding_unnamed_substate(self):
+        o = O()
+        o.init_state()
+
+        name = 'do_not_tread_on_me'
+
+        with self.assertRaises(Exception) as cm:
+            o.add_substate(name)
+
+        msg = ("Cannot add substate '{0}'. Already a defined "
+               "property").format(name)
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_adding_unnamed_substate(self):
+        o = O()
+
+        name = 'A'
+
+        with self.assertRaises(Exception) as cm:
+            o.add_substate(name)
+
+        msg = ("Cannot add substate '{0}'. Parent state is not yet "
+               "initialized").format(name)
+        self.assertEqual(str(cm.exception), msg)
 

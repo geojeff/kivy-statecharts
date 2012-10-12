@@ -276,7 +276,7 @@ class State(EventDispatcher):
     
         if not self.name:
             self.state_log_error("Cannot init_state() an unnamed state.")
-            raise NameError("Cannot init_state() an unnamed state.")
+            raise Exception("Cannot init_state() an unnamed state.")
 
         self._register_with_parent_states()
     
@@ -305,7 +305,7 @@ class State(EventDispatcher):
                     msg = ("Initial substate is invalid. History state "
                            "requires the name of a default state to be set.")
                     self.state_log_error(msg)
-                    raise NameError(msg)
+                    raise Exception(msg)
     
         # Iterate through all this state's substates, if any, create them, and
         # then initialize them. This causes a recursive process.
@@ -359,13 +359,13 @@ class State(EventDispatcher):
                            "{1} has no substates").format(
                                    self.initial_substate_key, self)
                     self.state_log_error(msg)
-                    raise AttributeError(msg)
+                    raise Exception(msg)
             elif len(self.substates) > 0:
                 msg = ("Unable to set initial substate {0} since it did "
                        "not match any of state {1}'s substates").format(
                                self.initial_substate_key, self)
                 self.state_log_error(msg)
-                raise AttributeError(msg)
+                raise Exception(msg)
 
         if len(self.substates) > 0:
             state = self._add_empty_initial_substate_if_needed()
@@ -376,7 +376,7 @@ class State(EventDispatcher):
                        "substates are all concurrent for state "
                        "{1}").format(self.initial_substate_key, self)
                 self.state_log_error(msg)
-                raise AttributeError(msg)
+                raise Exception(msg)
 
         #self.notifyPropertyChange("substates")
         # [PORT] substates have changed. Call _current_states on statechart,
@@ -468,18 +468,21 @@ class State(EventDispatcher):
     """
     def add_substate(self, name, state=None, attr={}):
         if not name: # [PORT] this used the empty(name) function.
-            self.state_log_error("Cannot add substate. name required")
-            return None
+            msg = "Cannot add substate. name required"
+            self.state_log_error(msg)
+            raise Exception(msg)
 
         if hasattr(self, name):
-            msg = "Cannot add substate '{0}'. Already a defined property"
-            self.state_log_error(msg.format(name))
-            return None
+            msg = ("Cannot add substate '{0}'. Already a defined "
+                   "property").format(name)
+            self.state_log_error(msg)
+            raise Exception(msg)
 
         if not self.state_is_initialized:
-            msg = "Cannot add substate '{0}'. this state is not yet initialized"
-            self.state_log_error(msg.format(name))
-            return None
+            msg = ("Cannot add substate '{0}'. Parent state is not yet "
+                   "initialized").format(name)
+            self.state_log_error(msg)
+            raise Exception(msg)
 
         if state is None:
             state = State

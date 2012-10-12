@@ -85,7 +85,7 @@ class StateAddSubstateTestCase(unittest.TestCase):
 
         state_P.parent_state = state_O
 
-        with self.assertRaises(NameError) as cm:
+        with self.assertRaises(Exception) as cm:
             state_P.init_state()
 
         the_exception = cm.exception
@@ -116,7 +116,7 @@ class StateAddSubstateTestCase(unittest.TestCase):
         msg = ("Unable to set initial substate {0} since it did not match any "
                "of state {1}'s substates").format("I do not exist", o)
 
-        with self.assertRaises(AttributeError) as cm:
+        with self.assertRaises(Exception) as cm:
             o.init_state()
 
         self.assertEqual(str(cm.exception), msg)
@@ -137,7 +137,7 @@ class StateAddSubstateTestCase(unittest.TestCase):
         msg = ("Unable to make {0} an initial substate since state "
                "{1} has no substates").format("I do not exist", o)
 
-        with self.assertRaises(AttributeError) as cm:
+        with self.assertRaises(Exception) as cm:
             o.init_state()
 
         self.assertEqual(str(cm.exception), msg)
@@ -168,7 +168,7 @@ class StateAddSubstateTestCase(unittest.TestCase):
                "substates are all concurrent for state "
                "{1}").format('P', o)
 
-        with self.assertRaises(AttributeError) as cm:
+        with self.assertRaises(Exception) as cm:
             o.init_state()
 
         self.assertEqual(str(cm.exception), msg)
