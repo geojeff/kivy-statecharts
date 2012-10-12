@@ -112,7 +112,7 @@ class Background(Image):
                 # pass the touch to the deflector scatter
                 return super(Background, self).on_touch_down(touch)
 
-        self.parent.app.statechart.sendEvent('background_touch_down', touch)
+        self.parent.app.statechart.send_event('background_touch_down', touch)
 
 #
 #  Bullet
@@ -244,7 +244,7 @@ class Deflector(Scatter):
         self.point1.bind(size=self.size_callback)
     
     def size_callback(self, instance, size):
-        self.statechart.sendEvent('resize_deflector', self, size)
+        self.statechart.send_event('resize_deflector', self, size)
 
     def collide_widget(self, wid):
         point1_parent = self.to_parent(self.point1.center[0], self.point1.center[1])
@@ -277,7 +277,7 @@ class Deflector(Scatter):
             or point2_parent[0] - GRAB_RADIUS <= x <= point2_parent[0] + GRAB_RADIUS and point2_parent[1] - GRAB_RADIUS <= y <= point2_parent[1] + GRAB_RADIUS
 
     def on_touch_down(self, touch):
-        self.statechart.sendEvent('deflector_touch_down')
+        self.statechart.send_event('deflector_touch_down')
         return super(Deflector, self).on_touch_down(touch)
     
     def on_touch_up(self, touch):
@@ -287,7 +287,7 @@ class Deflector(Scatter):
         context = 'deflector_touch_up'
 
         if self.parent != None and self.collide_grab_point(*touch.pos):
-            self.statechart.sendEvent('deflector_touch_up', self, context)
+            self.statechart.send_event('deflector_touch_up', self, context)
 
         return super(Deflector, self).on_touch_up(touch)
 
@@ -300,22 +300,22 @@ class AppStatechart(StatechartManager):
     def __init__(self, app, **kw):
         self.app = app
         self.trace = True
-        self.rootStateClass = self.RootState
+        self.root_state_class = self.RootState
         super(AppStatechart, self).__init__(**kw)
 
     #  RootState of statechart
     #
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initialSubstateKey'] = 'ShowingGameScreen'
+            kwargs['initial_substate_key'] = 'ShowingGameScreen'
             super(AppStatechart.
                   RootState, self).__init__(**kwargs)
 
-        def enterState(self, context=None):
-            print 'RootState/enterState'
+        def enter_state(self, context=None):
+            print 'RootState/enter_state'
 
-        def exitState(self, context=None):
-            print 'RootState/exitState'
+        def exit_state(self, context=None):
+            print 'RootState/exit_state'
 
         # ShowingGameScreen
         #
@@ -327,8 +327,8 @@ class AppStatechart(StatechartManager):
                       RootState.
                       ShowingGameScreen, self).__init__(**kwargs)
 
-            def enterState(self, context=None):
-                print 'ShowingGameScreen/enterState'
+            def enter_state(self, context=None):
+                print 'ShowingGameScreen/enter_state'
 
                 # create the root widget and give it a reference of the application instance (so it can access the application settings)
                 self.statechart.app.game_screen = self.statechart.app.root
@@ -362,7 +362,7 @@ class AppStatechart(StatechartManager):
                     self.statechart.app.sound[item].volume = sound_volume
 
                 # [statechart port] Changed up this section to set current_level, instead
-                #                   of calling load_level() -- this is now the enterState
+                #                   of calling load_level() -- this is now the enter_state
                 #                   of the ShowingLevel state. Also, added a way to put up
                 #                   the help screen then goto ShowingLevel, vs. directly
                 #                   from here.
@@ -386,13 +386,13 @@ class AppStatechart(StatechartManager):
                     self.statechart.app.config.set('General', 'FirstStartup', 'No')
                     self.statechart.app.config.write()
                 else:
-                    self.gotoState('ShowingLevel')
+                    self.go_to_state('ShowingLevel')
 
             def show_help_first_time(self, *args):
-                self.gotoState('ShowingWelcomePopup')
+                self.go_to_state('ShowingWelcomePopup')
 
-            def exitState(self, context=None):
-                print 'ShowingGameScreen/exitState'
+            def exit_state(self, context=None):
+                print 'ShowingGameScreen/exit_state'
 
             def sound_replay(self, instance):
                 if self.statechart.app.music.status != 'play':
@@ -409,8 +409,8 @@ class AppStatechart(StatechartManager):
                           ShowingGameScreen.
                           ShowingLevelsPopup, self).__init__(**kwargs)
 
-                def enterState(self, context=None):
-                    print 'ShowingLevelsPopup/enterState'
+                def enter_state(self, context=None):
+                    print 'ShowingLevelsPopup/enter_state'
 
                     # create a popup with all the levels
                     grid_layout = GridLayout(cols=8, rows=5, spacing=10, padding=10)
@@ -451,19 +451,19 @@ class AppStatechart(StatechartManager):
 
                 # [statechart port] See context of select_level binding above for how text of level buttons are set.
                 #                   This is a new action function, simplifying the code in what was the reset_level()
-                #                   function, but now is in ShowingLevel state's enterState() setup code.
+                #                   function, but now is in ShowingLevel state's enter_state() setup code.
                 def select_level(self, level_button, *args):
                     level = int(level_button.text)
                     self.statechart.app.current_level = level
                     self.statechart.app.sound['select'].play()
-                    self.gotoState('ShowingLevel')
+                    self.go_to_state('ShowingLevel')
 
-                def exitState(self, context=None):
-                    print 'ShowingLevelsPopup/exitState'
+                def exit_state(self, context=None):
+                    print 'ShowingLevelsPopup/exit_state'
                     self.popup.dismiss()
 
                 def cancel(self, context):
-                    self.gotoState(self.parentState)
+                    self.go_to_state(self.parent_state)
 
             # ShowingSettingsPopup
             #
@@ -476,8 +476,8 @@ class AppStatechart(StatechartManager):
                           ShowingGameScreen.
                           ShowingSettingsPopup, self).__init__(**kwargs)
 
-                def enterState(self, context=None):
-                    print 'ShowingSettingsPopup/enterState'
+                def enter_state(self, context=None):
+                    print 'ShowingSettingsPopup/enter_state'
 
                     # the first time the setting dialog is called, initialize its content.
                     if self.popup is None:
@@ -511,8 +511,8 @@ class AppStatechart(StatechartManager):
 
                     self.popup.open()
 
-                def exitState(self, context=None):
-                    print 'ShowingSettingsPopup/exitState'
+                def exit_state(self, context=None):
+                    print 'ShowingSettingsPopup/exit_state'
                     self.popup.dismiss()
 
                 def update_music_volume(self, instance, value):
@@ -534,10 +534,10 @@ class AppStatechart(StatechartManager):
                     self.statechart.app.config.write()
 
                 def show_help(self, *args):
-                    self.gotoState('ShowingHelpPopup')
+                    self.go_to_state('ShowingHelpPopup')
 
                 def close(self, *args):
-                    self.gotoState(self.parentState)
+                    self.go_to_state(self.parent_state)
 
             # ShowingHelpPopup
             #
@@ -550,8 +550,8 @@ class AppStatechart(StatechartManager):
                           ShowingGameScreen.
                           ShowingHelpPopup, self).__init__(**kwargs)
 
-                def enterState(self, context=None):
-                    print 'ShowingHelpPopup/enterState'
+                def enter_state(self, context=None):
+                    print 'ShowingHelpPopup/enter_state'
 
                     # display the help screen on a Popup
                     image = Image(source='graphics/help_screen.png')
@@ -563,12 +563,12 @@ class AppStatechart(StatechartManager):
                     image.bind(on_touch_down=self.dismiss)
                     self.popup.open()
 
-                def exitState(self, context=None):
-                    print 'ShowingHelpPopup/exitState'
+                def exit_state(self, context=None):
+                    print 'ShowingHelpPopup/exit_state'
                     self.popup.dismiss()
 
                 def dismiss(self, *args):
-                    self.gotoState(self.parentState)
+                    self.go_to_state(self.parent_state)
 
             # [statechart port] Note reuse of ShowingHelpPopup through subclassing.
             #                   Only difference is that dismiss fires to ShowingLevel
@@ -584,15 +584,15 @@ class AppStatechart(StatechartManager):
                           ShowingWelcomePopup, self).__init__(**kwargs)
 
                 def dismiss(self, *args):
-                    self.gotoState('ShowingLevel')
+                    self.go_to_state('ShowingLevel')
 
             # ShowingLevelAccomplished (transient state)
             #
             class ShowingLevelAccomplished(State):
                 animation = None
 
-                def enterState(self, context):
-                    print 'ShowingLevelAccomplished/enterState'
+                def enter_state(self, context):
+                    print 'ShowingLevelAccomplished/enter_state'
                     self.statechart.app.sound['accomplished'].play()
 
                     # store score in config: (i have to convert the string to a list to do specific char writing)
@@ -624,22 +624,22 @@ class AppStatechart(StatechartManager):
                                                 size_hint=(0.3, 0.15)).open()
 
                         self.statechart.app.current_level += 1
-                        self.gotoState('ShowingLevel')
+                        self.go_to_state('ShowingLevel')
 
-                def exitState(self, context):
-                    print 'ShowingLevelAccomplished/exitState'
+                def exit_state(self, context):
+                    print 'ShowingLevelAccomplished/exit_state'
 
             # ResettingLevel
             #
             class ResettingLevel(State):
-                def enterState(self, context=None):
-                    print 'ResettingLevel/enterState'
+                def enter_state(self, context=None):
+                    print 'ResettingLevel/enter_state'
                     self.statechart.app.sound['reset'].play()
 
-                    self.gotoState('ShowingLevel')
+                    self.go_to_state('ShowingLevel')
 
-                def exitState(self, context=None):
-                    print 'ResettingLevel/exitState'
+                def exit_state(self, context=None):
+                    print 'ResettingLevel/exit_state'
 
             # ShowingLevel
             #
@@ -647,14 +647,14 @@ class AppStatechart(StatechartManager):
                 level_image = ObjectProperty(None)
 
                 def __init__(self, **kwargs):
-                    kwargs['initialSubstateKey'] = 'ShowingBackground'
+                    kwargs['initial_substate_key'] = 'ShowingBackground'
                     super(AppStatechart.
                             RootState.
                             ShowingGameScreen.
                             ShowingLevel, self).__init__(**kwargs)
 
-                def enterState(self, context=None):
-                    print 'ShowingLevel/enterState'
+                def enter_state(self, context=None):
+                    print 'ShowingLevel/enter_state'
                     #print gc.get_count()
                     #print gc.get_objects()
                     #print gc.get_referrers(gc.get_objects())
@@ -662,7 +662,7 @@ class AppStatechart(StatechartManager):
                     BRICK_WIDTH = self.statechart.app.game_screen.height / 17.73
                     LEVEL_OFFSET = [self.statechart.app.game_screen.center_x - (LEVEL_WIDTH / 2) * BRICK_WIDTH, self.statechart.app.game_screen.height / 12.5]
 
-                    # [statechart port] Now have a select_level action function in ShowingLevelsPopup that plays the select sound, then gotoState ShowingLevel
+                    # [statechart port] Now have a select_level action function in ShowingLevelsPopup that plays the select sound, then go_to_state ShowingLevel
                     # i have to check if the function is called by a level button in the level popup OR with an int as argument:
                     #if not isinstance(level, int):
                     #    level = int(level.text)
@@ -681,9 +681,9 @@ class AppStatechart(StatechartManager):
 
                     # [statechart port] Should the following bullet killing and deflector delecting 
                     #                   sections be done? Originally was call to this code in reset_level(),
-                    #                   which is now in enterState of ShowingLevel state.
+                    #                   which is now in enter_state of ShowingLevel state.
                     #
-                    #    *** moved to exitState ***
+                    #    *** moved to exit_state ***
 
                     # The user begins with 3 lives:
                     self.statechart.app.lives = 3
@@ -751,8 +751,8 @@ class AppStatechart(StatechartManager):
                             return False
                     self.statechart.app.level_build_index += 1
 
-                def exitState(self, context):
-                    print 'ShowingLevel/exitState'
+                def exit_state(self, context):
+                    print 'ShowingLevel/exit_state'
 
                     self.statechart.app.game_screen.remove_widget(self.statechart.app.stockbar)
                     self.statechart.app.stockbar = None
@@ -765,41 +765,41 @@ class AppStatechart(StatechartManager):
 
                     self.statechart.app.deflector_list = []
 
-                    self.gotoState('ShowingBackground')
+                    self.go_to_state('ShowingBackground')
 
                 # ShowingBackground == ShowingBackground
                 #
                 class ShowingBackground(State):
                     def __init__(self, **kwargs):
-                        kwargs['initialSubstateKey'] = 'ShowingStockbar'
+                        kwargs['initial_substate_key'] = 'ShowingStockbar'
                         super(AppStatechart.
                               RootState.
                               ShowingGameScreen.
                               ShowingLevel.
                               ShowingBackground, self).__init__(**kwargs)
 
-                    def enterState(self, context=None):
-                        print 'ShowingBackground/enterState'
+                    def enter_state(self, context=None):
+                        print 'ShowingBackground/enter_state'
 
-                    def exitState(self, context=None):
-                        print 'ShowingBackground/exitState'
+                    def exit_state(self, context=None):
+                        print 'ShowingBackground/exit_state'
 
                     def fire(self, *args):
                         # If there is already a bullet existing (which means 
                         # its flying around or exploding somewhere) don't fire.
                         if self.statechart.app.bullet is None:
-                            self.gotoState('BulletMoving')
+                            self.go_to_state('BulletMoving')
   
                     def show_levels(self, *args):
                         self.statechart.app.sound['switch'].play()
-                        self.gotoState('ShowingLevelsPopup')
+                        self.go_to_state('ShowingLevelsPopup')
 
                     def show_settings(self, *args):
                         self.statechart.app.sound['switch'].play()
-                        self.gotoState('ShowingSettingsPopup')
+                        self.go_to_state('ShowingSettingsPopup')
 
                     def show_help(self, *args):
-                        self.gotoState('ShowingHelpPopup')
+                        self.go_to_state('ShowingHelpPopup')
 
                     def stop(self, *args):
                         self.statechart.app.stop()
@@ -808,7 +808,7 @@ class AppStatechart(StatechartManager):
                     #
                     class ShowingStockbar(State):
                         def __init__(self, **kwargs):
-                            kwargs['initialSubstateKey'] = 'WaitingForTouches'
+                            kwargs['initial_substate_key'] = 'WaitingForTouches'
                             super(AppStatechart.
                                   RootState.
                                   ShowingGameScreen.
@@ -816,15 +816,15 @@ class AppStatechart(StatechartManager):
                                   ShowingBackground.
                                   ShowingStockbar, self).__init__(**kwargs)
 
-                        def enterState(self, context=None):
-                            print 'ShowingStockbar/enterState'
+                        def enter_state(self, context=None):
+                            print 'ShowingStockbar/enter_state'
 
                             if self.statechart.app.stockbar is None:
                                 self.statechart.app.max_stock = 0
 
                                 # in the lowermost row there is also stored the value for the maximum stock
                                 for x in range(LEVEL_WIDTH):
-                                    color = self.parentState.parentState.level_image.read_pixel(x, 0)
+                                    color = self.parent_state.parent_state.level_image.read_pixel(x, 0)
                                     color = [int(c) for c in color]
                                     if len(color) > 3:
                                         # if there was transparency stored in the image, cut it.
@@ -884,10 +884,10 @@ class AppStatechart(StatechartManager):
 
                                     self.statechart.app.current_deflector_and_vector = None
 
-                                self.gotoState('WaitingForTouches')
+                                self.go_to_state('WaitingForTouches')
 
-                        def exitState(self, context=None):
-                            print 'ShowingStockbar/exitState'
+                        def exit_state(self, context=None):
+                            print 'ShowingStockbar/exit_state'
                         
                         # WaitingForTouches
                         #
@@ -901,13 +901,13 @@ class AppStatechart(StatechartManager):
                                       ShowingStockbar.
                                       WaitingForTouches, self).__init__(**kwargs)
 
-                            def enterState(self, context=None):
-                                print 'WaitingForTouches/enterState'
+                            def enter_state(self, context=None):
+                                print 'WaitingForTouches/enter_state'
 
-                            def exitState(self, context=None):
-                                print 'WaitingForTouches/exitState'
+                            def exit_state(self, context=None):
+                                print 'WaitingForTouches/exit_state'
 
-                            @State.eventHandler(['background_touch_down', 'background_touch_up']) 
+                            @State.event_handler(['background_touch_down', 'background_touch_up']) 
                             def analyze_touches(self, event, touch, context):
                                 print 'analyze_touches'
                                 ud = touch.ud
@@ -935,7 +935,7 @@ class AppStatechart(StatechartManager):
                                                     creating_new_deflector = True
 
                                     if creating_new_deflector == True:
-                                        self.gotoState('CreatingDeflector')
+                                        self.go_to_state('CreatingDeflector')
                                     else:
                                         # no second touch was found: tag the current one as a 'lonely' touch
                                         ud['lonely'] = True
@@ -953,7 +953,7 @@ class AppStatechart(StatechartManager):
 
                                 if deflector.length < MIN_DEFLECTOR_LENGTH and deflector.parent != None:
                                     self.statechart.app.current_deflector_and_vector = (deflector, None)
-                                    self.statechart.gotoState('DeletingDeflector')
+                                    self.statechart.go_to_state('DeletingDeflector')
          
                 # CreatingDeflector (transient)
                 #
@@ -965,8 +965,8 @@ class AppStatechart(StatechartManager):
                               ShowingLevel.
                               CreatingDeflector, self).__init__(**kwargs)
 
-                    def enterState(self, context=None):
-                        print 'CreatingDeflector/enterState'
+                    def enter_state(self, context=None):
+                        print 'CreatingDeflector/enter_state'
                         self.statechart.app.sound['deflector_new'].play()
 
                         deflector = Deflector(statechart=self.statechart,
@@ -986,10 +986,10 @@ class AppStatechart(StatechartManager):
                         self.statechart.app.new_deflector_touch2 = None
                         self.statechart.app.new_deflector_length = 0
 
-                        self.gotoState('ShowingBackground')
+                        self.go_to_state('ShowingBackground')
 
-                    def exitState(self, context=None):
-                        print 'CreatingDeflector/exitState'
+                    def exit_state(self, context=None):
+                        print 'CreatingDeflector/exit_state'
 
                 # ResizingDeflector (transient)
                 #
@@ -1001,12 +1001,12 @@ class AppStatechart(StatechartManager):
                               ShowingLevel.
                               ResizingDeflector, self).__init__(**kwargs)
 
-                    def enterState(self, context=None):
-                        print 'ResizingDeflector/enterState'
+                    def enter_state(self, context=None):
+                        print 'ResizingDeflector/enter_state'
                         self.deflector,self.deflector_vector = self.statechart.app.current_deflector_and_vector
 
-                    def exitState(self, context=None):
-                        print 'ResizingDeflector/exitState'
+                    def exit_state(self, context=None):
+                        print 'ResizingDeflector/exit_state'
 
                     def resize_deflector(self, deflector, size):
                         print 'resize_deflector'
@@ -1020,7 +1020,7 @@ class AppStatechart(StatechartManager):
                         #deflector.length = Vector(deflector.touch1.pos).distance(deflector.touch2.pos)
                         deflector.length = deflector.length_origin * deflector.scale
 
-                        self.gotoState('ShowingBackground')
+                        self.go_to_state('ShowingBackground')
 
                 # DeletingDeflector (transient)
                 #
@@ -1032,8 +1032,8 @@ class AppStatechart(StatechartManager):
                               ShowingLevel.
                               DeletingDeflector, self).__init__(**kwargs)
 
-                    def enterState(self, context=None):
-                        print 'DeletingDeflector/enterState'
+                    def enter_state(self, context=None):
+                        print 'DeletingDeflector/enter_state'
                         self.deflector,self.deflector_vector = self.statechart.app.current_deflector_and_vector
 
                         self.statechart.app.sound['deflector_delete'].play()
@@ -1042,12 +1042,12 @@ class AppStatechart(StatechartManager):
                         self.statechart.app.game_screen.remove_widget(deflector)
                         self.statechart.app.deflector_list.remove(deflector)
 
-                        self.gotoState('ShowingBackground')
+                        self.go_to_state('ShowingBackground')
 
-                    def exitState(self, context=None):
-                        print 'DeletingDeflector/exitState'
+                    def exit_state(self, context=None):
+                        print 'DeletingDeflector/exit_state'
 
-                    #@State.eventHandler(['delete_deflector']) 
+                    #@State.event_handler(['delete_deflector']) 
                     #def delete_deflector_handler(self, event, deflector, context):
                         #self.statechart.app.sound['deflector_delete'].play()
                         #self.deflector_deleted(deflector.length)
@@ -1062,21 +1062,21 @@ class AppStatechart(StatechartManager):
                 #
                 class BulletMoving(State):
                     def __init__(self, **kwargs):
-                        kwargs['initialSubstateKey'] = 'EstablishingTrajectory'
+                        kwargs['initial_substate_key'] = 'EstablishingTrajectory'
                         super(AppStatechart.
                               RootState.
                               ShowingGameScreen.
                               ShowingLevel.
                               BulletMoving, self).__init__(**kwargs)
 
-                    def enterState(self, context=None):
-                        print 'BulletMoving/enterState'
+                    def enter_state(self, context=None):
+                        print 'BulletMoving/enter_state'
                         self.statechart.app.sound['bullet_start'].play()
                         self.statechart.app.bullet = Bullet()
                         self.statechart.app.game_screen.add_widget(self.statechart.app.bullet)
 
-                    def exitState(self, context=None):
-                        print 'BulletMoving/exitState'
+                    def exit_state(self, context=None):
+                        print 'BulletMoving/exit_state'
                         self.statechart.app.game_screen.remove_widget(self.statechart.app.bullet)
                         self.statechart.app.bullet = None
 
@@ -1086,8 +1086,8 @@ class AppStatechart(StatechartManager):
                         def __init__(self, **kwargs):
                             super(AppStatechart.RootState.ShowingGameScreen.ShowingLevel.BulletMoving.EstablishingTrajectory, self).__init__(**kwargs)
 
-                        def enterState(self, context=None):
-                            print 'EstablishingTrajectory/enterState'
+                        def enter_state(self, context=None):
+                            print 'EstablishingTrajectory/enter_state'
                             # Calculate bullet start position.
                             tower_angle = radians(self.statechart.app.game_screen.tank.tank_tower_scatter.rotation)
                             tower_position = self.statechart.app.game_screen.tank.pos
@@ -1096,10 +1096,10 @@ class AppStatechart(StatechartManager):
                             self.statechart.app.bullet.angle = tower_angle
                             self.statechart.app.bullet.center = bullet_position
 
-                            self.statechart.gotoState('OnTrajectory')
+                            self.statechart.go_to_state('OnTrajectory')
 
-                        def exitState(self, context=None):
-                            print 'EstablishingTrajectory/exitState'
+                        def exit_state(self, context=None):
+                            print 'EstablishingTrajectory/exit_state'
 
                     # ChangingTrajectory (transient state)
                     #
@@ -1114,8 +1114,8 @@ class AppStatechart(StatechartManager):
                                   BulletMoving.
                                   ChangingTrajectory, self).__init__(**kwargs)
 
-                        def enterState(self, context=None):
-                            print 'ChangingTrajectory/enterState'
+                        def enter_state(self, context=None):
+                            print 'ChangingTrajectory/enter_state'
 
                             self.deflector,self.deflector_vector = self.statechart.app.current_deflector_and_vector
 
@@ -1123,10 +1123,10 @@ class AppStatechart(StatechartManager):
                             impact_angle = (radians(self.deflector_vector.angle(Vector(1, 0))) % pi) - (self.statechart.app.bullet.angle % pi)
                             self.statechart.app.bullet.angle = (self.statechart.app.bullet.angle + 2 * impact_angle) % (2 * pi)
 
-                            self.statechart.gotoState('OnTrajectory')
+                            self.statechart.go_to_state('OnTrajectory')
 
-                        def exitState(self, context=None):
-                            print 'ChangingTrajectory/exitState'
+                        def exit_state(self, context=None):
+                            print 'ChangingTrajectory/exit_state'
 
                     # OnTrajectory
                     #
@@ -1141,8 +1141,8 @@ class AppStatechart(StatechartManager):
                                   BulletMoving.
                                   OnTrajectory, self).__init__(**kwargs)
 
-                        def enterState(self, context=None):
-                            print 'OnTrajectory/enterState'
+                        def enter_state(self, context=None):
+                            print 'OnTrajectory/enter_state'
 
                             # start the animation
                             destination = self.calc_bullet_destination_at_edge(self.statechart.app.bullet.angle)
@@ -1156,8 +1156,8 @@ class AppStatechart(StatechartManager):
                             # start to track the position changes
                             self.statechart.app.bullet.bind(pos=self.bullet_pos_callback)
 
-                        def exitState(self, context=None):
-                            print 'OnTrajectory/exitState'
+                        def exit_state(self, context=None):
+                            print 'OnTrajectory/exit_state'
                             self.statechart.app.bullet.unbind(pos=self.bullet_pos_callback)
                             self.bullet_animation.unbind(on_complete=self.collide_with_edge)
                             self.bullet_animation.stop(self.statechart.app.bullet)
@@ -1296,15 +1296,15 @@ class AppStatechart(StatechartManager):
 
                         def collide_with_deflector(self, deflector, deflector_vector):
                             self.statechart.app.current_deflector_and_vector = (deflector, deflector_vector)
-                            self.gotoState('CollisionWithDeflector')
+                            self.go_to_state('CollisionWithDeflector')
 
                         def collide_with_obstacle(self, *args):
                             print 'collide_with_obstacle'
-                            self.gotoState('CollisionWithObstacle')
+                            self.go_to_state('CollisionWithObstacle')
 
                         def collide_with_edge(self, *args):
                             print 'collide_with_edge'
-                            self.gotoState('CollisionWithEdge')
+                            self.go_to_state('CollisionWithEdge')
 
                         def collide_with_goal(self, *args):
                             print 'collide_with_goal'
@@ -1314,7 +1314,7 @@ class AppStatechart(StatechartManager):
                                 #return
 
                             #self.parent.level_accomplished()
-                            self.gotoState('CollisionWithGoal')
+                            self.go_to_state('CollisionWithGoal')
 
                     # Collision
                     #
@@ -1329,12 +1329,12 @@ class AppStatechart(StatechartManager):
                                   BulletMoving.
                                   Collision, self).__init__(**kwargs)
 
-                        def enterState(self, context=None):
-                            print 'Collision/enterState'
+                        def enter_state(self, context=None):
+                            print 'Collision/enter_state'
                             self.statechart.app.sound['explosion'].play()
 
-                        def exitState(self, context=None):
-                            print 'Collision/exitState'
+                        def exit_state(self, context=None):
+                            print 'Collision/exit_state'
 
                         # [statechart port] The solution used here for CollisionWithObject and substates
                         #                   CollisionWithEdge and CollisionWithObstacle, is to have these
@@ -1360,12 +1360,12 @@ class AppStatechart(StatechartManager):
                                       Collision.
                                       CollisionWithObject, self).__init__(**kwargs)
 
-                            def enterState(self, context=None):
-                                print 'CollisionWithObject/enterState'
+                            def enter_state(self, context=None):
+                                print 'CollisionWithObject/enter_state'
                                 self.statechart.app.lives -= 1
 
-                            def exitState(self, context=None):
-                                print 'CollisionWithObject/exitState'
+                            def exit_state(self, context=None):
+                                print 'CollisionWithObject/exit_state'
 
                             # CollisionWithObjectState(transient state)
                             #
@@ -1380,29 +1380,29 @@ class AppStatechart(StatechartManager):
                                           CollisionWithObject.
                                           CollisionWithObjectState, self).__init__(**kwargs)
 
-                                def enterState(self, context=None):
-                                    print 'CollisionWithObjectState/enterState'
-                                    # [statechart port] These should call statechart.sendEvent('some_action'),
-                                    #                   and not self.parentState.some_action() directly, in this
+                                def enter_state(self, context=None):
+                                    print 'CollisionWithObjectState/enter_state'
+                                    # [statechart port] These should call statechart.send_event('some_action'),
+                                    #                   and not self.parent_state.some_action() directly, in this
                                     #                   case, because we want the statechart machinery to figure
                                     #                   out the sequence of state transitions that should happen
                                     #                   for the action in the current context.
                                     #
                                     # Ah, but, there could be a problem with state transitions fired within an
-                                    # enterState() firing immediately.
+                                    # enter_state() firing immediately.
                                     #
                                     if self.statechart.app.lives == 0:
-                                        #self.statechart.sendEvent('reset_level')
+                                        #self.statechart.send_event('reset_level')
                                         self.reset_level()
                                     else:
-                                        #self.statechart.sendEvent('keep_playing_level')
+                                        #self.statechart.send_event('keep_playing_level')
                                         self.keep_playing_level()
 
                                 def reset_level(self, *args):
-                                    self.gotoState('ResettingLevel')
+                                    self.go_to_state('ResettingLevel')
 
                                 def keep_playing_level(self, *args):
-                                    self.gotoState('ShowingBackground')
+                                    self.go_to_state('ShowingBackground')
 
                             # CollisionWithEdge (transient state)
                             #
@@ -1428,16 +1428,16 @@ class AppStatechart(StatechartManager):
                                       Collision.
                                       CollisionWithDeflector, self).__init__(**kwargs)
 
-                            def enterState(self, context=None):
-                                print 'CollisionWithDeflector/enterState'
+                            def enter_state(self, context=None):
+                                print 'CollisionWithDeflector/enter_state'
                                 self.statechart.app.sound['deflection'].play()
 
                                 self.deflector,self.deflector_vector = self.statechart.app.current_deflector_and_vector
 
                                 self.flash_deflector()
 
-                                # [statechart port] See note below about sendEvent() vs. direct call.
-                                #self.statechart.sendEvent('change_trajectory')
+                                # [statechart port] See note below about send_event() vs. direct call.
+                                #self.statechart.send_event('change_trajectory')
                                 self.change_trajectory()
 
                             def flash_deflector(self, *args): 
@@ -1450,14 +1450,14 @@ class AppStatechart(StatechartManager):
                                 animation.start(self.deflector.point1)
                                 animation.start(self.deflector.point2)
 
-                            def exitState(self, context=None):
-                                print 'CollisionWithDeflector/exitState'
+                            def exit_state(self, context=None):
+                                print 'CollisionWithDeflector/exit_state'
 
                                 # Do not remove the bullet widget nor set bullet = None here.
                                 # (Bullet only changes trajectory).
 
                             def change_trajectory(self, *args):
-                                self.gotoState('ChangingTrajectory')
+                                self.go_to_state('ChangingTrajectory')
 
                         # CollisionWithGoal (transient state)
                         #
@@ -1471,22 +1471,22 @@ class AppStatechart(StatechartManager):
                                       Collision.
                                       CollisionWithGoal, self).__init__(**kwargs)
 
-                            def enterState(self, context=None):
-                                print 'CollisionWithGoal/enterState'
+                            def enter_state(self, context=None):
+                                print 'CollisionWithGoal/enter_state'
 
                                 # [statechart port] Direct call to self.show_level_accomplished() OK here?
-                                #                   Or is it a bad habit to ever call gotoState() from
-                                #                   enterState() or exitState()? Efficiency of action lookup
+                                #                   Or is it a bad habit to ever call go_to_state() from
+                                #                   enter_state() or exit_state()? Efficiency of action lookup
                                 #                   a factor, no? Could show_level_accomplished() live in
                                 #
-                                #self.statechart.sendEvent('show_level_accomplished')
+                                #self.statechart.send_event('show_level_accomplished')
                                 self.show_level_accomplished()
 
-                            def exitState(self, context=None):
-                                print 'CollisionWithObject/exitState'
+                            def exit_state(self, context=None):
+                                print 'CollisionWithObject/exit_state'
 
                             def show_level_accomplished(self, *args):
-                                self.gotoState('ShowingLevelAccomplished')
+                                self.go_to_state('ShowingLevelAccomplished')
 
 
 class GameScreen(Widget):
@@ -1559,7 +1559,7 @@ class Deflectouch(App):
 
     def on_start(self):
         self.statechart = AppStatechart(app=self)
-        self.statechart.initStatechart()
+        self.statechart.init_statechart()
 
 if __name__ in ('__main__', '__android__'):
     Deflectouch().run()

@@ -54,9 +54,9 @@ class BallsView(Widget):
         print ' - modifiers are %r' % modifiers
 
         if text == 'u':
-            self.app.statechart.sendEvent('speed_up')
+            self.app.statechart.send_event('speed_up')
         elif text == 'd':
-            self.app.statechart.sendEvent('slow_down')
+            self.app.statechart.send_event('slow_down')
         elif keycode[1] == 'escape':
             # Keycode is composed of an integer + a string
             # If we hit escape, release the keyboard
@@ -90,12 +90,12 @@ class MovingBall(State):
     velocity_x_factor = NumericProperty(1)
     velocity_y_factor = NumericProperty(1)
 
-    def enterState(self, context=None):
+    def enter_state(self, context=None):
         self.ball = getattr(self.statechart.app.mainView, self.ball_key)
         self.ball.velocity_x += self.velocity_x_factor
         self.ball.velocity_y += self.velocity_y_factor
 
-    def exitState(self, context=None):
+    def exit_state(self, context=None):
         pass
 
     def speed_up(self, arg1=None, arg2=None):
@@ -120,35 +120,35 @@ class AppStatechart(StatechartManager):
     def __init__(self, app, **kw):
         self.app = app
         self.trace = True
-        self.rootStateClass = self.RootState
+        self.root_state_class = self.RootState
         super(AppStatechart, self).__init__(**kw)
 
     ###########################
     # RootState of statechart
     #
     class RootState(State):
-        initialSubstateKey = 'ShowingBalls'
+        initial_substate_key = 'ShowingBalls'
 
-        def enterState(self, context=None):
-            print 'RootState/enterState'
+        def enter_state(self, context=None):
+            print 'RootState/enter_state'
             self.statechart.app.mainView.serve_balls()
             Clock.schedule_interval(self.statechart.app.mainView.update,
                                     1.0 / 60.0)
 
-        def exitState(self, context=None):
-            print 'RootState/exitState'
+        def exit_state(self, context=None):
+            print 'RootState/exit_state'
 
         ##############################
         # ShowingBalls
         #
         class ShowingBalls(State):
-            substatesAreConcurrent = True
+            substates_are_concurrent = True
 
-            def enterState(self, context=None):
-                print 'ShowingBalls/enterState'
+            def enter_state(self, context=None):
+                print 'ShowingBalls/enter_state'
 
-            def exitState(self, context=None):
-                print 'ShowingBalls/exitState'
+            def exit_state(self, context=None):
+                print 'ShowingBalls/exit_state'
 
             class MovingBall_1(MovingBall):
                 def __init__(self, **kwargs):
@@ -215,7 +215,7 @@ class BallsApp(App):
 
     def on_start(self):
         self.statechart = AppStatechart(app=self)
-        self.statechart.initStatechart()
+        self.statechart.init_statechart()
 
 
 if __name__ in ('__android__', '__main__'):

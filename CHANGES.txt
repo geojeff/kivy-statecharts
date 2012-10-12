@@ -1,0 +1,11 @@
+CHANGES
+=======
+
+0.0.9 (pre_release_full_port)
+-----------------------------
+
+ - First steps toward compliance with pep8, by changing camelCase of method
+   and function names and instance variables to lower_case_with_underscores.
+ - Renamed repo from kivy-statechart to kivy-statecharts, because the plural
+   usage better fits general discussion about statecharts.
+ - Much porting work on code and tests, and creation of examples

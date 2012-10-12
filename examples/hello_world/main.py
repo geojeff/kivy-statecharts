@@ -24,7 +24,7 @@ class HelloWorldView(Widget):
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if text in ['h', 'e', 'l', 'o', 'w', 'r', 'd']:
-            self.app.statechart.sendEvent(text)
+            self.app.statechart.send_event(text)
 
         if keycode[1] == 'escape':
             keyboard.release()
@@ -43,7 +43,7 @@ class LetterButton(Button):
 
     def letter_clicked(self, *args):
         print 'letter clicked', self.letter
-        self.statechart.sendEvent(self.letter)
+        self.statechart.send_event(self.letter)
 
 
 class AppStatechart(StatechartManager):
@@ -51,21 +51,21 @@ class AppStatechart(StatechartManager):
 
     def __init__(self, **kw):
         self.trace = True
-        self.rootStateClass = self.RootState
+        self.root_state_class = self.RootState
         super(AppStatechart, self).__init__(**kw)
 
     class RootState(State):
-        initialSubstateKey = 'ShowingHelloWorld'
+        initial_substate_key = 'ShowingHelloWorld'
 
         class ShowingHelloWorld(State):
             root = ObjectProperty(None)
 
-            def enterState(self, context=None):
-                print 'ShowingHelloWorld/enterState'
+            def enter_state(self, context=None):
+                print 'ShowingHelloWorld/enter_state'
                 self.root = self.statechart.app.root
 
-            def exitState(self, context=None):
-                print 'ShowingHelloWorld/exitState'
+            def exit_state(self, context=None):
+                print 'ShowingHelloWorld/exit_state'
 
             # Utility method:
             #
@@ -115,7 +115,7 @@ class HelloWorldApp(App):
 
     def on_start(self):
         self.statechart = AppStatechart(app=self)
-        self.statechart.initStatechart()
+        self.statechart.init_statechart()
 
 
 if __name__ in ('__android__', '__main__'):

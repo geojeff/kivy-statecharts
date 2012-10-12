@@ -172,7 +172,7 @@
 		    font_size: 15
 		    size_hint: 1, 1.5
 		    #on_release: root.display_help_screen()
-            on_release: root.statechart.sendEvent('show_help')
+            on_release: root.statechart.send_event('show_help')
 		    
 		Button:
 		    id: close_button
@@ -183,7 +183,7 @@
             font_size: 15
             size_hint: 1, 1.5
             #on_press: root.dismiss_parent()
-            on_press: root.statechart.sendEvent('close')
+            on_press: root.statechart.send_event('close')
 
 
 # Main widget description:
@@ -232,7 +232,7 @@
 			background_normal: 'graphics/button_normal.png'
             background_down: 'graphics/button_down.png'
 			#on_press: root.fire_button_pressed()
-            on_press: root.app.statechart.sendEvent('fire')
+            on_press: root.app.statechart.send_event('fire')
 		
 		Button:
 			text: 'Reset'
@@ -241,7 +241,7 @@
 			background_normal: 'graphics/button_normal.png'
             background_down: 'graphics/button_down.png'
 			#on_press: root.reset_button_pressed()
-            on_press: root.app.statechart.sendEvent('reset')
+            on_press: root.app.statechart.send_event('reset')
 		
 		Label:
 	        text: 'Lives: ' + str(root.app.lives)
@@ -257,7 +257,7 @@
 	        background_normal: 'graphics/button_normal.png'
             background_down: 'graphics/button_down.png'
 	        #on_press: root.level_button_pressed()
-            on_press: root.app.statechart.sendEvent('show_levels')
+            on_press: root.app.statechart.send_event('show_levels')
 	    
 	    Widget:
 	        size_hint: 1, 0.5
@@ -269,7 +269,7 @@
 			background_normal: 'graphics/button_normal.png'
             background_down: 'graphics/button_down.png'
 			#on_press: root.settings_button_pressed()
-            on_press: root.app.statechart.sendEvent('show_settings')
+            on_press: root.app.statechart.send_event('show_settings')
 		
 		Button:
             text: 'Exit'
@@ -277,4 +277,4 @@
             font_size: 17
             background_normal: 'graphics/button_normal.png'
             background_down: 'graphics/button_down.png'
-            on_press: root.app.statechart.sendEvent('stop')
+            on_press: root.app.statechart.send_event('stop')
