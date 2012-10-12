@@ -59,38 +59,6 @@ class State(EventDispatcher):
     #
     trace_key = StringProperty(None)
 
-    """
-      Returns the statechart's assigned delegate. A statechart delegate is one
-      that adheres to the {@link StatechartDelegate} mixin. 
-        
-      @property {Object}
-          
-      @see StatechartDelegate
-    """
-    statechart_delegate = ObjectProperty(None)
-
-    """
-      A volatile property used to get and set the app's current location. 
-          
-      This computed property defers to the the statechart's delegate to 
-      actually update and acquire the app's location.
-          
-      Note: Binding for this pariticular case is discouraged since in most
-      cases we need the location value immediately. If we were to use
-      bindings then the location value wouldn't be updated until at least
-      the end of one run loop. It is also advised that the delegate not
-      have its `statechart_update_location_for_state` and
-      `statechart_acquire_location_for_state` methods implemented where bindings
-      are used since they will inadvertenly stall the location value from
-      propogating immediately.
-          
-      @property {String}
-          
-      @see StatechartDelegate#statechart_update_location_for_state
-      @see StatechartDelegate#statechart_acquire_location_for_state
-    """
-    location = StringProperty(None) # [TODO] marked as idempotent in js
-
     full_path = StringProperty(None)
 
     """
@@ -179,25 +147,6 @@ class State(EventDispatcher):
     """
     entered_substates = ListProperty([])
 
-    """
-      Can optionally assign what route this state is to represent. 
-      
-      If assigned then this state will be notified to handle the route when triggered
-      any time the app's location changes and matches this state's assigned route. 
-      The handler invoked is this state's {@link #route_triggered} method. 
-      
-      The value assigned to this property is dependent on the underlying routing 
-      mechanism used by the application. The default routing mechanism is to use 
-      routes.
-      
-      @property {String|Hash}
-      
-      @see #route_triggered
-      @see #location
-      @see StatechartDelegate
-    """
-    represented_route = StringProperty(None)
-
     #is_root_state = BooleanProperty(False)
     #is_current_state = BooleanProperty(False)
     #is_concurrent_state = BooleanProperty(False)
@@ -219,8 +168,6 @@ class State(EventDispatcher):
 
         self.bind(statechart=self._trace)
         self.bind(statechart=self._owner)
-        self.bind(statechart=self._statechart_delegate)
-        self.bind(statechart_delegate=self._location)
 
         self._registered_event_handlers = {}
         self._registered_string_event_handlers = {}
@@ -250,7 +197,7 @@ class State(EventDispatcher):
                 # [PORT] Force initial_substate_key to always be string.
                 if isinstance(v, basestring):
                     self.initial_substate_key = v
-                else:
+                else: 
                     name = v.name if hasattr(v, 'name') else None
                     if not name:
                         name = v.__name__ if hasattr(v, '__name__') else None
@@ -276,15 +223,6 @@ class State(EventDispatcher):
         for substate in self.substates:
             substate.statechart_owner_did_change()
 
-    def _statechart_delegate(self, *l):
-        self.statechart_delegate = self.statechart.statechart_delegate
-
-    def _location(self, instance, value, *l):
-        sc = self.statechart
-        delegate = self.statechart_delegate
-        delegate.statechart_update_location_for_state(sc, value, self if value else None)
-        self.location = delegate.statechart_acquire_location_for_state(sc, self)
-        
     def destroy(self):
         sc = self.statechart
 
@@ -331,7 +269,6 @@ class State(EventDispatcher):
             return  
     
         self._register_with_parent_states()
-        self._setup_route_handling()
     
         substates = []
         matched_initial_substate = False
@@ -417,100 +354,6 @@ class State(EventDispatcher):
         self.current_substates = []
         self.entered_substates = []
         self.state_is_initialized = True
-
-    """ @private 
-    
-      Used to bind this state with a route this state is to represent if a route has been assigned.
-      
-      When invoked, the method will delegate the actual binding strategy to the statechart delegate 
-      via the delegate's {@link StatechartDelegate#statechart_bind_state_to_route} method.
-      
-      Note that a state cannot be bound to a route if this state is a concurrent state.
-      
-      @see #represented_route
-      @see StatechartDelegate#statechart_bind_state_to_route
-    """
-    def _setup_route_handling(self):
-        route = self.represented_route
-        sc = self.statechart
-        delegate = self.statechart_delegate
-
-        if route is None:
-            return
-    
-        if self.is_concurrent_state():
-            self.state_log_error("State {0} cannot handle route '{1}' since state is concurrent".format(self, route))
-            return
-    
-        delegate.statechart_bind_state_to_route(sc, self, route, self.route_triggered)
-
-    """
-      Main handler that gets triggered whenever the app's location matches this state's assigned
-      route. 
-      
-      When invoked the handler will first refer to the statechart delegate to determine if it
-      should actually handle the route via the delegate's 
-      {@see StatechartDelegate#statechart_should_state_handle_triggered_route} method. If the 
-      delegate allows the handling of the route then the state will continue on with handling
-      the triggered route by calling the state's {@link #handle_triggered_route} method, otherwise 
-      the state will cancel the handling and inform the delegate through the delegate's 
-      {@see StatechartDelegate#statechartStateCancelledHandlingRoute} method.
-      
-      The handler will create a state route context ({@link StateRouteContext}) object 
-      that packages information about what is being currently handled. This context object gets 
-      passed along to the delegate's invoked methods as well as the state transition process. 
-      
-      Note that this method is not intended to be directly called or overridden.
-      
-      @see #represented_route
-      @see StatechartDelegate#statechartShouldStateHandleRoute
-      @see StatechartDelegate#statechartStateCancelledHandlingRoute
-      @see #create_state_route_handler_context
-      @see #handle_triggered_route
-    """
-    def route_triggered(self, params):
-        if self._is_entering_state:
-            return
-
-        sc = self.statechart
-        delegate = self.statechart_delegate
-        loc = self.location
-    
-        attr = {
-            'state': self,
-            'location': loc,
-            'params': params,
-            'handler': self.route_triggered
-        }
-
-        context = self.create_state_route_handler_context(attr)
-
-        if delegate.statechart_should_state_handle_triggered_route(sc, self, context):
-            if self.trace and loc:
-                self.state_log_trace("will handle route '{0}'".format(loc))
-            self.handle_triggered_route(context)
-        else:
-            delegate.statechart_state_cancelled_handling_triggered_route(sc, self, context)
-
-    """
-      Constructs a new instance of a state routing context object.
-      
-      @param {Hash} attr attributes to apply to the constructed object
-      @return {StateRouteContext}
-      
-      @see #handleRoute
-    """
-    def create_state_route_handler_context(attr):
-        return StateRouteHandlerContext.create(attr)
-
-    """
-      Invoked by this state's {@link #route_triggered} method if the state is
-      actually allowed to handle the triggered route. 
-      
-      By default the method invokes a state transition to this state.
-    """
-    def handle_triggered_route(self, context):
-        self.go_to_state(state=self, context=context)
 
     """ @private """
     def _add_empty_initial_substate_if_needed(self):
@@ -1233,16 +1076,7 @@ class State(EventDispatcher):
       When the enter_state method is called, an optional context value may be supplied if
       one was provided to the go_to_state method.
       
-      In the case that the context being supplied is a state context object 
-      ({@link StateRouteHandlerContext}), an optional `enter_state_by_route` method can be invoked
-      on this state if the state has implemented the method. If `enter_state_by_route` is
-      not part of this state then the `enter_state` method will be invoked by default. The
-      `enter_state_by_route` is simply a convenience method that helps removes checks to 
-      determine if the context provide is a state route context object. 
-      
       @param {Hash} [context] value if one was supplied to go_to_state when invoked
-      
-      @see #represented_route
     """
     def enter_state(self, context=None):
         pass

@@ -10,7 +10,6 @@ from kivy_statecharts.system.async import Async
 from kivy_statecharts.system.state import State
 from kivy_statecharts.system.history_state import HistoryState
 from kivy_statecharts.system.empty_state import EmptyState
-from kivy_statecharts.mixins.statechart_delegate import StatechartDelegate
 from kivy.properties import BooleanProperty, ListProperty, NumericProperty, ObjectProperty, StringProperty
 from kivy.logger import Logger
 
@@ -177,15 +176,6 @@ import inspect
 """
 
 class StatechartManager(EventDispatcher):
-    """
-      Computed property that returns an object that adheres to the
-      {@link StatechartDelegate} mixin. If the {@link #delegate} is not
-      assigned then this object is the default value returned.
-      
-      @see StatechartDelegate
-      @see #delegate
-    """
-    statechart_delegate = ObjectProperty(None)
 
     current_states = ListProperty([])
     go_to_state_locked = BooleanProperty(False)
@@ -349,21 +339,10 @@ class StatechartManager(EventDispatcher):
     """
     suppress_statechart_warnings = BooleanProperty(False)
     
-    """
-      A statechart delegate used by the statechart and the states that the statechart 
-      manages. The value assigned must adhere to the {@link StatechartDelegate} mixin.
-      
-      @property {Object}
-      
-      @see StatechartDelegate
-    """
-    delegate = ObjectProperty(None)
-
     def __init__(self, **kw):
         #self.bind(current_states=self._current_states)
         self.bind(monitor_is_active=self._monitor_is_active_did_change)
         self.bind(statechart_trace_key=self._statechart_trace_did_change)
-        self.bind(delegate=self._statechart_delegate)
         #self.bind(root_state=self._current_states) # [PORT] Added current_states property -- moved this to the bottom of init_statechart().
         self.bind(statechart_owner_key=self._owner_did_change) # [PORT] Added, to use top-down updating approach in kivy.
         self.bind(owner=self._owner_did_change) # [PORT] Added, to use top-down updating approach in kivy.
@@ -388,9 +367,6 @@ class StatechartManager(EventDispatcher):
         if self.root_state_instance: # [PORT] root_state can be None
             self.root_state_instance.statechart_owner_did_change()
 
-    def _statechart_delegate(self):
-        self.statechart_delegate = self.delegateFor('is_statechart_delegate', self.delegate);
-        
     def destroy_mixin(self):
         self.unbind(statechart_trace_key=_statechart_trace_did_change)
         self.root_state_instance.destroy();
@@ -855,20 +831,11 @@ class StatechartManager(EventDispatcher):
       Called during the state transition process whenever the go_to_state method is
       invoked.
       
-      If the context provided is a state route context object 
-      ({@link StateRouteContext}), then if the given state has a enter_state_by_route 
-      method, that method will be invoked, otherwise the state's enter_state method 
-      will be invoked by default. The state route context object will be supplied to 
-      both enter methods in either case.
-      
       @param state {State} the state whose enter_state method is to be invoked
       @param context {Hash} a context hash object to provide the enter_state method
     """
     def enter_state(self, state, context):
-        if hasattr(state, 'enter_state_by_route') and issubclass(context, StateRouteHandlerContext):
-            return state.enter_state_by_route(context)
-        else:
-            return state.enter_state(context)
+        return state.enter_state(context)
         
     """
       When called, the statechart will proceed to make transitions to the given state then follow that
@@ -1592,7 +1559,7 @@ class StatechartManager(EventDispatcher):
           
         return array_as_string
       
-class StatechartMixin(StatechartManager, StatechartDelegate): # [PORT] also sublassed here was DelegateSupport, from SC
+class StatechartMixin(StatechartManager):
     pass
       
 """ 
