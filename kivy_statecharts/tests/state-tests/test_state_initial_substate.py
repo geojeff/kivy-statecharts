@@ -52,6 +52,7 @@ class Statechart_1(StatechartManager):
                 def __init__(self, **kwargs):
                     super(Statechart_1.RootState.B.F, self).__init__(**kwargs)
 
+
 class StateInitialSubstateTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
@@ -74,7 +75,7 @@ class StateInitialSubstateTestCase(unittest.TestCase):
         state_D = statechart_1.get_state('D')
         state_E = statechart_1.get_state('E')
         state_F = statechart_1.get_state('F')
-        
+
     def test_initial_substates_statechart_1(self):
         self.assertEqual(root_state_1.initial_substate_key, state_A.name)
         self.assertEqual(state_A.initial_substate_key, state_C.name)
@@ -93,4 +94,3 @@ class StateInitialSubstateTestCase(unittest.TestCase):
         initial_substate_of_B = state_B.get_substate(state_B.initial_substate_key)
         self.assertTrue(monitor_1.match_sequence().begin().exited(state_C, state_A).entered(state_B, initial_substate_of_B).end())
         self.assertTrue(state_B.get_substate(state_B.initial_substate_key).is_current_state())
-

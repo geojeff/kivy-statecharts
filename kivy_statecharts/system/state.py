@@ -188,9 +188,9 @@ class State(EventDispatcher):
         self.owner_key = sc.statechart_owner_key if sc else None
         self.trace_key = sc.statechart_owner_key if sc else None
     
-        if sc is not None:
-            self.bind(owner_key=self._statechart_owner_did_change) # [PORT] Changed to bind to self, to try to do it from here...
-            self.bind(trace_key=self._statechart_trace_did_change)
+        # [PORT] Changed to bind to self, to try to do it from here...
+        self.bind(owner_key=self._statechart_owner_did_change)
+        self.bind(trace_key=self._statechart_trace_did_change)
 
         for k,v in kwargs.items():
             if k == 'initial_substate_key':
