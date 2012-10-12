@@ -265,11 +265,12 @@ class State(EventDispatcher):
     """
     def init_state(self):
         if self.state_is_initialized:
+            self.state_log_warning("Cannot init_state() -- already init'ed.")
             return  
     
         if not self.name:
             self.state_log_error("Cannot init_state() an unnamed state.")
-            return
+            raise NameError("Cannot init_state() an unnamed state.")
 
         self._register_with_parent_states()
     
@@ -1303,20 +1304,28 @@ class State(EventDispatcher):
       Used to log a state trace message
     """
     def state_log_trace(self, msg):
-        self.statechart.statechart_log_trace("{0}: {1}".format(self, msg))
+        if self.statechart:
+            self.statechart.statechart_log_trace("{0}: {1}".format(self, msg))
+        else:
+            print "{0}: {1}".format(self, msg)
 
     """ 
       Used to log a state warning message
     """
     def state_log_warning(self, msg):
-        self.statechart.statechart_log_warning(msg)
+        if self.statechart:
+            self.statechart.statechart_log_warning(msg)
+        else:
+            print msg
 
     """ 
       Used to log a state error message
     """
     def state_log_error(self, msg):
-        sc = self.statechart
-        sc.statechart_log_error(msg)
+        if self.statechart:
+            self.statechart.statechart_log_error(msg)
+        else:
+            print msg
 
     # [PORT] plugin() method removed in python version.
 

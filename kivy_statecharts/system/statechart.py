@@ -395,7 +395,7 @@ class StatechartManager(EventDispatcher):
         trace = self.allow_statechart_tracing
         root_state_class = self.root_state_class # [PORT] Clarify in docs that root_state is None or is a class.
         msg = ''
-          
+
         if trace:
             self.statechart_log_trace("BEGIN initialize statechart")
           
@@ -590,7 +590,7 @@ class StatechartManager(EventDispatcher):
         state = self.get_state(state)
           
         if state is None:
-            self.statechart_log_error("Can not to goto state {0}. Not a recognized state in statechart".format(param_state))
+            self.statechart_log_error("Cannot to goto state {0}. Not a recognized state in statechart".format(param_state))
             return
           
         if self.go_to_state_locked:
@@ -613,7 +613,7 @@ class StatechartManager(EventDispatcher):
             # Check to make sure the current state given is actually a current state of this statechart
             from_current_state = self.get_state(from_current_state)
             if from_current_state is None or not from_current_state.is_current_state():
-                msg = "Can not to goto state {0}. {1} is not a recognized current state in statechart"
+                msg = "Cannot to goto state {0}. {1} is not a recognized current state in statechart"
                 self.statechart_log_error(msg.format(param_state, param_from_current_state))
                 self.go_to_state_locked = False
                 return
@@ -648,7 +648,7 @@ class StatechartManager(EventDispatcher):
             if trace:
                 self.statechart_log_trace("pivot state = {0}".format(pivot_state))
             if pivot_state.substates_are_concurrent and pivot_state is not state:
-                msg = "Can not go to state {0} from {1}. Pivot state {2} has concurrent substates."
+                msg = "Cannot go to state {0} from {1}. Pivot state {2} has concurrent substates."
                 self.statechart_log_error(msg.format(state, from_current_state, pivot_state))
                 self.go_to_state_locked = False
                 return
@@ -688,7 +688,7 @@ class StatechartManager(EventDispatcher):
     """
     def resume_go_to_state(self):
         if not self.go_to_state_suspended:
-            self.statechart_log_error("Can not resume goto state since it has not been suspended")
+            self.statechart_log_error("Cannot resume goto state since it has not been suspended")
             return
           
         point = self.go_to_state_suspended_point
@@ -876,7 +876,7 @@ class StatechartManager(EventDispatcher):
     """
     def go_to_history_state(self, state, from_current_state=None, recursive=None, context=None):
         if not self.statechart_is_initialized:
-            self.statechart_log_error("can not go to state {0}'s history state. Statechart has not yet been initialized".format(state))
+            self.statechart_log_error("Cannot go to state {0}'s history state. Statechart has not yet been initialized".format(state))
             return
           
         # [PORT] Assumming that in python argument handling will suffice.
@@ -890,7 +890,7 @@ class StatechartManager(EventDispatcher):
         state = self.get_state(state)
         
         if state is None:
-            self.statechart_log_error("Can not to goto state {0}'s history state. Not a recognized state in statechart".format(state))
+            self.statechart_log_error("Cannot to goto state {0}'s history state. Not a recognized state in statechart".format(state))
             return
           
         history_state = state.history_state
@@ -1370,7 +1370,7 @@ class StatechartManager(EventDispatcher):
             return None
           
         if self.states_are_concurrent and self.initial_state_key:
-            self._log_statechart_creation_error("Can not assign an initial state when states are concurrent")
+            self._log_statechart_creation_error("Cannot assign an initial state when states are concurrent")
         elif self.states_are_concurrent:
             attrs['substates_are_concurrent'] = True
         elif self.initial_state_key:
@@ -1423,13 +1423,13 @@ class StatechartManager(EventDispatcher):
       Used to log a statechart trace message
     """
     def statechart_log_trace(self, msg):
-        Logger.info("{0}: {1}".format(self.statechart_log_prefix, msg))
+        Logger.info("{0}: {1}".format(self._statechart_log_prefix(), msg))
         
     """
       Used to log a statechart error message
     """
     def statechart_log_error(self, msg):
-        Logger.info("ERROR {0}: {1}".format(self.statechart_log_prefix, msg)) # [PORT] ditto?
+        Logger.info("ERROR {0}: {1}".format(self._statechart_log_prefix(), msg)) # [PORT] ditto?
         
     """ 
       Used to log a statechart warning message
@@ -1437,19 +1437,16 @@ class StatechartManager(EventDispatcher):
     def statechart_log_warning(self, msg):
         if self.suppress_statechart_warnings:
             return
-        Logger.info("WARN {0}: {1}".format(self.statechart_log_prefix, msg))
+        Logger.info("WARN {0}: {1}".format(self._statechart_log_prefix(), msg))
         
     """ @property """
     def _statechart_log_prefix(self):
-        className = self.__name__
-        name = self.name, prefix;
+        className = self.__class__.__name__
               
         if self.name is None:
-            prefix = "{0}<{1}>".format(className, guidFor(self))
+            return "{0}".format(className)
         else:
-            prefix = "{0}<{1}, {2}>".format(className, name, guidFor(self))
-          
-        self.statechart_log_prefix = prefix
+            return "{0}<{1}".format(className, self.name)
       
     """ @private @property """
     def _allow_statechart_tracing(self):

@@ -78,3 +78,16 @@ class StateAddSubstateTestCase(unittest.TestCase):
         # Nothing should happen if init_state() called again.
         state_P.init_state()
         self.assertEqual(len(state_O._registered_substates), 1)
+
+    def test_init_for_unnamed_state(self):
+        state_O = State()
+        state_P = State()
+
+        state_P.parent_state = state_O
+
+        with self.assertRaises(NameError) as cm:
+            state_P.init_state()
+
+        the_exception = cm.exception
+        self.assertEqual(str(the_exception),
+                         'Cannot init_state() an unnamed state.')
