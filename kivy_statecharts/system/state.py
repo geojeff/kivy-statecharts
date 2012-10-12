@@ -49,7 +49,7 @@ class State(EventDispatcher):
         
       @property {Object}
     """
-    owner = ObjectProperty(None)
+    owner = ObjectProperty(None, allownone=True)
 
     # [PORT] Adding owner_key as property
     #
@@ -73,7 +73,7 @@ class State(EventDispatcher):
    
       @property {State}
     """
-    parent_state = ObjectProperty(None)
+    parent_state = ObjectProperty(None, allownone=True)
 
     """
       This state's history state. Can be null. Managed by the statechart.
@@ -123,7 +123,7 @@ class State(EventDispatcher):
     
       @property {Statechart}
     """
-    statechart = ObjectProperty(None)
+    statechart = ObjectProperty(None, allownone=True)
 
     """
       Indicates if this state has been initialized by the statechart
@@ -209,8 +209,9 @@ class State(EventDispatcher):
         super(State, self).__init__() # [PORT] initialize how? We have also init_state()
 
     def _trace(self, *l):
-        key = self.statechart.statechart_trace_key
-        self.trace = getattr(self.statechart, key) if hasattr(self.statechart, key) else None
+        if self.statechart:
+            key = self.statechart.statechart_trace_key
+            self.trace = getattr(self.statechart, key) if hasattr(self.statechart, key) else None
 
     def _owner(self, *l):
         sc = self.statechart
@@ -227,38 +228,35 @@ class State(EventDispatcher):
     def destroy(self):
         sc = self.statechart
 
+        # [PORT] What about destroyin owner_key and trace_key?
         self.owner_key = sc.statechart_owner_key if sc else None
         self.trace_key = sc.statechart_owner_key if sc else None
     
-        if sc is not None:
-            self.unbind(owner_key=self._statechart_owner_did_change)
-            self.unbind(trace_key=self._statechart_trace_did_change)
+        self.unbind(owner_key=self._statechart_owner_did_change)
+        self.unbind(trace_key=self._statechart_trace_did_change)
 
-        substates = self.substates
-    
-        if substates is not None:
-            for state in substates:
-                state.destroy()
+        [state.destroy() for state in self.substates]
     
         self._teardown_all_state_observe_handlers()
     
-        self.substates = None
-        self.current_substates = None
-        self.entered_substates = None
+        self.substates = []
+        self.current_substates = []
+        self.entered_substates = []
         self.parent_state = None
         self.history_state = None
-        self.initial_substate_key = ''
+        self.initial_substate_key = None
+        self.initial_substate_object = None
         self.statechart = None
     
         #self.notifyPropertyChange("trace") # [PORT] Use kivy's dispatch?
         #self.notifyPropertyChange("owner")
     
-        self._registered_event_handlers = None
-        self._registered_string_event_handlers = None
-        self._registered_reg_exp_event_handlers = None
-        self._registered_state_observe_handlers = None
-        self._registered_substate_paths = None
-        self._registered_substates = None
+        self._registered_event_handlers = []
+        self._registered_string_event_handlers = []
+        self._registered_reg_exp_event_handlers = []
+        self._registered_state_observe_handlers = []
+        self._registered_substate_paths = []
+        self._registered_substates = []
     
         #sc_super()
 
@@ -269,6 +267,10 @@ class State(EventDispatcher):
         if self.state_is_initialized:
             return  
     
+        if not self.name:
+            self.state_log_error("Cannot init_state() an unnamed state.")
+            return
+
         self._register_with_parent_states()
     
         substates = []
@@ -344,14 +346,15 @@ class State(EventDispatcher):
               state = self._add_empty_initial_substate_if_needed()
               if state is None and self.initial_substate_key and self.substates_are_concurrent:
                     self.initial_substate_key = ''
-                    msg = "Can not use {0} as initial substate since substates are all concurrent for state {1}"
+                    msg = "Cannot use {0} as initial substate since substates are all concurrent for state {1}"
                     self.state_log_warning(msg.format(self.initial_substate_key, self))
 
         #self.notifyPropertyChange("substates")
         # [PORT] substates have changed. Call _current_states on statechart, which is bound to root_state_instance,
         #        and updates self.current_states = self.root_state_instance.substates. That binding won't fire if 
         #        root_state_instance.substates changes, so we manually call it in kivy.
-        self.statechart._current_states()
+        if self.statechart:
+            self.statechart._current_states()
 
         self.current_substates = []
         self.entered_substates = []
@@ -430,15 +433,15 @@ class State(EventDispatcher):
     """
     def add_substate(self, name, state=None, attr={}):
         if not name: # [PORT] this used the empty(name) function.
-            self.state_log_error("Can not add substate. name required")
+            self.state_log_error("Cannot add substate. name required")
             return None
 
         if hasattr(self, name):
-            self.state_log_error("Can not add substate '{0}'. Already a defined property".format(name))
+            self.state_log_error("Cannot add substate '{0}'. Already a defined property".format(name))
             return None
 
         if not self.state_is_initialized:
-            self.state_log_error("Can not add substate '{0}'. this state is not yet initialized".format(name))
+            self.state_log_error("Cannot add substate '{0}'. this state is not yet initialized".format(name))
             return None
 
         if state is None:
@@ -450,7 +453,7 @@ class State(EventDispatcher):
         state_is_valid = inspect.isclass(state) and issubclass(state, State)
 
         if not state_is_valid:
-            self.state_log_error("Can not add substate '{0}'. must provide a state class".format(name))
+            self.state_log_error("Cannot add substate '{0}'. must provide a state class".format(name))
             return None
 
         state = self._add_substate(name, state, attr)
@@ -564,7 +567,7 @@ class State(EventDispatcher):
 #      }
 #
 #      if (parent !== state && state !== this) {
-#        this.stateLogError('Can not generate relative path from %@ since it not a parent state of %@'.fmt(state, this));
+#        this.stateLogError('Cannot generate relative path from %@ since it not a parent state of %@'.fmt(state, this));
 #        return null;
 #      }
 #
@@ -596,7 +599,7 @@ class State(EventDispatcher):
         #if parent is not state and state is not self:
         #if parent is not state and state is not type(self):
         if parent != state and state != self:
-            self.state_log_error("Can not generate relative path from {0} since it not a parent state of {1} ({2})".format(state, self, path))
+            self.state_log_error("Cannot generate relative path from {0} since it not a parent state of {1} ({2})".format(state, self, path))
             return None
 
         return path
@@ -645,7 +648,7 @@ class State(EventDispatcher):
             return value if value in self._registered_substates else None
 
         if not isinstance(value, basestring):
-            self.state_log_error("Can not find matching subtype. value must be a State class or string: {0}".format(value))
+            self.state_log_error("Cannot find matching subtype. value must be a State class or string: {0}".format(value))
             return None
         
         # [PORT] In python API for history states, the history state must be called InitialSubstate.
@@ -697,7 +700,7 @@ class State(EventDispatcher):
             if callback is not None:
                 return self._notify_substate_not_found(callback=callback, target=target, value=value, keys=path_keys)
 
-            msg = "Can not find substate matching '{0}' in state {1}. Ambiguous with the following: {2}"
+            msg = "Cannot find substate matching '{0}' in state {1}. Ambiguous with the following: {2}"
             self.state_log_error(msg.format(value, self.full_path, ', '.join(path_keys)))
 
         return self._notify_substate_not_found(callback=callback, target=target, value=value)
@@ -750,7 +753,7 @@ class State(EventDispatcher):
             return parent_state.get_state(value)
 
         if keys is not None:
-            msg = "Can not find state matching '{0}'. Ambiguous with the following: {1}"
+            msg = "Cannot find state matching '{0}'. Ambiguous with the following: {1}"
             self.state_log_error(msg.format(value, ', '.join(keys)))
 
         return None
@@ -942,7 +945,7 @@ class State(EventDispatcher):
             #        down that difference.
             self.statechart.go_to_state(state=self.name)
         else:
-            Logger.error("Can not re-enter state {0} since it is not an entered state in the statechart".format(self))
+            Logger.error("Cannot re-enter state {0} since it is not an entered state in the statechart".format(self))
 
     """
       Called by the statechart to allow a state to try and handle the given event. If the

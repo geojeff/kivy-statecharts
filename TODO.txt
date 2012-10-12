@@ -20,3 +20,5 @@ TODO
 - Review  # pragma: no cover tags.
 - If initial_substate_key is None, use initial_substate_object (needs coding),
   and document usages for intitial substates set as string keys vs. objects.
+- Is the stateObserver system used? Adapt for Kivy property bindings?
+
