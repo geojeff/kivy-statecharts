@@ -1,8 +1,8 @@
 CHANGES
 =======
 
-0.1
----
+0.0.9 (pre_release_full_port)
+-----------------------------
 
  - First steps toward compliance with pep8, by changing camelCase of method
    and function names and instance variables to lower_case_with_underscores.
