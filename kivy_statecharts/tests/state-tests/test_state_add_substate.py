@@ -155,6 +155,18 @@ class StateAddSubstateTestCase(unittest.TestCase):
         o = O()
         o.init_state()
 
+        name = ''
+
+        with self.assertRaises(Exception) as cm:
+            o.add_substate(name)
+
+        msg = "Cannot add substate. name required"
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_adding_substate_in_conflict_with_property(self):
+        o = O()
+        o.init_state()
+
         name = 'do_not_tread_on_me'
 
         with self.assertRaises(Exception) as cm:
@@ -164,7 +176,7 @@ class StateAddSubstateTestCase(unittest.TestCase):
                "property").format(name)
         self.assertEqual(str(cm.exception), msg)
 
-    def test_adding_unnamed_substate(self):
+    def test_adding_substate_without_initializing_parent(self):
         o = O()
 
         name = 'A'
