@@ -295,8 +295,9 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
         self.assertFalse(matcher.match)
 
 
-    # Call match_entered_states() with incorrect arguments
-    def test_match_entered_states_with_incorrect_arguments(self):
+    # Tests added to make coverage (in some cases, somewhat forced, and
+    # perhaps artificial).
+    def test_for_coverage(self):
         monitor_1.append_entered_state(state_A)
 
         matcher = monitor_1.match_sequence()
@@ -307,6 +308,7 @@ class StateSequenceMatcherTestCase(unittest.TestCase):
         self.assertTrue(monitor_1.match_entered_states(root_state_1, state_A))
         self.assertTrue(monitor_1.match_entered_states(root_state_1, 'A'))
 
+        # Call match_entered_states() with incorrect arguments
         self.assertFalse(monitor_1.match_entered_states(root_state_1, state_A, state_B))
         self.assertFalse(monitor_1.match_entered_states(root_state_1, 'A', 'B'))
 

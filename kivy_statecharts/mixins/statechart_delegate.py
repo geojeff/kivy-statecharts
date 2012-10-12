@@ -32,7 +32,8 @@ class StatechartDelegate:
       @param {String|Hash} location the new location 
       @param {State} state the state requesting the location update
     """
-    def statechart_update_location_for_state(self, statechart, location, state): # [TODO] routes was SC.routes, so a system global
+    # [TODO] routes was SC.routes, so a system global
+    def statechart_update_location_for_state(self, statechart, location, state):
         routes.location = location
   
     """

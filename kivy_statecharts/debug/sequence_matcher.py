@@ -86,7 +86,7 @@ class StatechartSequenceMatcher:
         if marker > len(self.statechart_monitor.sequence):
             return MISMATCH
         
-        # values is hierarchical, so that it is: {values: [{ values: [{ values: ...
+        # [PORT] values is hierarchical: {values: [{ values: [{ values: ...
         # and actions are mixed in there.
         if values:
             for val in values:
@@ -95,7 +95,10 @@ class StatechartSequenceMatcher:
                         marker = self._match_sequence(val, marker)
                     elif val['token_type'] == 'concurrent':
                         marker = self._match_concurrent(val, marker)
-                elif marker > len(self.statechart_monitor.sequence)-1 or not self._match_items(val, self.statechart_monitor.sequence[marker]):
+                elif ((marker > len(self.statechart_monitor.sequence)-1) or
+                      not self._match_items(
+                             val,
+                             self.statechart_monitor.sequence[marker])):
                     return MISMATCH
                 else:
                     marker += 1
@@ -140,7 +143,10 @@ class StatechartSequenceMatcher:
                             temp_marker = self._match_sequence(val, marker)
                         elif val['token_type'] == 'concurrent':
                             temp_marker = self._match_concurrent(val, marker)
-                    elif marker > len(self.statechart_monitor.sequence)-1 or not self._match_items(val, monitor.sequence[marker]):
+                    elif ((marker > len(self.statechart_monitor.sequence)-1) or
+                          not self._match_items(
+                                 val,
+                                 monitor.sequence[marker])):
                         temp_marker = MISMATCH
                     else:
                         temp_marker = marker + 1
