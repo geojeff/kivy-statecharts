@@ -280,12 +280,11 @@ class State(EventDispatcher):
 
         self._register_with_parent_states()
     
-        substates = []
         matched_initial_substate = False
         value_is_method = False
         history_state = None
     
-        self.substates = substates
+        self.substates = []
     
         if hasattr(self, 'InitialSubstate'):
             from kivy_statecharts.system.history_state import HistoryState
@@ -354,27 +353,30 @@ class State(EventDispatcher):
                     matched_initial_substate = True
 
         if self.initial_substate_key and not matched_initial_substate:
-            msg = ("Unable to set initial substate {0} since it did not match "
-                   "any of state {1}'s substates").format(
-                           self.initial_substate_key, self)
-            self.state_log_error(msg)
-            raise AttributeError(msg)
+            if len(self.substates) == 0:
+                if self.initial_substate_key:
+                    msg = ("Unable to make {0} an initial substate since state "
+                           "{1} has no substates").format(
+                                   self.initial_substate_key, self)
+                    self.state_log_error(msg)
+                    raise AttributeError(msg)
+            elif len(self.substates) > 0:
+                msg = ("Unable to set initial substate {0} since it did "
+                       "not match any of state {1}'s substates").format(
+                               self.initial_substate_key, self)
+                self.state_log_error(msg)
+                raise AttributeError(msg)
 
-        if len(self.substates) == 0:
-            if self.initial_substate_key:
-                msg = ("Unable to make {0} an initial substate since state "
-                       "{1} has no substates")
-                self.state_log_warning(msg.format(self.initial_substate_key, self))
-        elif len(self.substates) > 0:
-              state = self._add_empty_initial_substate_if_needed()
-              if (state is None 
+        if len(self.substates) > 0:
+            state = self._add_empty_initial_substate_if_needed()
+            if (state is None 
                       and self.initial_substate_key
                       and self.substates_are_concurrent):
-                    self.initial_substate_key = ''
-                    msg = ("Cannot use {0} as initial substate since "
-                           "substates are all concurrent for state {1}")
-                    self.state_log_warning(
-                            msg.format(self.initial_substate_key, self))
+                msg = ("Cannot use {0} as initial substate since "
+                       "substates are all concurrent for state "
+                       "{1}").format(self.initial_substate_key, self)
+                self.state_log_error(msg)
+                raise AttributeError(msg)
 
         #self.notifyPropertyChange("substates")
         # [PORT] substates have changed. Call _current_states on statechart,
