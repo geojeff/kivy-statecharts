@@ -282,18 +282,25 @@ class State(EventDispatcher):
         self.substates = substates
     
         if hasattr(self, 'InitialSubstate'):
-            initial_substate_class = getattr(self, 'InitialSubstate')
             from kivy_statecharts.system.history_state import HistoryState
-            if initial_substate_class is not None:
-                if issubclass(initial_substate_class, HistoryState):
-                    history_state = self.create_substate(initial_substate_class)
-              
-                    if not history_state.default_state:
-                        self.state_log_error("Initial substate is invalid. History state requires the name of a default state to be set")
-                        self.initial_substate_key = ''
-                        history_state = None
-                    else:
-                        setattr(self, 'initial_substate_key', history_state.default_state)
+
+            initial_substate_class = getattr(self, 'InitialSubstate')
+
+            if (initial_substate_class is not None and
+                inspect.isclass(initial_substate_class) and
+                issubclass(initial_substate_class, HistoryState)):
+
+                history_state = self.create_substate(initial_substate_class)
+
+                if history_state.default_state:
+                    setattr(self, 
+                            'initial_substate_key',
+                            history_state.default_state)
+                else:
+                    msg = ("Initial substate is invalid. History state "
+                           "requires the name of a default state to be set.")
+                    self.state_log_error(msg)
+                    raise NameError(msg)
     
         # Iterate through all this state's substates, if any, create them, and then initialize
         # them. This causes a recursive process.

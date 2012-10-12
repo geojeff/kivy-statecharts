@@ -167,3 +167,15 @@ class StateTransitioningHistoryInitialSubstateWithoutConcurrentTestCase(unittest
   
         self.assertEqual(state_A.history_state, state_C)
         self.assertIsNone(state_B.history_state)
+
+    def test_initial_state_without_default_state(self):
+        msg = ("Initial substate is invalid. History state requires the name "
+                "of a default state to be set.")
+
+        state_P = State(name='P')
+        state_P.InitialSubstate = HistoryState
+
+        with self.assertRaises(NameError) as cm:
+            state_P.init_state()
+
+        self.assertEqual(str(cm.exception), msg)

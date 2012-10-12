@@ -29,11 +29,13 @@ smpeg, portmidi), and after installing virtualenvwrapper and mercurial, do:
     pip install cython
     pip install pil
     pip install hg+http://bitbucket.org/pygame/pygame
-    pip install kivy
+    pip install kivy (when available on PyPI)
 
 If you are only using kivy_statecharts, just install it:
 
-    pip install kivy_statecharts
+    pip install kivy_statecharts (when available on PyPI)
+
+NOTE: Until kivy_statecharts is on PyPI, do clone and setup as below:
 
 If you are debugging or adding features to kivy_statecharts, clone the repo
 and set up for development:
