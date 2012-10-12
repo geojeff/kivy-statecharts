@@ -178,7 +178,6 @@ class State(EventDispatcher):
         self._registered_event_handlers = {}
         self._registered_string_event_handlers = {}
         self._registered_reg_exp_event_handlers = []
-        self._registered_state_observe_handlers = {}
         self._registered_substate_paths = {}
         self._registered_substates = []
         self._is_entering_state = False
@@ -246,8 +245,6 @@ class State(EventDispatcher):
 
         [state.destroy() for state in self.substates]
     
-        self._teardown_all_state_observe_handlers()
-    
         self.substates = []
         self.current_substates = []
         self.entered_substates = []
@@ -263,7 +260,6 @@ class State(EventDispatcher):
         self._registered_event_handlers = []
         self._registered_string_event_handlers = []
         self._registered_reg_exp_event_handlers = []
-        self._registered_state_observe_handlers = []
         self._registered_substate_paths = []
         self._registered_substates = []
     
@@ -327,11 +323,6 @@ class State(EventDispatcher):
             if (value_is_method and hasattr(value, 'is_event_handler')
                     and value.is_event_handler == True):
                 self._register_event_handler(key, value)
-                continue
-
-            if (value_is_method and hasattr(value, 'is_state_observe_handler')
-                    and value.is_state_observe_handler == True):
-                self._register_state_observe_handler(key, value)
                 continue
 
             # [PORT] Removed statePlugin system. Use import in python.
@@ -542,35 +533,6 @@ class State(EventDispatcher):
 
             msg = "Invalid event {0} for event handler {1} in state {1}"
             self.state_log_error(msg.format(event, name, self))
-
-    """ @private 
-    
-      Registers state observe handlers with this state. State observe
-      handlers behave just like when you apply observes() on a method but
-      will only be active when the state is currently entered, otherwise the
-      handlers are inactive until the next time the state is entered
-    """
-    def _register_state_observe_handler(self, name, handler):
-        i = 0
-        args = handler.args
-        number_of_args = len(args)
-        arg = None
-        handlers_are_valid = True
-
-        while i < number_of_args:
-            arg = args[i]
-            # [PORT] this used the empty(name) function.
-            if not isinstance(arg, basestring) or not arg:
-                msg = ("Invalid argument {0} for state observe handler {1} "
-                       "in state {2}")
-                self.state_log_error(msg.format(arg, name, self))
-                handlers_are_valid = False
-            i += 1
-
-        if not handlers_are_valid:
-            return
-
-        self._registered_state_observe_handlers[name] = handler.args
 
     """ @private
       Will traverse up through this state's parent states to register
@@ -1107,12 +1069,6 @@ class State(EventDispatcher):
             self.state_log_warning(msg)
             return False
 
-        if event in self._registered_state_observe_handlers:
-            msg = ("state {0} can not handle event '{1}' since it is a "
-                   "registered state observe handler").format(self, event)
-            self.state_log_warning(msg)
-            return False
-
         # Now begin by trying a basic method on the state to respond to the
         # event
         if hasattr(self, event) and inspect.ismethod(getattr(self, event)):
@@ -1231,7 +1187,6 @@ class State(EventDispatcher):
       @see #enter_state
     """
     def state_did_become_entered(self, context=None):
-        self._setup_all_state_observe_handlers()
         self._is_entering_state = False
 
     """
@@ -1273,7 +1228,6 @@ class State(EventDispatcher):
     """
     def state_will_become_exited(self, context=None):
         self._is_exiting_state = True
-        self._teardown_all_state_observe_handlers()
 
     """
       Notification called just after exit_state is invoked. 
@@ -1286,64 +1240,6 @@ class State(EventDispatcher):
     """
     def state_did_become_exited(self, context=None):
         self._is_exiting_state = False
-
-    """ @private 
-    
-      Used to setup all the state observer handlers. Should be done when
-      the state has been entered.
-    """
-    def _setup_all_state_observe_handlers(self):
-        self._configure_all_state_observe_handlers("addObserver")
-
-    """ @private 
-    
-      Used to teardown all the state observer handlers. Should be done when
-      the state is being exited.
-    """
-    def _teardown_all_state_observe_handlers(self):
-        self._configure_all_state_observe_handlers("removeObserver")
-
-    """ @private 
-    
-      Primary method used to either add or remove this state as an observer
-      based on all the state observe handlers that have been registered with
-      this state.
-      
-      Note: The code to add and remove the state as an observer has been taken
-      from the observerable mixin and made slightly more generic. However,
-      having this code in two different places is not ideal, but for now this
-      will have to do. In the future the code should be refactored so that
-      there is one common function that both the observerable mixin and the
-      statechart framework use.  
-    """
-    def _configure_all_state_observe_handlers(self, action):
-        values = []
-        for key in self._registered_state_observe_handlers:
-            values = self._registered_state_observe_handlers[key]
-
-        i = 0
-        while i < len(values):
-            path = values[i]
-            observer = key
-            dot_index = path.find(".")
-
-            if dot_index < 0:
-                getattr(self, action)(path, self, observer)
-            elif path.find("*") == 0:
-                getattr(self, action)(path[1], self, observer)
-            else:
-                root = None
-                if dot_index == 0:
-                    root = this
-                    path = path[1]
-                elif dot_index == 4 and path[0, 5] == "self.":
-                    root = self
-                    path = path[5]
-                elif dot_index < 0 and len(path) == 4 and path == "self":
-                    root = self
-                    path = ""
-                Observers[action](path, self, observer, root)
-            i += 1
 
     """
       Call when an asynchronous action need to be performed when either
@@ -1370,8 +1266,6 @@ class State(EventDispatcher):
             return True
         if event in self._registered_string_event_handlers:
             return True
-        if event in self._registered_state_observe_handlers:
-            return False
 
         for handler in self._registered_reg_exp_event_handlers:
             if handler['regexp'].match(event):
