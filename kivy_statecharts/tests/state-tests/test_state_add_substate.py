@@ -188,3 +188,32 @@ class StateAddSubstateTestCase(unittest.TestCase):
                "initialized").format(name)
         self.assertEqual(str(cm.exception), msg)
 
+    def test_adding_substate_with_dict_of_properties(self):
+        o = O()
+        o.init_state()
+
+        name = 'A New Substate'
+
+        attr = {'count': 12}
+
+        new_substate = o.add_substate(name, state=attr)
+
+        self.assertEqual(new_substate.name, 'A New Substate')
+        self.assertEqual(new_substate.count, 12) 
+
+    def test_adding_substate_with_dict_of_properties_but_wrong_type(self):
+        o = O()
+        o.init_state()
+
+        name = 'A New Substate'
+
+        # Make attr a tuple, instead of required dict:
+        attr = ('count', 12)
+
+        with self.assertRaises(Exception) as cm:
+            new_substate = o.add_substate(name, state=attr)
+
+        msg = ("Cannot add substate '{0}'. Must provide a state "
+               "class").format(name)
+
+        self.assertEqual(str(cm.exception), msg)

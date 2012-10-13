@@ -463,7 +463,7 @@ class State(EventDispatcher):
     
       @param {String} name a unique name for the given substate.
       @param {State} state a class that derives from `State`
-      @param {Hash} [attr] liternal to be applied to the substate
+      @param {Hash} [attr] literal to be applied to the substate
       @returns {State} an instance of the given state class
     """
     def add_substate(self, name, state=None, attr={}):
@@ -493,9 +493,10 @@ class State(EventDispatcher):
         state_is_valid = inspect.isclass(state) and issubclass(state, State)
 
         if not state_is_valid:
-            msg = "Cannot add substate '{0}'. must provide a state class"
-            self.state_log_error(msg.format(name))
-            return None
+            msg = ("Cannot add substate '{0}'. Must provide a state "
+                   "class").format(name)
+            self.state_log_error(msg)
+            raise Exception(msg)
 
         state = self._add_substate(name, state, attr)
 
