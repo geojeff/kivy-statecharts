@@ -654,14 +654,6 @@ class State(EventDispatcher):
                 self.state_log_error(msg)
                 raise Exception(msg)
         
-        # [PORT] In python API for history states, the history state must be
-        #        called InitialSubstate. We need an explicit check for it
-        #        here, otherwise the path matcher might fail if there are
-        #        other substates with history states (multiple matches on
-        #        'InitialSubstate').
-        if value == 'InitialSubstate' and hasattr(self, 'InitialSubstate'):
-            return getattr(self, 'InitialSubstate')
-
         # [PORT] Considered this, but it seemed to match on what should
         #        remain ambiguous.
         #for state in self._registered_substates:
