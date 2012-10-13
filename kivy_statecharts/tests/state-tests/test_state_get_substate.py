@@ -361,25 +361,19 @@ class StateGetSubstateTestCase(unittest.TestCase):
         self.assertEqual(callback_manager.callback_value, 'ABC')
         self.assertIsNone(callback_manager.callback_keys)
 
-    # Get ambiguous substate 'x' with using callback
-    #def test_get_ambiguous_substate_x_with_callback(self):
-        #callback_manager = CallbackManager_1()
+    # Get ambiguous substate 'A1' with using callback
+    def test_get_ambiguous_substate_x_with_callback(self):
+        callback_manager = CallbackManager_1()
 
-        # [PORT] The javascript version treats X as ambiguous -- there is an X
-        #        as a direct substate of root, and another X that is a substate
-        #        as root.BAR.X. In the python version, root.get_substate('X') will
-        #        not be ambiguous, as the direct substate X will be returned.
-        #
-        #        So, this test is ignored, and the previous will be deemed sufficient.
-        #
-        #result = root_state_1.get_substate('X', callback_manager.callback_func)
-        #print callback_manager.callback_keys
-        #self.assertIsNone(result)
-        #self.assertEqual(callback_manager.callback_state, root_state_1)
-        #self.assertEqual(callback_manager.callback_value, 'X')
-        #self.assertEqual(len(callback_manager.callback_keys), 2)
-        #self.assertTrue('X' in callback_manager.callback_keys)
-        #self.assertTrue('BAR.X' in callback_manager.callback_keys)
+        result = root_state_1.get_substate('A1', callback_manager.callback_func)
+
+        self.assertIsNone(result)
+        self.assertEqual(callback_manager.callback_state, root_state_1)
+        self.assertEqual(callback_manager.callback_value, 'A1')
+        self.assertEqual(len(callback_manager.callback_keys), 2)
+        print callback_manager.callback_keys
+        self.assertTrue('X.A.A1' in callback_manager.callback_keys)
+        self.assertTrue('FOO.A.A1' in callback_manager.callback_keys)
 
     def test_trying_to_get_substate_with_wrong_type(self):
         value_of_wrong_type = {'key': 1}

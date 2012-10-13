@@ -610,13 +610,13 @@ class State(EventDispatcher):
       is indeed a substate of this state, otherwise null is returned. 
       
       If the given value is a string, then the string is assumed to be a path
-      expression to a substate. The value is then parsed to find the closes
+      expression to a substate. The value is then parsed to find the closest
       match. For path expression syntax, refer to the {@link StatePathMatcher}
       class.
       
       If there is no match then null is returned. If there is more than one
-      match then null is return and an error is generated indicating ambiguity
-      of the given value. 
+      match then null is returned and an error is generated indicating
+      ambiguity of the given value. 
       
       An optional callback can be provided to handle the scenario when either
       no substate is found or there is more than one match. The callback is

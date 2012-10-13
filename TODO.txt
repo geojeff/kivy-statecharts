@@ -31,11 +31,7 @@ TODO
   involve history in the name, e.g. InitialStateForHistory?
 - Find calls to state_log_error() that are followed by a return, and replace
   them with raise Exception(msg) with a matching test.
-- In state-tests/test_state_get_substate.py, a test for ambiguous results is
-  commented out, on the basis that the python version return state X if it is
-  a direct substate of A, regardless of whether a parellel state B also has a
-  substate X. See also statechart-tests/test_statechart_get_state.py, where
-  there are tests for ambiguity when getting states of the statechart -- but
-  that is a broader context, so everything seems correct. However, the test
-  that is commented out involves a callback -- is there functionality
-  untested?
+- Document how a get_state() call to find state 'X' that is a direct substate
+  of state 'A' will return 'X', because it is a direct substate, regardless if
+  there are other 'X' states in siblings. This is different from the
+  javascript version, which would flag this case as ambiguous.
