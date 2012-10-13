@@ -217,3 +217,26 @@ class StateAddSubstateTestCase(unittest.TestCase):
                "class").format(name)
 
         self.assertEqual(str(cm.exception), msg)
+
+    def test_getting_relative_path_from_root(self):
+        path = state_X.path_relative_to(root_state_1)
+
+        self.assertEqual(path, 'B.X')
+
+    def test_getting_relative_path_from_parent(self):
+        path = state_X.path_relative_to(state_B)
+
+        self.assertEqual(path, 'X')
+
+    def test_trying_to_get_relative_path_to_nonparent(self):
+        nobody = State(name='nobody')
+
+        # Note: The test will fail after the parentage is searched all the
+        #       way to the root, and at that point the path will be B.X.
+
+        with self.assertRaises(Exception) as cm:
+            state_X.path_relative_to(nobody)
+
+        msg = ("Cannot generate relative path from {0} since it is not a "
+               "parent state of {1}").format('nobody', 'B.X')
+        self.assertEqual(str(cm.exception), msg)

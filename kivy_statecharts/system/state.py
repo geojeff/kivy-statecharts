@@ -561,9 +561,6 @@ class State(EventDispatcher):
     def _register_substate(self, state):
         path = state.path_relative_to(self)
 
-        if path is None:
-            return
-
         self._registered_substates.append(state)
 
         # Keep track of states based on their relative path to this state. 
@@ -594,21 +591,15 @@ class State(EventDispatcher):
         if parent is None:
             return path
 
-        #while parent is not None and parent is not state and state != type(self):
-        #while parent is not None and parent is not state:
-        # [PORT] != versions, here and in the if below, seem to be correct,
-        # because the check is against instances.
         while parent and parent != state:
             path = "{0}.{1}".format(parent.name, path)
             parent = parent.parent_state
 
-        #if parent is not state and state is not self:
-        #if parent is not state and state is not type(self):
         if parent != state and state != self:
-            msg = ("Cannot generate relative path from {0} since it not a "
-                   "parent state of {1} ({2})")
-            self.state_log_error(msg.format(state, self, path))
-            return None
+            msg = ("Cannot generate relative path from {0} since it is not a "
+                   "parent state of {1}").format(state, self)
+            self.state_log_error(msg)
+            raise Exception(msg)
 
         return path
 
