@@ -376,6 +376,15 @@ class StateGetSubstateTestCase(unittest.TestCase):
         #self.assertTrue('X' in callback_manager.callback_keys)
         #self.assertTrue('BAR.X' in callback_manager.callback_keys)
 
+    def test_trying_to_get_substate_with_wrong_type(self):
+        value_of_wrong_type = {'key': 1}
+
+        with self.assertRaises(Exception) as cm:
+            root_state_1.get_substate(value_of_wrong_type)
+
+        msg = ("Cannot find matching substate. value must be a State "
+               "class or string, not type: {0}").format(type(value_of_wrong_type))
+        self.assertEqual(str(cm.exception), msg)
 
 
 

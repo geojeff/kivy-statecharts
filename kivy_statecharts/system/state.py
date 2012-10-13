@@ -643,17 +643,16 @@ class State(EventDispatcher):
         if value is None:
             return None
 
-        # If the value is an object then just check if the value is 
-        # a registered substate of this state, and if so return it. 
-        # [PORT] if not a string, is an object
         if not isinstance(value, basestring):
-            return value if value in self._registered_substates else None
-
-        if not isinstance(value, basestring):
-            msg = ("Cannot find matching subtype. value must be a State class "
-                   "or string: {0}").format(value)
-            self.state_log_error(msg)
-            return None
+            if value in self._registered_substates:
+                return value
+            elif isinstance(value, State):
+                return None
+            else:
+                msg = ("Cannot find matching substate. value must be a State "
+                       "class or string, not type: {0}").format(type(value))
+                self.state_log_error(msg)
+                raise Exception(msg)
         
         # [PORT] In python API for history states, the history state must be
         #        called InitialSubstate. We need an explicit check for it
