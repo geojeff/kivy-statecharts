@@ -181,9 +181,13 @@ class StateTransitioningHistoryInitialSubstateWithoutConcurrentTestCase(unittest
         self.assertEqual(str(cm.exception), msg)
 
     def test_get_substate_InitialSubstate_of_root(self):
-        initial_substate = root_state_1.get_substate('InitialSubstate')
+        msg = ("Cannot find substate matching 'InitialSubstate' in state "
+               "__ROOT_STATE__. Ambiguous with the following: "
+               "B.InitialSubstate, A.InitialSubstate")
+        with self.assertRaises(Exception) as cm:
+            initial_substate = root_state_1.get_substate('InitialSubstate')
 
-        self.assertIsNone(initial_substate)
+        self.assertEqual(str(cm.exception), msg)
 
     def test_get_substate_InitialSubstate_of_state_A(self):
         initial_substate = state_A.get_substate('InitialSubstate')

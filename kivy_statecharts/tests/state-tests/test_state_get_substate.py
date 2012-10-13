@@ -305,8 +305,11 @@ class StateGetSubstateTestCase(unittest.TestCase):
     def test_z_substates_from_foo_state(self):
         foo = root_state_1.get_substate('FOO')
 
-        state = foo.get_substate('Z')
-        self.assertIsNone(state)
+        with self.assertRaises(Exception) as cm:
+            state = foo.get_substate('Z')
+        msg = ("Cannot find substate matching 'Z' in state FOO. Ambiguous "
+               "with the following: B.Z, A.Z")
+        self.assertEqual(str(cm.exception), msg)
 
         state = foo.get_substate('A~Z')
         self.assertEqual(state.full_path, 'FOO.A.Z')
@@ -330,9 +333,11 @@ class StateGetSubstateTestCase(unittest.TestCase):
 
     # Get A1 substate from Y state
     def test_a1_substate_from_y_state(self):
-        print 'expecting an error message...'
-        state = root_state_1.get_substate('A1')
-        self.assertIsNone(state)
+        with self.assertRaises(Exception) as cm:
+            state = root_state_1.get_substate('A1')
+        msg = ("Cannot find substate matching 'A1' in state __ROOT_STATE__. "
+               "Ambiguous with the following: X.A.A1, FOO.A.A1")
+        self.assertEqual(str(cm.exception), msg)
 
         state = root_state_1.get_substate('FOO~A1')
         self.assertEqual(state.full_path, 'FOO.A.A1')

@@ -665,9 +665,6 @@ class State(EventDispatcher):
 
         matches = []
 
-        if len(matcher.tokens) == 0:
-            return None
-
         # Grab the paths associated with this state name.
         paths = self._registered_substate_paths[matcher.last_part] \
                 if matcher.last_part in self._registered_substate_paths \
@@ -691,15 +688,6 @@ class State(EventDispatcher):
         if len(matches) > 1:
             path_keys = []
             for key in paths:
-                # [PORT] Added this. Perhaps the matcher should return only
-                #        the exact match, if it exists. This will catch
-                #        substate A, when there are also substates X.A and
-                #        B.Y.A. Otherwise, as apparently the way the
-                #        javascript version works, there would be no match,
-                #        because of that ambiguity. This way, state references
-                #        must be explicit.
-                #if path == value: 
-                #    return self.get_state(paths[path])
                 path_keys.append(key)
 
             if callback is not None:
@@ -709,9 +697,11 @@ class State(EventDispatcher):
                                                        keys=path_keys)
 
             msg = ("Cannot find substate matching '{0}' in state {1}. "
-                   "Ambiguous with the following: {2}")
-            self.state_log_error(
-                    msg.format(value, self.full_path, ', '.join(path_keys)))
+                   "Ambiguous with "
+                   "the following: {2}").format(value, self.full_path,
+                                                ', '.join(path_keys))
+            self.state_log_error(msg)
+            raise Exception(msg)
 
         return self._notify_substate_not_found(callback=callback,
                                                target=target,
