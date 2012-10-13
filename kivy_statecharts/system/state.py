@@ -632,14 +632,10 @@ class State(EventDispatcher):
       
       If there were no matches then `paths` is not provided to the callback. 
       
-      You can also optionally provide a target that the callback is invoked
-      on. If no target is provided then this state is used as the target. 
-      
       @param value {State|String} used to identify a substate of this state
       @param [callback] {Function} the callback
-      @param [target] {Object} the target
     """
-    def get_substate(self, value, callback=None, target=None):
+    def get_substate(self, value, callback=None):
         if value is None:
             return None
 
@@ -672,7 +668,6 @@ class State(EventDispatcher):
 
         if paths is None:
             return self._notify_substate_not_found(callback=callback,
-                                                   target=target,
                                                    value=value)
 
         if value in paths:
@@ -692,7 +687,6 @@ class State(EventDispatcher):
 
             if callback is not None:
                 return self._notify_substate_not_found(callback=callback,
-                                                       target=target,
                                                        value=value,
                                                        keys=path_keys)
 
@@ -704,19 +698,19 @@ class State(EventDispatcher):
             raise Exception(msg)
 
         return self._notify_substate_not_found(callback=callback,
-                                               target=target,
                                                value=value)
 
     """ @private """
-    def _notify_substate_not_found(self, callback=None, target=None,
+    def _notify_substate_not_found(self, callback=None,
                                    value=None, keys=None):
         if callback:
-            if target and hasattr(target, callback.__name__):
-                return getattr(target, callback.__name__)(self, value, keys)
-            elif hasattr(self, callback.__name__):
-                return getattr(self, callback.__name__)(self, value, keys)
-            else:
-                return callback(self, value, keys)
+            # This, and an even more complicated system involving an optional
+            # target argument, was in the javascript version. Removed here,
+            # until it is deemed necessary for some reason.
+            #if hasattr(self, callback.__name__):
+            #    return getattr(self, callback.__name__)(self, value, keys)
+            #else:
+            return callback(self, value, keys)
         else:
             return None
 

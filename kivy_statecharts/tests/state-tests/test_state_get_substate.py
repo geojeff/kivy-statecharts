@@ -123,6 +123,17 @@ class CallbackManager_1:
         self.callback_value = value
         self.callback_keys = keys
 
+class CallbackManager_2:
+    def __init__(self):
+        self.callback_state = None
+        self.callback_value = None
+        self.callback_keys = None
+
+    def callback_func(self, state, value, keys):
+        self.callback_state = state
+        self.callback_value = value
+        self.callback_keys = keys
+
 class StateGetSubstateTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
