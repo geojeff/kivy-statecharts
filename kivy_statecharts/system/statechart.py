@@ -431,7 +431,9 @@ class StatechartManager(EventDispatcher):
             problem_with_initial_root_state = True
 
         if problem_with_initial_root_state:
-            msg = "Unable to initialize statechart. Root state must have an initial substate or substates_are_concurrent explicitly defined."
+            msg = ("Unable to initialize statechart. Root state must have an "
+                   "initial substate or substates_are_concurrent explicitly "
+                   "defined.")
             self.statechart_log_error(msg)
             raise Exception(msg)
 

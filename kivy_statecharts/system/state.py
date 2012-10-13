@@ -539,8 +539,10 @@ class State(EventDispatcher):
                         { 'name': name, 'handler': handler, 'regexp': event })
                 continue
 
-            msg = "Invalid event {0} for event handler {1} in state {1}"
-            self.state_log_error(msg.format(event, name, self))
+            msg = ("Invalid event {0} for event handler {1} in "
+                   "state {1}").format(event, name, self)
+            self.state_log_error(msg)
+            raise Exception(msg)
 
     """ @private
       Will traverse up through this state's parent states to register
