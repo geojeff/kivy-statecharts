@@ -353,10 +353,6 @@ class StatechartManager(EventDispatcher):
         if self.root_state_instance: # [PORT] root_state can be None
             self.root_state_instance.statechart_owner_did_change()
 
-    def destroy_mixin(self):
-        self.root_state_instance.destroy();
-        self.root_state_instance = None
-      
     """
       Initializes the statechart. By initializing the statechart, it will create all the states and register
       them with the statechart. Once complete, the statechart can be used to go to states and send events to.
