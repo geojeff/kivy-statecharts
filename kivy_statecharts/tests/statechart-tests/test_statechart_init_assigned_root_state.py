@@ -116,3 +116,4 @@ class StatechartTestCase(unittest.TestCase):
         msg = "Unable to initialize statechart. Root state must be a state class"
         self.assertEqual(str(cm.exception), msg)
 
+

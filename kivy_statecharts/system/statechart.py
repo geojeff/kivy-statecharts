@@ -371,49 +371,57 @@ class StatechartManager(EventDispatcher):
         if self.monitor_is_active:
             self.monitor = StatechartMonitor(statechart=self)
       
-        root_state_class = self.root_state_class # [PORT] Clarify in docs that root_state is None or is a class.
+        # [PORT] Clarify in docs that root_state is None or is a class.
         msg = ''
 
         if self.trace:
             self.statechart_log_trace("BEGIN initialize statechart")
           
-        # If no root state was explicitly defined then try to construct a root state class
-        if not root_state_class:
-            root_state_class = self._construct_root_state_class()
+        # If no root state was explicitly defined then try to construct a root
+        # state class
+        if not self.root_state_class:
+            self.root_state_class = self._construct_root_state_class()
           
-        # [PORT] plugin system in javascript version removed in python version. States are classes, declared
-        #        either in the source file with the statechart, or imported from individual files.
+        # [PORT] plugin system in javascript version removed in python version.
+        # States are classes, declared either in the source file with the
+        # statechart, or imported from individual files.
 
-        if inspect.isclass(root_state_class) and not issubclass(root_state_class, State):
-            msg = "Unable to initialize statechart. Root state must be a state class"
+        if (inspect.isclass(self.root_state_class) 
+                and not issubclass(self.root_state_class, State)):
+            msg = ("Unable to initialize statechart. Root state must be a "
+                   "state class")
             self.statechart_log_error(msg)
             raise Exception(msg)
           
         # Instantiate the root_state class.
-        root_state_instance = self.create_root_state(root_state_class, ROOT_STATE_NAME)
+        root_state_instance = \
+                self.create_root_state(self.root_state_class, ROOT_STATE_NAME)
           
         # Set self.root_state_instance to be the instantiated object.
         self.root_state_instance = root_state_instance
 
         root_state_instance.init_state()
           
-        # The initialState of root_state must be a real state -- can't be the EmptyState.
-        problem_with_initial_root_state = False
-        if hasattr(root_state_instance, 'initial_substate_key') and root_state_instance.initial_substate_key:
-            initial_root_state = root_state_instance.initial_substate_object
-            if initial_root_state is None:
-                problem_with_initial_root_state = True
-            elif isinstance(initial_root_state, EmptyState):
-                problem_with_initial_root_state = True
-        elif not hasattr(root_state_instance, 'substates_are_concurrent') or not root_state_instance.substates_are_concurrent:
-            problem_with_initial_root_state = True
-
-        if problem_with_initial_root_state:
-            msg = ("Unable to initialize statechart. Root state must have an "
-                   "initial substate or substates_are_concurrent explicitly "
-                   "defined.")
-            self.statechart_log_error(msg)
-            raise Exception(msg)
+#        # The initialState of root_state must be a real state -- can't be the
+#        # EmptyState.
+#        problem_with_initial_root_state = False
+#        if (hasattr(root_state_instance, 'initial_substate_key') 
+#                and root_state_instance.initial_substate_key):
+#            initial_root_state = root_state_instance.initial_substate_object
+#            if initial_root_state is None:
+#                problem_with_initial_root_state = True
+#            elif isinstance(initial_root_state, EmptyState):
+#                problem_with_initial_root_state = True
+#        elif (not hasattr(root_state_instance, 'substates_are_concurrent') 
+#                or not root_state_instance.substates_are_concurrent):
+#            problem_with_initial_root_state = True
+#
+#        if problem_with_initial_root_state:
+#            msg = ("Unable to initialize statechart. Root state must have an "
+#                   "initial substate or substates_are_concurrent explicitly "
+#                   "defined.")
+#            self.statechart_log_error(msg)
+#            raise Exception(msg)
 
     #if (SC.kindOf(root_state.get('initial_substate'), SC.EmptyState)) {
       #msg = "Unable to initialize statechart. Root state must have an initial substate explicilty defined";
