@@ -961,14 +961,15 @@ class State(EventDispatcher):
     def reenter(self):
         if self.is_entered_state():
             # [PORT] Changed this from self to self.name, after str and key
-            #        changes. Then, had to change it form self.go_to_state to
+            #        changes. Then, had to change it from self.go_to_state to
             #        self.statechart.go_to_state -- need to pin down that
             #        difference.
             self.statechart.go_to_state(state=self.name)
         else:
             msg = ("Cannot re-enter state {0} since it is not an entered "
                    "state in the statechart").format(self)
-            Logger.error(msg)
+            self.state_log_error(msg)
+            raise Exception(msg)
 
     """
       Called by the statechart to allow a state to try and handle the given
