@@ -58,10 +58,6 @@ class State(EventDispatcher):
     #
     owner_key = StringProperty(None)
 
-    # [PORT] Adding trace_key as property
-    #
-    trace_key = StringProperty(None)
-
     full_path = StringProperty(None)
 
     """
@@ -191,11 +187,9 @@ class State(EventDispatcher):
         sc = self.statechart
     
         self.owner_key = sc.statechart_owner_key if sc else None
-        self.trace_key = sc.statechart_owner_key if sc else None
     
         # [PORT] Changed to bind to self, to try to do it from here...
         self.bind(owner_key=self._statechart_owner_did_change)
-        self.bind(trace_key=self._statechart_trace_did_change)
 
         for k,v in kwargs.items():
             if k == 'initial_substate_key':
@@ -216,10 +210,7 @@ class State(EventDispatcher):
 
     def _trace(self, *l):
         if self.statechart:
-            key = self.statechart.statechart_trace_key
-            self.trace = getattr(self.statechart, key) \
-                         if hasattr(self.statechart, key) \
-                         else None
+            self.trace = self.statechart.trace
 
     def _owner(self, *l):
         sc = self.statechart
@@ -236,12 +227,10 @@ class State(EventDispatcher):
     def destroy(self):
         sc = self.statechart
 
-        # [PORT] What about destroyin owner_key and trace_key?
+        # [PORT] What about destroying owner_key
         self.owner_key = sc.statechart_owner_key if sc else None
-        self.trace_key = sc.statechart_owner_key if sc else None
     
         self.unbind(owner_key=self._statechart_owner_did_change)
-        self.unbind(trace_key=self._statechart_trace_did_change)
 
         [state.destroy() for state in self.substates]
     
@@ -254,7 +243,6 @@ class State(EventDispatcher):
         self.initial_substate_object = None
         self.statechart = None
     
-        #self.notifyPropertyChange("trace") # [PORT] Use kivy's dispatch?
         #self.notifyPropertyChange("owner")
     
         self._registered_event_handlers = []
@@ -1022,7 +1010,6 @@ class State(EventDispatcher):
           });
     """
     def try_to_handle_event(self, event, arg1=None, arg2=None):
-        trace = self.trace
         sc = self.statechart
         ret = None
 
@@ -1050,7 +1037,7 @@ class State(EventDispatcher):
         # Now begin by trying a basic method on the state to respond to the
         # event
         if hasattr(self, event) and inspect.ismethod(getattr(self, event)):
-            if trace:
+            if self.trace:
                 self.state_log_trace("will handle event '{0}'".format(event))
 
             sc.state_will_try_to_handle_event(self, event, event)
@@ -1064,7 +1051,7 @@ class State(EventDispatcher):
                   if event in self._registered_string_event_handlers \
                   else None
         if handler is not None:
-            if trace:
+            if self.trace:
                 msg = ("{0} will handle event '{1}'").format(handler['name'],
                                                              event)
                 self.state_log_trace(msg)
@@ -1082,7 +1069,7 @@ class State(EventDispatcher):
         while i < number_of_handlers:
             handler = self._registered_reg_exp_event_handlers[i]
             if handler['regexp'].match(event):
-                if trace:
+                if self.trace:
                     msg = "{0} will handle event '{1}'".format(
                             handler['name'], event)
                     self.state_log_trace(msg)
@@ -1099,7 +1086,7 @@ class State(EventDispatcher):
         # invoke it to handle the event
         if (hasattr(self, 'unknown_event') and
                 inspect.ismethod(getattr(self, 'unknown_event'))):
-            if trace:
+            if self.trace:
                 msg = "unknown_event will handle event '{0}'".format(event)
                 self.state_log_trace(msg)
 
@@ -1284,11 +1271,6 @@ class State(EventDispatcher):
     """ @private """
     def _current_substates_did_change(self, *l):  #pragma: no cover
         #self.notifyPropertyChange("current_substates")
-        pass
-
-    """ @private """
-    def _statechart_trace_did_change(self, *l):  #pragma: no cover
-        #self.notifyPropertyChange("trace")
         pass
 
     """ @private """

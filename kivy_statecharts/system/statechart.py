@@ -183,7 +183,6 @@ class StatechartManager(EventDispatcher):
     go_to_state_suspended_point = ObjectProperty(None, allownone=True)
     go_to_state_suspended = BooleanProperty(False)
     statechart_log_prefix = StringProperty(None)
-    allow_statechart_tracing = BooleanProperty(True)
     details = ObjectProperty(None)
 
     # Walk like a duck
@@ -284,18 +283,8 @@ class StatechartManager(EventDispatcher):
     monitor = ObjectProperty(None)
     
     """
-      Used to specify what property (key) on the statechart should be used as the trace property. By
-      default the property is 'trace'.
-  
-      @property {String}
-    """
-    statechart_trace_key = StringProperty('trace')
-  
-    """
       Indicates whether to trace the statecharts activities. If true then the statechart will output
-      its activites to the browser's JS console. Useful for debugging purposes.
-  
-      @see #statechart_trace_key
+      its activites to the logger. Useful for debugging purposes.
   
       @property {Boolean}
     """
@@ -342,7 +331,6 @@ class StatechartManager(EventDispatcher):
     def __init__(self, **kw):
         #self.bind(current_states=self._current_states)
         self.bind(monitor_is_active=self._monitor_is_active_did_change)
-        self.bind(statechart_trace_key=self._statechart_trace_did_change)
         #self.bind(root_state=self._current_states) # [PORT] Added current_states property -- moved this to the bottom of init_statechart().
         self.bind(statechart_owner_key=self._owner_did_change) # [PORT] Added, to use top-down updating approach in kivy.
         self.bind(owner=self._owner_did_change) # [PORT] Added, to use top-down updating approach in kivy.
@@ -351,8 +339,6 @@ class StatechartManager(EventDispatcher):
         self.bind(go_to_state_suspended_point=self._go_to_state_suspended)
 
         for k,v in kw.items():
-            if k == 'allow_statechart_tracing': # [PORT] hack to set self.trace -- why is there also allow_statechart_tracing? limit to one or other.
-                setattr(self, 'trace', v)
             setattr(self, k, v)
 
         # [PORT] NOTE: The binding, self.bind(root_state_instance=self._current_states) is set at the
@@ -368,7 +354,6 @@ class StatechartManager(EventDispatcher):
             self.root_state_instance.statechart_owner_did_change()
 
     def destroy_mixin(self):
-        self.unbind(statechart_trace_key=_statechart_trace_did_change)
         self.root_state_instance.destroy();
         self.root_state_instance = None
       
@@ -390,13 +375,10 @@ class StatechartManager(EventDispatcher):
         if self.monitor_is_active:
             self.monitor = StatechartMonitor(statechart=self)
       
-        self._statechart_trace_did_change() # [PORT] this call needed for kivy?
-      
-        trace = self.allow_statechart_tracing
         root_state_class = self.root_state_class # [PORT] Clarify in docs that root_state is None or is a class.
         msg = ''
 
-        if trace:
+        if self.trace:
             self.statechart_log_trace("BEGIN initialize statechart")
           
         # If no root state was explicitly defined then try to construct a root state class
@@ -464,7 +446,7 @@ class StatechartManager(EventDispatcher):
 
         self.go_to_state(root_state_instance)
           
-        if trace:
+        if self.trace:
             self.statechart_log_trace("END initialize statechart")
         
     """
@@ -585,7 +567,6 @@ class StatechartManager(EventDispatcher):
         pivot_state = None
         exit_states = deque()
         enter_states = deque()
-        trace = self.allow_statechart_tracing
         param_state = state
         param_from_current_state = from_current_state
           
@@ -626,7 +607,7 @@ class StatechartManager(EventDispatcher):
             if from_current_state is None:
                 from_current_state = self.current_states[0] if self.current_states else None
               
-        if trace:
+        if self.trace:
             self.statechart_log_trace("BEGIN go_to_state: {0}".format(state))
             msg = "starting from current state: {0}"
             msg = msg.format(from_current_state if from_current_state else '---')
@@ -647,7 +628,7 @@ class StatechartManager(EventDispatcher):
         pivot_state = self._find_pivot_state(exit_states, enter_states)
       
         if pivot_state is not None:
-            if trace:
+            if self.trace:
                 self.statechart_log_trace("pivot state = {0}".format(pivot_state))
             if pivot_state.substates_are_concurrent and pivot_state is not state:
                 msg = ("Cannot go to state {0} from {1}. Pivot state {2} has "
@@ -741,7 +722,7 @@ class StatechartManager(EventDispatcher):
         #self.endPropertyChanges()
         self._current_states()
           
-        if self.allow_statechart_tracing:
+        if self.trace:
             self.statechart_log_trace("current states after: {0}".format(self.current_states))
             self.statechart_log_trace("END go_to_state: {0}".format(go_to_state))
           
@@ -772,7 +753,7 @@ class StatechartManager(EventDispatcher):
                 parent_state.entered_substates.remove(state)
             parent_state = parent_state.parent_state
             
-        if self.allow_statechart_tracing:
+        if self.trace:
             self.statechart_log_trace("<-- exiting state: {0}".format(state))
           
         state.current_substates = []
@@ -818,7 +799,7 @@ class StatechartManager(EventDispatcher):
             parent_state.entered_substates.append(state)
             parent_state = parent_state.parent_state
           
-        if self.allow_statechart_tracing:
+        if self.trace:
              self.statechart_log_trace("--> entering state: {0}".format(state))
           
         state.state_will_become_entered(context)
@@ -989,7 +970,6 @@ class StatechartManager(EventDispatcher):
         current_states_copy = self.current_states[:]
         checked_states = {}
         state = None
-        trace = self.allow_statechart_tracing
           
         if self._send_event_locked or self.go_to_state_locked:
             # Want to prevent any actions from being processed by the states until 
@@ -1005,7 +985,7 @@ class StatechartManager(EventDispatcher):
           
         self._send_event_locked = True
           
-        if trace:
+        if self.trace:
             self.statechart_log_trace("BEGIN send_event: '{0}'".format(event))
           
         for state in current_states_copy:
@@ -1025,7 +1005,7 @@ class StatechartManager(EventDispatcher):
         # first event, we can go ahead and flush any pending sent events.
         self._send_event_locked = False
           
-        if trace:
+        if self.trace:
             if not statechart_handled_event:
                 self.statechart_log_trace("No state was able handle event {0}".format(event))
             self.statechart_log_trace("END send_event: '{0}'".format(event))
@@ -1103,8 +1083,6 @@ class StatechartManager(EventDispatcher):
         if state is None or state is stopState:
             return
           
-        trace = self.allow_statechart_tracing
-          
         # This state has concurrent substates. Therefore we have to make sure we
         # exit them up to this state before we can go any further up the exit chain.
         if state.substates_are_concurrent:
@@ -1135,8 +1113,6 @@ class StatechartManager(EventDispatcher):
     def _traverse_states_to_enter(self, state, enter_state_path, pivot_state, use_history, go_to_state_actions):
         if not state:
             return
-          
-        trace = self.allow_statechart_tracing
           
         # We do not want to enter states in the enter path until the pivot state has been reached. After
         # the pivot state has been reached, then we can go ahead and actually enter states.
@@ -1453,16 +1429,6 @@ class StatechartManager(EventDispatcher):
         else:
             return "{0}<{1}".format(className, self.name)
       
-    """ @private @property """
-    def _allow_statechart_tracing(self):
-        self.allow_statechart_tracing = getattr(self, self.statechart_trace_key)
-      
-    """ @private """
-    def _statechart_trace_did_change(self):
-        #self.notifyPropertyChange('allow_statechart_tracing')
-        #pass # [PORT] notify needed here in kivy?
-        self._allow_statechart_tracing()
-        
     """
       @property
           
