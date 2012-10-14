@@ -134,6 +134,24 @@ class CallbackManager_2:
         self.callback_info['state{0}'.format(self.num_callbacks)] = state
         self.callback_info['result{0}'.format(self.num_callbacks)] = result
 
+class Statechart_3(StatechartManager):
+    def __init__(self, **kwargs):
+        kwargs['initial_state_key'] = 'A'
+        kwargs['auto_init_statechart'] = False
+        kwargs['root_state_example_class'] = RootStateExample_1
+        kwargs['A'] = self.A
+        kwargs['B'] = self.B
+        super(Statechart_3, self).__init__(**kwargs)
+
+    class A(TestState):
+        def __init__(self, **kwargs):
+            super(Statechart_3.A, self).__init__(**kwargs)
+
+    class B(TestState):
+        def __init__(self, **kwargs):
+            super(Statechart_3.B, self).__init__(**kwargs)
+
+
 class StatechartInvokeStateMethodTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
@@ -302,36 +320,31 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
 
 
     def test_invoke_method_go_to_state_before_init_statechart_called(self):
-        class Statechart_2(StatechartManager):
-            def __init__(self, **kwargs):
-                kwargs['initial_state_key'] = 'A'
-                kwargs['auto_init_statechart'] = False
-                kwargs['root_state_example_class'] = RootStateExample_1
-                kwargs['A'] = self.A
-                kwargs['B'] = self.B
-                super(Statechart_2, self).__init__(**kwargs)
-
-            class A(TestState):
-                def __init__(self, **kwargs):
-                    super(Statechart_2.A, self).__init__(**kwargs)
-
-            class B(TestState):
-                def __init__(self, **kwargs):
-                    super(Statechart_2.B, self).__init__(**kwargs)
-
-        statechart_2 = Statechart_2()
+        statechart_3 = Statechart_3()
 
         with self.assertRaises(Exception) as cm:
-            statechart_2.go_to_state('B')
+            statechart_3.go_to_state('B')
         msg = ("Cannot go to state B. Statechart has not yet been "
                "initialized.")
         self.assertEqual(str(cm.exception), msg)
 
-        statechart_2.init_statechart()
+    def test_invoke_method_go_to_state_with_bad_state(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
 
         with self.assertRaises(Exception) as cm:
-            statechart_2.go_to_state('Z')
+            statechart_3.go_to_state('Z')
         msg = ("Cannot to goto state Z. Not a recognized state in "
                "statechart.")
         self.assertEqual(str(cm.exception), msg)
 
+    def test_invoke_method_go_to_state_with_bad_from_state(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.go_to_state('B', from_current_state='Z')
+        msg = ("Cannot to goto state B. Z is not a "
+               "recognized current state in "
+               "the statechart.")
+        self.assertEqual(str(cm.exception), msg)

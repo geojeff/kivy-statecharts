@@ -592,18 +592,23 @@ class StatechartManager(EventDispatcher):
             })
             return
           
-        # Lock the current state transition so that no other requested state transition 
-        # interferes. 
+        # Lock the current state transition so that no other requested state
+        # transition interferes. 
         self.go_to_state_locked = True
           
         if from_current_state is not None:
-            # Check to make sure the current state given is actually a current state of this statechart
+            # Check to make sure the current state given is actually a current
+            # state of this statechart
             from_current_state = self.get_state(from_current_state)
-            if from_current_state is None or not from_current_state.is_current_state():
-                msg = "Cannot to goto state {0}. {1} is not a recognized current state in statechart"
-                self.statechart_log_error(msg.format(param_state, param_from_current_state))
+            if (from_current_state is None
+                    or not from_current_state.is_current_state()):
+                msg = ("Cannot to goto state {0}. {1} is not a "
+                       "recognized current state in "
+                       "the statechart.").format(param_state,
+                                                 param_from_current_state)
+                self.statechart_log_error(msg)
                 self.go_to_state_locked = False
-                return
+                raise Exception(msg)
         else:
             # No explicit current state to start from; therefore, need to find a current state
             # to transition from.
