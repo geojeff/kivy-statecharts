@@ -100,3 +100,19 @@ class StatechartTestCase(unittest.TestCase):
         statechart_2.init_statechart()
 
         self.assertTrue(statechart_2.statechart_is_initialized)
+
+    def test_init_with_root_state_class_of_wrong_type(self):
+        class Statechart_3(StatechartManager):
+            def __init__(self, **kwargs):
+                kwargs['auto_init_statechart'] = False
+                kwargs['root_state_class'] = dict
+                super(Statechart_3, self).__init__(**kwargs)
+
+        statechart_3 = Statechart_3()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.init_statechart()
+
+        msg = "Unable to initialize statechart. Root state must be a state class"
+        self.assertEqual(str(cm.exception), msg)
+
