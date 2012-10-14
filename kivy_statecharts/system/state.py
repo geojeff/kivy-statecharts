@@ -822,10 +822,10 @@ class State(EventDispatcher):
         state = self.get_state(value)
 
         if state is None:
-            msg = ("can not go to history state {0} from state {1}. "
+            msg = ("Cannot go to history state {0} from state {1}. "
                    "Invalid value.").format(value, self)
             self.state_log_error(msg)
-            return
+            raise Exception(msg)
 
         fromState = self.find_first_relative_current_state(state)
 
