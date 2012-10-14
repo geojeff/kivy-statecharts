@@ -542,21 +542,28 @@ class StatechartManager(EventDispatcher):
           # With four arguments.
           go_to_state(<state>, <state>, <boolean>, <hash>)
       
-      where <state> is either a State object or a string and <hash> is a regular JS hash object.
+      where <state> is either a State object or a string and <hash> is a
+      regular JS hash object.
       
-      @param state {State|String} the state to go to (may not be the final state in the transition process)
-      @param from_current_state {State|String} Optional. The current state to start the transition process from.
-      @param use_history {Boolean} Optional. Indicates whether to include using history states in the transition process
-      @param context {Hash} Optional. A context object that will be passed to all exited and entered states
+      @param state {State|String} the state to go to (may not be the final
+        state in the transition process)
+      @param from_current_state {State|String} Optional. The current state to
+        start the transition process from.
+      @param use_history {Boolean} Optional. Indicates whether to include using
+        history states in the transition process
+      @param context {Hash} Optional. A context object that will be passed to
+        all exited and entered states
     """
     def go_to_state(self, state, from_current_state=None, use_history=None, context=None):
         if not self.statechart_is_initialized:
-            self.statechart_log_error("can not go to state {0}. statechart has not yet been initialized".format(state))
-            return
+            msg = ("Cannot go to state {0}. Statechart has not yet been "
+                   "initialized.").format(state)
+            self.statechart_log_error(msg)
+            raise Exception(msg)
           
         # [PORT] Removed isDestroyed check -- but this is a punt for a later time...
         #if self.isDestroyed:
-            #self.statechart_log_error("can not go to state {0}. statechart is destroyed".format(this))
+            #self.statechart_log_error("Cannot go to state {0}. statechart is destroyed".format(this))
             #return
           
         pivot_state = None
@@ -939,7 +946,7 @@ class StatechartManager(EventDispatcher):
     """
       Sends a given event to all the statechart's current states.
           
-      If a current state does can not respond to the sent event, then the current state's parent state
+      If a current state does cannot respond to the sent event, then the current state's parent state
       will be tried. This process is recursively done until no more parent state can be tried.
       
       Note that a state will only be checked once if it can respond to an event. Therefore, if
@@ -1204,7 +1211,7 @@ class StatechartManager(EventDispatcher):
         return self.send_event(event, arg1, arg2) is not None
         
     """
-      Used to invoke a method on current states. If the method can not be executed
+      Used to invoke a method on current states. If the method cannot be executed
       on a current state, then the state's parent states will be tried in order
       of closest ancestry.
           
@@ -1256,7 +1263,7 @@ class StatechartManager(EventDispatcher):
     """
     def invoke_state_method(self, method_name, *args):
         if method_name == 'unknown_event':
-            self.statechart_log_error("can not invoke method unkownEvent")
+            self.statechart_log_error("Cannot invoke method unkownEvent")
             return
           
         callback = None

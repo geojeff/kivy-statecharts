@@ -301,3 +301,31 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         self.assertFalse(state_D.test_invoked)
 
 
+    def test_invoke_method_go_to_state_before_init_statechart_called(self):
+        class Statechart_2(StatechartManager):
+            def __init__(self, **kwargs):
+                kwargs['initial_state_key'] = 'A'
+                kwargs['auto_init_statechart'] = False
+                kwargs['root_state_example_class'] = RootStateExample_1
+                kwargs['A'] = self.A
+                kwargs['B'] = self.B
+                super(Statechart_2, self).__init__(**kwargs)
+
+            class A(TestState):
+                def __init__(self, **kwargs):
+                    super(Statechart_2.A, self).__init__(**kwargs)
+
+            class B(TestState):
+                def __init__(self, **kwargs):
+                    super(Statechart_2.B, self).__init__(**kwargs)
+
+        statechart_2 = Statechart_2()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_2.go_to_state('B')
+
+        msg = ("Cannot go to state B. Statechart has not yet been "
+               "initialized.")
+
+        self.assertEqual(str(cm.exception), msg)
+
