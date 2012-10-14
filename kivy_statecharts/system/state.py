@@ -1277,22 +1277,22 @@ class State(EventDispatcher):
         return self.full_path
 
     """ @private """
-    def _entered_substates_did_change(self, *l):
+    def _entered_substates_did_change(self, *l):  #pragma: no cover
         #self.notifyPropertyChange("entered_substates")
         pass
 
     """ @private """
-    def _current_substates_did_change(self, *l):
+    def _current_substates_did_change(self, *l):  #pragma: no cover
         #self.notifyPropertyChange("current_substates")
         pass
 
     """ @private """
-    def _statechart_trace_did_change(self, *l):
+    def _statechart_trace_did_change(self, *l):  #pragma: no cover
         #self.notifyPropertyChange("trace")
         pass
 
     """ @private """
-    def _statechart_owner_did_change(self, *l):
+    def _statechart_owner_did_change(self, *l):  #pragma: no cover
         #self.notifyPropertyChange("owner")
         pass
 
@@ -1302,8 +1302,6 @@ class State(EventDispatcher):
     def state_log_trace(self, msg):
         if self.statechart:
             self.statechart.statechart_log_trace("{0}: {1}".format(self, msg))
-        else:
-            print "{0}: {1}".format(self, msg)
 
     """ 
       Used to log a state warning message
@@ -1311,8 +1309,6 @@ class State(EventDispatcher):
     def state_log_warning(self, msg):
         if self.statechart:
             self.statechart.statechart_log_warning(msg)
-        else:
-            print msg
 
     """ 
       Used to log a state error message
@@ -1320,8 +1316,6 @@ class State(EventDispatcher):
     def state_log_error(self, msg):
         if self.statechart:
             self.statechart.statechart_log_error(msg)
-        else:
-            print msg
 
     # [PORT] plugin() method removed in python version.
 
