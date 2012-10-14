@@ -54,6 +54,12 @@ class StateIsCurrentStateTestCase(unittest.TestCase):
         class o(object):
             def __init__(self):
                 self.value = None
-                #self.bind(value, state_A.is_current_state) # [PORT] Won't work in kivy. Plus, is_current_state() is now a method.
+                # [PORT] Won't work in kivy. Plus, is_current_state() is now a method.
+                #self.bind(value, state_A.is_current_state) 
 
         self.assertEqual(root_state_1.initial_substate_key, state_A.name)
+
+    # check if state is current substate of another?
+    def test_if_state_is_current_substate(self):
+        self.assertTrue(root_state_1.state_is_current_substate(state_A))
+        self.assertFalse(state_B.state_is_current_substate(state_A))
