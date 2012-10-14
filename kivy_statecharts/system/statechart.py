@@ -650,10 +650,13 @@ class StatechartManager(EventDispatcher):
             if trace:
                 self.statechart_log_trace("pivot state = {0}".format(pivot_state))
             if pivot_state.substates_are_concurrent and pivot_state is not state:
-                msg = "Cannot go to state {0} from {1}. Pivot state {2} has concurrent substates."
-                self.statechart_log_error(msg.format(state, from_current_state, pivot_state))
+                msg = ("Cannot go to state {0} from {1}. Pivot state {2} has "
+                       "concurrent substates.").format(state,
+                                                       from_current_state,
+                                                       pivot_state)
+                self.statechart_log_error(msg)
                 self.go_to_state_locked = False
-                return
+                raise Exception(msg)
           
         # Collect what actions to perform for the state transition process
         go_to_state_actions = []
