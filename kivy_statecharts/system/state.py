@@ -1045,7 +1045,7 @@ class State(EventDispatcher):
             msg = ("state {0} can not handle event '{1}' since it is a "
                    "registered event handler").format(self, event)
             self.state_log_warning(msg)
-            return False
+            raise Exception(msg)
 
         # Now begin by trying a basic method on the state to respond to the
         # event

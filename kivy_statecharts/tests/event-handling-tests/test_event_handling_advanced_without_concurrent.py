@@ -374,3 +374,20 @@ class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
         msg = ("Invalid event {0} for event handler {1} in "
                "state {1}").format(dict, 'bad_event_handler', bad)
         self.assertEqual(str(cm.exception), msg)
+
+    # Try to use an event handler name as an event
+    def test_for_event_handler_name_used_as_an_event(self):
+        class Sender:
+            pass
+        class Context:
+            pass
+        sender = Sender()
+        context = Context()
+
+        with self.assertRaises(Exception) as cm:
+            root_state_1.try_to_handle_event('event_handler_A', sender, context)
+
+        msg = ("state __ROOT_STATE__ can not handle event 'event_handler_A' "
+               "since it is a registered event handler")
+        self.assertEqual(str(cm.exception), msg)
+
