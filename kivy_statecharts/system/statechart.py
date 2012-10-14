@@ -908,58 +908,6 @@ class StatechartManager(EventDispatcher):
         else:
             self.go_to_state(state=state, from_current_state=from_current_state, use_history=True, context=context)
 
-    """ 
-      @private 
-      Will process the arguments supplied to the go_to_state method.
-    
-      TODO: Come back to this and refactor the code. It works, but it
-            could certainly be improved
-
-      [PORT] Instead of this, made args optional, and made go_to_state and go_to_history_state 
-             calls with explicit args
-    """
-    def _process_go_to_state_args(self, args):
-        processed_args = { 
-            'state': None, 
-            'from_current_state': None, 
-            'use_history': False, 
-            'context': None 
-        }
-          
-        args = (arg for arg in args if arg)
-      
-        if (len(args) < 1):
-            return processed_args
-      
-        processed_args['state'] = args[0]
-    
-        if (len(args) == 2):
-            value = args[1]
-            if isinstance(value, bool):
-                processed_args['use_history'] = value
-            elif (isinstance(value, dict) or isinstance(value, object)) and not isinstance(value, State):
-                processed_args['context'] = value
-            else:
-                processed_args['from_current_state'] = value
-        elif (len(args) == 3):
-            value = args[1]
-            if isinstance(value, bool):
-                processed_args['use_history'] = value
-                processed_args['context'] = args[2]
-            else:
-                processed_args['from_current_state'] = value
-                value = args[2]
-                if isinstance(value, bool):
-                    processed_args['use_history'] = value
-                else:
-                    processed_args['context'] = value
-        else:
-            processed_args['from_current_state'] = args[1]
-            processed_args['use_history'] = args[2]
-            processed_args['context'] = args[3]
-      
-        return processed_args
- 
     """
       Sends a given event to all the statechart's current states.
           
