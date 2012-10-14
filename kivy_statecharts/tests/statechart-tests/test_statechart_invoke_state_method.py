@@ -377,4 +377,16 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
                "recognized state in statechart")
         self.assertEqual(str(cm.exception), msg)
 
+    # [PORT] [TODO] This doesn't work -- can it be slowed down?
+    def test_invoke_method_go_to_state_then_lock_and_unlock_the_transitioning_system(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
+
+        # Locking is not normally done via API.
+        statechart_3.go_to_state_locked = True
+        statechart_3.go_to_state('B')
+        statechart_3.go_to_state_locked = True
+        statechart_3.go_to_state('A')
+        statechart_3.go_to_state_locked = True
+        statechart_3.go_to_state('B')
 
