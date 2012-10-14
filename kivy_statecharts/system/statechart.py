@@ -495,15 +495,6 @@ class StatechartManager(EventDispatcher):
         return self.root_state_instance.state_is_entered_substate(state)
         
     """
-      Checks if the given value represents a state is this statechart
-      
-      @param value {State|String} either a state object or the name of a state
-      @returns {Boolean} true if the state does belong ot the statechart, otherwise false is returned
-    """
-    def does_contain_state(self, value):
-        return self.get_state(value) is not None
-        
-    """
       Gets a state from the statechart that matches the given value
       
       @param value {State|String} either a state object or the name of a state
