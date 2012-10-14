@@ -575,8 +575,10 @@ class StatechartManager(EventDispatcher):
         state = self.get_state(state)
           
         if state is None:
-            self.statechart_log_error("Cannot to goto state {0}. Not a recognized state in statechart".format(param_state))
-            return
+            msg = ("Cannot to goto state {0}. Not a recognized state in "
+                   "statechart.").format(param_state)
+            self.statechart_log_error(msg)
+            raise Exception(msg)
           
         if self.go_to_state_locked:
             # There is a state transition currently happening. Add this requested state

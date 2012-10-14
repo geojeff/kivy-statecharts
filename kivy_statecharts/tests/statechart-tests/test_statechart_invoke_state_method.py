@@ -323,9 +323,15 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
 
         with self.assertRaises(Exception) as cm:
             statechart_2.go_to_state('B')
-
         msg = ("Cannot go to state B. Statechart has not yet been "
                "initialized.")
+        self.assertEqual(str(cm.exception), msg)
 
+        statechart_2.init_statechart()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_2.go_to_state('Z')
+        msg = ("Cannot to goto state Z. Not a recognized state in "
+               "statechart.")
         self.assertEqual(str(cm.exception), msg)
 
