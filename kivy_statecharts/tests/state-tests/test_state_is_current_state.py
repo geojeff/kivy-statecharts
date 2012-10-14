@@ -63,3 +63,4 @@ class StateIsCurrentStateTestCase(unittest.TestCase):
     def test_if_state_is_current_substate(self):
         self.assertTrue(root_state_1.state_is_current_substate(state_A))
         self.assertFalse(state_B.state_is_current_substate(state_A))
+        self.assertFalse(state_B.state_is_current_substate(None))
