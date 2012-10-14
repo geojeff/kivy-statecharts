@@ -676,21 +676,27 @@ class StatechartManager(EventDispatcher):
       that has been suspended
     """
     def _go_to_state_suspended(self, *l):
-        self.go_to_state_suspended = self.go_to_state_locked and self.go_to_state_suspended_point is not None # [PORT] this was !!self.go_to_state_suspended_point -- boolean force?
+        self.go_to_state_suspended = (self.go_to_state_locked 
+                and self.go_to_state_suspended_point is not None)
         
     """
       Resumes an active goto state transition process that has been suspended.
     """
     def resume_go_to_state(self):
         if not self.go_to_state_suspended:
-            self.statechart_log_error("Cannot resume goto state since it has not been suspended")
-            return
+            msg = ("Cannot resume goto state since it has not been suspended.")
+            self.statechart_log_error(msg)
+            raise Exception(msg)
           
         point = self.go_to_state_suspended_point
-        self._execute_go_to_state_actions(point['go_to_state'], point['actions'], point['marker'], point['context'])
+        self._execute_go_to_state_actions(point['go_to_state'],
+                                          point['actions'],
+                                          point['marker'],
+                                          point['context'])
         
     """ @private """
-    def _execute_go_to_state_actions(self, go_to_state, actions, marker, context):
+    def _execute_go_to_state_actions(self, go_to_state,
+                                     actions, marker, context):
         action = None
         action_result = None
             

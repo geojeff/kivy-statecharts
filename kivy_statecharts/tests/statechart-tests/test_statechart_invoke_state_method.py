@@ -347,4 +347,15 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         msg = ("Cannot to goto state B. Z is not a "
                "recognized current state in "
                "the statechart.")
-        self.assertEqual(str(cm.exception), msg)
+        self.assertEqual(str(cm.exception), msg) 
+
+    def test_invoke_method_resume_go_to_state_when_not_suspended(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.resume_go_to_state()
+        msg = ("Cannot resume goto state since it has not been suspended.")
+        self.assertEqual(str(cm.exception), msg) 
+
+
