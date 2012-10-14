@@ -358,4 +358,23 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         msg = ("Cannot resume goto state since it has not been suspended.")
         self.assertEqual(str(cm.exception), msg) 
 
+    def test_invoke_method_go_to_history_state_before_init_statechart_called(self):
+        statechart_3 = Statechart_3()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.go_to_history_state('B')
+        msg = ("Cannot go to state B's history state. Statechart has "
+               "not yet been initialized")
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_invoke_method_go_to_history_state_with_bad_state(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.go_to_history_state('Z')
+        msg = ("Cannot to goto state None's history state. Not a "
+               "recognized state in statechart")
+        self.assertEqual(str(cm.exception), msg)
+
 

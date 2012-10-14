@@ -877,8 +877,10 @@ class StatechartManager(EventDispatcher):
     """
     def go_to_history_state(self, state, from_current_state=None, recursive=None, context=None):
         if not self.statechart_is_initialized:
-            self.statechart_log_error("Cannot go to state {0}'s history state. Statechart has not yet been initialized".format(state))
-            return
+            msg = ("Cannot go to state {0}'s history state. Statechart has "
+                   "not yet been initialized").format(state)
+            self.statechart_log_error(msg)
+            raise Exception(msg)
           
         # [PORT] Assumming that in python argument handling will suffice.
         #args = self._process_go_to_state_args(arguments)
@@ -891,8 +893,10 @@ class StatechartManager(EventDispatcher):
         state = self.get_state(state)
         
         if state is None:
-            self.statechart_log_error("Cannot to goto state {0}'s history state. Not a recognized state in statechart".format(state))
-            return
+            msg = ("Cannot to goto state {0}'s history state. Not a "
+                   "recognized state in statechart").format(state)
+            self.statechart_log_error(msg)
+            raise Exception(msg)
           
         history_state = state.history_state
           
