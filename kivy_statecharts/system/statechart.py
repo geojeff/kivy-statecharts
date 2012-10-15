@@ -1414,11 +1414,7 @@ class StatechartManager(EventDispatcher):
             
             value = getattr(self, key)
 
-            # [PORT] We don't care about functions here -- States must be classes.
-            if inspect.isfunction(value):
-                continue
-
-            # [PORT] And same goes for methods.
+            # [PORT] We don't care about methods here -- States must be classes.
             if inspect.ismethod(value):
                 continue
             
