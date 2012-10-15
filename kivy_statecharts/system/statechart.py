@@ -10,7 +10,12 @@ from kivy_statecharts.system.async import Async
 from kivy_statecharts.system.state import State
 from kivy_statecharts.system.history_state import HistoryState
 from kivy_statecharts.system.empty_state import EmptyState
-from kivy.properties import BooleanProperty, ListProperty, NumericProperty, ObjectProperty, StringProperty
+from kivy.properties import BooleanProperty
+from kivy.properties import ListProperty
+from kivy.properties import NumericProperty
+from kivy.properties import ObjectProperty
+from kivy.properties import StringProperty
+from kivy.properties import DictProperty
 from kivy.logger import Logger
 
 from collections import deque
@@ -328,6 +333,12 @@ class StatechartManager(EventDispatcher):
     """
     suppress_statechart_warnings = BooleanProperty(False)
     
+    """
+      A dictionary for holding statechart info, for debugging.
+    """
+    _state_handle_event_info = DictProperty({})
+
+
     def __init__(self, **kw):
         #self.bind(current_states=self._current_states)
         self.bind(monitor_is_active=self._monitor_is_active_did_change)
@@ -1017,7 +1028,7 @@ class StatechartManager(EventDispatcher):
       @param {Boolean} handled indicates if the handler was able to handle the event 
     """
     def state_did_try_to_handle_event(self, state, event, handler, handled):
-        self._state_handle_event_info = None
+        self._state_handle_event_info = {}
       
     """ @private
     

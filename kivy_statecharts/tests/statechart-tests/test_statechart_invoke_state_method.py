@@ -390,3 +390,6 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         statechart_3.go_to_state_locked = True
         statechart_3.go_to_state('B')
 
+    def test_invoke_method_details(self):
+        details = statechart_1.details()
+        self.assertTrue(type(details) == dict)
