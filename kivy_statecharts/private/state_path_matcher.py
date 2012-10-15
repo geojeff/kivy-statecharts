@@ -20,13 +20,13 @@ from kivy.properties import ListProperty, StringProperty, ObjectProperty
   
   Syntax:
   
-    expression -> <this> <subpath> | <path>
+    expression -> <self> <subpath> | <path>
     
     path -> <part> <subpath>
     
     subpath -> '.' <part> <subpath> | empty
   
-    this -> 'this'
+    self -> 'self'
     
     part -> <name> | <expansion>
     
@@ -106,21 +106,23 @@ class StatePathMatcher(EventDispatcher):
         parts = self.expression.split('.') if self.expression else []
         tokens = []
       
+        index = 0
         for part in parts:
             if '~' in part:
                 part = part.split('~')
                 if len(part) > 2:
-                    raise "Invalid use of '~' at part {0}".format(i)
+                    raise Exception("Invalid use of '~' at part {0}".format(index))
                 token = _ExpandToken(start=part[0], end=part[1])
             elif part == 'self':
                 if len(tokens) > 0:
-                    raise "Invalid use of 'self' at part {0}".format(i)
+                    raise Exception("Invalid use of 'self' at part {0}".format(index))
                 token = _ThisToken()
             else:
                 token = _BasicToken(value=part)
             
             token.owning_matcher = self
             tokens.append(token)
+            index += 1
       
         self.tokens = tokens
       
@@ -146,12 +148,16 @@ class StatePathMatcher(EventDispatcher):
       Will make a state path against this matcher's expression. 
       
       The path provided must follow a basic dot-notation path containing
-      one or dots '.'. Ex: 'foo', 'foo.bar'
+      one or more dots '.'. Ex: 'foo', 'foo.bar'
       
       @param path {String} a dot-notation path
       @return {Boolean} true if there is a match, otherwise false
     """
     def match(self, path):
+        # Bug out if path is None or is '' or if path is not a string.
+        if path is None or not path or not isinstance(path, basestring):
+            return False
+
         # When this matcher starts a match run, set self._stack. For example,
         # for path A.B.C, the stack witll be [ A, B, C ]. The related _pop method
         # will pop them off as C, then B, then A, during match operations.
@@ -159,11 +165,6 @@ class StatePathMatcher(EventDispatcher):
         # Set self._stack to None if path is None.
         #
         self._stack = path.split('.') if path else None
-
-
-        # Bug out if path is None or is '' or if path is not a string.
-        if path is None or not path or not isinstance(path, basestring):
-            return False
 
         # self._chain is the head of a linked-list of chained tokens. Kick off a
         # traversal of the tokens by firing on the head.
@@ -201,8 +202,8 @@ class _Token(EventDispatcher):
       Used to match against what is currently on the owning_matcher's
       current path stack
     """
-    def match(self):
-        return False
+    def match(self):  #pragma: no cover
+        raise NotImplementedError
 
 """ @private @class
 
