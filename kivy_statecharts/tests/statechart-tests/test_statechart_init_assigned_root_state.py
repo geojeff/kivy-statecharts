@@ -101,6 +101,9 @@ class StatechartTestCase(unittest.TestCase):
 
         self.assertTrue(statechart_2.statechart_is_initialized)
 
+        statechart_2.suppress_statechart_warnings = True
+        statechart_2.statechart_log_warning('Ignore me')
+
     def test_init_with_root_state_class_of_wrong_type(self):
         class Statechart_3(StatechartManager):
             def __init__(self, **kwargs):
