@@ -407,4 +407,6 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         statechart_3.name = 'Number 3'
         details = statechart_3.details()
         self.assertTrue(type(details) == dict)
+        details = statechart_3._list_to_string('key', [], 2)
+        self.assertEqual(details, "  key: []")
 
