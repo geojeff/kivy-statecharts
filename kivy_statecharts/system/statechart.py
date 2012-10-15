@@ -1604,12 +1604,3 @@ ROOT_STATE_NAME = "__ROOT_STATE__"
 """
 EXIT_STATE = 0
 ENTER_STATE = 1
-
-"""
-  A Startchart class. 
-"""
-class Statechart(StatechartManager):
-    def __init__(self, **kw):
-        kw['auto_init_statechart'] = False
-        super(Statechart, self).__init__(**kw)
-        #StatechartManager.__init__(self)
