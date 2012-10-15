@@ -1559,16 +1559,17 @@ class StatechartManager(EventDispatcher):
       @see #details
     """
     def to_string_with_details(self):
-        return "{0}\n{1}".format(self, self._hash_to_string(self.details, 2))
+        return "{0}\n{1}".format(self, self._hash_to_string(self.details(), 2))
       
     """ @private """
     def _hash_to_string(self, hash_to_convert, indent):
+        print hash_to_convert
         hash_as_string = ''
         for key in hash_to_convert:
             value = hash_to_convert[key]
-            if isinstance(value, Array):
-                hash_as_string += self._array_to_string(key, value, indent) + "\n";
-            elif isinstance(value, Object):
+            if isinstance(value, list):
+                hash_as_string += self._list_to_string(key, value, indent) + "\n";
+            elif isinstance(value, dict):
                 hash_as_string += "{0}{1}:\n".format(' ' * indent, key)
                 hash_as_string += self._hash_to_string(value, indent + 2)
             else:
@@ -1577,18 +1578,18 @@ class StatechartManager(EventDispatcher):
         return hash_as_string
         
     """ @private """
-    def _array_to_string(self, key, array, indent):
-        if len(array) == 0:
+    def _list_to_string(self, key, l, indent):
+        if len(l) == 0:
             return "{0}{1}: []".format(' ' * indent, key)
           
-        array_as_string = "{0}{1}: [\n".format(' ' * indent, key)
+        list_as_string = "{0}{1}: [\n".format(' ' * indent, key)
           
-        for item, idx in array:
-            array_as_string += "{0}{1}\n".format(' ' * indent + 2, item)
+        for item in l:
+            list_as_string += "{0}{1}\n".format(' ' * (indent + 2), item)
           
-        array_as_string += ' ' * indent + "]"
+        list_as_string += ' ' * indent + "]"
           
-        return array_as_string
+        return list_as_string
       
 class StatechartMixin(StatechartManager):
     pass

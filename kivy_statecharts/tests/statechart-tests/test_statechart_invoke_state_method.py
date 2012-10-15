@@ -393,3 +393,5 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
     def test_invoke_method_details(self):
         details = statechart_1.details()
         self.assertTrue(type(details) == dict)
+        details = statechart_1.to_string_with_details()
+        self.assertEqual(type(details), str)
