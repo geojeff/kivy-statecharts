@@ -395,3 +395,11 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         self.assertTrue(type(details) == dict)
         details = statechart_1.to_string_with_details()
         self.assertEqual(type(details), str)
+
+    def test_invoke_method_forbidden_unknown_event(self):
+        with self.assertRaises(Exception) as cm:
+            statechart_1.invoke_state_method('unknown_event')
+        msg = "Cannot invoke method unkown_event"
+        self.assertEqual(str(cm.exception), msg)
+
+

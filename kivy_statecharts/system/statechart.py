@@ -1278,8 +1278,8 @@ class StatechartManager(EventDispatcher):
     """
     def invoke_state_method(self, method_name, *args):
         if method_name == 'unknown_event':
-            self.statechart_log_error("Cannot invoke method unkownEvent")
-            return
+            self.statechart_log_error("Cannot invoke method unkown_event")
+            raise Exception("Cannot invoke method unkown_event")
           
         callback = None
         checked_states = {}
