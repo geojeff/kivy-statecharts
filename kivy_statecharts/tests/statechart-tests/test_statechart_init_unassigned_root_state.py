@@ -91,6 +91,17 @@ class Statechart_5(StatechartManager):
             }
         super(Statechart_5, self).__init__(**attrs) 
 
+class Statechart_6(StatechartManager):
+    def __init__(self):
+        attrs = { 
+            'auto_init_statechart': False,
+            'root_state_example_class': RootStateExampleClass,
+            'initial_state_key': 'F',
+            'F': F,
+            'states_are_concurrent': True
+            }
+        super(Statechart_6, self).__init__(**attrs) 
+
 #Statechart_1 = StatechartManager(**{
 #    'initial_state_key': 'A',
 #    'A': State(**{ 'foo': lambda self,*l: self.go_to_state('B')}),
@@ -204,4 +215,14 @@ class StatechartTestCase(unittest.TestCase):
             statechart_5.init_statechart()
 
         self.assertEqual(str(cm.exception), "Invalid root state example")
+
+    def test_statechart_6_which_has_an_initial_state_set_with_concurrent_states(self):
+        statechart_6 = Statechart_6()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_6.init_statechart()
+
+        msg = "Cannot assign an initial state when states are concurrent"
+
+        self.assertEqual(str(cm.exception), msg)
 
