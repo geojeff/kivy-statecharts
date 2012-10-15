@@ -78,6 +78,19 @@ class Statechart_4(StatechartManager):
             }
         super(Statechart_4, self).__init__(**attrs) 
 
+class InvalidRootStateExampleClass(object):
+    pass
+
+class Statechart_5(StatechartManager):
+    def __init__(self):
+        attrs = { 
+            'auto_init_statechart': False,
+            'root_state_example_class': InvalidRootStateExampleClass,
+            'initial_state_key': 'F',
+            'F': F
+            }
+        super(Statechart_5, self).__init__(**attrs) 
+
 #Statechart_1 = StatechartManager(**{
 #    'initial_state_key': 'A',
 #    'A': State(**{ 'foo': lambda self,*l: self.go_to_state('B')}),
@@ -183,3 +196,12 @@ class StatechartTestCase(unittest.TestCase):
         self.assertTrue(statechart_4.statechart_is_initialized)
         self.assertFalse(statechart_4.root_state_instance is None)
         self.assertEqual(statechart_4.root_state_instance.get_substate('F'), statechart_4.get_state('F'))
+
+    def test_statechart_5_which_has_invalid_root_state_example_class(self):
+        statechart_5 = Statechart_5()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_5.init_statechart()
+
+        self.assertEqual(str(cm.exception), "Invalid root state example")
+

@@ -652,14 +652,25 @@ class StatechartManager(EventDispatcher):
         go_to_state_actions = []
 
         # Go ahead and find states that are to be exited
-        self._traverse_states_to_exit(exit_states.popleft() if exit_states else None, exit_states, pivot_state, go_to_state_actions)
+        self._traverse_states_to_exit(
+                exit_states.popleft() if exit_states else None,
+                exit_states, pivot_state, go_to_state_actions)
           
         # Now go find states that are to be entered
         if pivot_state is not state:
-            self._traverse_states_to_enter(enter_states.pop(), enter_states, pivot_state, use_history, go_to_state_actions)
+            self._traverse_states_to_enter(enter_states.pop(), enter_states,
+                                           pivot_state, use_history,
+                                           go_to_state_actions)
         else:
-            self._traverse_states_to_exit(pivot_state, deque(), None, go_to_state_actions)
-            self._traverse_states_to_enter(pivot_state, None, None, use_history, go_to_state_actions)
+            self._traverse_states_to_exit(pivot_state,
+                                          deque(),
+                                          None,
+                                          go_to_state_actions)
+
+            self._traverse_states_to_enter(pivot_state,
+                                           None,
+                                           None,
+                                           use_history, go_to_state_actions)
           
         # Collected all the state transition actions to be performed. Now execute them.
         self._go_to_state_actions = go_to_state_actions
@@ -1066,71 +1077,96 @@ class StatechartManager(EventDispatcher):
         
     """ @private
         
-      Recursively follow states that are to be entered during the state transition process. The
-      enter process is to start from the given state and work its way down a given enter path. When
-      the end of enter path has been reached, then continue entering states based on whether 
-      an initial substate is defined, there are concurrent substates or history states are to be
-      followed; when none of those condition are met then the enter process is done.
+      Recursively follow states that are to be entered during the state
+      transition process. The enter process is to start from the given state
+      and work its way down a given enter path. When the end of enter path has
+      been reached, then continue entering states based on whether an initial
+      substate is defined, there are concurrent substates or history states are
+      to be followed; when none of those condition are met then the enter
+      process is done.
           
       @param state {State} the sate to be entered
-      @param enter_state_path {collection.deque} a deque representing an initial path of states that are to be entered
-      @param pivot_state {State} The state pivoting when to go from exiting states to entering states
-      @param use_history {Boolean} indicates whether to recursively follow history states 
+      @param enter_state_path {collection.deque} a deque representing an
+        initial path of states that are to be entered
+      @param pivot_state {State} The state pivoting when to go from exiting
+        states to entering states
+      @param use_history {Boolean} indicates whether to recursively follow
+        history states 
     """
-    def _traverse_states_to_enter(self, state, enter_state_path, pivot_state, use_history, go_to_state_actions):
-        if not state:
+    def _traverse_states_to_enter(self, state, enter_state_path, pivot_state,
+                                  use_history, go_to_state_actions):
+        if not state: #pragma: no cover
             return
           
-        # We do not want to enter states in the enter path until the pivot state has been reached. After
-        # the pivot state has been reached, then we can go ahead and actually enter states.
+        # We do not want to enter states in the enter path until the pivot
+        # state has been reached. After the pivot state has been reached, then
+        # we can go ahead and actually enter states.
         if pivot_state:
             if state is not pivot_state:
-                self._traverse_states_to_enter(enter_state_path.pop(), enter_state_path, pivot_state, use_history, go_to_state_actions) # [PORT] pop, now on deque
+                # [PORT] pop, now on deque
+                self._traverse_states_to_enter(enter_state_path.pop(),
+                        enter_state_path, pivot_state, use_history,
+                        go_to_state_actions)
             else:
-                self._traverse_states_to_enter(enter_state_path.pop(), enter_state_path, None, use_history, go_to_state_actions) # [PORT] pop, now on deque
+                # [PORT] pop, now on deque
+                self._traverse_states_to_enter(enter_state_path.pop(),
+                        enter_state_path, None, use_history,
+                        go_to_state_actions)
           
-        # If no more explicit enter path instructions, then default to enter states based on 
-        # other criteria
+        # If no more explicit enter path instructions, then default to enter
+        # states based on other criteria
         elif not enter_state_path or len(enter_state_path) == 0:
-            go_to_state_action = { 'action': ENTER_STATE, 'state': state, 'current_state': False }
+            go_to_state_action = { 'action': ENTER_STATE, 'state': state,
+                    'current_state': False }
             go_to_state_actions.append(go_to_state_action)
             
-            initial_substate_key = state.initial_substate_key if hasattr(state, 'initial_substate_key') else ''
+            initial_substate_key = state.initial_substate_key \
+                    if hasattr(state, 'initial_substate_key') \
+                    else ''
             history_state = state.history_state
             
             # State has concurrent substates. Need to enter all of the substates
             state_obj = self.get_state(state)
             if state_obj.substates_are_concurrent:
-                self._traverse_concurrent_states_to_enter(state_obj.substates, None, use_history, go_to_state_actions)
+                self._traverse_concurrent_states_to_enter(state_obj.substates,
+                        None, use_history, go_to_state_actions)
             
-            # State has substates and we are instructed to recursively follow the state's
-            # history state if it has one.
+            # State has substates and we are instructed to recursively follow
+            # the state's history state if it has one.
             elif state_obj.substates > 0 and history_state and use_history:
-                self._traverse_states_to_enter(history_state, None, None, use_history, go_to_state_actions)
+                self._traverse_states_to_enter(history_state, None, None,
+                        use_history, go_to_state_actions)
             
             # State has an initial substate to enter
             elif initial_substate_key:
                 initial_substate_obj = getattr(state, initial_substate_key)
-                if initial_substate_obj is not None and isinstance(initial_substate_obj, HistoryState):
-                    if not use_history:
-                        use_history = initial_substate_obj.is_recursive
-                self._traverse_states_to_enter(initial_substate_obj, None, None, use_history, go_to_state_actions)
+                if (initial_substate_obj is not None 
+                        and isinstance(initial_substate_obj, HistoryState)
+                        and not use_history):
+                    use_history = initial_substate_obj.is_recursive
+                self._traverse_states_to_enter(initial_substate_obj,
+                                               None, None, use_history,
+                                               go_to_state_actions)
                 
-            # Looks like we hit the end of the road. Therefore the state has now become
-            # a current state of the statechart.
+            # Looks like we hit the end of the road. Therefore the state has
+            # now become a current state of the statechart.
             else:
                 go_to_state_action['current_state'] = True
           
-        # Still have an explicit enter path to follow, so keep moving through the path.
+        # Still have an explicit enter path to follow, so keep moving through
+        # the path.
         elif len(enter_state_path) > 0:
-            go_to_state_actions.append({ 'action': ENTER_STATE, 'state': state, 'current_state': False })
+            go_to_state_actions.append({ 'action': ENTER_STATE, 'state': state,
+                'current_state': False })
             next_state = enter_state_path.pop() # [PORT] pop, now on deque
-            self._traverse_states_to_enter(next_state, enter_state_path, None, use_history, go_to_state_actions)
+            self._traverse_states_to_enter(next_state, enter_state_path, None,
+                    use_history, go_to_state_actions)
             
-            # We hit a state that has concurrent substates. Must go through each of the substates
-            # and enter them
+            # We hit a state that has concurrent substates. Must go through
+            # each of the substates and enter them
             if state.substates_are_concurrent:
-                self._traverse_concurrent_states_to_enter(state.substates, next_state, use_history, go_to_state_actions)
+                self._traverse_concurrent_states_to_enter(state.substates,
+                        next_state, use_history, go_to_state_actions)
         
     """ @override
         
@@ -1147,7 +1183,8 @@ class StatechartManager(EventDispatcher):
                     return True
                 state = state.parent_state
           
-        # None of the current states can respond. Now check the statechart itself
+        # None of the current states can respond. Now check the statechart
+        # itself
         if not hasattr(self, event):
             return False
 
@@ -1155,9 +1192,10 @@ class StatechartManager(EventDispatcher):
         
     """ @override
         
-      Attempts to handle a given event against any of the statechart's current states and the
-      statechart itself. If any current state can handle the event or the statechart itself can
-      handle the event then True is returned, otherwise False is returned.
+      Attempts to handle a given event against any of the statechart's current
+      states and the statechart itself. If any current state can handle the
+      event or the statechart itself can handle the event then True is
+      returned, otherwise False is returned.
         
       @param event {String} what to perform
       @param arg1 {Object} Optional
@@ -1176,19 +1214,19 @@ class StatechartManager(EventDispatcher):
         return self.send_event(event, arg1, arg2) is not None
         
     """
-      Used to invoke a method on current states. If the method cannot be executed
-      on a current state, then the state's parent states will be tried in order
-      of closest ancestry.
+      Used to invoke a method on current states. If the method cannot be
+      executed on a current state, then the state's parent states will be tried
+      in order of closest ancestry.
           
       A few notes: 
           
        1. Calling this is not the same as calling send_event or send_action.
           Rather, this should be seen as calling normal methods on a state that 
           will *not* call go_to_state or go_to_history_state.
-       2. A state will only ever be invoked once per call. So if there are two 
-          or more current states that have the same parent state, then that parent 
-          state will only be invoked once if none of the current states are able
-          to invoke the given method.
+       2. A state will only ever be invoked once per call. So if there are two
+          or more current states that have the same parent state, then that 
+          parent state will only be invoked once if none of the current states
+          are able to invoke the given method.
           
       When calling this method, you are able to supply zero ore more arguments
       that can be pass onto the method called on the states. As an example
@@ -1198,11 +1236,12 @@ class StatechartManager(EventDispatcher):
       The above call will invoke the render method on the current states
       and supply the context and firstTime arguments to the method. 
           
-      Because a statechart can have more than one current state and the method 
-      invoked may return a value, the addition of a callback function may be provided 
-      in order to handle the returned value for each state. As an example, let's say
-      we want to call a calculate method on the current states where the method
-      will return a value when invoked. We can handle the returned values like so:
+      Because a statechart can have more than one current state and the method
+      invoked may return a value, the addition of a callback function may be
+      provided in order to handle the returned value for each state. As an
+      example, let's say we want to call a calculate method on the current
+      states where the method will return a value when invoked. We can handle
+      the returned values like so:
           
           invoke_state_method('calculate', value, function(state, result) {
             # .. handle the result returned from calculate that was invoked
@@ -1214,17 +1253,17 @@ class StatechartManager(EventDispatcher):
       a callback function is given, it must be the last value supplied to this
       method.
           
-      invoke_state_method will return a value if only one state was able to have 
-      the given method invoked on it, otherwise no value is returned. 
+      invoke_state_method will return a value if only one state was able to
+      have the given method invoked on it, otherwise no value is returned. 
           
       @param method_name {String} method_name a method name
       @param args {Object...} Optional. any additional arguments
       @param func {Function} Optional. a callback function. Must be the last
              value supplied if provided.
              
-      @returns a value if the number of current states is one, otherwise undefined
-               is returned. The value is the result of the method that got invoked
-               on a state.
+      @returns a value if the number of current states is one, otherwise
+        undefined is returned. The value is the result of the method that got
+        invoked on a state.
     """
     def invoke_state_method(self, method_name, *args):
         if method_name == 'unknown_event':
@@ -1237,18 +1276,24 @@ class StatechartManager(EventDispatcher):
           
         # If last arg is a callback function, set it, popping it off args.
         args = list(args) if args else None
-        if args and (inspect.isfunction(args[-1]) or inspect.ismethod(args[-1])):
+        if (args and 
+                (inspect.isfunction(args[-1]) or inspect.ismethod(args[-1]))):
             callback = args.pop()
 
-        # Search current states for methods matching method_name, call the method on each,
-        # and fire the callback on each, if it exists.
+        # Search current states for methods matching method_name, call the
+        # method on each, and fire the callback on each, if it exists.
         for state in self.current_states:
             while state is not None:
                 if state.full_path in checked_states:
                     break
                 checked_states[state.full_path] = True
-                method = getattr(state, method_name) if hasattr(state, method_name) else None
-                if method and inspect.ismethod(method) and not (hasattr(method, 'is_event_handler') and not method.is_event_handler):
+                method = getattr(state, method_name) \
+                        if hasattr(state, method_name) \
+                        else None
+                if (method 
+                        and inspect.ismethod(method)
+                        and not (hasattr(method, 'is_event_handler')
+                            and not method.is_event_handler)):
                     result = method(*tuple(args if args else []))
                     if callback is not None:
                         callback(state, result)
@@ -1262,73 +1307,105 @@ class StatechartManager(EventDispatcher):
         
       Iterate over all the given concurrent states and enter them
     """
-    def _traverse_concurrent_states_to_enter(self, states, exclude, use_history, go_to_state_actions):
+    def _traverse_concurrent_states_to_enter(self, states, exclude,
+            use_history, go_to_state_actions):
         for i in range(len(states)):
             state = states[i]
             if state is not exclude:
-                self._traverse_states_to_enter(state, None, None, use_history, go_to_state_actions)
+                self._traverse_states_to_enter(state, None, None, use_history,
+                        go_to_state_actions)
         
     """ @private
         
-      Called by go_to_state to flush a pending state transition at the front of the 
-      pending queue.
+      Called by go_to_state to flush a pending state transition at the front of
+      the pending queue.
     """
     def _flush_pending_state_transition(self):
+
         if not self._pending_state_transitions:
-            self.statechart_log_error("Unable to flush pending state transition. _pending_state_transitions is invalid.")
-            return
-        pending = self._pending_state_transitions.popleft() if self._pending_state_transitions else None
+            msg = ("Unable to flush pending state transition. "
+                   "_pending_state_transitions is invalid.")
+            self.statechart_log_error(msg)
+            raise Exception(msg)
+
+        pending = None
+
+        if self._pending_state_transitions:
+            pending = self._pending_state_transitions.popleft()
+
         if not pending:
             return
-        self.go_to_state(state=pending['state'], from_current_state=pending['from_current_state'], use_history=pending['use_history'], context=pending['context'])
+
+        self.go_to_state(state=pending['state'],
+                         from_current_state=pending['from_current_state'],
+                         use_history=pending['use_history'],
+                         context=pending['context'])
         
     """ @private
       
-      Called by send_event to flush a pending actions at the front of the pending
-      queue
+      Called by send_event to flush a pending actions at the front of the
+      pending queue
     """
     def _flush_pending_sent_events(self):
-        pending = self._pending_sent_events.popleft() if self._pending_sent_events else None
+
+        pending = self._pending_sent_events.popleft() \
+                if self._pending_sent_events \
+                else None
+
         if not pending:
             return None
-        return self.send_event(pending['event'], pending['arg1'], pending['arg2'])
+
+        return self.send_event(pending['event'],
+                               pending['arg1'],
+                               pending['arg2'])
         
     """ @private """
     def _monitor_is_active_did_change(self, *l):
+
         if self.monitor_is_active and self.monitor is None:
             self.monitor = StatechartMonitor(self)
         
     """ @private 
         
-      Will return a newly constructed root state class. The root state will have substates added to
-      it based on properties found on this state that derive from a State class. For the
-      root state to be successfully built, the following much be met:
+      Will return a newly constructed root state class. The root state will
+      have substates added to it based on properties found on this state that
+      derive from a State class. For the root state to be successfully built,
+      the following much be met:
           
-       - The root_state_example_class property must be defined with a class that derives from State
-       - Either the initial_state_key or states_are_concurrent property must be set, but not both
+       - The root_state_example_class property must be defined with a class
+         that derives from State
+       - Either the initial_state_key or states_are_concurrent property must be
+         set, but not both
        - There must be one or more states that can be added to the root state
             
     """
     def _construct_root_state_class(self):
+
         state_count = 0
         attrs = {}
           
-        if inspect.isclass(self.root_state_example_class) and not issubclass(self.root_state_example_class, State):
+        if (inspect.isclass(self.root_state_example_class)
+                and not issubclass(self.root_state_example_class, State)):
             self._log_statechart_creation_error("Invalid root state example")
-            return None
+            raise Exception("Invalid root state example")
           
         if self.states_are_concurrent and self.initial_state_key:
-            self._log_statechart_creation_error("Cannot assign an initial state when states are concurrent")
+            msg = "Cannot assign an initial state when states are concurrent"
+            self._log_statechart_creation_error(msg)
+            raise Exception(msg)
         elif self.states_are_concurrent:
             attrs['substates_are_concurrent'] = True
         elif self.initial_state_key:
             attrs['initial_substate_key'] = self.initial_state_key
         else:
-            self._log_statechart_creation_error("Must either define initial state or assign states as concurrent")
-            return None
+            msg = ("Must either define initial state or assign states as "
+                   "concurrent")
+            self._log_statechart_creation_error(msg)
+            raise Exception(msg)
           
         # Find the states:
         for key in dir(self):
+
             if key == '__class__':
                 continue
 
@@ -1337,23 +1414,31 @@ class StatechartManager(EventDispatcher):
             
             value = getattr(self, key)
 
-            if inspect.isfunction(value): # [PORT] We don't care about functions here -- States must be classes.
+            # [PORT] We don't care about functions here -- States must be classes.
+            if inspect.isfunction(value):
                 continue
 
-            if inspect.ismethod(value): # [PORT] And same goes for methods.
+            # [PORT] And same goes for methods.
+            if inspect.ismethod(value):
                 continue
             
-            # [PORT] Check for value.plugin removed here. Substates are classes, either defined in-file or imported.
+            # [PORT] Check for value.plugin removed here. Substates are
+            # classes, either defined in-file or imported.
             
-            #if isinstance(value, State) and inspect.isclass(value) and self[key] is not self.__init__:
-            if inspect.isclass(value) and issubclass(value, State): # [PORT] Compare to same usage in state.py. Same here?
-                if key != 'initial_state_key': # [PORT] Don't set this. root_state will only have initial_substate_key, not initial_state_key.
+            #if (isinstance(value, State) and inspect.isclass(value) and
+            #             self[key] is not self.__init__):
+            # [PORT] Compare to same usage in state.py. Same here?
+            if inspect.isclass(value) and issubclass(value, State):
+                # [PORT] Don't set this. root_state will only have
+                # initial_substate_key, not initial_state_key.
+                if key != 'initial_state_key':
                     attrs[key] = value
                 state_count += 1
 
         if state_count == 0:
-            self._log_statechart_creation_error("Must define one or more states")
-            return None
+            msg = "Must define one or more states"
+            self._log_statechart_creation_error(msg)
+            raise Exception(msg)
           
         # [PORT] Using python type to make a new class...
 
@@ -1364,8 +1449,10 @@ class StatechartManager(EventDispatcher):
 
     """ @private """
     def _log_statechart_creation_error(self, msg):
-        #Logger.debug("Unable to create statechart for {0}: {1}.".format(self, msg)) # [PORT] Where does debug go in Kivy?
-        Logger.info("Unable to create statechart for {0}: {1}.".format(self, msg))
+
+        # [PORT] Where does Logger.debug() go in Kivy?
+        msg = "Unable to create statechart for {0}: {1}.".format(self, msg)
+        Logger.info(msg)
         
     """ 
       Used to log a statechart trace message
@@ -1377,7 +1464,9 @@ class StatechartManager(EventDispatcher):
       Used to log a statechart error message
     """
     def statechart_log_error(self, msg):
-        Logger.info("ERROR {0}: {1}".format(self._statechart_log_prefix(), msg)) # [PORT] ditto?
+        # [PORT] ditto?
+        msg = "ERROR {0}: {1}".format(self._statechart_log_prefix(), msg)
+        Logger.info(msg)
         
     """ 
       Used to log a statechart warning message
