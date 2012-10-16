@@ -164,7 +164,7 @@ class StatechartSequenceMatcher:
         return marker
   
     def _match_items(self, matcher_item, monitor_item):
-        if matcher_item is None or monitor_item is None:
+        if matcher_item is None or monitor_item is None:  #pragma: no cover
             return False
   
         if 'action' in matcher_item and matcher_item['action'] != monitor_item['action']:

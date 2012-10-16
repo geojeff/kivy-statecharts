@@ -14,6 +14,7 @@ from kivy_statecharts.system.statechart import StatechartManager
 
 import os, inspect
 
+
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
         kwargs['root_state_class'] = self.RootState

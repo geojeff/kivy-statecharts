@@ -14,6 +14,13 @@ from kivy_statecharts.system.statechart import StatechartManager
 
 import os, inspect
 
+"""
+  Constants used during the state transition process
+"""
+EXIT_STATE = 0
+ENTER_STATE = 1
+
+
 class TestState(State):
     enter_stateContext = ObjectProperty(None)
     exit_stateContext = ObjectProperty(None)
@@ -26,6 +33,7 @@ class TestState(State):
       
     def exit_state(self, context):
         self.exit_stateContext = context
+
 
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
@@ -63,6 +71,79 @@ class Statechart_1(StatechartManager):
             class F(TestState):
                 def __init__(self, **kwargs):
                     super(Statechart_1.RootState.B.F, self).__init__(**kwargs)
+
+class TestState_2(State):
+    enter_stateContext = ObjectProperty(None)
+    exit_stateContext = ObjectProperty(None)
+      
+    def __init__(self, **kwargs):
+        super(TestState_2, self).__init__(**kwargs)
+
+    def enter_state(self, context):
+        # Cause a delay.
+        i = 0
+        while i < 10000:
+            j = i * 1
+            i += 1
+        self.enter_stateContext = context
+      
+    def exit_state(self, context):
+        self.exit_stateContext = context
+
+class Statechart_2(StatechartManager):
+    def __init__(self, **kwargs):
+        kwargs['root_state_class'] = self.RootState
+        kwargs['monitor_is_active'] = True
+        kwargs['trace'] = True
+        super(Statechart_2, self).__init__(**kwargs)
+
+    class RootState(TestState_2):
+        def __init__(self, **kwargs):
+            kwargs['initial_substate_key'] = 'A'
+            super(Statechart_2.RootState, self).__init__(**kwargs)
+
+        class A(TestState_2):
+            def __init__(self, **kwargs):
+                kwargs['initial_substate_key'] = 'B'
+                super(Statechart_2.RootState.A, self).__init__(**kwargs)
+
+            class B(TestState_2):
+                def __init__(self, **kwargs):
+                    kwargs['initial_substate_key'] = 'C'
+                    super(Statechart_2.RootState.A.B, self).__init__(**kwargs)
+
+                class C(TestState_2):
+                    def __init__(self, **kwargs):
+                        kwargs['initial_substate_key'] = 'D'
+                        super(Statechart_2.RootState.A.B.C, self).__init__(**kwargs)
+
+                    class D(TestState_2):
+                        def __init__(self, **kwargs):
+                            kwargs['initial_substate_key'] = 'E'
+                            super(Statechart_2.RootState.A.B.C.D, self).__init__(**kwargs)
+
+                        class E(TestState_2):
+                            def __init__(self, **kwargs):
+                                kwargs['initial_substate_key'] = 'F'
+                                super(Statechart_2.RootState.A.B.C.D.E, self).__init__(**kwargs)
+
+                            class F(TestState_2):
+                                def __init__(self, **kwargs):
+                                    kwargs['initial_substate_key'] = 'G'
+                                    super(Statechart_2.RootState.A.B.C.D.E.F, self).__init__(**kwargs)
+
+                                class G(TestState_2):
+                                    def __init__(self, **kwargs):
+                                        kwargs['initial_substate_key'] = 'H'
+                                        super(Statechart_2.RootState.A.B.C.D.E.F.G, self).__init__(**kwargs)
+
+                                    class H(TestState_2):
+                                        def __init__(self, **kwargs):
+                                            super(Statechart_2.RootState.A.B.C.D.E.F.G.H, self).__init__(**kwargs)
+        class X(TestState_2):
+            def __init__(self, **kwargs):
+                super(Statechart_2.RootState.X, self).__init__(**kwargs)
+
 
 class StateTransitioningStandardContextWithoutConcurrentTestCase(unittest.TestCase):
     def setUp(self):
@@ -160,3 +241,52 @@ class StateTransitioningStandardContextWithoutConcurrentTestCase(unittest.TestCa
         self.assertEqual(state_B.enter_stateContext, context)
         self.assertEqual(state_F.enter_stateContext, context)
 
+    def test_calling_go_to_with_suspension_and_resume_to_trigger_pending_code(self):
+        statechart_2 = Statechart_2()
+        statechart_2.init_statechart()
+        root_state_2 = statechart_2.root_state_instance
+        monitor_2 = statechart_2.monitor
+        state_A = statechart_2.get_state('A')
+        state_B = statechart_2.get_state('B')
+        state_C = statechart_2.get_state('C')
+        state_D = statechart_2.get_state('D')
+        state_E = statechart_2.get_state('E')
+        state_F = statechart_2.get_state('F')
+        state_G = statechart_2.get_state('G')
+        state_H = statechart_2.get_state('H')
+        state_X = statechart_2.get_state('X')
+
+        self.assertTrue(state_H.is_current_state())
+        statechart_2.go_to_state('X', from_current_state=state_H, use_history=False, context=context)
+        self.assertTrue(state_X.is_current_state())
+
+        actions = []
+        actions.append({ 'action': EXIT_STATE, 'state': state_H })
+        actions.append({ 'action': EXIT_STATE, 'state': state_G })
+        actions.append({ 'action': EXIT_STATE, 'state': state_F })
+        actions.append({ 'action': EXIT_STATE, 'state': state_E })
+        actions.append({ 'action': EXIT_STATE, 'state': state_D })
+        actions.append({ 'action': EXIT_STATE, 'state': state_C })
+        actions.append({ 'action': EXIT_STATE, 'state': state_B })
+        actions.append({ 'action': EXIT_STATE, 'state': state_A })
+        actions.append({ 'action': ENTER_STATE, 'state': state_X, 'current_state': True })
+
+        statechart_2.go_to_state_locked = True
+
+        statechart_2.go_to_state_suspended_point = {
+            'go_to_state': state_X,
+            'actions': actions,
+            'marker': None,
+            'context': {}
+        }
+
+        statechart_2.go_to_state_suspended = True
+
+        statechart_2.go_to_state('A.B.C.D.E.F.G.H', from_current_state=state_X, use_history=False, context=context)
+        statechart_2.go_to_state('X', from_current_state=state_H, use_history=False, context=context)
+        statechart_2.go_to_state('A.B.C.D.E.F.G.H', from_current_state=state_X, use_history=False, context=context)
+        statechart_2.go_to_state('X', from_current_state=state_H, use_history=False, context=context)
+        statechart_2.go_to_state('A.B.C.D.E.F.G.H', from_current_state=state_X, use_history=False, context=context)
+        statechart_2.resume_go_to_state()
+        statechart_2.go_to_state('X', from_current_state=state_H, use_history=False, context=context)
+        self.assertTrue(state_X.is_current_state())

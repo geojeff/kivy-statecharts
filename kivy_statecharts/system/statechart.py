@@ -346,7 +346,7 @@ class StatechartManager(EventDispatcher):
         self.bind(statechart_owner_key=self._owner_did_change) # [PORT] Added, to use top-down updating approach in kivy.
         self.bind(owner=self._owner_did_change) # [PORT] Added, to use top-down updating approach in kivy.
         self.bind(go_to_state_locked=self._go_to_state_active)
-        self.bind(go_to_state_locked=self._go_to_state_suspended)
+        self.bind(go_to_state_suspended=self._go_to_state_suspended)
         self.bind(go_to_state_suspended_point=self._go_to_state_suspended)
 
         for k,v in kw.items():
@@ -513,9 +513,13 @@ class StatechartManager(EventDispatcher):
     """
     def get_state(self, state):
         if isinstance(state, basestring):
-            return self.root_state_instance if self.root_state_instance.name == state else self.root_state_instance.get_substate(state)
+            return self.root_state_instance \
+                    if self.root_state_instance.name == state \
+                    else self.root_state_instance.get_substate(state)
         else:
-            return self.root_state_instance if self.root_state_instance is state else self.root_state_instance.get_substate(state)
+            return self.root_state_instance \
+                    if self.root_state_instance is state \
+                    else self.root_state_instance.get_substate(state)
       
     """
       When called, the statechart will proceed with making state transitions in the statechart starting from 
@@ -740,7 +744,7 @@ class StatechartManager(EventDispatcher):
             # else to resume this statechart's state transition process by calling the
             # statechart's resume_go_to_state method.
             #
-            #if action_result and inspect.isclass(action_result) and issubclass(action_result, Async):
+            # if action_result and inspect.isclass(action_result) and issubclass(action_result, Async):
             if action_result and isinstance(action_result, Async):
                 self.go_to_state_suspended_point = {
                     'go_to_state': go_to_state,
@@ -749,7 +753,8 @@ class StatechartManager(EventDispatcher):
                     'context': context
                 }
               
-                action_result.try_to_perform(self.get_state(action['state'])) # [PORT] state arg must be object, not string key
+                # [PORT] state arg must be object, not string key
+                action_result.try_to_perform(self.get_state(action['state']))
                 return
 
             marker += 1
@@ -1060,31 +1065,44 @@ class StatechartManager(EventDispatcher):
 
     """ @private
           
-      Recursively follow states that are to be exited during a state transition process. The exit
-      process is to start from the given state and work its way up to when either all exit
-      states have been reached based on a given exit path or when a stop state has been reached.
+      Recursively follow states that are to be exited during a state transition
+      process. The exit process is to start from the given state and work its
+      way up to when either all exit states have been reached based on a given
+      exit path or when a stop state has been reached.
           
       @param state {State} the state to be exited
-      @param exit_state_path {collections.deque} a deque representing a path of states that are to be exited
-      @param stopState {State} an explicit state in which to stop the exiting process
+      @param exit_state_path {collections.deque} a deque representing a path of
+        states that are to be exited
+      @param stop_state {State} an explicit state in which to stop the exiting
+        process
     """
-    def _traverse_states_to_exit(self, state, exit_state_path, stopState, go_to_state_actions):
-        if state is None or state is stopState:
+    def _traverse_states_to_exit(self, state, exit_state_path, stop_state,
+                                 go_to_state_actions):
+        if state is None or state is stop_state:
             return
           
         # This state has concurrent substates. Therefore we have to make sure we
         # exit them up to this state before we can go any further up the exit chain.
         if state.substates_are_concurrent:
             for current_state in state.current_substates:
-                if hasattr(current_state, '_traverse_states_to_exit_skip_state') and current_state._traverse_states_to_exit_skip_state == True:
+                if (hasattr(current_state,
+                            '_traverse_states_to_exit_skip_state') 
+                        and current_state._traverse_states_to_exit_skip_state):
                     continue
                 chain = self._create_state_chain(current_state)
-                self._traverse_states_to_exit(chain.popleft() if chain else None, chain, state, go_to_state_actions)
+                self._traverse_states_to_exit(
+                        chain.popleft() \
+                        if chain \
+                        else None, chain, state, go_to_state_actions)
           
         go_to_state_actions.append({ 'action': EXIT_STATE, 'state': state })
         if state.is_current_state():
             setattr(state, '_traverse_states_to_exit_skip_state', True)
-        self._traverse_states_to_exit(exit_state_path.popleft() if exit_state_path else None, exit_state_path, stopState, go_to_state_actions)
+        self._traverse_states_to_exit(
+            exit_state_path.popleft() if exit_state_path else None,
+            exit_state_path,
+            stop_state,
+            go_to_state_actions)
         
     """ @private
         
@@ -1522,18 +1540,27 @@ class StatechartManager(EventDispatcher):
         for state in self.current_states:
             details['current-states'].append(state.full_path)
           
-        state_transition = { 'active': self.go_to_state_active, 'suspended': self.go_to_state_suspended }
+        state_transition = {'active': self.go_to_state_active,
+                            'suspended': self.go_to_state_suspended}
       
         if self._go_to_state_actions:
             state_transition['transition-sequence'] = []
                 
-            for action in self.go_to_state_actions:
-                actionName = "enter" if action['action'] == ENTER_STATE else "exit"
-                actionName = "{0} {1}".format(actionName, action['state'].full_path)
+            # [TODO] Fix in javascript version -- should be _gotoStateActions
+            for action in self._go_to_state_actions:
+                actionName = "enter" \
+                        if action['action'] == ENTER_STATE \
+                        else "exit"
+                actionName = "{0} {1}".format(actionName,
+                                              action['state'].full_path)
                 state_transition['transition-sequence'].append(actionName)
             
-            actionName = "enter" if self._current_go_to_state_action['action'] == ENTER_STATE else "exit"
-            actionName = "{0} {1}".format(actionName, self._current_go_to_state_action['state'].full_path)
+            actionName = "enter" \
+                if self._current_go_to_state_action['action'] == ENTER_STATE \
+                else "exit"
+            actionName = "{0} {1}".format(
+                    actionName,
+                    self._current_go_to_state_action['state'].full_path)
             state_transition['current-transition'] = actionName
           
         details['state-transition'] = state_transition
@@ -1551,15 +1578,16 @@ class StatechartManager(EventDispatcher):
         return details
 
     """
-      Returns a formatted string of detailed information about this statechart. Useful
-      for diagnostic/debugging purposes.
+      Returns a formatted string of detailed information about this statechart.
+      Useful for diagnostic/debugging purposes.
           
       @returns {String}
           
       @see #details
     """
     def to_string_with_details(self):
-        return "{0}\n{1}".format(self, self._hash_to_string(self.details(), 2))
+        return "{0}\n{1}".format(
+                self, self._hash_to_string(self.details(), 2))
       
     """ @private """
     def _hash_to_string(self, hash_to_convert, indent):
@@ -1568,12 +1596,14 @@ class StatechartManager(EventDispatcher):
         for key in hash_to_convert:
             value = hash_to_convert[key]
             if isinstance(value, list):
-                hash_as_string += self._list_to_string(key, value, indent) + "\n";
+                hash_as_string += \
+                        self._list_to_string(key, value, indent) + "\n";
             elif isinstance(value, dict):
                 hash_as_string += "{0}{1}:\n".format(' ' * indent, key)
                 hash_as_string += self._hash_to_string(value, indent + 2)
             else:
-                hash_as_string += "{0}{1}: {2}\n".format(' ' * indent, key, value)
+                hash_as_string += \
+                        "{0}{1}: {2}\n".format(' ' * indent, key, value)
           
         return hash_as_string
         

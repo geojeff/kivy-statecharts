@@ -375,4 +375,26 @@ class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
                "state {1}").format(dict, 'bad_event_handler', bad)
         self.assertEqual(str(cm.exception), msg)
 
+    # This tests what would happen if multiple send_event calls were made
+    # in rapid succession, causing an internal _send_event_locked, but here
+    # we reach the same code by setting go_to_state_locked, during which time
+    # there also should be suspension of send_event.
+    def test_invoke_method_send_event_when_go_to_state_locked(self):
+        class Sender:
+            pass
+        class Context:
+            pass
+        sender = Sender()
+        context = Context()
 
+        root_state_1.reset();
+        statechart_1._send_event_locked = True
+        statechart_1.send_event('foo', sender, context)
+        self.assertEqual(root_state_1.handler, None)
+        statechart_1._send_event_locked = False
+        # Repeat send_event() (will actually result in two calls).
+        statechart_1.send_event('foo', sender, context)
+        self.assertEqual(root_state_1.handler, 'foo')
+        self.assertEqual(root_state_1.event, None)
+        self.assertEqual(root_state_1.sender, sender)
+        self.assertEqual(root_state_1.context, context)
