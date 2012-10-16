@@ -776,8 +776,7 @@ class StatechartManager(EventDispatcher):
         self.go_to_state_suspended_point = None
         self._go_to_state_actions = None
         self.go_to_state_locked = False
-        if self._pending_state_transitions: # [PORT] There is an error check in the function that this if now skips. But isn't it ok to be empty?
-            self._flush_pending_state_transition()
+        self._flush_pending_state_transition()
         
     """ @private """
     def _exit_state(self, state, context):
@@ -1351,11 +1350,14 @@ class StatechartManager(EventDispatcher):
     """
     def _flush_pending_state_transition(self):
 
-        if not self._pending_state_transitions:
-            msg = ("Unable to flush pending state transition. "
-                   "_pending_state_transitions is invalid.")
-            self.statechart_log_error(msg)
-            raise Exception(msg)
+        # [PORT] This, together with the context of the call to this method,
+        #        does not seem necessary. If there are pending transitions to
+        #        flush, flush them. Otherwise, return. So, commenting out.
+        #if not self._pending_state_transitions:
+        #    msg = ("Unable to flush pending state transition. "
+        #           "_pending_state_transitions is invalid.")
+        #    self.statechart_log_error(msg)
+        #    raise Exception(msg)
 
         pending = None
 
