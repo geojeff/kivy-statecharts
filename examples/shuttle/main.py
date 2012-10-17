@@ -17,7 +17,6 @@ from kivy.uix.switch import Switch
 from kivy.config import Config 
 
 from kivy_statecharts.system.state import State
-from kivy_statecharts.system.statechart import Statechart
 from kivy_statecharts.system.statechart import StatechartManager
 
 import inspect
