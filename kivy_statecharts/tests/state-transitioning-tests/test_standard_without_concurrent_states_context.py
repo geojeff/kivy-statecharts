@@ -10,6 +10,7 @@ counter = 0
 from kivy.app import App
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty
 from kivy_statecharts.system.state import State
+from kivy_statecharts.system.history_state import HistoryState
 from kivy_statecharts.system.statechart import StatechartManager
 
 import os, inspect
@@ -143,6 +144,25 @@ class Statechart_2(StatechartManager):
         class X(TestState_2):
             def __init__(self, **kwargs):
                 super(Statechart_2.RootState.X, self).__init__(**kwargs)
+
+
+# For testing special case with _traverse_states_to_enter()
+class Statechart_3(StatechartManager):
+    def __init__(self, **kwargs):
+        kwargs['root_state_class'] = self.RootState
+        kwargs['monitor_is_active'] = True
+        kwargs['trace'] = True
+        super(Statechart_3, self).__init__(**kwargs)
+
+    class RootState(TestState_2):
+        def __init__(self, **kwargs):
+            kwargs['initial_substate_key'] = 'A'
+            kwargs['is_recursive'] = True
+            super(Statechart_3.RootState, self).__init__(**kwargs)
+
+        class A(HistoryState):
+            def __init__(self, **kwargs):
+                super(Statechart_3.RootState.A, self).__init__(**kwargs)
 
 
 class StateTransitioningStandardContextWithoutConcurrentTestCase(unittest.TestCase):
@@ -291,3 +311,32 @@ class StateTransitioningStandardContextWithoutConcurrentTestCase(unittest.TestCa
 
         statechart_2.go_to_state('X', from_current_state=state_H, use_history=False, context=context)
         self.assertTrue(state_X.is_current_state())
+        
+        # While we are here, test _create_state_chain()
+        state_chain_to_H = statechart_2._create_state_chain(state_H)
+        self.assertEqual(len(state_chain_to_H), 9)
+
+    # Test special case for hitting code in _traverse_states_to_enter, when
+    # the initial substate is a history state, with is_recursive True.
+    # Also, call this function with no args.
+    def test_calling_traverse_states_to_enter(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
+        root_state_3 = statechart_3.root_state_instance
+        monitor_3 = statechart_3.monitor
+        state_A = statechart_3.get_state('A')
+
+        #self.assertTrue(root_state_3.is_current_state())
+
+        # Hit the code for no args (no state).
+        statechart_3._traverse_states_to_enter(None, None, None, None, None)
+
+        enter_state_path = None 
+        pivot_state = None
+        use_history = False
+        go_to_state_actions = []
+
+        # state_A has is_recursive = True
+        statechart_3._traverse_states_to_enter(root_state_3, enter_state_path, pivot_state,
+                                  use_history, go_to_state_actions)
+ 

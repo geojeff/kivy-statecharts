@@ -569,7 +569,7 @@ class StatechartManager(EventDispatcher):
       @param context {Hash} Optional. A context object that will be passed to
         all exited and entered states
     """
-    def go_to_state(self, state, from_current_state=None, use_history=None, context=None):
+    def go_to_state(self, state, from_current_state=None, use_history=False, context=None):
         if not self.statechart_is_initialized:
             msg = ("Cannot go to state {0}. Statechart has not yet been "
                    "initialized.").format(state)
@@ -901,7 +901,7 @@ class StatechartManager(EventDispatcher):
       @param from_current_state {State|String} Optional. the current state to start the state transition process from
       @param recursive {Boolean} Optional. whether to follow history states recursively.
     """
-    def go_to_history_state(self, state, from_current_state=None, recursive=None, context=None):
+    def go_to_history_state(self, state, from_current_state=None, recursive=False, context=None):
         if not self.statechart_is_initialized:
             msg = ("Cannot go to state {0}'s history state. Statechart has "
                    "not yet been initialized").format(state)
@@ -1123,7 +1123,7 @@ class StatechartManager(EventDispatcher):
     """
     def _traverse_states_to_enter(self, state, enter_state_path, pivot_state,
                                   use_history, go_to_state_actions):
-        if not state: #pragma: no cover
+        if not state:
             return
           
         # We do not want to enter states in the enter path until the pivot
@@ -1167,15 +1167,17 @@ class StatechartManager(EventDispatcher):
             
             # State has an initial substate to enter
             elif initial_substate_key:
-                initial_substate_obj = getattr(state, initial_substate_key)
-                if (initial_substate_obj is not None 
-                        and isinstance(initial_substate_obj, HistoryState)
-                        and not use_history):
-                    use_history = initial_substate_obj.is_recursive
-                self._traverse_states_to_enter(initial_substate_obj,
-                                               None, None, use_history,
-                                               go_to_state_actions)
-                
+                initial_substate_obj = \
+                        state_obj.get_substate(initial_substate_key)
+                if initial_substate_obj:
+                    if isinstance(initial_substate_obj, HistoryState):
+                        if not use_history:
+                            use_history = initial_substate_obj.is_recursive
+                        initial_substate_obj = initial_substate_obj.state()
+                    self._traverse_states_to_enter(initial_substate_obj,
+                                                   None, None, use_history,
+                                                   go_to_state_actions)
+
             # Looks like we hit the end of the road. Therefore the state has
             # now become a current state of the statechart.
             else:
