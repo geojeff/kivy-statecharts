@@ -288,5 +288,6 @@ class StateTransitioningStandardContextWithoutConcurrentTestCase(unittest.TestCa
         statechart_2.go_to_state('X', from_current_state=state_H, use_history=False, context=context)
         statechart_2.go_to_state('A.B.C.D.E.F.G.H', from_current_state=state_X, use_history=False, context=context)
         statechart_2.resume_go_to_state()
+
         statechart_2.go_to_state('X', from_current_state=state_H, use_history=False, context=context)
         self.assertTrue(state_X.is_current_state())

@@ -1570,9 +1570,9 @@ class StatechartManager(EventDispatcher):
         if self._state_handle_event_info:
             info = self._state_handle_event_info
             details['handling-event'] = {
-              'state': info.state.full_path,
-              'event': info.event,
-              'handler': info.handler
+              'state': info['state'].full_path,
+              'event': info['event'],
+              'handler': info['handler']
             }
         else:
             details['handling-event'] = False

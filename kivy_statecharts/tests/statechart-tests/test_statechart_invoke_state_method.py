@@ -396,3 +396,39 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         details = statechart_3._list_to_string('key', [], 2)
         self.assertEqual(details, "  key: []")
 
+    def test_invoke_method_details_when_there_are_go_to_actions(self):
+        EXIT_STATE = 0
+        ENTER_STATE = 1
+
+        actions = []
+        actions.append({ 'action': EXIT_STATE, 'state': state_B })
+        actions.append({ 'action': ENTER_STATE, 'state': state_A, 'current_state': True })
+
+        statechart_1.go_to_state_locked = True
+
+        statechart_1.go_to_state_suspended_point = {
+            'go_to_state': state_B,
+            'actions': actions,
+            'marker': None,
+            'context': {}
+        }
+
+        statechart_1.go_to_state_suspended = True
+
+        statechart_1._current_go_to_state_action = actions[1]
+
+        statechart_1._go_to_state_actions = actions
+
+        statechart_1._state_handle_event_info = {
+              'state': state_A,
+              'event': 'an event',
+              'handler': 'a handler'
+              }
+
+        # Call details() methods to trigger code in there that is only hit in
+        # this situation.
+        details = statechart_1.details()
+        self.assertTrue(type(details) == dict)
+        details = statechart_1.to_string_with_details()
+        self.assertEqual(type(details), str)
+
