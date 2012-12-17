@@ -29,7 +29,7 @@ smpeg, portmidi), and after installing virtualenvwrapper and mercurial, do:
     pip install cython
     pip install pil
     pip install hg+http://bitbucket.org/pygame/pygame
-    pip install kivy (when available on PyPI)
+    pip install kivy
 
 If you are only using kivy_statecharts, just install it:
 
@@ -82,8 +82,7 @@ Testing
 
 |build status|_
 
-``kivy_statecharts`` has 78% test coverage reported by nosetests, and 87% reported
-by py.test.
+``kivy_statecharts`` has 100% test coverage. Use nosetests or py.test.
 
 Please make sure that you add tests for new features and that all tests pass before
 submitting pull requests.  Running the test suite is as easy as running ``py.test``
@@ -105,6 +104,4 @@ As of April 2012, most tests were ported.
 .. _GitHub repository: https://github.com/geojeff/kivy_statecharts
 .. _gitflow: https://github.com/nvie/gitflow
 .. _A successful Git branching model: http://nvie.com/posts/a-successful-git-branching-model/
-.. |build status| image:: https://secure.travis-ci.org/geojeff/kivy_statecharts.png?branch=master
-.. _build status: http://travis-ci.org/geojeff/kivy_statecharts
 .. _nose: http://readthedocs.org/docs/nose/en/latest/
