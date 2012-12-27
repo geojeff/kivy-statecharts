@@ -61,11 +61,9 @@ Python for use in Kivy projects.</p>
 alongside your local clone of Kivy if you are doing development. For
 development, consider the following setup:</p>
 <p>~/Development/kivy/kivy, for a Kivy clone, and
-~/Development/kivy/kivy_statechart, for a kivy-statecharts clone. Both
-were added to PYTHONPATH in ~/.profile so imports would work during
-development, as:</p>
-<div class="highlight-python"><pre>export PYTHONPATH=$PYTHONPATH:/Users/geojeff/Development/kivy/kivy:/Users/geojeff/Development/kivy</pre>
-</div>
+~/Development/kivy/kivy-statecharts, for a kivy-statecharts clone.
+Add the kivy-statecharts directory to PYTHONPATH so imports would will during
+development.</p>
 </div>
 <div class="section" id="tests">
 <h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
@@ -80,24 +78,35 @@ kivy_statechart directory, run</p>
 </div>
 <div class="section" id="in-a-nutshell">
 <h1>In a Nutshell<a class="headerlink" href="#in-a-nutshell" title="Permalink to this headline">¶</a></h1>
-<p>The developer draws a statechart &#8211; on a piece of paper is fine, but
-there are good drawing programs. This process is easy enough to start
-laying out what needs to happen as the app loads, and user interaction
-begins. As each user action is envisioned, it is drawn as a connector
-between states representing different parts of the user interface. More
-is added to the statechart, as details are realized and considered.</p>
+<p>The developer may code the statechart for a new app directly, or a statechart
+drawing may be done first.</p>
+<p>If the direct-coding method is used, the developer starts by writing the root
+state and its primary substates, and from there builds up the hierarchy of
+states. Since individual states often code for specific views and widgets, this
+can be done in a step-wise fashion, with the state for the main widget coded
+first, followed by addition of new states as the app is constructed.</p>
+<p>If a statechart drawing is made either initially or after some coding has been
+done, a piece of paper works fine, and there are good drawing programs and
+python libraries to use. Several of the examples have drawings made with
+<tt class="docutils literal"><span class="pre">yEd</span></tt>, a free diagram editor, or with the <tt class="docutils literal"><span class="pre">blockdiag</span></tt> python library.</p>
+<p>Regardless of methods used, the process of statechart construction is easy to
+start by laying out what needs to happen as the app loads, and user interaction
+begins.  As each user action is envisioned, it is drawn as a connector between
+states representing different parts of the user interface or coded directly as
+the action method used to go to from one state to another. More is added to the
+statechart, as details are realized and considered through iterative testing of
+the app and coding.</p>
 <p>Once the developer has the hang of the simple coding constructs, it is a
 straightforward process to write the code corresponding to states and
 transitions on the statechart.</p>
-<p>Iteration of refining the statechart and writing code goes along as the
-app develops.</p>
+<p>Refining the statechart and writing code goes along as the app develops.</p>
 <p>For testing, a human-readable table of events and actions can be made
-from the statechart, and test cases made to cover each item.</p>
+from the statechart, and test cases made to cover each item in the table.</p>
 </div>
 <div class="section" id="example-apps">
 <h1>Example Apps<a class="headerlink" href="#example-apps" title="Permalink to this headline">¶</a></h1>
 <p>The examples directory contains several brand new apps and some of the Kivy
-example apps adapted to use statecharts. These examples are presented in
+example apps adapted to use statecharts. These examples are presented here in
 order of increasing complexity, before turning to theoretical background for
 statecharts.</p>
 <div class="section" id="hello-world-example-app">

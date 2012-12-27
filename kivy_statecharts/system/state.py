@@ -1,4 +1,5 @@
-# Project:   Kivy.Statechart - A Statechart Framework for Kivy
+# ================================================================================
+# Project: kivy-statecharts - A Statechart Framework for Kivy
 # Copyright: (c) 2010, 2011 Michael Cohen, and contributors.
 # Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
 # ================================================================================
@@ -19,11 +20,11 @@ REGEX_TYPE = type(re.compile(''))
 """
   @class
 
-  Represents a state within a statechart. 
-  
+  Represents a state within a statechart.
+
   The statechart actively manages all states belonging to it. When a state
-  is created, it immediately registers itself with it parent states. 
-  
+  is created, it immediately registers itself with it parent states.
+
   You do not create an instance of a state itself. The statechart manager
   will go through its state heirarchy and create the states itself.
 
@@ -33,23 +34,23 @@ REGEX_TYPE = type(re.compile(''))
   @extends Object
 """
 class State(EventDispatcher):
-    """ 
+    """
       Indicates if this state should trace actions. Useful for debugging
       purposes. Managed by the statechart.
-        
+
       @see StatechartManager#trace
-        
+
       @property {Boolean}
     """
     trace = BooleanProperty(False)
 
-    """ 
+    """
       Indicates who the owner is of this state. If not set on the statechart
       then the owner is the statechart, otherwise it is the assigned
       object. Managed by the statechart.
-          
+
       @see StatechartManager#owner
-        
+
       @property {Object}
     """
     owner = ObjectProperty(None, allownone=True)
@@ -62,39 +63,39 @@ class State(EventDispatcher):
 
     """
       The name of the state
-          
+
       @property {String}
     """
     name = StringProperty(None)
 
     """
       This state's parent state. Managed by the statechart
-   
+
       @property {State}
     """
     parent_state = ObjectProperty(None, allownone=True)
 
     """
       This state's history state. Can be null. Managed by the statechart.
-          
+
       @property {State}
     """
     history_state = ObjectProperty(None, allownone=True)
 
     """
-      Used to indicate the initial substate of this state to enter into. 
-          
-      You assign the value with the name of the state. Upon creation of 
-      the state, the statechart will automatically change the property 
+      Used to indicate the initial substate of this state to enter into.
+
+      You assign the value with the name of the state. Upon creation of
+      the state, the statechart will automatically change the property
       to be a corresponding state object
-      
+
       The substate is only to be this state's immediate substates. If
       no initial substate is assigned then this states initial substate
       will be an instance of an empty state (EmptyState).
-      
+
       Note that a statechart's root state must always have an explicity
       initial substate value assigned else an error will be thrown.
-      
+
       @property {String|State}
     """
     initial_substate_key = StringProperty(None, allownone=True)
@@ -103,15 +104,15 @@ class State(EventDispatcher):
 
     """
       Used to indicates if this state's immediate substates are to be
-      concurrent (orthogonal) to each other. 
-      
+      concurrent (orthogonal) to each other.
+
       @property {Boolean}
     """
     substates_are_concurrent = BooleanProperty(False)
 
     """
       The immediate substates of this state. Managed by the statechart.
-      
+
       @property {Array}
     """
     substates = ListProperty([])
@@ -119,29 +120,29 @@ class State(EventDispatcher):
     """
       The statechart that this state belongs to. Assigned by the owning
       statechart.
-    
+
       @property {Statechart}
     """
     statechart = ObjectProperty(None, allownone=True)
 
     """
       Indicates if this state has been initialized by the statechart
-      
+
       @propety {Boolean}
     """
     state_is_initialized = BooleanProperty(False)
 
     """
       An array of this state's current substates. Managed by the statechart
-      
+
       @propety {Array}
     """
     current_substates = ListProperty([])
 
-    """ 
+    """
       An array of this state's substates that are currently entered. Managed by
       the statechart.
-      
+
       @property {Array}
     """
     entered_substates = ListProperty([])
@@ -178,16 +179,16 @@ class State(EventDispatcher):
         self._registered_substates = []
         self._is_entering_state = False
         self._is_exiting_state = False
-        
+
         # [PORT] Not sure: ...
 
         # Setting up observes this way is faster then using .observes,
         # which adds a noticable increase in initialization time.
-    
+
         sc = self.statechart
-    
+
         self.owner_key = sc.statechart_owner_key if sc else None
-    
+
         # [PORT] Changed to bind to self, to try to do it from here...
         self.bind(owner_key=self._statechart_owner_did_change)
 
@@ -196,7 +197,7 @@ class State(EventDispatcher):
                 # [PORT] Force initial_substate_key to always be string.
                 if isinstance(v, basestring):
                     self.initial_substate_key = v
-                else: 
+                else:
                     name = v.name if hasattr(v, 'name') else None
                     if name:
                         self.initial_substate_key = name
@@ -229,11 +230,11 @@ class State(EventDispatcher):
 
         # [PORT] What about destroying owner_key
         self.owner_key = sc.statechart_owner_key if sc else None
-    
+
         self.unbind(owner_key=self._statechart_owner_did_change)
 
         [state.destroy() for state in self.substates]
-    
+
         self.substates = []
         self.current_substates = []
         self.entered_substates = []
@@ -242,15 +243,15 @@ class State(EventDispatcher):
         self.initial_substate_key = None
         self.initial_substate_object = None
         self.statechart = None
-    
+
         #self.notifyPropertyChange("owner")
-    
+
         self._registered_event_handlers = []
         self._registered_string_event_handlers = []
         self._registered_reg_exp_event_handlers = []
         self._registered_substate_paths = []
         self._registered_substates = []
-    
+
         #sc_super()
 
     """
@@ -260,20 +261,20 @@ class State(EventDispatcher):
     def init_state(self):
         if self.state_is_initialized:
             self.state_log_warning("Cannot init_state() -- already init'ed.")
-            return  
-    
+            return
+
         if not self.name:
             self.state_log_error("Cannot init_state() an unnamed state.")
             raise Exception("Cannot init_state() an unnamed state.")
 
         self._register_with_parent_states()
-    
+
         matched_initial_substate = False
         value_is_method = False
         history_state = None
-    
+
         self.substates = []
-    
+
         if hasattr(self, 'InitialSubstate'):
             from kivy_statecharts.system.history_state import HistoryState
 
@@ -286,7 +287,7 @@ class State(EventDispatcher):
                 history_state = self.create_substate(initial_substate_class)
 
                 if history_state.default_state:
-                    setattr(self, 
+                    setattr(self,
                             'initial_substate_key',
                             history_state.default_state)
                 else:
@@ -294,7 +295,7 @@ class State(EventDispatcher):
                            "requires the name of a default state to be set.")
                     self.state_log_error(msg)
                     raise Exception(msg)
-    
+
         # Iterate through all this state's substates, if any, create them, and
         # then initialize them. This causes a recursive process.
         for key in dir(self):
@@ -306,7 +307,7 @@ class State(EventDispatcher):
                 continue
 
             value_is_method = inspect.ismethod(value)
-      
+
             if (value_is_method and hasattr(value, 'is_event_handler')
                     and value.is_event_handler == True):
                 self._register_event_handler(key, value)
@@ -357,7 +358,7 @@ class State(EventDispatcher):
 
         if len(self.substates) > 0:
             state = self._add_empty_initial_substate_if_needed()
-            if (state is None 
+            if (state is None
                       and self.initial_substate_key
                       and self.substates_are_concurrent):
                 msg = ("Cannot use {0} as initial substate since "
@@ -368,7 +369,7 @@ class State(EventDispatcher):
 
         #self.notifyPropertyChange("substates")
         # [PORT] substates have changed. Call _current_states on statechart,
-        #        which is bound to root_state_instance, and updates 
+        #        which is bound to root_state_instance, and updates
         #        self.current_states = self.root_state_instance.substates.
         #        That binding won't fire if root_state_instance.substates
         #        changes, so we manually call it in kivy.
@@ -427,28 +428,28 @@ class State(EventDispatcher):
       Used to dynamically add a substate to this state. Once added
       successfully you are then able to go to it from any other state within
       the owning statechart.
-     
+
       A couple of notes when adding a substate:
-      
+
       - If this state does not have any substates, then in addition to the
         substate being added, an empty state will also be added and set as the
         initial substate. To make the added substate the initial substate, set
         this object's initial_substate_key property.
-         
+
       - If this state is a current state, the added substate will not be
-        entered. 
-      
-      - If this state is entered and its substates are concurrent, the added 
-        substate will not be entered.  
-     
+        entered.
+
+      - If this state is entered and its substates are concurrent, the added
+        substate will not be entered.
+
       If this state is either entered or current and you'd like the added
       substate to take affect, you will need to explicitly reenter this state
       by calling its `reenter` method.
-     
+
       Be aware that the name of the state you are adding must not conflict
       with the name of a property on this state or else you will get an error.
       In addition, this state must be initialized to add substates.
-    
+
       @param {String} name a unique name for the given substate.
       @param {State} state a class that derives from `State`
       @param {Hash} [attr] literal to be applied to the substate
@@ -505,8 +506,8 @@ class State(EventDispatcher):
         attr['statechart'] = self.statechart
         return state(**attr)
 
-    """ @private 
-    
+    """ @private
+
       Registers event handlers with this state. Event handlers are special
       functions on the state that are intended to handle more than one event.
       This compared to basic functions that only respond to a single event
@@ -538,7 +539,7 @@ class State(EventDispatcher):
     """
     def _register_with_parent_states(self):
         parent = self.parent_state
-        
+
         while parent is not None:
             parent._register_substate(self)
             parent = parent.parent_state
@@ -551,18 +552,18 @@ class State(EventDispatcher):
 
         self._registered_substates.append(state)
 
-        # Keep track of states based on their relative path to this state. 
+        # Keep track of states based on their relative path to this state.
         if not state.name in self._registered_substate_paths:
             self._registered_substate_paths[state.name] = {}
-        
+
         self._registered_substate_paths[state.name][path] = state
 
     """
       Will generate path for a given state that is relative to this state. It is
       required that the given state is a substate of this state.
-      
+
       If the heirarchy of the given state to this state is the following:
-      A > B > C, where A is this state and C is the given state, then the 
+      A > B > C, where A is this state and C is the given state, then the
       relative path generated will be "B.C"
     """
     def path_relative_to(self, state):
@@ -592,34 +593,34 @@ class State(EventDispatcher):
         return path
 
     """
-      Used to get a substate of this state that matches a given value. 
-      
+      Used to get a substate of this state that matches a given value.
+
       If the value is a state object, then the value will be returned if it
-      is indeed a substate of this state, otherwise null is returned. 
-      
+      is indeed a substate of this state, otherwise null is returned.
+
       If the given value is a string, then the string is assumed to be a path
       expression to a substate. The value is then parsed to find the closest
       match. For path expression syntax, refer to the {@link StatePathMatcher}
       class.
-      
+
       If there is no match then null is returned. If there is more than one
       match then null is returned and an error is generated indicating
-      ambiguity of the given value. 
-      
+      ambiguity of the given value.
+
       An optional callback can be provided to handle the scenario when either
       no substate is found or there is more than one match. The callback is
       then given the opportunity to further handle the outcome and return a
       result which the get_substate method will then return. The callback
       should have the following signature:
-      
-        function(state, value, paths) 
-        
+
+        function(state, value, paths)
+
       - state: The state get_state was invoked on
-      - value: The value supplied to get_state 
+      - value: The value supplied to get_state
       - paths: An array of substate paths that matched the given value
-      
-      If there were no matches then `paths` is not provided to the callback. 
-      
+
+      If there were no matches then `paths` is not provided to the callback.
+
       @param value {State|String} used to identify a substate of this state
       @param [callback] {Function} the callback
     """
@@ -637,7 +638,7 @@ class State(EventDispatcher):
                        "class or string, not type: {0}").format(type(value))
                 self.state_log_error(msg)
                 raise Exception(msg)
-        
+
         # [PORT] Considered this, but it seemed to match on what should
         #        remain ambiguous.
         #for state in self._registered_substates:
@@ -703,19 +704,19 @@ class State(EventDispatcher):
             return None
 
     """
-      Will attempt to get a state relative to this state. 
-      
+      Will attempt to get a state relative to this state.
+
       A state is returned based on the following:
-      
+
       1. First check this state's substates for a match; and
       2. If no matching substate then attempt to get the state from
          this state's parent state.
-         
+
       Therefore states are recursively traversed up to the root state
       to identify a match, and if found is ultimately returned, otherwise
       null is returned. In the case that the value supplied is ambiguous
       an error message is returned.
-      
+
       The value provided can either be a state object or a state path
       expression. For path expression syntax, refer to the
       {@link StatePathMatcher} class.
@@ -750,11 +751,11 @@ class State(EventDispatcher):
       Used to go to a state in the statechart either directly from this state
       if it is a current state, or from the first relative current state from
       this state.
-      
+
       If the value given is a string then it is considered a state path
       expression. The path is then used to find a state relative to this state
       based on rules of the {@link #get_state} method.
-      
+
       @param value {State|String} the state to go to
       @param [context] {Hash|Object} context object that will be supplied to
              all states that are exited and entered during the state transition
@@ -779,26 +780,26 @@ class State(EventDispatcher):
     """
       Used to go to a given state's history state in the statechart either
       directly from this state if it is a current state or from one of this
-      state's current substates. 
-      
+      state's current substates.
+
       If the value given is a string then it is considered a state path
       expression. The path is then used to find a state relative to this state
       based on rules of the {@link #get_state} method.
-      
+
       Method can be called in the following ways:
-      
+
           // With one argument
           go_to_history_state(<value>)
-      
+
           // With two arguments
           go_to_history_state(<value>, <boolean | hash>)
-      
+
           // With three arguments
           go_to_history_state(<value>, <boolean>, <hash>)
-      
+
       Where <value> is either a string or a State object and <hash> is a
       regular JS hash object.
-      
+
       @param value {State|String} the state whose history state to go to
       @param [recusive] {Boolean} indicates whether to follow history states
              recusively starting from the given state
@@ -831,7 +832,7 @@ class State(EventDispatcher):
     """
       Used to check if a given state is a current substate of this state.
       Mainly used in cases when this state is a concurrent state.
-      
+
       @param state {State|String} either a state object or the name of a state
       @returns {Boolean} true is the given state is a current substate,
       otherwise False is returned
@@ -851,7 +852,7 @@ class State(EventDispatcher):
     """
       Used to check if a given state is a current substate of this state.
       Mainly used in cases when this state is a concurrent state.
-      
+
       @param state {State|String} either a state object or the name of a
       state @returns {Boolean} true is the given state is a current substate,
       otherwise False is returned
@@ -870,7 +871,7 @@ class State(EventDispatcher):
 
     """
       Indicates if this state is the root state of the statechart.
-      
+
       @property {Boolean}
     """
     def is_root_state(self):
@@ -878,23 +879,23 @@ class State(EventDispatcher):
 
     """
       Indicates if this state is a current state of the statechart.
-      
-      @property {Boolean} 
+
+      @property {Boolean}
     """
     def is_current_state(self):
         return True if self.state_is_current_substate(self) else False
 
     """
       Indicates if this state is a concurrent state
-      
+
       @property {Boolean}
     """
     def is_concurrent_state(self):
         return True if self.parent_state.substates_are_concurrent else False
 
     """
-      Indicates if this state is a currently entered state. 
-      
+      Indicates if this state is a currently entered state.
+
       A state is currently entered if during a state transition process the
       state's enter_state method was invoked, but only after its exit_state
       method was called, if at all.
@@ -904,24 +905,24 @@ class State(EventDispatcher):
 
     """
       Will attempt to find a current state in the statechart that is relative
-      to this state. 
-      
+      to this state.
+
       Ordered set of rules to find a relative current state:
-      
+
         1. If this state is a current state then it will be returned
-        
+
         2. If this state has no current states and this state has a parent
            state then return parent state's first relative current state,
            otherwise return null
-          
+
         3. If this state has more than one current state then use the given
            anchor state to get a corresponding substate that can be used to
            find a current state relative to the substate, if a substate was
-           found. 
-          
+           found.
+
         4. If (3) did not find a relative current state then default to
-           returning this state's first current substate. 
-  
+           returning this state's first current substate.
+
       @param anchor {State|String} Optional. a substate of this state used
         to help direct finding a current state
       @return {State} a current state
@@ -944,7 +945,7 @@ class State(EventDispatcher):
 
     """
       Used to re-enter this state. Call this only when the state is a current
-      state of the statechart.  
+      state of the statechart.
     """
     def reenter(self):
         if self.is_entered_state():
@@ -963,50 +964,50 @@ class State(EventDispatcher):
       Called by the statechart to allow a state to try and handle the given
       event. If the event is handled by the state then YES is returned,
       otherwise NO.
-      
+
       There is a particular order in how an event is handled by a state:
-      
+
        1. Basic function whose name matches the event
        2. Registered event handler that is associated with an event
           represented as a string
        3. Registered event handler that is associated with events matching a
           regular expression
        4. The unknown_event function
-        
+
       Use of event handlers that are associated with events matching a regular
       expression may incur a performance hit, so they should be used
       sparingly.
-      
+
       The unknown_event function is only invoked if the state has it,
       otherwise it is skipped. Note that you should be careful when using
       unknown_event since it can be either abused or cause unexpected
       behavior.
-      
+
       Example of a state using all four event handling techniques:
-      
+
           State.extend({
-        
+
             // Basic function handling event 'foo'
             foo: function(arg1, arg2) { ... },
-          
+
             // event handler that handles 'frozen' and 'canuck'
             event_handlerA: function(event, arg1, arg2) {
               ...
             }.handle_event('frozen', 'canuck'),
-          
+
             // event handler that handles events matching the regular
             // expression /num\d/
             //   ex. num1, num2
             event_handlerB: function(event, arg1, arg2) {
               ...
             }.handle_event(/num\d/),
-          
+
             // Handle any event that was not handled by some other
             // method on the state
             unknown_event: function(event, arg1, arg2) {
-          
+
             }
-        
+
           });
     """
     def try_to_handle_event(self, event, arg1=None, arg2=None):
@@ -1103,25 +1104,25 @@ class State(EventDispatcher):
     """
       Called whenever this state is to be entered during a state transition
       process. This is useful when you want the state to perform some initial
-      set up procedures. 
-      
+      set up procedures.
+
       If when entering the state you want to perform some kind of asynchronous
       action, such as an animation or fetching remote data, then you need to
       return an asynchronous action, which is done like so:
-      
+
           enter_state: function() {
             return this.perform_async('foo');
           }
-      
+
       After returning an action to be performed asynchronously, the statechart
       will suspend the active state transition process. In order to resume the
       process, you must call this state's resume_go_to_state method or the
       statechart's resume_go_to_state. If no asynchronous action is to be
       performed, then nothing needs to be returned.
-      
+
       When the enter_state method is called, an optional context value may be
       supplied if one was provided to the go_to_state method.
-      
+
       @param {Hash} [context] value if one was supplied to go_to_state when
         invoked
     """
@@ -1129,11 +1130,11 @@ class State(EventDispatcher):
         pass
 
     """
-      Notification called just before enter_state is invoked. 
-      
+      Notification called just before enter_state is invoked.
+
       Note: This is intended to be used by the owning statechart but it can be
       overridden if you need to do something special.
-      
+
       @param {Hash} [context] value if one was supplied to go_to_state when
         invoked
       @see #enter_state
@@ -1142,11 +1143,11 @@ class State(EventDispatcher):
         self._is_entering_state = True
 
     """
-      Notification called just after enter_state is invoked. 
-      
+      Notification called just after enter_state is invoked.
+
       Note: This is intended to be used by the owning statechart but it can be
       overridden if you need to do something special.
-      
+
       @param context {Hash} Optional value if one was supplied to go_to_state
         when invoked
       @see #enter_state
@@ -1158,24 +1159,24 @@ class State(EventDispatcher):
       Called whenever this state is to be exited during a state transition
       process. This is useful when you want the state to peform some clean up
       procedures.
-      
+
       If when exiting the state you want to perform some kind of asynchronous
       action, such as an animation or fetching remote data, then you need to
       return an asynchronous action, which is done like so:
-      
+
           exit_state: function() {
             return this.perform_async('foo');
           }
-      
+
       After returning an action to be performed asynchronously, the statechart
       will suspend the active state transition process. In order to resume the
       process, you must call this state's resume_go_to_state method or the
       statechart's resume_go_to_state. If no asynchronous action is to be
       performed, then nothing needs to be returned.
-      
+
       When the exit_state method is called, an optional context value may be
       supplied if one was provided to the go_to_state method.
-      
+
       @param context {Hash} Optional value if one was supplied to go_to_state
         when invoked
     """
@@ -1183,11 +1184,11 @@ class State(EventDispatcher):
         pass
 
     """
-      Notification called just before exit_state is invoked. 
-      
+      Notification called just before exit_state is invoked.
+
       Note: This is intended to be used by the owning statechart but it can be
       overridden if you need to do something special.
-      
+
       @param context {Hash} Optional value if one was supplied to go_to_state
       when invoked @see #exit_state
     """
@@ -1195,11 +1196,11 @@ class State(EventDispatcher):
         self._is_exiting_state = True
 
     """
-      Notification called just after exit_state is invoked. 
-      
+      Notification called just after exit_state is invoked.
+
       Note: This is intended to be used by the owning statechart but it can be
       overridden if you need to do something special.
-      
+
       @param context {Hash} Optional value if one was supplied to go_to_state
       when invoked @see #exit_state
     """
@@ -1209,7 +1210,7 @@ class State(EventDispatcher):
     """
       Call when an asynchronous action need to be performed when either
       entering or exiting a state.
-      
+
       @see enter_state
       @see exit_state
     """
@@ -1217,10 +1218,10 @@ class State(EventDispatcher):
         return AsyncMixin().perform(func, arg1=arg1, arg2=arg2)
 
     """ @override
-    
+
       Returns YES if this state can respond to the given event, otherwise
       NO is returned
-    
+
       @param event {String} the value to check
       @returns {Boolean}
     """
@@ -1241,14 +1242,14 @@ class State(EventDispatcher):
 
     """
       Returns the path for this state relative to the statechart's
-      root state. 
-      
+      root state.
+
       The path is a dot-notation string representing the path from
       this state to the statechart's root state, but without including
       the root state in the path. For instance, if the name of this
       state if "foo" and the parent state's name is "bar" where bar's
       parent state is the root state, then the full path is "Bar.foo"
-    
+
       @property {String}
     """
     def _full_path(self, *l): # [PORT] Added *l
@@ -1278,21 +1279,21 @@ class State(EventDispatcher):
         #self.notifyPropertyChange("owner")
         pass
 
-    """ 
+    """
       Used to log a state trace message
     """
     def state_log_trace(self, msg):
         if self.statechart:
             self.statechart.statechart_log_trace("{0}: {1}".format(self, msg))
 
-    """ 
+    """
       Used to log a state warning message
     """
     def state_log_warning(self, msg):
         if self.statechart:
             self.statechart.statechart_log_warning(msg)
 
-    """ 
+    """
       Used to log a state error message
     """
     def state_log_error(self, msg):

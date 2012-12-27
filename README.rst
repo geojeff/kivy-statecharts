@@ -21,17 +21,7 @@ Setting up kivy_statecharts
 
 A virtual environment works well for Kivy and kivy_statecharts development.
 Using the virtualenvwrapper framework is a good approach. After installing the
-base system prerequisites for Kivy (sdl, sdl_image, sdl_mixer, sdl_ttf,
-smpeg, portmidi), and after installing virtualenvwrapper and mercurial, do:
-
-    mkvirtualenv myproject
-    workon myproject
-    pip install cython
-    pip install pil
-    pip install hg+http://bitbucket.org/pygame/pygame
-    pip install kivy
-
-If you are only using kivy_statecharts, just install it:
+base system prerequisites for Kivy:
 
     pip install kivy_statecharts (when available on PyPI)
 
@@ -48,8 +38,6 @@ Be warned: This addon is in alpha state. Use it at your own risk.
 
 Using kivy_statecharts
 ======================
-
-[Refer to new docs when they get on readthedocs.org.]
 
 For now, source Sphinx docs are in the docs directory.
 

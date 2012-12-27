@@ -1,16 +1,16 @@
 # ================================================================================
-# Project:   kivy_statecharts - An Add-On Statechart Framework for Kivy
+# Project: kivy-statecharts - A Statechart Framework for Kivy
 # Copyright: ©2012 Jeffrey Gill Pittman, and contributors.
 # Copyright: ©2010, 2011 Michael Cohen, and contributors.
 # Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
 # ================================================================================
 #
-# Work-in-progress Port
+# Ported from:
 #
-# from https://github.com/sproutcore/sproutcore/tree/master/frameworks/statechart
+#     https://github.com/sproutcore/sproutcore/tree/master/frameworks/statechart
 #
 # =================================================================================
-# Project:   kivy_statecharts - An Add-On Statechart Framework for Kivy
+# Project:   kivy_statecharts - A Statechart Framework for Kivy
 #
 # Copyright: (c) 2012 Jeffrey Gill Pittman, and contributors.
 # Copyright: (c) 2010, 2011 Michael Cohen, and contributors.
@@ -22,4 +22,3 @@
 #       framework, which was later ported to SproutCore, and the name Kivy, is
 #       purely coincidental.
 #
-
