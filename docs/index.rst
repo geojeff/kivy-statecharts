@@ -44,17 +44,16 @@ kivy\_statechart directory, run
 
 As of April 2012, most tests were ported.
 
-In a Nutshell
-=============
+Introduction
+============
 
-The kivy-statecharts framework can be considered "advanced," but this could be
+The kivy-statecharts framework might be called "advanced," but this could be
 a mistaken notion. As we will see in the examples, even a simple application
-can be made using statecharts. The pay-off of using statecharts really comes
-in, however, for a fairly complex application.
+can be made using statecharts.
 
-Regardless, it is assumed here that you already understand Kivy bindings and
-its events system, how to build widgets with both python and kv language
-approaches, and general concepts of using Kivy.
+It is assumed here that you already understand Kivy bindings and the events
+system, how to build widgets with both python and kv language approaches, and
+general concepts of using Kivy.
 
 The developer may code the statechart for a new app directly, or a statechart
 drawing may be done first. At some point, making a statechart drawing is
@@ -89,11 +88,12 @@ and state transitions.
 For testing, a human-readable table of events and actions can be made
 from the statechart, and test cases made to cover each item in the table.
 
-Basic Ideas for States
-======================
+States
+======
 
 In a typical case, there is a state for each major user interface element, and
-there may be substates for smaller elements. Each state has an enter_state()
+there may be substates for smaller elements. A state is coded as a normal
+Python class, a subclass of the State class. Each state has an enter_state()
 method and an exit_state() method. The given user interface element is
 constructed or refreshed by code in the enter_state() method, and the opposite,
 either bringing down or hiding, is defined in code of the exit_state() method.
@@ -142,10 +142,9 @@ state called ShowingHelloWorld:
             class ShowingHelloWorld(State):
 
 The statechart is defined by the root state and its substates. The root state
-must have an initial substate set, or have substates_are_concurrent = True
-explicitly defined. Here, we only have one state, ShowingHelloWorld, and it is
-the initial substate. When the statechart is instantiated, control will flow
-immediately from the root state to the ShowingHelloWorld state.
+has an initial substate set. Here, we only have one state, ShowingHelloWorld,
+and it is the initial substate. When the statechart is instantiated, control
+will flow immediately from the root state to the ShowingHelloWorld state.
 
 **Running**
 
@@ -326,7 +325,7 @@ enter_state() and exit_state().
 
 **Utility Methods**
 
-A state is a normal python class. It can have properties, an __init__(),
+A state, as a normal python class, can have properties, an __init__(),
 specialized methods, etc. Here we are calling the add_label() method a
 "utility" method, meaning a normal method that does whatever work is
 necessary. add_label() creates a randomly located button for a given
@@ -458,6 +457,9 @@ slow_down() action method.
 
    Statechart diagram for BallsApp
 
+As you can see in the diagram, the 'speed_up' and 'slow_down' events are
+``broadcast actions`` -- they apply to multiple states concurrently.
+
 The combination of velocity adjustments in the enter_state() method for each
 moving ball state, and the adjustments made in the speed_up() and slow_down()
 methods, forms an algorithm for this app, giving an interesting effect, with
@@ -469,7 +471,41 @@ happens for given events, what happens on exit.
 Fruits Example App
 ------------------
 
+The "Fruits" example borrows from the set of examples for ListView in Kivy, and
+uses ScreenManager along with the statechart to present four main user
+interface screens: Lists (the equivalent of the list_cascade_dict.py example in
+Kivy), Search, Data, and Detail. There are states for each of these screens:
+ShowingListsState, ShowingSearchState, ShowingDataScreen, and
+ShowingDetailScreen.  Views for each of the states are constructed the first
+time their enter_state() methods are called. On subsequent transitions into the
+states, the current screen in the ScreenManager instance is simply switched. No
+tear-down tasks are needed in the exit_state() methods of the states, because
+the screens are not destroyed on exit. Revisits to a screen will see it in its
+previously visited state, except for the Detail screen, which always shows the
+fruit selected in the Lists screen.
 
+.. figure::  ../examples/fruits/design/screencapture.png
+   :align:   center
+
+   Screen capture of Fruits App
+
+A toolbar at the top of each screen has buttons bound to action methods in the
+states, of the form go_to_search(), go_to_data(), etc. Each of these methods
+does a state transition with a call such as go_to_state('ShowingSearchState').
+
+The screen capture shows the Search screen, which has text boxes for the lower
+and upper bounds of search criteria for each of the fruit data properties. On
+the right is a list of all the fruits, with the ones matching the current
+search criteria shown in red. In the example, we see fruits that have protein
+values between 5 and 16 grams per serving.
+
+The "Data" screen shows a list of the raw data values for reference when making
+search criteria. The "Detail" screen shows the data for the fruit currently
+selected in the "Lists" screen.
+
+The "Fruits" example shows how the statechart itself can be used as a storage
+point for application data. Likewise, properties and methods of individual
+states are related to the views the state classes serve. 
 
 ShuttleControl Example App
 --------------------------
