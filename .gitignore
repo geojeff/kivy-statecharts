@@ -9,3 +9,6 @@
 tests/results
 .last_known_portable_deps_hash
 deps.zip  
+docs/_build
+docs/_static
+docs/_templates
