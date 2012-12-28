@@ -78,6 +78,48 @@ class Statechart_4(StatechartManager):
             }
         super(Statechart_4, self).__init__(**attrs) 
 
+class InvalidRootStateExampleClass(object):
+    pass
+
+class Statechart_5(StatechartManager):
+    def __init__(self):
+        attrs = { 
+            'auto_init_statechart': False,
+            'root_state_example_class': InvalidRootStateExampleClass,
+            'initial_state_key': 'F',
+            'F': F
+            }
+        super(Statechart_5, self).__init__(**attrs) 
+
+class Statechart_6(StatechartManager):
+    def __init__(self):
+        attrs = { 
+            'auto_init_statechart': False,
+            'root_state_example_class': RootStateExampleClass,
+            'initial_state_key': 'F',
+            'F': F,
+            'states_are_concurrent': True
+            }
+        super(Statechart_6, self).__init__(**attrs) 
+
+class Statechart_7(StatechartManager):
+    def __init__(self):
+        attrs = { 
+            'auto_init_statechart': False,
+            'root_state_example_class': RootStateExampleClass,
+            'F': F
+            }
+        super(Statechart_7, self).__init__(**attrs) 
+
+class Statechart_8(StatechartManager):
+    def __init__(self):
+        attrs = { 
+            'auto_init_statechart': False,
+            'root_state_example_class': RootStateExampleClass,
+            'states_are_concurrent': True
+            }
+        super(Statechart_8, self).__init__(**attrs) 
+
 #Statechart_1 = StatechartManager(**{
 #    'initial_state_key': 'A',
 #    'A': State(**{ 'foo': lambda self,*l: self.go_to_state('B')}),
@@ -147,8 +189,8 @@ class StatechartTestCase(unittest.TestCase):
         self.assertTrue(isinstance(root_state_2, State))
         self.assertTrue(root_state_2.substates_are_concurrent)
 
-        self.assertEqual(statechart_2.initial_state_key, '')
-        self.assertEqual(root_state_2.initial_substate_key, '')
+        self.assertEqual(statechart_2.initial_state_key, None)
+        self.assertEqual(root_state_2.initial_substate_key, None)
         self.assertEqual(state_C, root_state_2.get_substate('C'))
         self.assertEqual(state_D, root_state_2.get_substate('D'))
         
@@ -183,3 +225,42 @@ class StatechartTestCase(unittest.TestCase):
         self.assertTrue(statechart_4.statechart_is_initialized)
         self.assertFalse(statechart_4.root_state_instance is None)
         self.assertEqual(statechart_4.root_state_instance.get_substate('F'), statechart_4.get_state('F'))
+
+    def test_statechart_5_which_has_invalid_root_state_example_class(self):
+        statechart_5 = Statechart_5()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_5.init_statechart()
+
+        self.assertEqual(str(cm.exception), "Invalid root state example")
+
+    def test_statechart_6_which_has_an_initial_state_set_with_concurrent_states(self):
+        statechart_6 = Statechart_6()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_6.init_statechart()
+
+        msg = "Cannot assign an initial state when states are concurrent"
+
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_statechart_7_which_has_neither_an_initial_state_or_concurrent_states_set(self):
+        statechart_7 = Statechart_7()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_7.init_statechart()
+
+        msg = "Must either define initial state or assign states as concurrent"
+
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_statechart_8_which_has_no_states(self):
+        statechart_8 = Statechart_8()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_8.init_statechart()
+
+        msg = "Must define one or more states"
+
+        self.assertEqual(str(cm.exception), msg)
+

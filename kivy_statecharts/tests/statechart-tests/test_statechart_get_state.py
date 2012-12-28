@@ -271,12 +271,18 @@ class StatechartGetStateTestCase(unittest.TestCase):
         self.assertIsNotNone(state)
         self.assertEqual(state.value, 'state B.Y') 
   
-        print 'expecting to get an error message...'
-        state = statechart_4.get_state('X')
-        self.assertIsNone(state)
-  
-        print 'expecting to get an error message...'
-        state = statechart_4.get_state('Y')
-        self.assertIsNone(state)
+    def test_access_states_statechart_4_ambiguous_case_1(self):
+        with self.assertRaises(Exception) as cm:
+            state = statechart_4.get_state('X')
 
+        msg = ("Cannot find substate matching 'X' in state __ROOT_STATE__. "
+               "Ambiguous with the following: B.X, A.X")
+        self.assertEqual(str(cm.exception), msg)
 
+    def test_access_states_statechart_4_ambiguous_case_2(self):
+        with self.assertRaises(Exception) as cm:
+            state = statechart_4.get_state('Y')
+
+        msg = ("Cannot find substate matching 'Y' in state __ROOT_STATE__. "
+               "Ambiguous with the following: B.Y, A.Y")
+        self.assertEqual(str(cm.exception), msg)

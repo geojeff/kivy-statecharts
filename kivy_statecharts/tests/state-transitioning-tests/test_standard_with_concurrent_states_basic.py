@@ -140,8 +140,11 @@ class StateTransitioningStandardBasicWithConcurrentTestCase(unittest.TestCase):
     def test_from_a_to_sibling_concurrent_state_b(self):
         monitor_1.reset()
 
-        print 'expecting to get an error...'
-        state_A.go_to_state('B')
+        with self.assertRaises(Exception) as cm:
+            state_A.go_to_state('B')
+        msg = ("Cannot go to state B from A.C. Pivot state __ROOT_STATE__ "
+               "has concurrent substates.")
+        self.assertEqual(str(cm.exception), msg)
 
         self.assertEqual(monitor_1.length, 0)
         self.assertEqual(len(statechart_1.current_states), 2)
@@ -153,3 +156,13 @@ class StateTransitioningStandardBasicWithConcurrentTestCase(unittest.TestCase):
         self.assertFalse(state_B.state_is_current_substate('F'))
   
         self.assertIsNotNone(monitor_1.match_entered_states(root_state_1, 'A', 'C', 'B', 'E'))
+
+    # From state A, try to go to an invalid state
+    def test_from_a_to_an_invalid_state(self):
+        monitor_1.reset()
+
+        with self.assertRaises(Exception) as cm:
+            state_A.go_to_state('Wrong')
+        msg = "Cannot go to state Wrong from state A. Invalid value."
+        self.assertEqual(str(cm.exception), msg)
+

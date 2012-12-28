@@ -43,6 +43,7 @@ class Statechart_1(StatechartManager):
 
         def __init__(self, **kwargs):
             kwargs['event_handler_return_value'] = True
+            kwargs['trace'] = True
             super(Statechart_1.FOO, self).__init__(**kwargs)
 
         def _notify_handled_event(self, handler, event, arg1, arg2):
@@ -262,3 +263,29 @@ class StateTryToHandleEventTestCase(unittest.TestCase):
         self.assertEqual(info['handler'], 'unknown_event')
         self.assertTrue(statechart_1.state_will_try_to_handle_event_info)
         self.assertTrue(statechart_1.state_did_try_to_handle_event_info)
+        
+    # Try to use an event handler name as an event
+    def test_for_event_handler_name_used_as_an_event(self):
+        class Sender:
+            pass
+        class Context:
+            pass
+        sender = Sender()
+        context = Context()
+
+        with self.assertRaises(Exception) as cm:
+            foo.try_to_handle_event('event_handler1', sender, context)
+
+        msg = ("state FOO can not handle event 'event_handler1' "
+               "since it is a registered event handler")
+        self.assertEqual(str(cm.exception), msg)
+
+    # Test responds_to_event
+    def test_responds_to_event(self):
+        self.assertTrue(foo.responds_to_event('event1'))
+
+        # This is True because FOO has an unknown_event method.
+        self.assertTrue(foo.responds_to_event('none_event'))
+
+        # This is False because the event is the name of a handler.
+        self.assertFalse(foo.responds_to_event('event_handler1'))

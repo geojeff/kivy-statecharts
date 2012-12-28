@@ -80,7 +80,7 @@ class StatechartTestCase(unittest.TestCase):
         self.assertTrue(app.statechart.statechart_is_initialized)
         self.assertEqual(app.statechart.root_state_instance.name, '__ROOT_STATE__')
         self.assertTrue(isinstance(app.statechart.root_state_instance, State))
-        self.assertEqual(app.statechart.initial_state_key, '')
+        self.assertEqual(app.statechart.initial_state_key, None)
 
         self.assertTrue(app.statechart.get_state('A').is_current_state())
         self.assertFalse(app.statechart.get_state('B').is_current_state())
@@ -100,3 +100,28 @@ class StatechartTestCase(unittest.TestCase):
         statechart_2.init_statechart()
 
         self.assertTrue(statechart_2.statechart_is_initialized)
+
+        # Trigger parts of the logging code system.
+        statechart_2.suppress_statechart_warnings = True
+        statechart_2.statechart_log_warning('Ignore me')
+
+        statechart_2.suppress_statechart_warnings = False
+        statechart_2.name = 'STATECHART 2'
+        statechart_2.statechart_log_warning('Ignore me, now with a name')
+
+    def test_init_with_root_state_class_of_wrong_type(self):
+        class Statechart_3(StatechartManager):
+            def __init__(self, **kwargs):
+                kwargs['auto_init_statechart'] = False
+                kwargs['root_state_class'] = dict
+                super(Statechart_3, self).__init__(**kwargs)
+
+        statechart_3 = Statechart_3()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.init_statechart()
+
+        msg = "Unable to initialize statechart. Root state must be a state class"
+        self.assertEqual(str(cm.exception), msg)
+
+

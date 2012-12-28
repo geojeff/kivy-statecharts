@@ -1,6 +1,6 @@
 '''
 Statechart tests, advanced event handling, without concurrent states
-===========
+====================================================================
 '''
 
 import unittest, re
@@ -15,10 +15,10 @@ from kivy_statecharts.system.statechart import StatechartManager
 import os, inspect
 
 class TestState(State):
-    event = ObjectProperty(None)
-    sender = ObjectProperty(None)
-    context = ObjectProperty(None)
-    handler = ObjectProperty(None)
+    event = ObjectProperty(None, allownone=True)
+    sender = ObjectProperty(None, allownone=True)
+    context = ObjectProperty(None, allownone=True)
+    handler = ObjectProperty(None, allownone=True)
       
     def _handled_event(self, handler, event, sender, context):
         setattr(self, 'handler', handler);
@@ -39,9 +39,10 @@ class Statechart_1(StatechartManager):
 
     class RootState(TestState):
         def __init__(self, **kwargs):
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_1.RootState, self).__init__(**kwargs)
 
-        def foo(self, context):
+        def foo(self, sender, context):
             self._handled_event('foo', None, sender, context)
  
         @State.event_handler(['plus', 'minus', 'multiply', 'divide']) 
@@ -54,7 +55,16 @@ class Statechart_1(StatechartManager):
 
         def unknown_event(self, event, sender, context):
             self._handled_event('unknown_event', event, sender, context)
-        
+
+        class A(State):
+            def __init__(self, **kwargs):
+                super(Statechart_1.RootState.A, self).__init__(**kwargs)
+
+        class B(State):
+            def __init__(self, **kwargs):
+                super(Statechart_1.RootState.B, self).__init__(**kwargs)
+
+
 class Statechart_2(StatechartManager):
     def __init__(self, **kwargs):
         kwargs['root_state_class'] = self.RootState
@@ -62,11 +72,21 @@ class Statechart_2(StatechartManager):
 
     class RootState(TestState):
         def __init__(self, **kwargs):
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_2.RootState, self).__init__(**kwargs)
 
-        def foo(self, context):
+        def foo(self, sender, context):
             self._handled_event('foo', None, sender, context)
  
+        class A(State):
+            def __init__(self, **kwargs):
+                super(Statechart_2.RootState.A, self).__init__(**kwargs)
+
+        class B(State):
+            def __init__(self, **kwargs):
+                super(Statechart_2.RootState.B, self).__init__(**kwargs)
+
+
 class Statechart_3(StatechartManager):
     def __init__(self, **kwargs):
         kwargs['root_state_class'] = self.RootState
@@ -74,6 +94,7 @@ class Statechart_3(StatechartManager):
 
     class RootState(TestState):
         def __init__(self, **kwargs):
+            kwargs['initial_substate_key'] = 'A'
             super(Statechart_3.RootState, self).__init__(**kwargs)
 
         @State.event_handler([re.compile('num\d'), 'decimal']) 
@@ -83,6 +104,15 @@ class Statechart_3(StatechartManager):
         @State.event_handler([re.compile('foo'), re.compile('bar')]) 
         def event_handler_B(self, event, sender, context):
             self._handled_event('event_handler_B', event, sender, context)
+
+        class A(State):
+            def __init__(self, **kwargs):
+                super(Statechart_3.RootState.A, self).__init__(**kwargs)
+
+        class B(State):
+            def __init__(self, **kwargs):
+                super(Statechart_3.RootState.B, self).__init__(**kwargs)
+
 
 class Statechart_4(StatechartManager):
     def __init__(self, **kwargs):
@@ -94,7 +124,7 @@ class Statechart_4(StatechartManager):
             kwargs['initial_substate_key'] = 'A'
             super(Statechart_4.RootState, self).__init__(**kwargs)
 
-        def foo(self, context):
+        def foo(self, sender, context):
             self._handled_event('foo', None, sender, context)
  
         @State.event_handler(['yes', 'no']) 
@@ -104,28 +134,29 @@ class Statechart_4(StatechartManager):
         def unknown_event(self, event, sender, context):
             self._handled_event('unknown_event', event, sender, context)
         
-        class A(State):
+        class A(TestState):
             def __init__(self, **kwargs):
                 kwargs['initial_substate_key'] = 'B'
                 super(Statechart_4.RootState.A, self).__init__(**kwargs)
 
-            def bar(self, context):
+            def bar(self, sender, context):
                 self._handled_event('bar', None, sender, context)
  
             @State.event_handler(['frozen', 'canuck']) 
             def event_handler_A(self, event, sender, context):
                 self._handled_event('event_handler_A', event, sender, context)
 
-            class B(State):
+            class B(TestState):
                 def __init__(self, **kwargs):
                     super(Statechart_4.RootState.A.B, self).__init__(**kwargs)
     
-                def cat(self, context):
+                def cat(self, sender, context):
                     self._handled_event('cat', None, sender, context)
      
                 @State.event_handler([re.compile('apple'), re.compile('orange')]) 
                 def event_handler_B(self, event, sender, context):
                     self._handled_event('event_handler_B', event, sender, context)
+
 
 class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
     def setUp(self):
@@ -156,7 +187,7 @@ class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
         state_B = statechart_4.get_state('B')
 
     # Check statechart_1 event handling
-    def check_statechart_1_event_handling(self):
+    def test_statechart_1_event_handling(self):
         class Sender:
             pass
         class Context:
@@ -200,10 +231,10 @@ class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
         self.assertEqual(root_state_1.context, context)
 
     # Check statechart_2 event handling
-    def check_statechart_2_event_handling(self):
+    def test_statechart_2_event_handling(self):
         class Sender:
             pass
-        class Contect:
+        class Context:
             pass
         sender = Sender()
         context = Context()
@@ -223,7 +254,7 @@ class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
         self.assertEqual(root_state_2.context, None)
 
     # Check statechart_3 event handling
-    def check_statechart_3_event_handling(self):
+    def test_statechart_3_event_handling(self):
         root_state_3.reset();
         statechart_3.send_event('num2')
         self.assertEqual(root_state_3.handler, 'event_handler_A')
@@ -245,7 +276,7 @@ class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
         self.assertEqual(root_state_3.event, 'bar')
 
     # Check statechart_4 event handling
-    def check_statechart_4_event_handling(self):
+    def test_statechart_4_event_handling(self):
         root_state_4.reset();
         state_A.reset();
         state_B.reset();
@@ -322,3 +353,48 @@ class StateEventHandlingAdvancedWithoutConcurrentTestCase(unittest.TestCase):
         self.assertEqual(state_A.event, None)
         self.assertEqual(state_B.handler, 'event_handler_B')
         self.assertEqual(state_B.event, 'orange')
+
+    # Check for bad handler in statechart_5
+    def test_for_bad_handler(self):
+        class BadState(TestState):
+            def __init__(self, **kwargs):
+                kwargs['name'] = 'bad_state'  # name needed for test
+                super(BadState, self).__init__(**kwargs)
+    
+            # Only event types allowed are strings and regexes.
+            @State.event_handler(['yes', 'no', dict]) 
+            def bad_event_handler(self, event, sender, context):
+                pass
+
+        bad = BadState()
+
+        with self.assertRaises(Exception) as cm:
+            bad.init_state()
+
+        msg = ("Invalid event {0} for event handler {1} in "
+               "state {1}").format(dict, 'bad_event_handler', bad)
+        self.assertEqual(str(cm.exception), msg)
+
+    # This tests what would happen if multiple send_event calls were made
+    # in rapid succession, causing an internal _send_event_locked, but here
+    # we reach the same code by setting go_to_state_locked, during which time
+    # there also should be suspension of send_event.
+    def test_invoke_method_send_event_when_go_to_state_locked(self):
+        class Sender:
+            pass
+        class Context:
+            pass
+        sender = Sender()
+        context = Context()
+
+        root_state_1.reset();
+        statechart_1._send_event_locked = True
+        statechart_1.send_event('foo', sender, context)
+        self.assertEqual(root_state_1.handler, None)
+        statechart_1._send_event_locked = False
+        # Repeat send_event() (will actually result in two calls).
+        statechart_1.send_event('foo', sender, context)
+        self.assertEqual(root_state_1.handler, 'foo')
+        self.assertEqual(root_state_1.event, None)
+        self.assertEqual(root_state_1.sender, sender)
+        self.assertEqual(root_state_1.context, context)

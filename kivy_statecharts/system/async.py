@@ -1,5 +1,5 @@
 # ================================================================================
-# Project:   Kivy.Statechart - A Statechart Framework for Kivy
+# Project: kivy-statecharts - A Statechart Framework for Kivy
 # Copyright: (c) 2010, 2011 Michael Cohen, and contributors.
 # Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
 # ================================================================================

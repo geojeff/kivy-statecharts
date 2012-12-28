@@ -248,3 +248,12 @@ class StateTransitioningHistoryStandardCoreWithoutConcurrentTestCase(unittest.Te
         self.assertEqual(statechart_1.get_state('B').history_state, statechart_1.get_state('E'))
         self.assertEqual(statechart_1.get_state('E').history_state, statechart_1.get_state('K'))
 
+    # From state A, try to go to an invalid history state
+    def test_from_a_to_an_invalid_history_state(self):
+        monitor_1.reset()
+
+        with self.assertRaises(Exception) as cm:
+            state_A.go_to_history_state('Wrong')
+        msg = "Cannot go to history state Wrong from state A. Invalid value."
+        self.assertEqual(str(cm.exception), msg)
+

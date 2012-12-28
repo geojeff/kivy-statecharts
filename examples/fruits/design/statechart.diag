@@ -1,0 +1,31 @@
+blockdiag {
+  default_shape = roundedbox;
+  default_node_color = lightblue;
+  default_group_color = "#C0C0C0";
+  default_linecolor = "#808080";
+  node_width = 200
+
+  root -> ShowingSearchScreen
+  ShowingListsScreen -> ShowingSearchScreen
+  ShowingListsScreen -> ShowingDataScreen
+  ShowingListsScreen -> ShowingDetailScreen
+
+  ShowingSearchScreen -> ShowingListsScreen
+  ShowingSearchScreen -> ShowingDataScreen
+  ShowingSearchScreen -> ShowingDetailScreen
+
+  ShowingDataScreen -> ShowingListsScreen
+  ShowingDataScreen -> ShowingSearchScreen
+  ShowingDataScreen -> ShowingDetailScreen
+
+  ShowingDetailScreen -> ShowingListsScreen
+  ShowingDetailScreen -> ShowingSearchScreen
+  ShowingDetailScreen -> ShowingDataScreen
+
+  root [shape = beginpoint]
+  ShowingListsScreen
+  ShowingSearchScreen
+  ShowingDataScreen
+  ShowingDetailScreen
+}
+

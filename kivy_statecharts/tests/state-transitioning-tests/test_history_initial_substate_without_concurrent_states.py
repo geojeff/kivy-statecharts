@@ -1,6 +1,6 @@
 '''
 Statechart tests, transitioning, history, initial substate, without concurrent
-===========
+==============================================================================
 '''
 
 import unittest, re
@@ -167,3 +167,35 @@ class StateTransitioningHistoryInitialSubstateWithoutConcurrentTestCase(unittest
   
         self.assertEqual(state_A.history_state, state_C)
         self.assertIsNone(state_B.history_state)
+
+    def test_initial_state_without_default_state(self):
+        msg = ("Initial substate is invalid. History state requires the name "
+                "of a default state to be set.")
+
+        state_P = State(name='P')
+        state_P.InitialSubstate = HistoryState
+
+        with self.assertRaises(Exception) as cm:
+            state_P.init_state()
+
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_get_substate_InitialSubstate_of_root(self):
+        msg = ("Cannot find substate matching 'InitialSubstate' in state "
+               "__ROOT_STATE__. Ambiguous with the following: "
+               "B.InitialSubstate, A.InitialSubstate")
+        with self.assertRaises(Exception) as cm:
+            initial_substate = root_state_1.get_substate('InitialSubstate')
+
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_get_substate_InitialSubstate_of_state_A(self):
+        initial_substate = state_A.get_substate('InitialSubstate')
+
+        self.assertEqual(initial_substate.default_state, 'C')
+
+    def test_get_substate_InitialSubstate_of_state_B(self):
+        initial_substate = state_B.get_substate('InitialSubstate')
+
+        self.assertEqual(initial_substate.default_state, 'E')
+

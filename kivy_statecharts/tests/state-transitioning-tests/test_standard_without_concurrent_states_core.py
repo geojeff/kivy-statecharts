@@ -14,6 +14,7 @@ from kivy_statecharts.system.statechart import StatechartManager
 
 import os, inspect
 
+
 class Statechart_1(StatechartManager):
     def __init__(self, **kwargs):
         kwargs['root_state_class'] = self.RootState
@@ -283,6 +284,17 @@ class StateTransitioningStandardCoreWithoutConcurrentTestCase(unittest.TestCase)
         self.assertTrue(statechart_1.state_is_current_state('G'))
   
         self.assertIsNotNone(monitor_1.match_entered_states(root_state_1, 'A', 'C', 'G'))
+
+    # Check re-enter state H, which has not been entered
+    def test_reenter_state_h_incorrectly(self):
+        monitor_1.reset()
+        statechart_1.go_to_state('G')
+
+        with self.assertRaises(Exception) as cm:
+            state_H.reenter()
+        msg = ("Cannot re-enter state A.C.H since it is not an entered state "
+               "in the statechart")
+        self.assertEqual(str(cm.exception), msg)
 
     # Check go to g state's ancestor state a
     def test_go_to_g_state_ancestor_state_a(self):

@@ -44,6 +44,26 @@ class Statechart_1(StatechartManager):
                 def __init__(self, **kwargs):
                     super(Statechart_1.RootState.B.Y, self).__init__(**kwargs)
 
+
+# name has to be set as kwargs for this to work.
+class O(State):
+    def __init__(self, **kwargs):
+        kwargs['name'] = 'O'
+        kwargs['initial_substate_key'] = 'P'
+        super(O, self).__init__(**kwargs)
+
+    def do_not_tread_on_me(self):
+        pass
+
+    class P(State):
+        def __init__(self, **kwargs):
+            super(O.P, self).__init__(**kwargs)
+
+    class Q(State):
+        def __init__(self, **kwargs):
+            super(O.Q, self).__init__(**kwargs)
+
+
 class StateAddSubstateTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
@@ -84,8 +104,9 @@ class StateAddSubstateTestCase(unittest.TestCase):
     # Add a substate to state A
     def test_add_substate_to_state_A_statechart_1(self):
         self.assertIsNone(state_A.get_substate('Z'))
-        # In [PORT], EmptyState is created only for states with substates, and no initial_substate set. Correct?
-        self.assertEqual(state_A.initial_substate_key, '')
+        # [PORT] EmptyState is created only for states with substates,
+        #        and no initial_substate set. Correct?
+        self.assertEqual(state_A.initial_substate_key, None)
 
         state = state_A.add_substate('Z')
 
@@ -119,7 +140,7 @@ class StateAddSubstateTestCase(unittest.TestCase):
         self.assertFalse(state.is_entered_state())
         self.assertFalse(state.is_current_state())
         self.assertFalse(state_B.is_current_state())
-        self.assertEqual(state_B.initial_substate_key, '')
+        self.assertEqual(state_B.initial_substate_key, None)
         self.assertTrue(state_B.is_entered_state())
         self.assertEqual(len(state_B.current_substates), 2)
 
@@ -130,4 +151,92 @@ class StateAddSubstateTestCase(unittest.TestCase):
         self.assertTrue(state_B.is_entered_state())
         self.assertEqual(len(state_B.current_substates), 3)
 
+    def test_adding_unnamed_substate(self):
+        o = O()
+        o.init_state()
 
+        name = ''
+
+        with self.assertRaises(Exception) as cm:
+            o.add_substate(name)
+
+        msg = "Cannot add substate. name required"
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_adding_substate_in_conflict_with_property(self):
+        o = O()
+        o.init_state()
+
+        name = 'do_not_tread_on_me'
+
+        with self.assertRaises(Exception) as cm:
+            o.add_substate(name)
+
+        msg = ("Cannot add substate '{0}'. Already a defined "
+               "property").format(name)
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_adding_substate_without_initializing_parent(self):
+        o = O()
+
+        name = 'A'
+
+        with self.assertRaises(Exception) as cm:
+            o.add_substate(name)
+
+        msg = ("Cannot add substate '{0}'. Parent state is not yet "
+               "initialized").format(name)
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_adding_substate_with_dict_of_properties(self):
+        o = O()
+        o.init_state()
+
+        name = 'A New Substate'
+
+        attr = {'count': 12}
+
+        new_substate = o.add_substate(name, state=attr)
+
+        self.assertEqual(new_substate.name, 'A New Substate')
+        self.assertEqual(new_substate.count, 12) 
+
+    def test_adding_substate_with_dict_of_properties_but_wrong_type(self):
+        o = O()
+        o.init_state()
+
+        name = 'A New Substate'
+
+        # Make attr a tuple, instead of required dict:
+        attr = ('count', 12)
+
+        with self.assertRaises(Exception) as cm:
+            new_substate = o.add_substate(name, state=attr)
+
+        msg = ("Cannot add substate '{0}'. Must provide a state "
+               "class").format(name)
+
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_getting_relative_path_from_root(self):
+        path = state_X.path_relative_to(root_state_1)
+
+        self.assertEqual(path, 'B.X')
+
+    def test_getting_relative_path_from_parent(self):
+        path = state_X.path_relative_to(state_B)
+
+        self.assertEqual(path, 'X')
+
+    def test_trying_to_get_relative_path_to_nonparent(self):
+        nobody = State(name='nobody')
+
+        # Note: The test will fail after the parentage is searched all the
+        #       way to the root, and at that point the path will be B.X.
+
+        with self.assertRaises(Exception) as cm:
+            state_X.path_relative_to(nobody)
+
+        msg = ("Cannot generate relative path from {0} since it is not a "
+               "parent state of {1}").format('nobody', 'B.X')
+        self.assertEqual(str(cm.exception), msg)

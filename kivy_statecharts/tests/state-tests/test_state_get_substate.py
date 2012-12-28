@@ -123,6 +123,17 @@ class CallbackManager_1:
         self.callback_value = value
         self.callback_keys = keys
 
+class CallbackManager_2:
+    def __init__(self):
+        self.callback_state = None
+        self.callback_value = None
+        self.callback_keys = None
+
+    def callback_func(self, state, value, keys):
+        self.callback_state = state
+        self.callback_value = value
+        self.callback_keys = keys
+
 class StateGetSubstateTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
@@ -305,8 +316,11 @@ class StateGetSubstateTestCase(unittest.TestCase):
     def test_z_substates_from_foo_state(self):
         foo = root_state_1.get_substate('FOO')
 
-        state = foo.get_substate('Z')
-        self.assertIsNone(state)
+        with self.assertRaises(Exception) as cm:
+            state = foo.get_substate('Z')
+        msg = ("Cannot find substate matching 'Z' in state FOO. Ambiguous "
+               "with the following: B.Z, A.Z")
+        self.assertEqual(str(cm.exception), msg)
 
         state = foo.get_substate('A~Z')
         self.assertEqual(state.full_path, 'FOO.A.Z')
@@ -330,9 +344,11 @@ class StateGetSubstateTestCase(unittest.TestCase):
 
     # Get A1 substate from Y state
     def test_a1_substate_from_y_state(self):
-        print 'expecting an error message...'
-        state = root_state_1.get_substate('A1')
-        self.assertIsNone(state)
+        with self.assertRaises(Exception) as cm:
+            state = root_state_1.get_substate('A1')
+        msg = ("Cannot find substate matching 'A1' in state __ROOT_STATE__. "
+               "Ambiguous with the following: X.A.A1, FOO.A.A1")
+        self.assertEqual(str(cm.exception), msg)
 
         state = root_state_1.get_substate('FOO~A1')
         self.assertEqual(state.full_path, 'FOO.A.A1')
@@ -356,26 +372,29 @@ class StateGetSubstateTestCase(unittest.TestCase):
         self.assertEqual(callback_manager.callback_value, 'ABC')
         self.assertIsNone(callback_manager.callback_keys)
 
-    # Get ambiguous substate 'x' with using callback
-    #def test_get_ambiguous_substate_x_with_callback(self):
-        #callback_manager = CallbackManager_1()
+    # Get ambiguous substate 'A1' with using callback
+    def test_get_ambiguous_substate_x_with_callback(self):
+        callback_manager = CallbackManager_1()
 
-        # [PORT] The javascript version treats X as ambiguous -- there is an X
-        #        as a direct substate of root, and another X that is a substate
-        #        as root.BAR.X. In the python version, root.get_substate('X') will
-        #        not be ambiguous, as the direct substate X will be returned.
-        #
-        #        So, this test is ignored, and the previous will be deemed sufficient.
-        #
-        #result = root_state_1.get_substate('X', callback_manager.callback_func)
-        #print callback_manager.callback_keys
-        #self.assertIsNone(result)
-        #self.assertEqual(callback_manager.callback_state, root_state_1)
-        #self.assertEqual(callback_manager.callback_value, 'X')
-        #self.assertEqual(len(callback_manager.callback_keys), 2)
-        #self.assertTrue('X' in callback_manager.callback_keys)
-        #self.assertTrue('BAR.X' in callback_manager.callback_keys)
+        result = root_state_1.get_substate('A1', callback_manager.callback_func)
 
+        self.assertIsNone(result)
+        self.assertEqual(callback_manager.callback_state, root_state_1)
+        self.assertEqual(callback_manager.callback_value, 'A1')
+        self.assertEqual(len(callback_manager.callback_keys), 2)
+        print callback_manager.callback_keys
+        self.assertTrue('X.A.A1' in callback_manager.callback_keys)
+        self.assertTrue('FOO.A.A1' in callback_manager.callback_keys)
+
+    def test_trying_to_get_substate_with_wrong_type(self):
+        value_of_wrong_type = {'key': 1}
+
+        with self.assertRaises(Exception) as cm:
+            root_state_1.get_substate(value_of_wrong_type)
+
+        msg = ("Cannot find matching substate. value must be a State "
+               "class or string, not type: {0}").format(type(value_of_wrong_type))
+        self.assertEqual(str(cm.exception), msg)
 
 
 

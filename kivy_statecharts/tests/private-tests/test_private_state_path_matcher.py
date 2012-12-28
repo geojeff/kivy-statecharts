@@ -131,3 +131,29 @@ class StatePathMatcherTestCase(unittest.TestCase):
         self.assertFalse(spm.match('B'))
         self.assertFalse(spm.match('B.A'))
         
+    # Test with expression A~B~C -- too many ~
+    def test_with_expression_a_tilde_b_tilde_c(self):
+
+        with self.assertRaises(Exception) as cm:
+            spm = StatePathMatcher(expression='A~B~C')
+
+        msg = "Invalid use of '~' at part 0"
+        self.assertEqual(str(cm.exception), msg)
+
+    # Test with expression A.self.A.B.C -- embedded self
+    def test_with_expression_a_dot_self_dot_a_dot_b_dot_c(self):
+
+        with self.assertRaises(Exception) as cm:
+            spm = StatePathMatcher(expression='A.self.A.B.C')
+
+        msg = "Invalid use of 'self' at part 1"
+        self.assertEqual(str(cm.exception), msg)
+
+    # Test with bad match arguments
+    def test_with_bad_match_arguments(self):
+        spm = StatePathMatcher(expression='self.A~B')
+
+        self.assertFalse(spm.match(None))
+        self.assertFalse(spm.match(''))
+        self.assertFalse(spm.match(dict))
+

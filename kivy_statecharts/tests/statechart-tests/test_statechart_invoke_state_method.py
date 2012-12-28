@@ -134,6 +134,24 @@ class CallbackManager_2:
         self.callback_info['state{0}'.format(self.num_callbacks)] = state
         self.callback_info['result{0}'.format(self.num_callbacks)] = result
 
+class Statechart_3(StatechartManager):
+    def __init__(self, **kwargs):
+        kwargs['initial_state_key'] = 'A'
+        kwargs['auto_init_statechart'] = False
+        kwargs['root_state_example_class'] = RootStateExample_1
+        kwargs['A'] = self.A
+        kwargs['B'] = self.B
+        super(Statechart_3, self).__init__(**kwargs)
+
+    class A(TestState):
+        def __init__(self, **kwargs):
+            super(Statechart_3.A, self).__init__(**kwargs)
+
+    class B(TestState):
+        def __init__(self, **kwargs):
+            super(Statechart_3.B, self).__init__(**kwargs)
+
+
 class StatechartInvokeStateMethodTestCase(unittest.TestCase):
     def setUp(self):
         global statechart_1
@@ -300,4 +318,117 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         self.assertFalse(state_C.test_invoked)
         self.assertFalse(state_D.test_invoked)
 
+    def test_invoke_method_go_to_state_before_init_statechart_called(self):
+        statechart_3 = Statechart_3()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.go_to_state('B')
+        msg = ("Cannot go to state B. Statechart has not yet been "
+               "initialized.")
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_invoke_method_go_to_state_with_bad_state(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.go_to_state('Z')
+        msg = ("Cannot to goto state Z. Not a recognized state in "
+               "statechart.")
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_invoke_method_go_to_state_with_bad_from_state(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.go_to_state('B', from_current_state='Z')
+        msg = ("Cannot to goto state B. Z is not a "
+               "recognized current state in "
+               "the statechart.")
+        self.assertEqual(str(cm.exception), msg) 
+
+    def test_invoke_method_resume_go_to_state_when_not_suspended(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.resume_go_to_state()
+        msg = ("Cannot resume goto state since it has not been suspended.")
+        self.assertEqual(str(cm.exception), msg) 
+
+    def test_invoke_method_go_to_history_state_before_init_statechart_called(self):
+        statechart_3 = Statechart_3()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.go_to_history_state('B')
+        msg = ("Cannot go to state B's history state. Statechart has "
+               "not yet been initialized")
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_invoke_method_go_to_history_state_with_bad_state(self):
+        statechart_3 = Statechart_3()
+        statechart_3.init_statechart()
+
+        with self.assertRaises(Exception) as cm:
+            statechart_3.go_to_history_state('Z')
+        msg = ("Cannot to goto state None's history state. Not a "
+               "recognized state in statechart")
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_invoke_method_details(self):
+        details = statechart_1.details()
+        self.assertTrue(type(details) == dict)
+        details = statechart_1.to_string_with_details()
+        self.assertEqual(type(details), str)
+
+    def test_invoke_method_forbidden_unknown_event(self):
+        with self.assertRaises(Exception) as cm:
+            statechart_1.invoke_state_method('unknown_event')
+        msg = "Cannot invoke method unkown_event"
+        self.assertEqual(str(cm.exception), msg)
+
+    def test_invoke_method_details_before_init_and_with_a_name(self):
+        statechart_3 = Statechart_3()
+        statechart_3.name = 'Number 3'
+        details = statechart_3.details()
+        self.assertTrue(type(details) == dict)
+        details = statechart_3._list_to_string('key', [], 2)
+        self.assertEqual(details, "  key: []")
+
+    def test_invoke_method_details_when_there_are_go_to_actions(self):
+        EXIT_STATE = 0
+        ENTER_STATE = 1
+
+        actions = []
+        actions.append({ 'action': EXIT_STATE, 'state': state_B })
+        actions.append({ 'action': ENTER_STATE, 'state': state_A, 'current_state': True })
+
+        statechart_1.go_to_state_locked = True
+
+        statechart_1.go_to_state_suspended_point = {
+            'go_to_state': state_B,
+            'actions': actions,
+            'marker': None,
+            'context': {}
+        }
+
+        statechart_1.go_to_state_suspended = True
+
+        statechart_1._current_go_to_state_action = actions[1]
+
+        statechart_1._go_to_state_actions = actions
+
+        statechart_1._state_handle_event_info = {
+              'state': state_A,
+              'event': 'an event',
+              'handler': 'a handler'
+              }
+
+        # Call details() methods to trigger code in there that is only hit in
+        # this situation.
+        details = statechart_1.details()
+        self.assertTrue(type(details) == dict)
+        details = statechart_1.to_string_with_details()
+        self.assertEqual(type(details), str)
 
