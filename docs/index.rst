@@ -555,6 +555,14 @@ methods for transitioning to the other states. The Lists and Search screen
 states are substantial, and have utility and action callback methods that form
 an important part of application logic.
 
+.. figure::  ../examples/fruits/design/statechart.png
+   :align:   center
+
+   Statechart diagram for Fruits App
+
+The statechart diagram shows that any of the states have possible transitions
+to any other state, in a simple tabbed app design.
+
 ShuttleControl Example App
 --------------------------
 

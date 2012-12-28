@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to kivy-statecharts’s documentation! &mdash; kivy-statecharts 0.1 documentation</title>
+    <title>kivy-statecharts &mdash; kivy-statecharts 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -43,8 +43,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="welcome-to-kivy-statecharts-s-documentation">
-<h1>Welcome to kivy-statecharts&#8217;s documentation!<a class="headerlink" href="#welcome-to-kivy-statecharts-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="kivy-statecharts">
+<h1>kivy-statecharts<a class="headerlink" href="#kivy-statecharts" title="Permalink to this headline">¶</a></h1>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul class="simple">
@@ -78,12 +78,13 @@ kivy_statechart directory, run</p>
 </div>
 <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>The kivy-statecharts framework might be called &#8220;advanced,&#8221; but this could be
-a mistaken notion. As we will see in the examples, even a simple application
-can be made using statecharts.</p>
-<p>It is assumed here that you already understand Kivy bindings and the events
-system, how to build widgets with both python and kv language approaches, and
-general concepts of using Kivy.</p>
+<p>The kivy-statecharts framework might be called &#8220;advanced,&#8221; but this is a
+mistaken notion. As we will see in the examples, even a simple application can
+be made using statecharts. However, because there is a natural progression and
+dedicated documentation for learning basic Kivy programming, it is assumed here
+that you already understand Kivy bindings and the events system, how to build
+widgets with both python and kv language approaches, and general concepts of
+using Kivy.</p>
 <p>The developer may code the statechart for a new app directly, or a statechart
 drawing may be done first. At some point, making a statechart drawing is
 advised, but it is not required.</p>
@@ -98,7 +99,8 @@ logic code, as well as user interface definitions and operations.</p>
 done, a piece of paper works fine for getting started, but there are good
 drawing programs and python libraries that are recommended. Several of the
 examples have drawings made with <tt class="docutils literal"><span class="pre">yEd</span></tt>, a free diagram editor, or with the
-<tt class="docutils literal"><span class="pre">blockdiag</span></tt> python library.</p>
+<tt class="docutils literal"><span class="pre">blockdiag</span></tt> python library. Some developers may have available commercial
+tools such as <tt class="docutils literal"><span class="pre">OmniGraffle</span></tt>, which is capable of drawing statecharts.</p>
 <p>Regardless of methods used, the process of statechart construction is easy to
 start by laying out what needs to happen as the app loads, and user interaction
 begins.  As each user interface component and user action is envisioned, it is
@@ -520,6 +522,12 @@ simple: they only contain enter_state() and exit_state() methods along with
 methods for transitioning to the other states. The Lists and Search screen
 states are substantial, and have utility and action callback methods that form
 an important part of application logic.</p>
+<div class="figure align-center">
+<img alt="_images/statechart2.png" src="_images/statechart2.png" />
+<p class="caption">Statechart diagram for Fruits App</p>
+</div>
+<p>The statechart diagram shows that any of the states have possible transitions
+to any other state, in a simple tabbed app design.</p>
 </div>
 <div class="section" id="shuttlecontrol-example-app">
 <h2>ShuttleControl Example App<a class="headerlink" href="#shuttlecontrol-example-app" title="Permalink to this headline">¶</a></h2>
@@ -538,11 +546,10 @@ group begin to pulsate, getting larger with more thrust applied. The list on
 the left and the table display at the top are also updated for individual
 thruster amount. If you want to decrease thrust, toggle the &#8220;more / less&#8221;
 control mode at left center.</p>
-<p>As with previous examples, there is really just one main state,
-ShowingThrusterControls, which contains states for each of the 14 thruster
-groups.</p>
+<p>There is really just one main state, ShowingThrusterControls, which contains
+states for each of the 14 thruster groups.</p>
 <div class="figure align-center">
-<img alt="_images/statechart2.png" src="_images/statechart2.png" />
+<img alt="_images/statechart3.png" src="_images/statechart3.png" />
 <p class="caption">Statechart diagram for ShuttleControlApp</p>
 </div>
 <p>The Thruster_Group_x states are concurrent, so multitouch is allowed. If this
@@ -575,7 +582,7 @@ and states for deflectors toward top right, all that happens when a bullet is
 in flight at bottom right, and the rest as odds and ends at left, and at far
 right, where you see the game level changing action.</p>
 <div class="figure align-center">
-<img alt="_images/statechart3.png" src="_images/statechart3.png" />
+<img alt="_images/statechart4.png" src="_images/statechart4.png" />
 <p class="caption">Statechart diagram for Deflectouch-With-Statecharts App</p>
 </div>
 <p>A new concept is introduced here for states: transient states, which are shown
@@ -730,7 +737,7 @@ for an app.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to kivy-statecharts&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#">kivy-statecharts</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#tests">Tests</a></li>
 </ul>
