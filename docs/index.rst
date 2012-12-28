@@ -122,6 +122,47 @@ becomes familiar. You may wonder why anyone would prefer to code without it.
 A well-designed system that does not use statecharts will in some fashion use
 similar techniques in statecharts, so the question is probably moot.
 
+Coding Style
+------------
+
+State classes may be declared "inline" in an indented fashion::
+
+    class AppStatechart(StatechartManager):
+        class RootState(State):
+            class ShowingHelloWorld(State):
+                ...
+                more code here
+                ...
+
+Or, state classes may be declared in their own files and imported to build the
+statechart. An attractive approach is to put state classes in their own files
+within a states package, e.g. states/showing_hello_world/ShowingHelloWorld.
+They would be imported like this::
+
+    from states.showing_hello_world import ShowingHelloWorld
+
+and would be available by their class names in the source file where the
+statechart is declared, e.g. ShowingHelloWorld, and used in one of several
+ways. An __init__() method and kwargs may be used::
+
+    class AppStatechart(StatechartManager):
+        class RootState(State):
+            def __init__(self, **kwargs):
+                kwargs['initial_substate_key'] = 'ShowingHelloWorld'
+                kwargs['ShowingHelloWorld'] = ShowingHelloWorld
+                super(RootState, self).__init__(**kwargs)
+
+Or, you may prefer to declare them in shorthand fashion, that does not require
+an __init__() method::
+
+    class AppStatechart(StatechartManager):
+        class RootState(State):
+            initial_substate_key = 'ShowingHelloWorld'
+            ShowingHelloWorld = ShowingHelloWorld
+
+Regardless of coding style, for more deeply nested substates, we would declare
+them in the same fashion to build a substate hierarchy in the statechart.
+
 Example Apps
 ============
 
