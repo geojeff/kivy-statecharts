@@ -473,7 +473,53 @@ search criteria. The &#8220;Detail&#8221; screen shows the data for the fruit cu
 selected in the &#8220;Lists&#8221; screen.</p>
 <p>The &#8220;Fruits&#8221; example shows how the statechart itself can be used as a storage
 point for application data. Likewise, properties and methods of individual
-states are related to the views the state classes serve.</p>
+states are related to the views the state classes serve. Here are the states
+and methods of the &#8220;Fruits&#8221; app statechart:</p>
+<div class="highlight-python"><pre>class AppStatechart(StatechartManager):
+    def create_searchable_data(self):
+    def create_adapters(self):
+    class RootState(State):
+        initial_substate_key = 'ShowingListsScreen'
+        class ShowingListsScreen(State):
+            def enter_state(self, context=None):
+            def exit_state(self, context=None):
+            def create_adapter_bindings(self):
+            def fruit_category_changed(self, fruit_categories_adapter, *args):
+            def fruit_changed(self, list_adapter, *args):
+            def go_to_search(self, *args):
+            def go_to_data(self, *args):
+            def go_to_detail(self, *args):
+        class ShowingSearchScreen(State):
+            def enter_state(self, context=None):
+            def exit_state(self, context=None):
+            def list_item_args_converter(self, row_index, record):
+            def criterion_entered(self, text_input):
+            def search(self):
+            def go_to_lists(self, *args):
+            def go_to_data(self, *args):
+            def go_to_detail(self, *args):
+        class ShowingDataScreen(State):
+            def enter_state(self, context=None):
+            def exit_state(self, context=None):
+            def go_to_lists(self, *args):
+            def go_to_search(self, *args):
+            def go_to_detail(self, *args):
+        class ShowingDetailScreen(State):
+            def enter_state(self, context=None):
+            def exit_state(self, context=None):
+            def go_to_lists(self, *args):
+            def go_to_search(self, *args):
+            def go_to_data(self, *args):</pre>
+</div>
+<p>The statechart has several methods for setting up data and adapters. There is a
+root state, with &#8216;ShowingListsScreen&#8217; set as the initial state. And, there are
+the four states for showing the screens in the app. Each of these states has an
+enter_state() and exit_state() method. The enter_state() method of each state
+contains the bulk of the code in the app. The Data and Detail screen states are
+simple: they only contain enter_state() and exit_state() methods along with
+methods for transitioning to the other states. The Lists and Search screen
+states are substantial, and have utility and action callback methods that form
+an important part of application logic.</p>
 </div>
 <div class="section" id="shuttlecontrol-example-app">
 <h2>ShuttleControl Example App<a class="headerlink" href="#shuttlecontrol-example-app" title="Permalink to this headline">¶</a></h2>
