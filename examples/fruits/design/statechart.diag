@@ -3,6 +3,7 @@ blockdiag {
   default_node_color = lightblue;
   default_group_color = "#C0C0C0";
   default_linecolor = "#808080";
+  node_width = 200
 
   root -> ShowingSearchScreen
   ShowingListsScreen -> ShowingSearchScreen

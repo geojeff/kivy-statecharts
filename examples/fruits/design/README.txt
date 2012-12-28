@@ -20,3 +20,11 @@ blockdiag statechart.diag
 which produces statechart.png
 
 Learn how to write blockdiag definition files at blockdiag.com.
+
+Add a font locally, such as:
+
+wget http://sourceforge.net/projects/dejavu/files/dejavu/2.33/dejavu-fonts-ttf-2.33.tar.bz2
+
+Then use the -f option to specify a specific font:
+
+blockdiag -f ../../../dejavu-fonts-ttf-2.33/ttf/DejaVuSerif.ttf statechart.diag
