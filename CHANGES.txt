@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+0.1.0
+-----
+
+ - Added docs.
+ - Added Fruits app example.
+ - Improved tests.
+
 0.0.9 (pre_release_full_port)
 -----------------------------
 
