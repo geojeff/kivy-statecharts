@@ -141,6 +141,45 @@ of coding. The formalization offered by statecharts is not cumbersome after it
 becomes familiar. You may wonder why anyone would prefer to code without it.
 A well-designed system that does not use statecharts will in some fashion use
 similar techniques in statecharts, so the question is probably moot.</p>
+<div class="section" id="coding-style">
+<h2>Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h2>
+<p>State classes may be declared &#8220;inline&#8221; in an indented fashion:</p>
+<div class="highlight-python"><pre>class AppStatechart(StatechartManager):
+    class RootState(State):
+        class ShowingHelloWorld(State):
+            ...
+            code for state here
+            ...</pre>
+</div>
+<p>Or, state classes may be declared in their own files and imported to build the
+statechart. An attractive approach is to put state classes in their own files
+in a states package, e.g. myapp/states/showing_hello_world/ShowingHelloWorld.
+They would be imported like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">states.showing_hello_world</span> <span class="kn">import</span> <span class="n">ShowingHelloWorld</span>
+</pre></div>
+</div>
+<p>and would be available by their class names in the source file where the
+statechart is declared, e.g. as ShowingHelloWorld, and used in one of several
+ways. An __init__() method and kwargs may be used to declare states:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">AppStatechart</span><span class="p">(</span><span class="n">StatechartManager</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">RootState</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;initial_substate_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;ShowingHelloWorld&#39;</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;ShowingHelloWorld&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ShowingHelloWorld</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">RootState</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or, you may prefer to declare them in shorthand fashion, that does not require
+an __init__() method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">AppStatechart</span><span class="p">(</span><span class="n">StatechartManager</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">RootState</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+        <span class="n">initial_substate_key</span> <span class="o">=</span> <span class="s">&#39;ShowingHelloWorld&#39;</span>
+        <span class="n">ShowingHelloWorld</span> <span class="o">=</span> <span class="n">ShowingHelloWorld</span>
+</pre></div>
+</div>
+<p>Regardless of coding style, for more deeply nested substates, we would declare
+them in the same fashion to build a substate hierarchy in the statechart.</p>
+</div>
 </div>
 <div class="section" id="example-apps">
 <h1>Example Apps<a class="headerlink" href="#example-apps" title="Permalink to this headline">¶</a></h1>
@@ -395,16 +434,16 @@ an update method that is called on a timer, every 1/60th of a second, to move
 the balls.</p>
 <p>The statechart has the same basic setup as HelloWorldApp, but in the
 ShowingBalls state, a new concept for states is introduced. In HelloWorldApp,
-there is only one state within the root state, however in BallsApp, there is
-a ShowingBalls state, and within that five &#8220;moving ball&#8221; states for each of
+there is only one state within the root state, however in BallsApp, there is a
+ShowingBalls state, and within that five &#8220;moving ball&#8221; substates for each of
 five balls. In many apps, states that are siblings of one another are
-independent (also termed orthogonal) &#8211; one or the other is active at a given
-time. But in some apps, a set of sibling states can all be active at the same
-time. These are called concurrent states. The ShowingBalls state contains five
-concurrent substates, for each of the moving balls. Note the use of the
-boolean property substates_are_concurrent. If you omit this property for a state
-that contains substates, the substates will be independent of one another
-(orthogonal), but here they are concurrent:</p>
+<tt class="docutils literal"><span class="pre">independent</span></tt> (also termed <tt class="docutils literal"><span class="pre">orthogonal</span></tt>) &#8211; one or the other is active at a
+given time. But in some apps, a set of sibling states can all be active at the
+same time. These are called <tt class="docutils literal"><span class="pre">concurrent</span></tt> states. The ShowingBalls state
+contains five concurrent substates, for each of the moving balls. Note the use
+of the boolean property substates_are_concurrent. If you omit this property for
+a state that contains substates, the substates will be independent of one
+another (orthogonal), but here they are concurrent:</p>
 <div class="highlight-python"><pre>class AppStatechart(StatechartManager):
     class RootState(State):
         initial_substate_key = 'ShowingBalls'
@@ -476,7 +515,7 @@ selected in the &#8220;Lists&#8221; screen.</p>
 <p>The &#8220;Fruits&#8221; example shows how the statechart itself can be used as a storage
 point for application data. Likewise, properties and methods of individual
 states are related to the views the state classes serve. Here are the states
-and methods of the &#8220;Fruits&#8221; app statechart:</p>
+and methods of the &#8220;Fruits&#8221; app statechart, with code collapsed:</p>
 <div class="highlight-python"><pre>class AppStatechart(StatechartManager):
     def create_searchable_data(self):
     def create_adapters(self):
@@ -743,7 +782,10 @@ for an app.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#states">States</a></li>
+<li><a class="reference internal" href="#states">States</a><ul>
+<li><a class="reference internal" href="#coding-style">Coding Style</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#example-apps">Example Apps</a><ul>
 <li><a class="reference internal" href="#hello-world-example-app">Hello World Example App</a></li>
 <li><a class="reference internal" href="#balls-example-app">Balls Example App</a></li>

@@ -131,19 +131,19 @@ State classes may be declared "inline" in an indented fashion::
         class RootState(State):
             class ShowingHelloWorld(State):
                 ...
-                more code here
+                code for state here
                 ...
 
 Or, state classes may be declared in their own files and imported to build the
 statechart. An attractive approach is to put state classes in their own files
-within a states package, e.g. states/showing_hello_world/ShowingHelloWorld.
+in a states package, e.g. myapp/states/showing_hello_world/ShowingHelloWorld.
 They would be imported like this::
 
     from states.showing_hello_world import ShowingHelloWorld
 
 and would be available by their class names in the source file where the
-statechart is declared, e.g. ShowingHelloWorld, and used in one of several
-ways. An __init__() method and kwargs may be used::
+statechart is declared, e.g. as ShowingHelloWorld, and used in one of several
+ways. An __init__() method and kwargs may be used to declare states::
 
     class AppStatechart(StatechartManager):
         class RootState(State):
@@ -454,16 +454,16 @@ the balls.
 
 The statechart has the same basic setup as HelloWorldApp, but in the
 ShowingBalls state, a new concept for states is introduced. In HelloWorldApp,
-there is only one state within the root state, however in BallsApp, there is
-a ShowingBalls state, and within that five "moving ball" states for each of
+there is only one state within the root state, however in BallsApp, there is a
+ShowingBalls state, and within that five "moving ball" substates for each of
 five balls. In many apps, states that are siblings of one another are
-independent (also termed orthogonal) -- one or the other is active at a given
-time. But in some apps, a set of sibling states can all be active at the same
-time. These are called concurrent states. The ShowingBalls state contains five
-concurrent substates, for each of the moving balls. Note the use of the
-boolean property substates_are_concurrent. If you omit this property for a state
-that contains substates, the substates will be independent of one another
-(orthogonal), but here they are concurrent:
+``independent`` (also termed ``orthogonal``) -- one or the other is active at a
+given time. But in some apps, a set of sibling states can all be active at the
+same time. These are called ``concurrent`` states. The ShowingBalls state
+contains five concurrent substates, for each of the moving balls. Note the use
+of the boolean property substates_are_concurrent. If you omit this property for
+a state that contains substates, the substates will be independent of one
+another (orthogonal), but here they are concurrent:
 
 ::
 
@@ -548,7 +548,7 @@ selected in the "Lists" screen.
 The "Fruits" example shows how the statechart itself can be used as a storage
 point for application data. Likewise, properties and methods of individual
 states are related to the views the state classes serve. Here are the states
-and methods of the "Fruits" app statechart::
+and methods of the "Fruits" app statechart, with code collapsed::
 
     class AppStatechart(StatechartManager):
         def create_searchable_data(self):
