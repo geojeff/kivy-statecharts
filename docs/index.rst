@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to kivy-statecharts's documentation!
-============================================
+kivy-statecharts
+================
 
 Contents:
 
@@ -47,13 +47,13 @@ As of April 2012, most tests were ported.
 Introduction
 ============
 
-The kivy-statecharts framework might be called "advanced," but this could be
-a mistaken notion. As we will see in the examples, even a simple application
-can be made using statecharts.
-
-It is assumed here that you already understand Kivy bindings and the events
-system, how to build widgets with both python and kv language approaches, and
-general concepts of using Kivy.
+The kivy-statecharts framework might be called "advanced," but this is a
+mistaken notion. As we will see in the examples, even a simple application can
+be made using statecharts. However, because there is a natural progression and
+dedicated documentation for learning basic Kivy programming, it is assumed here
+that you already understand Kivy bindings and the events system, how to build
+widgets with both python and kv language approaches, and general concepts of
+using Kivy.
 
 The developer may code the statechart for a new app directly, or a statechart
 drawing may be done first. At some point, making a statechart drawing is
@@ -71,7 +71,8 @@ If a statechart drawing is made either initially or after some coding has been
 done, a piece of paper works fine for getting started, but there are good
 drawing programs and python libraries that are recommended. Several of the
 examples have drawings made with ``yEd``, a free diagram editor, or with the
-``blockdiag`` python library.
+``blockdiag`` python library. Some developers may have available commercial
+tools such as ``OmniGraffle``, which is capable of drawing statecharts.
 
 Regardless of methods used, the process of statechart construction is easy to
 start by laying out what needs to happen as the app loads, and user interaction
@@ -575,9 +576,8 @@ the left and the table display at the top are also updated for individual
 thruster amount. If you want to decrease thrust, toggle the "more / less"
 control mode at left center.
 
-As with previous examples, there is really just one main state,
-ShowingThrusterControls, which contains states for each of the 14 thruster
-groups.
+There is really just one main state, ShowingThrusterControls, which contains
+states for each of the 14 thruster groups.
 
 
 .. figure::  ../examples/shuttle/design/statechart.png
