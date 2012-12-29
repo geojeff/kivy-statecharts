@@ -22,7 +22,7 @@ from collections import deque
 
 import inspect
 
-"""
+'''
   Authorship Details
   ------------------
 
@@ -115,7 +115,7 @@ import inspect
   [PORT] Implement tito's idea for doing MyState = 'states.MyState' and add
          lazy loading, as the Factory code does.
 
-"""
+'''
 
 class StatechartManager(EventDispatcher):
 
@@ -128,38 +128,38 @@ class StatechartManager(EventDispatcher):
     details = ObjectProperty(None)
 
     is_responder_context = BooleanProperty(True)
-    """Walk like a duck.
+    '''Walk like a duck.
 
        :data:`is_responder_context` is a
        :class:`~kivy.properties.BooleanProperty`, default is True.
-    """
+    '''
 
     is_statechart = BooleanProperty(True)
-    """Walk like a duck.
+    '''Walk like a duck.
 
        :data:`is_statechart` is a :class:`~kivy.properties.BooleanProperty`,
        default is True.
-    """
+    '''
 
     statechart_is_initialized = BooleanProperty(False)
-    """This property is set by initialize_statechart(), and is checked before
+    '''This property is set by initialize_statechart(), and is checked before
        state transitions are attempted.
 
        :data:`statechart_is_initialized` is a
        :class:`~kivy.properties.BooleanProperty`, default is False.
-    """
+    '''
 
     name = StringProperty(None)
-    """Optional name you can provide the statechart. If set this will be included
+    '''Optional name you can provide the statechart. If set this will be included
        in tracing and error output as well as detail output. Useful for
        debugging/diagnostic purposes.
 
        :data:`name` is a :class:`~kivy.properties.StringProperty`, default is
        None.
-    """
+    '''
 
     root_state_class = ObjectProperty(None)
-    """The root state of this statechart. All statecharts must have a root
+    '''The root state of this statechart. All statecharts must have a root
        state.
 
        If this property is left unassigned, then when the statechart is
@@ -172,19 +172,19 @@ class StatechartManager(EventDispatcher):
 
        :data:`root_state_class` is a :class:`~kivy.properties.ObjectProperty`,
        default is None.
-    """
+    '''
 
     root_state_instance = ObjectProperty(None, allownone=True)
-    """The root_state_instance is set from the root_state_class normally.
+    '''The root_state_instance is set from the root_state_class normally.
 
        See root_state_class.
 
        :data:`root_state_instance` is a
        :class:`~kivy.properties.ObjectProperty`, default is None.
-    """
+    '''
 
     root_state_example_class = ObjectProperty(None)
-    """Represents the state used to construct a class that will be the root
+    '''Represents the state used to construct a class that will be the root
        state for this statechart. The class must derive from State.
 
        This property will only be used if the root_state_class property is not
@@ -192,10 +192,10 @@ class StatechartManager(EventDispatcher):
 
        :data:`root_state` is a :class:`~kivy.properties.ObjectProperty`,
        default is None.
-    """
+    '''
 
     initial_state_key = StringProperty(None, allownone=True)
-    """Indicates what state should be the initial state of this statechart. The
+    '''Indicates what state should be the initial state of this statechart. The
        value assigned must be the name of a property on this object that
        represents a state.  As well, the states_are_concurrent must be unset,
        or set to False.
@@ -213,10 +213,10 @@ class StatechartManager(EventDispatcher):
 
        :data:`initial_state_key` is a :class:`~kivy.properties.StringProperty`,
        default is None.
-    """
+    '''
 
     states_are_concurrent = BooleanProperty(False)
-    """Indicates if properties on this object representing states are
+    '''Indicates if properties on this object representing states are
        concurrent to each other.  If True then they are concurrent, otherwise
        they are not. If True, then the initial_state_key property must not be
        assigned.
@@ -226,62 +226,62 @@ class StatechartManager(EventDispatcher):
 
        :data:`states_are_concurrent` is a
        :class:`~kivy.properties.BooleanProperty`, default is False.
-    """
+    '''
 
     monitor_is_active = BooleanProperty(False)
-    """Indicates whether to use a monitor for the statechart's activities. If
+    '''Indicates whether to use a monitor for the statechart's activities. If
        true then the monitor will be active, otherwise the monitor will not be
        used. Useful for debugging purposes.
 
        :data:`monitor_is_active` is a
        :class:`~kivy.properties.BooleanProperty`, default is False.
-    """
+    '''
 
     monitor = ObjectProperty(None)
-    """A statechart monitor that can be used to monitor this statechart. Useful
+    '''A statechart monitor that can be used to monitor this statechart. Useful
        for debugging purposes.  A monitor will only be used if
        monitor_is_active is true.
 
        :data:`monitor` is an :class:`~kivy.properties.ObjectProperty`, default
        is None.
-    """
+    '''
 
     trace = BooleanProperty(False)
-    """Indicates whether to trace the statecharts activities. If true then the
+    '''Indicates whether to trace the statecharts activities. If true then the
        statechart will output its activites to the logger. Useful for debugging
        purposes.
 
        :data:`trace` is a :class:`~kivy.properties.BooleanProperty`, default is
        False.
-    """
+    '''
 
     statechart_owner_key = StringProperty('owner')
-    """Used to specify what property (key) on the statechart should be used as
+    '''Used to specify what property (key) on the statechart should be used as
        the owner property. By default the property is 'owner'.
 
        :data:`statechart_owner_key` is a
        :class:`~kivy.properties.StringProperty`, default is 'owner'.
-    """
+    '''
 
     owner = ObjectProperty(None, allownone=True)
-    """Sets who the owner is of this statechart. If None then the owner is this
+    '''Sets who the owner is of this statechart. If None then the owner is this
        object otherwise the owner is the assigned object.
 
        :data:`owner` is a :class:`~kivy.properties.ObjectProperty`, default is
        None.
-    """
+    '''
 
     auto_init_statechart = BooleanProperty(True)
-    """Indicates if the statechart should be automatically initialized by this
+    '''Indicates if the statechart should be automatically initialized by this
        object after it has been created. If True then init_statechart will be
        called automatically, otherwise it will not.
 
        :data:`auto_init_statechart` is a
        :class:`~kivy.properties.BooleanProperty`, default is True.
-    """
+    '''
 
     suppress_statechart_warnings = BooleanProperty(False)
-    """If yes, any warning messages produced by the statechart or any of its
+    '''If yes, any warning messages produced by the statechart or any of its
        states will not be logged, otherwise all warning messages will be
        logged.
 
@@ -290,13 +290,13 @@ class StatechartManager(EventDispatcher):
 
        :data:`supress_statechart_warnings` is a
        :class:`~kivy.properties.BooleanProperty`, default is True.
-    """
+    '''
 
-    """A dictionary for holding statechart info, for debugging.
+    '''A dictionary for holding statechart info, for debugging.
 
        :data:`_state_handle_event_info` is a
        :class:`~kivy.properties.DictProperty`, default is {}.
-    """
+    '''
     _state_handle_event_info = DictProperty({})
 
 
@@ -335,11 +335,11 @@ class StatechartManager(EventDispatcher):
             self.root_state_instance.statechart_owner_did_change()
 
     def init_statechart(self):
-        """Initializes the statechart. By initializing the statechart, it will
+        '''Initializes the statechart. By initializing the statechart, it will
            create all the states and register them with the statechart. Once
            complete, the statechart can be used to go to states and can receive
            events.
-        """
+        '''
         if self.statechart_is_initialized:
             return
 
@@ -410,7 +410,7 @@ class StatechartManager(EventDispatcher):
                     else self.root_state_instance.get_substate(state)
 
     def go_to_state(self, state, from_current_state=None, use_history=False, context=None):
-        """When called, the statechart will proceed with making state
+        '''When called, the statechart will proceed with making state
            transitions in the statechart starting from a current state that
            meets the statechart conditions. When complete, some or all of the
            statechart's current states will be changed, and all states that
@@ -448,7 +448,7 @@ class StatechartManager(EventDispatcher):
              history states in the transition process
            * context {Hash} Optional. A context dict that will be passed to
              all exited and entered states
-        """
+        '''
         if not self.statechart_is_initialized:
             msg = ("Cannot go to state {0}. Statechart has not yet been "
                    "initialized.").format(state)
@@ -571,20 +571,20 @@ class StatechartManager(EventDispatcher):
         self._execute_go_to_state_actions(state, go_to_state_actions, None, context)
 
     def _go_to_state_active(self, *l):
-        """Indicates if the statechart is in an active goto state process."""
+        '''Indicates if the statechart is in an active goto state process.'''
         self.go_to_state_active = self.go_to_state_locked
 
     def _go_to_state_suspended(self, *l):
-        """Indicates if the statechart is in an active goto state process
+        '''Indicates if the statechart is in an active goto state process
            that has been suspended.
-        """
+        '''
         self.go_to_state_suspended = (self.go_to_state_locked
                 and self.go_to_state_suspended_point is not None)
 
     def resume_go_to_state(self):
-        """Resumes an active goto state transition process that has been
+        '''Resumes an active goto state transition process that has been
            suspended.
-        """
+        '''
         if not self.go_to_state_suspended:
             msg = ("Cannot resume goto state since it has not been suspended.")
             self.statechart_log_error(msg)
@@ -684,7 +684,7 @@ class StatechartManager(EventDispatcher):
         return result
 
     def exit_state(self, state, context):
-        """Invokes a state's exit_state method."""
+        '''Invokes a state's exit_state method.'''
         return state.exit_state(context)
 
     def _enter_state(self, state, current, context):
@@ -717,11 +717,11 @@ class StatechartManager(EventDispatcher):
         return result
 
     def enter_state(self, state, context):
-        """Invokes a state's enter_state method.
+        '''Invokes a state's enter_state method.
 
            Called during the state transition process whenever the go_to_state
            method is invoked.
-        """
+        '''
         return state.enter_state(context)
 
     def go_to_history_state(self,
@@ -729,7 +729,7 @@ class StatechartManager(EventDispatcher):
                             from_current_state=None,
                             recursive=False,
                             context=None):
-        """When called, the statechart will proceed to make transitions to the
+        '''When called, the statechart will proceed to make transitions to the
            given state then follow that state's history state.
 
            You can either go to a given state's history recursively or
@@ -758,7 +758,7 @@ class StatechartManager(EventDispatcher):
              which to start the state transition process.
            * recursive {Boolean} Optional. Whether to follow history states
              recursively.
-        """
+        '''
         if not self.statechart_is_initialized:
             msg = ("Cannot go to state {0}'s history state. Statechart has "
                    "not yet been initialized").format(state)
@@ -784,7 +784,7 @@ class StatechartManager(EventDispatcher):
             self.go_to_state(state=state, from_current_state=from_current_state, use_history=True, context=context)
 
     def send_event(self, event, arg1=None, arg2=None):
-        """Sends a given event to all the statechart's current states.
+        '''Sends a given event to all the statechart's current states.
 
            If a current state does cannot respond to the sent event, then the
            current state's parent state will be tried. This process is
@@ -805,7 +805,7 @@ class StatechartManager(EventDispatcher):
 
            See state_will_try_to_handle_event().
            See state_did_try_to_handle_event().
-        """
+        '''
        # [PORT] Removed isDestroyed check -- but this is a punt for a later time...
         #if self.isDestroyed:
             #self.statechart_log_error("can send event {0}. statechart is destroyed".format(event))
@@ -861,14 +861,14 @@ class StatechartManager(EventDispatcher):
         return self if statechart_handled_event else (self if result else None)
 
     def state_will_try_to_handle_event(self, state, event, handler):
-        """Used to notify the statechart that a state will try to handle event
+        '''Used to notify the statechart that a state will try to handle event
            that has been passed to it.
 
            * state {State} - The state that will try to handle the event.
            * event {String} - The event the state will try to handle.
            * handler {String} - The name of the method on the state that
              will try to handle the event.
-        """
+        '''
         self._state_handle_event_info = {
             'state': state,
             'event': event,
@@ -876,7 +876,7 @@ class StatechartManager(EventDispatcher):
         }
 
     def state_did_try_to_handle_event(self, state, event, handler, handled):
-        """Used to notify the statechart that a state did try to handle event
+        '''Used to notify the statechart that a state did try to handle event
            that has been passed to it.
 
            Parameters:
@@ -887,13 +887,13 @@ class StatechartManager(EventDispatcher):
              try to handle the event.
            * handled {Boolean} - Indicates if the handler was able to handle
              the event.
-        """
+        '''
         self._state_handle_event_info = {}
 
     def _create_state_chain(self, state):
-        """Creates a chain of states from the given state to the greatest
+        '''Creates a chain of states from the given state to the greatest
            ancestor state (the root state). Used when perform state transitions.
-        """
+        '''
         chain = deque()
 
         while state is not None:
@@ -903,12 +903,12 @@ class StatechartManager(EventDispatcher):
         return chain
 
     def _find_pivot_state(self, state_chain_1, state_chain_2):
-        """Finds a pivot state from two given state chains. The pivot state is
+        '''Finds a pivot state from two given state chains. The pivot state is
            the state indicating when states go from being exited to states
            being entered during the state transition process. The value
            returned is the fist matching state between the two given state
            chains.
-        """
+        '''
         if len(state_chain_1) == 0 or len(state_chain_2) == 0:
             return None
 
@@ -918,7 +918,7 @@ class StatechartManager(EventDispatcher):
 
     def _traverse_states_to_exit(self, state, exit_state_path, stop_state,
                                  go_to_state_actions):
-        """Recursively follow states that are to be exited during a state
+        '''Recursively follow states that are to be exited during a state
            transition process. The exit process is to start from the given
            state and work its way up to when either all exit states have been
            reached based on a given exit path or when a stop state has been
@@ -931,7 +931,7 @@ class StatechartManager(EventDispatcher):
              states that are to be exited
            * stop_state {State} an explicit state in which to stop the exiting
              process
-        """
+        '''
         if state is None or state is stop_state:
             return
 
@@ -960,7 +960,7 @@ class StatechartManager(EventDispatcher):
 
     def _traverse_states_to_enter(self, state, enter_state_path, pivot_state,
                                   use_history, go_to_state_actions):
-        """Recursively follow states that are to be entered during the state
+        '''Recursively follow states that are to be entered during the state
            transition process. The enter process is to start from the given
            state and work its way down a given enter path. When the end of
            enter path has been reached, then continue entering states based on
@@ -977,7 +977,7 @@ class StatechartManager(EventDispatcher):
              states to entering states.
            * use_history {Boolean} - Indicates whether to recursively follow
              history states.
-        """
+        '''
         if not state:
             return
 
@@ -1054,11 +1054,11 @@ class StatechartManager(EventDispatcher):
                         next_state, use_history, go_to_state_actions)
 
     def responds_to(self, event):
-        """Override as needed.
+        '''Override as needed.
 
             Returns True if the named event matches an executable function on
             any of the statechart's current states or the statechart itself.
-        """
+        '''
         for state in self.current_states:
             while state is not None:
                 if (state.responds_to_event(event)):
@@ -1073,7 +1073,7 @@ class StatechartManager(EventDispatcher):
         return inspect.ismethod(getattr(self, event))
 
     def try_to_perform(self, event, arg1=None, arg2=None):
-        """Override as needed.
+        '''Override as needed.
 
            Attempts to handle a given event against any of the statechart's
            current states and the statechart itself. If any current state can
@@ -1087,7 +1087,7 @@ class StatechartManager(EventDispatcher):
            * arg2 {Object} Optional
 
            Returns True if handled, False if not handled.
-        """
+        '''
         if not self.responds_to(event):
             return False
 
@@ -1099,7 +1099,7 @@ class StatechartManager(EventDispatcher):
         return self.send_event(event, arg1, arg2) is not None
 
     def invoke_state_method(self, method_name, *args):
-        """Used to invoke a method on current states. If the method cannot be
+        '''Used to invoke a method on current states. If the method cannot be
            executed on a current state, then the state's parent states will be
            tried in order of closest ancestry.
 
@@ -1155,7 +1155,7 @@ class StatechartManager(EventDispatcher):
             Returns a value if the number of current states is one, otherwise
             undefined is returned. The value is the result of the method that
             got invoked on a state.
-        """
+        '''
         if method_name == 'unknown_event':
             self.statechart_log_error("Cannot invoke method unkown_event")
             raise Exception("Cannot invoke method unkown_event")
@@ -1198,7 +1198,7 @@ class StatechartManager(EventDispatcher):
                                              exclude,
                                              use_history,
                                              go_to_state_actions):
-        """Iterate over all the given concurrent states and enter them."""
+        '''Iterate over all the given concurrent states and enter them.'''
         for i in range(len(states)):
             state = states[i]
             if state is not exclude:
@@ -1206,9 +1206,9 @@ class StatechartManager(EventDispatcher):
                         go_to_state_actions)
 
     def _flush_pending_state_transition(self):
-        """Called by go_to_state to flush a pending state transition at the
+        '''Called by go_to_state to flush a pending state transition at the
            front of the pending queue.
-        """
+        '''
 
         # [PORT] This, together with the context of the call to this method,
         #        does not seem necessary. If there are pending transitions to
@@ -1233,9 +1233,9 @@ class StatechartManager(EventDispatcher):
                          context=pending['context'])
 
     def _flush_pending_sent_events(self):
-        """Called by send_event to flush a pending actions at the front of the
+        '''Called by send_event to flush a pending actions at the front of the
            pending queue.
-        """
+        '''
         pending = self._pending_sent_events.popleft() \
                 if self._pending_sent_events \
                 else None
@@ -1253,7 +1253,7 @@ class StatechartManager(EventDispatcher):
             self.monitor = StatechartMonitor(self)
 
     def _construct_root_state_class(self):
-        """Will return a newly constructed root state class. The root state
+        '''Will return a newly constructed root state class. The root state
            will have substates added to it based on properties found on this
            state that derive from a State class. For the root state to be
            successfully built, the following much be met:
@@ -1264,7 +1264,7 @@ class StatechartManager(EventDispatcher):
              must be set, but not both.
            * There must be one or more states that can be added to the root
              state.
-        """
+        '''
         state_count = 0
         attrs = {}
 
@@ -1331,17 +1331,17 @@ class StatechartManager(EventDispatcher):
         Logger.info(msg)
 
     def statechart_log_trace(self, msg):
-        """Used to log a statechart trace message."""
+        '''Used to log a statechart trace message.'''
         Logger.info("{0}: {1}".format(self._statechart_log_prefix(), msg))
 
     def statechart_log_error(self, msg):
-        """Used to log a statechart error message."""
+        '''Used to log a statechart error message.'''
         # [PORT] ditto?
         msg = "ERROR {0}: {1}".format(self._statechart_log_prefix(), msg)
         Logger.info(msg)
 
     def statechart_log_warning(self, msg):
-        """Used to log a statechart warning message."""
+        '''Used to log a statechart warning message.'''
         if self.suppress_statechart_warnings:
             return
         Logger.info("WARN {0}: {1}".format(self._statechart_log_prefix(), msg))
@@ -1355,7 +1355,7 @@ class StatechartManager(EventDispatcher):
             return "{0}<{1}".format(className, self.name)
 
     def details(self):
-        """Returns a dict containing current detailed information about
+        '''Returns a dict containing current detailed information about
            the statechart. This is primarily used for diagnostic/debugging
            purposes.
 
@@ -1366,7 +1366,7 @@ class StatechartManager(EventDispatcher):
            * event handling information
 
            [PORT] This was a property in javascript.
-        """
+        '''
         details = { 'initialized': self.statechart_is_initialized }
 
         if self.name:
@@ -1417,11 +1417,11 @@ class StatechartManager(EventDispatcher):
         return details
 
     def to_string_with_details(self):
-        """Returns a formatted string of detailed information about this
+        '''Returns a formatted string of detailed information about this
            statechart.  Useful for diagnostic/debugging purposes.
 
            See the details() method and the dict it returns.
-        """
+        '''
         return "{0}\n{1}".format(
                 self, self._hash_to_string(self.details(), 2))
 
