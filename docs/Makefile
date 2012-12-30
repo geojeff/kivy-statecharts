@@ -2,10 +2,10 @@
 #
 
 # You can set these variables from the command line.
-PYTHON        = ~/.virtualenvs/kivy_statecharts/bin/python
+PYTHON		  = python
 SPHINXOPTS    = -W
 #SPHINXOPTS    =
-SPHINXBUILD   = ~/.virtualenvs/kivy_statecharts/bin/sphinx-build
+SPHINXBUILD   = sphinx-build
 PAPER         =
 
 # Internal variables.
