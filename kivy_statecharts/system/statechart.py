@@ -446,7 +446,7 @@ class StatechartManager(EventDispatcher):
              start the transition process from.
            * use_history {Boolean} Optional. Indicates whether to include using
              history states in the transition process
-           * context {Hash} Optional. A context dict that will be passed to
+           * context {dict} Optional. A context dict that will be passed to
              all exited and entered states
         '''
         if not self.statechart_is_initialized:
@@ -1423,26 +1423,25 @@ class StatechartManager(EventDispatcher):
            See the details() method and the dict it returns.
         '''
         return "{0}\n{1}".format(
-                self, self._hash_to_string(self.details(), 2))
+                self, self._details_indented(self.details(), 2))
 
-    def _hash_to_string(self, hash_to_convert, indent):
-        print hash_to_convert
-        hash_as_string = ''
+    def _details_indented(self, hash_to_convert, indent):
+        details_indented = ''
         for key in hash_to_convert:
             value = hash_to_convert[key]
             if isinstance(value, list):
-                hash_as_string += \
-                        self._list_to_string(key, value, indent) + "\n";
+                details_indented += \
+                        self._value_indented(key, value, indent) + "\n";
             elif isinstance(value, dict):
-                hash_as_string += "{0}{1}:\n".format(' ' * indent, key)
-                hash_as_string += self._hash_to_string(value, indent + 2)
+                details_indented += "{0}{1}:\n".format(' ' * indent, key)
+                details_indented += self._details_indented(value, indent + 2)
             else:
-                hash_as_string += \
+                details_indented += \
                         "{0}{1}: {2}\n".format(' ' * indent, key, value)
 
-        return hash_as_string
+        return details_indented
 
-    def _list_to_string(self, key, l, indent):
+    def _value_indented(self, key, l, indent):
         if len(l) == 0:
             return "{0}{1}: []".format(' ' * indent, key)
 
