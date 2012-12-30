@@ -574,7 +574,7 @@ class State(EventDispatcher):
         return path
 
     def get_substate(self, value, callback=None):
-         '''Used to get a substate of this state that matches a given value.
+        '''Used to get a substate of this state that matches a given value.
 
            If the value is a state object, then the value will be returned if
            it is indeed a substate of this state, otherwise null is returned.
@@ -608,6 +608,7 @@ class State(EventDispatcher):
            * value {State|String} - Used to identify a substate of this state.
            * callback {Function} - Optional callback.
         '''
+
         if value is None:
             return None
 
