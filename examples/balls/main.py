@@ -24,7 +24,6 @@ class Ball(Widget):
 
 
 class BallsView(Widget):
-    app = ObjectProperty(None)
     ball_1 = ObjectProperty(None)
     ball_2 = ObjectProperty(None)
     ball_3 = ObjectProperty(None)
@@ -32,7 +31,6 @@ class BallsView(Widget):
     ball_5 = ObjectProperty(None)
 
     def __init__(self, app):
-        self.app = app
         super(BallsView, self).__init__()
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
@@ -54,9 +52,9 @@ class BallsView(Widget):
         print ' - modifiers are %r' % modifiers
 
         if text == 'u':
-            self.app.statechart.send_event('speed_up')
+            App.get_running_app().statechart.send_event('speed_up')
         elif text == 'd':
-            self.app.statechart.send_event('slow_down')
+            App.get_running_app().statechart.send_event('slow_down')
         elif keycode[1] == 'escape':
             # Keycode is composed of an integer + a string
             # If we hit escape, release the keyboard
@@ -91,7 +89,7 @@ class MovingBall(State):
     velocity_y_factor = NumericProperty(1)
 
     def enter_state(self, context=None):
-        self.ball = getattr(self.statechart.app.mainView, self.ball_key)
+        self.ball = getattr(App.get_running_app().mainView, self.ball_key)
         self.ball.velocity_x += self.velocity_x_factor
         self.ball.velocity_y += self.velocity_y_factor
 
@@ -117,11 +115,11 @@ class MovingBall(State):
 # Statechart
 #
 class AppStatechart(StatechartManager):
-    def __init__(self, app, **kw):
-        self.app = app
-        self.trace = True
-        self.root_state_class = self.RootState
-        super(AppStatechart, self).__init__(**kw)
+    def __init__(self, app, **kwargs):
+        kwargs['app'] = app
+        kwargs['trace'] = True
+        kwargs['root_state_class'] = self.RootState
+        super(AppStatechart, self).__init__(**kwargs)
 
     ###########################
     # RootState of statechart
@@ -131,8 +129,8 @@ class AppStatechart(StatechartManager):
 
         def enter_state(self, context=None):
             print 'RootState/enter_state'
-            self.statechart.app.mainView.serve_balls()
-            Clock.schedule_interval(self.statechart.app.mainView.update,
+            App.get_running_app().mainView.serve_balls()
+            Clock.schedule_interval(App.get_running_app().mainView.update,
                                     1.0 / 60.0)
 
         def exit_state(self, context=None):
@@ -219,5 +217,4 @@ class BallsApp(App):
 
 
 if __name__ in ('__android__', '__main__'):
-    app = BallsApp()
-    app.run()
+    BallsApp().run()
