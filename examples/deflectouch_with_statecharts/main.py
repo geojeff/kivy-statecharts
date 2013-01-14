@@ -137,34 +137,34 @@ class Stockbar(Image):
 #
 class Tank(Widget):
     tank_tower_scatter = ObjectProperty(None)
-    
+
     def on_touch_down(self, touch):
         if not self.collide_point(*touch.pos):
             return False
         else:
             touch.ud['tank_touch'] = True
             return True
-        
+
     def on_touch_move(self, touch):
         ud = touch.ud
-        
+
         if not 'tank_touch' in ud:
             return False
-        
+
         if 'rotation_mode' in ud:
             # if the current touch is already in the 'rotate' mode, rotate the tower.
             dx = touch.x - self.center_x
             dy = touch.y - self.center_y
             angle = boundary(atan2(dy, dx) * 360 / 2 / pi, -60, 60)
-            
+
             angle_change = self.tank_tower_scatter.rotation - angle
             rotation_matrix = Matrix().rotate(-radians(angle_change), 0, 0, 1)
             self.tank_tower_scatter.apply_transform(rotation_matrix, post_multiply=True, anchor=(105, 15))
-        
+
         elif touch.x > self.right:
             # if the finger moved too far to the right go into rotation mode
             ud['rotation_mode'] = True
-        
+
         else:
             # if the user wants only to drag the tank up and down, let him do it!
             self.y += touch.dy
@@ -179,33 +179,33 @@ class Deflector(Scatter):
 
     touch1 = ObjectProperty(None)
     touch2 = ObjectProperty(None)
-    
+
     point1 = ObjectProperty(None)
     point2 = ObjectProperty(None)
-    
+
     deflector_line = ObjectProperty(None)
-    
+
     length = NumericProperty(0)
     length_origin = 0
-    
+
     point_pos_origin = []
-    
+
     def __init__(self, **kwargs):
         super(Deflector, self).__init__(**kwargs)
-        
+
         # DEFLECTOR LINE:
         # Here I rotate and translate the deflector line so that it lays exactly under the two fingers
         # and can be moved and scaled by scatter from now on. Thus I also have to pass the touches to scatter.
         # First i create the line perfectly horizontal but with the correct length. Then i add the two
         # drag points at the beginning and the end.
-        
+
         self.length_origin = self.length
-        
+
         with self.canvas.before:
             Color(.8, .8, .8)
             self.deflector_line = Line(points=(self.touch1.x, self.touch1.y - 1, self.touch1.x + self.length, self.touch1.y - 1))
             self.deflector_line2 = Line(points=(self.touch1.x, self.touch1.y + 1, self.touch1.x + self.length, self.touch1.y + 1))
-        
+
         '''
         self.deflector_line = Image(source='graphics/beta/deflector_blue_beta2.png',
                                     allow_stretch=True,
@@ -214,42 +214,42 @@ class Deflector(Scatter):
                                     center_y=(self.touch1.y),
                                     x=self.touch1.x)
         '''
-        
+
         # set the right position for the two points:
         self.point1.center = self.touch1.pos
         self.point2.center = self.touch1.x + self.length, self.touch1.y
         self.point_pos_origin = [self.point1.x, self.point1.y, self.point2.x, self.point2.y]
-        
+
         # rotation:
         dx = self.touch2.x - self.touch1.x
         dy = self.touch2.y - self.touch1.y
         angle = atan2(dy, dx)
-        
+
         rotation_matrix = Matrix().rotate(angle, 0, 0, 1)
         self.apply_transform(rotation_matrix, post_multiply=True, anchor=self.to_local(self.touch1.x, self.touch1.y))
-        
+
         # We have to adjust the bounding box of ourself to the dimension of all the canvas objects (Do we have to?)
         #self.size = (abs(self.touch2.x - self.touch1.x), abs(self.touch2.y - self.touch1.y))
         #self.pos = (min(self.touch1.x, self.touch2.x), min(self.touch1.y, self.touch2.y))
-        
-        # Now we finally add both touches we received to the _touches list of the underlying scatter class structure. 
+
+        # Now we finally add both touches we received to the _touches list of the underlying scatter class structure.
         self.touch1.grab(self)
         self._touches.append(self.touch1)
         self._last_touch_pos[self.touch1] = self.touch1.pos
-        
+
         self.touch2.grab(self)
         self._touches.append(self.touch2)
         self._last_touch_pos[self.touch2] = self.touch2.pos
-        
+
         self.point1.bind(size=self.size_callback)
-    
+
     def size_callback(self, instance, size):
         self.statechart.send_event('resize_deflector', self, size)
 
     def collide_widget(self, wid):
         point1_parent = self.to_parent(self.point1.center[0], self.point1.center[1])
         point2_parent = self.to_parent(self.point2.center[0], self.point2.center[1])
-        
+
         if max(point1_parent[0], point2_parent[0]) < wid.x:
             return False
         if min(point1_parent[0], point2_parent[0]) > wid.right:
@@ -259,27 +259,27 @@ class Deflector(Scatter):
         if min(point1_parent[1], point2_parent[1]) > wid.top:
             return False
         return True
-    
+
     def collide_point(self, x, y):
         # this function is used exclusively by the underlying scatter functionality.
         # therefor i can control when a touch will be dispatched from here.
         point1_parent = self.to_parent(self.point1.center[0], self.point1.center[1])
         point2_parent = self.to_parent(self.point2.center[0], self.point2.center[1])
-        
+
         return min(point1_parent[0], point2_parent[0]) - GRAB_RADIUS <= x <= max(point1_parent[0], point2_parent[0]) + GRAB_RADIUS \
            and min(point1_parent[1], point2_parent[1]) - GRAB_RADIUS <= y <= max(point1_parent[1], point2_parent[1]) + GRAB_RADIUS
-    
+
     def collide_grab_point(self, x, y):
         point1_parent = self.to_parent(self.point1.center[0], self.point1.center[1])
         point2_parent = self.to_parent(self.point2.center[0], self.point2.center[1])
-        
+
         return point1_parent[0] - GRAB_RADIUS <= x <= point1_parent[0] + GRAB_RADIUS and point1_parent[1] - GRAB_RADIUS <= y <= point1_parent[1] + GRAB_RADIUS \
             or point2_parent[0] - GRAB_RADIUS <= x <= point2_parent[0] + GRAB_RADIUS and point2_parent[1] - GRAB_RADIUS <= y <= point2_parent[1] + GRAB_RADIUS
 
     def on_touch_down(self, touch):
         self.statechart.send_event('deflector_touch_down')
         return super(Deflector, self).on_touch_down(touch)
-    
+
     def on_touch_up(self, touch):
         # if the deflector want's to be removed (touches too close to each other):
         # [statechart port] context could normally be a class of some sort,
@@ -297,11 +297,13 @@ class Deflector(Scatter):
 #  Application Statechart
 #
 class AppStatechart(StatechartManager):
-    def __init__(self, app, **kw):
-        self.app = app
-        self.trace = True
-        self.root_state_class = self.RootState
-        super(AppStatechart, self).__init__(**kw)
+    app = ObjectProperty(None)
+
+    def __init__(self, app, **kwargs):
+        kwargs['app'] = app
+        kwargs['trace'] = True
+        kwargs['root_state_class'] = self.RootState
+        super(AppStatechart, self).__init__(**kwargs)
 
     #  RootState of statechart
     #
@@ -618,9 +620,9 @@ class AppStatechart(StatechartManager):
 
                     if self.statechart.app.level != 40:
                         if self.statechart.app.level % 8 == 0:
-                            Popup(title='New levels unlocked!', 
-                                  content=Label(text='Next 8 levels unlocked!', 
-                                                font_size=18), 
+                            Popup(title='New levels unlocked!',
+                                  content=Label(text='Next 8 levels unlocked!',
+                                                font_size=18),
                                                 size_hint=(0.3, 0.15)).open()
 
                         self.statechart.app.current_level += 1
@@ -679,7 +681,7 @@ class AppStatechart(StatechartManager):
                         Popup(title='Level loading error:', content=Label(text=error_text, font_size=18), size_hint=(0.3, 0.2)).open()
                         return
 
-                    # [statechart port] Should the following bullet killing and deflector delecting 
+                    # [statechart port] Should the following bullet killing and deflector delecting
                     #                   sections be done? Originally was call to this code in reset_level(),
                     #                   which is now in enter_state of ShowingLevel state.
                     #
@@ -785,11 +787,11 @@ class AppStatechart(StatechartManager):
                         print 'ShowingBackground/exit_state'
 
                     def fire(self, *args):
-                        # If there is already a bullet existing (which means 
+                        # If there is already a bullet existing (which means
                         # its flying around or exploding somewhere) don't fire.
                         if self.statechart.app.bullet is None:
                             self.go_to_state('BulletMoving')
-  
+
                     def show_levels(self, *args):
                         self.statechart.app.sound['switch'].play()
                         self.go_to_state('ShowingLevelsPopup')
@@ -871,10 +873,10 @@ class AppStatechart(StatechartManager):
                                     # get the current stock from the root widget:
                                     current_stock = self.statechart.app.stockbar.width
                                     stock_for_deflector = current_stock + deflector.length
-                
+
                                     # now set the limitation for scaling:
                                     deflector.scale_max = stock_for_deflector / deflector.length_origin
-                
+
                                     if deflector.length < MIN_DEFLECTOR_LENGTH:
                                         deflector.point1.color = (1, 0, 0, 1)
                                         deflector.point2.color = (1, 0, 0, 1)
@@ -888,7 +890,7 @@ class AppStatechart(StatechartManager):
 
                         def exit_state(self, context=None):
                             print 'ShowingStockbar/exit_state'
-                        
+
                         # WaitingForTouches
                         #
                         class WaitingForTouches(State):
@@ -907,7 +909,7 @@ class AppStatechart(StatechartManager):
                             def exit_state(self, context=None):
                                 print 'WaitingForTouches/exit_state'
 
-                            @State.event_handler(['background_touch_down', 'background_touch_up']) 
+                            @State.event_handler(['background_touch_down', 'background_touch_up'])
                             def analyze_touches(self, event, touch, context):
                                 print 'analyze_touches'
                                 ud = touch.ud
@@ -940,7 +942,7 @@ class AppStatechart(StatechartManager):
                                         # no second touch was found: tag the current one as a 'lonely' touch
                                         ud['lonely'] = True
                                         self.statechart.app.sound['no_deflector'].play()
-                        
+
                             def deflector_touch_down(self, deflector, context):
                                 print 'deflector_touch_down'
                                 if self.statechart.app.sound['deflector_touch_down'].status != 'play':
@@ -954,7 +956,7 @@ class AppStatechart(StatechartManager):
                                 if deflector.length < MIN_DEFLECTOR_LENGTH and deflector.parent != None:
                                     self.statechart.app.current_deflector_and_vector = (deflector, None)
                                     self.statechart.go_to_state('DeletingDeflector')
-         
+
                 # CreatingDeflector (transient)
                 #
                 class CreatingDeflector(State):
@@ -976,7 +978,7 @@ class AppStatechart(StatechartManager):
 
                         self.statechart.app.deflector_list.append(deflector)
                         self.statechart.app.game_screen.add_widget(deflector)
-        
+
                         self.statechart.app.stockbar.width -= self.statechart.app.new_deflector_length
 
                         print 'have new deflector', deflector
@@ -1015,7 +1017,7 @@ class AppStatechart(StatechartManager):
                         # their center isn't on the touch point anymore.
                         deflector.point1.pos = deflector.point_pos_origin[0] + (40 - size[0])/2, deflector.point_pos_origin[1] + (40 - size[0])/2
                         deflector.point2.pos = deflector.point_pos_origin[2] + (40 - size[0])/2, deflector.point_pos_origin[3] + (40 - size[0])/2
-    
+
                         # feedback to the stockbar: reducing of the deflector material stock:
                         #deflector.length = Vector(deflector.touch1.pos).distance(deflector.touch2.pos)
                         deflector.length = deflector.length_origin * deflector.scale
@@ -1047,7 +1049,7 @@ class AppStatechart(StatechartManager):
                     def exit_state(self, context=None):
                         print 'DeletingDeflector/exit_state'
 
-                    #@State.event_handler(['delete_deflector']) 
+                    #@State.event_handler(['delete_deflector'])
                     #def delete_deflector_handler(self, event, deflector, context):
                         #self.statechart.app.sound['deflector_delete'].play()
                         #self.deflector_deleted(deflector.length)
@@ -1440,7 +1442,7 @@ class AppStatechart(StatechartManager):
                                 #self.statechart.send_event('change_trajectory')
                                 self.change_trajectory()
 
-                            def flash_deflector(self, *args): 
+                            def flash_deflector(self, *args):
                                 # flash up the deflector
                                 Animation.stop_all(self.deflector.point1, 'color')
                                 Animation.stop_all(self.deflector.point2, 'color')
