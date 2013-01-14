@@ -25,18 +25,16 @@ from fixtures import fruit_data
 class AppStatechart(StatechartManager):
     app = ObjectProperty(None)
 
-    def __init__(self, **kw):
-        self.trace = True
-        self.root_state_class = self.RootState
-
-        self.categories = sorted(fruit_categories.keys())
+    def __init__(self, **kwargs):
+        kwargs['trace'] = True
+        kwargs['root_state_class'] = self.RootState
 
         self.create_searchable_data()
-
         self.create_adapters()
 
-        super(AppStatechart, self).__init__(**kw)
+        super(AppStatechart, self).__init__(**kwargs)
 
+    @classmethod
     def create_searchable_data(self):
         properties = ['Calories', 'Calories from Fat', 'Total Fat',
                       'Sodium', 'Potassium', 'Total Carbo-hydrate',
@@ -59,26 +57,29 @@ class AppStatechart(StatechartManager):
             for prop in properties:
                 self.data[fruit][prop] = fruit_data[fruit][prop]
 
+    @classmethod
     def create_adapters(self):
-        self.list_item_args_converter = \
+        list_item_args_converter = \
                 lambda row_index, rec: {'text': rec['name'],
                                         'size_hint_y': None,
                                         'height': 25}
 
+        categories = sorted(fruit_categories.keys())
+
         self.fruit_categories_dict_adapter = DictAdapter(
-                sorted_keys=self.categories,
+                sorted_keys=categories,
                 data=fruit_categories,
-                args_converter=self.list_item_args_converter,
+                args_converter=list_item_args_converter,
                 selection_mode='single',
                 allow_empty_selection=False,
                 cls=ListItemButton)
 
-        fruits = fruit_categories[self.categories[0]]['fruits']
+        fruits = fruit_categories[categories[0]]['fruits']
 
         self.fruits_dict_adapter = DictAdapter(
                 sorted_keys=fruits,
                 data=fruit_data,
-                args_converter=self.list_item_args_converter,
+                args_converter=list_item_args_converter,
                 selection_mode='single',
                 allow_empty_selection=False,
                 cls=ListItemButton)
@@ -112,7 +113,7 @@ class AppStatechart(StatechartManager):
             kwargs['ShowingDataScreen'] = ShowingDataScreen
             kwargs['ShowingDetailScreen'] = ShowingDetailScreen
 
-            super(RootState, self).__init__(**kwargs)
+            super(AppStatechart.RootState, self).__init__(**kwargs)
 
 
 class FruitsApp(App):
