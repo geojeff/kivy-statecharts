@@ -83,36 +83,36 @@ class AppStatechart(StatechartManager):
                 allow_empty_selection=False,
                 cls=ListItemButton)
 
-    # State classes are declared in their own files in states package, e.g.
-    # states/showing_lists/ShowingListsScreen. They are imported above, so are
-    # available by their class names, e.g. ShowingListsScreen.
+    # In this example, state classes are declared in their own files in states
+    # package, e.g.  states/showing_lists/ShowingListsScreen. They are imported
+    # above, so are available by their class names, e.g. ShowingListsScreen.
     #
     # They need to be declared here in RootState, in one of several ways. You
-    # may prefer to use an __init__() method and kwargs for some reason, as
-    # shown in the commented-out block below. Or, you may prefer to declare
-    # them in the shorter fashion used below.
-    #
-    # If we were to have more deeply nested substates, we would declare them in
-    # the same fashion to build a hierarchy.
+    # may prefer to use an __init__() method and kwargs as shown here, or you
+    # may declare them in shorter fashion:
     #
     # class RootState(State):
-    #     def __init__(self, **kwargs):
-    #         kwargs['initial_substate_key'] = 'ShowingListsScreen'
+    #     initial_substate_key = 'ShowingListsScreen'
     #
-    #        kwargs['ShowingListsScreen'] = ShowingListsScreen
-    #        kwargs['ShowingSearchScreen'] = ShowingSearchScreen
-    #        kwargs['ShowingDataScreen'] = ShowingDataScreen
-    #        kwargs['ShowingDetailScreen'] = ShowingDetailScreen
+    #     ShowingListsScreen = ShowingListsScreen
+    #     ShowingSearchScreen = ShowingSearchScreen
+    #     ShowingDataScreen = ShowingDataScreen
+    #     ShowingDetailScreen = ShowingDetailScreen
     #
-    #        super(RootState, self).__init__(**kwargs)
+    # Regardless of state declaration style, if we were to have more deeply
+    # nested substates, we would declare them in the same fashion to build a
+    # hierarchy.
     #
     class RootState(State):
-        initial_substate_key = 'ShowingListsScreen'
+        def __init__(self, **kwargs):
+            kwargs['initial_substate_key'] = 'ShowingListsScreen'
 
-        ShowingListsScreen = ShowingListsScreen
-        ShowingSearchScreen = ShowingSearchScreen
-        ShowingDataScreen = ShowingDataScreen
-        ShowingDetailScreen = ShowingDetailScreen
+            kwargs['ShowingListsScreen'] = ShowingListsScreen
+            kwargs['ShowingSearchScreen'] = ShowingSearchScreen
+            kwargs['ShowingDataScreen'] = ShowingDataScreen
+            kwargs['ShowingDetailScreen'] = ShowingDetailScreen
+
+            super(RootState, self).__init__(**kwargs)
 
 
 class FruitsApp(App):

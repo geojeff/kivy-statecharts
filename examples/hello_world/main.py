@@ -36,9 +36,9 @@ class LetterButton(Button):
     statechart = ObjectProperty(None)
 
     def __init__(self, statechart, letter, **kwargs):
+        super(LetterButton, self).__init__(**kwargs)
         self.statechart = statechart
         self.letter = letter
-        super(LetterButton, self).__init__(**kwargs)
         self.bind(on_press=self.letter_clicked)
 
     def letter_clicked(self, *args):
@@ -49,10 +49,10 @@ class LetterButton(Button):
 class AppStatechart(StatechartManager):
     app = ObjectProperty(None)
 
-    def __init__(self, **kw):
-        self.trace = True
-        self.root_state_class = self.RootState
-        super(AppStatechart, self).__init__(**kw)
+    def __init__(self, **kwargs):
+        kwargs['trace'] = True
+        kwargs['root_state_class'] = self.RootState
+        super(AppStatechart, self).__init__(**kwargs)
 
     class RootState(State):
         initial_substate_key = 'ShowingHelloWorld'

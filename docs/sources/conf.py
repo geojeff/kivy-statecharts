@@ -16,14 +16,18 @@ import sys, os
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
-sys.path.append(os.path.abspath('sphinxext'))
+#sys.path.append(os.path.abspath('sphinxext'))
+#
+# [TODO] How to avoid hardcoding here? A problem, or not?
+sys.path.append(os.path.abspath('~/.virtualenvs/kivy_statecharts/lib/python2.7/site-packages/sphinx/ext'))
+
 
 # General configuration
 # ---------------------
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['autodoc', 'sphinx.ext.todo', 'preprocess', 'sphinx.ext.ifconfig']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'preprocess', 'sphinx.ext.ifconfig']
 
 # Todo configuration
 todo_include_todos = True
