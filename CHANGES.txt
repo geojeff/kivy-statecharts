@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+0.1.1
+-----
+
+ - Updated dev docs.
+ - Improved use of kwargs in statechart.
+ - Adapted Sphinx docs for Kivy usage.
+ - Edited docs.
+
 0.1.0
 -----
 
