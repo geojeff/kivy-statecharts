@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+0.1.2
+-----
+
+ - Transferred to github.com/Kivy.
+ - Updated readme and license info for transfer.
+
 0.1.1
 -----
 
