@@ -1,7 +1,7 @@
 Authors
 =======
 
-Jeff Pittman [geojeff]
+Jeff Pittman [geojeff] for port to python and development of examples.
 
 kivy_statecharts started as a port of the SproutCore.statechart framework,
 which Michael Cohen [frozencanuck] first developed as the standalone framework
