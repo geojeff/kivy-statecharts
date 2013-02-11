@@ -47,13 +47,35 @@ As of April 2012, most tests were ported.
 Introduction
 ============
 
-The kivy-statecharts framework might be called "advanced," but this is a
-mistaken notion. As we will see in the examples, even a simple application can
-be made using statecharts. However, because there is a natural progression and
-dedicated documentation for learning basic Kivy programming, it is assumed here
-that you already understand Kivy bindings and the events system, how to build
-widgets with both python and kv language approaches, and general concepts of
-using Kivy.
+The kivy-statecharts framework might be called "advanced," because it is an
+add-on to basic widget, kv, and idiomatic Kivy programming style. However, as
+we will see in the examples, even a simple application can be made using
+statecharts. However, because there is a natural progression and dedicated
+documentation for learning basic Kivy programming, it is assumed here that you
+already understand Kivy bindings and the events system, how to build widgets
+with both python and kv language approaches, and general concepts of using
+Kivy.
+
+Why Use Statecharts?
+--------------------
+
+Michael Cohen provided a good summary: https://github.com/FrozenCanuck/Ki.
+
+If you are just starting to develop an app, consider using statecharts, even
+though you may not see the advantage when your app is small.
+
+If you aren't using statecharts, and you find yourself mired in complexity,
+adapting your app to use statecharts should help.
+
+Programming with statecharts can provide a comfort level, even for structuring
+code for a basic application, and the facilities are there for realizing
+solutions to handle complex situations such as those requiring concurrent
+processing, intricate start-and-stop action for subprocesses, and so on. There
+is a learning curve for these facilities, but it is probably worth the
+investment.
+
+Making a Statechart
+-------------------
 
 The developer may code the statechart for a new app directly, or a statechart
 drawing may be done first. At some point, making a statechart drawing is

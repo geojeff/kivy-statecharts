@@ -27,12 +27,31 @@ base system prerequisites for Kivy:
 
 NOTE: Until kivy_statecharts is on PyPI, do clone and setup as below:
 
-If you are debugging or adding features to kivy_statecharts, clone the repo
-and set up for development:
+If you are debugging or adding features to kivy_statecharts, here is one way
+to work with it. Make a virtualenv for doing kivy-statechart work. Here are
+steps using the virtualenvwrapper system::
+
+    mkvirtualenv kivy_statecharts
+    
+    cdvirtualenv
+
+You can check the paths for python, pip and other things in bin, and perhaps
+issue this command to ensure you are working properly in the virtualenv::
+
+    workon kivy_statecharts
+    
+Do steps to install kivy; if using master, install dependencies, then git clone
+it, and inside kivy, do::
+
+    python setup.py develop
+    
+Clone the kivy-statecharts repo::
 
     git clone https://github.com/geojeff/kivy-statecharts.git
+
     python setup develop
-    python setup dev (See below; For setting up for testing)
+
+    python setup dev (for setting up for testing)
 
 Be warned: This addon is in alpha state. Use it at your own risk.
 

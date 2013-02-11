@@ -7,7 +7,25 @@
 from kivy.event import EventDispatcher
 from kivy.properties import ListProperty, StringProperty, ObjectProperty
 
-""" @class
+'''
+  Authorship Details
+  ------------------
+
+  Michael Cohen wrote the javascript version in 2010-2011 as Ki:
+
+      https://github.com/FrozenCanuck/Ki/
+
+  which became SC.Statechart in 2011:
+
+      https://github.com/sproutcore/sproutcore/tree/master/frameworks/statechart
+
+  Jeff Pittman wrote the Python port in 2012, porting directly from
+  SC.Statechart, and prepared for incorporation into the Kivy project.
+
+  kivy-statecharts became part of the Kivy project in [TODO].
+
+  StatePathMatcher
+  ----------------
 
   The `StatePathMatcher` is used to match a given state path match expression
   against state paths. A state path is a basic dot-notion consisting of
@@ -53,56 +71,38 @@ from kivy.properties import ListProperty, StringProperty, ObjectProperty
     foo.bar~mah
 
     foo~bar.mah
-
-  @extends Object
-  @author Michael Cohen
-"""
+'''
 class StatePathMatcher(EventDispatcher):
-    """
-      A parsed set of tokens from the matcher's given expression
-
-      @field {Array}
-      @see #expression
-    """
     tokens = ListProperty([])
+    '''A parsed set of tokens from the matcher's given expression.'''
 
     last_part = StringProperty(None)
 
     def __init__(self, state=None, expression=None):
-        """
-          The state that is used to represent 'self' for the
-          matcher's given expression.
-
-          @field {State}
-          @see #expression
-        """
         self.state = state
+        '''The state that is used to represent 'self' for the
+           matcher's given expression.
+        '''
 
-        """
-          The expression used by this matcher to match against
-          given state paths
-
-          @field {String}
-        """
         self.expression = expression
+        '''The expression used by this matcher to match against
+           given state paths.
+        '''
 
         self.bind(tokens=self._last_part)
 
         self._parse_expression()
 
-    """ @private
-
-      Will parse the matcher's given expession by creating tokens and chaining them
-      together.
-
-      Note: Because the DSL for state path expressions is tiny, a simple hand-crafted
-      parser is being used. However, if the DSL becomes any more complex, then it will
-      probably be necessary to refactor the logic in order follow a more conventional
-      type of parser.
-
-      @see #expression
-    """
     def _parse_expression(self):
+        '''Will parse the matcher's given expession by creating tokens and
+           chaining them together.
+
+           .. Note:: Because the DSL for state path expressions is tiny, a
+                     simple hand-crafted parser is being used. However, if the
+                     DSL becomes any more complex, then it will probably be
+                     necessary to refactor the logic in order follow a more
+                     conventional type of parser.
+        '''
         parts = self.expression.split('.') if self.expression else []
         tokens = []
 
@@ -135,25 +135,21 @@ class StatePathMatcher(EventDispatcher):
             chain = token
             token = stack.pop() if stack else None
 
-    """
-      Returns the last part of the expression. So if the
-      expression is 'foo.bar' or 'foo~bar' then 'bar' is returned
-      in both cases. If the expression is 'self' then 'self' is
-      returned.
-    """
     def _last_part(self, *l):
+        '''Returns the last part of the expression. So if the
+           expression is 'foo.bar' or 'foo~bar' then 'bar' is returned in both
+           cases. If the expression is 'self' then 'self' is returned.
+        '''
         self.last_part = self.tokens[-1].last_part if self.tokens else None
 
-    """
-      Will make a state path against this matcher's expression.
-
-      The path provided must follow a basic dot-notation path containing
-      one or more dots '.'. Ex: 'foo', 'foo.bar'
-
-      @param path {String} a dot-notation path
-      @return {Boolean} true if there is a match, otherwise false
-    """
     def match(self, path):
+        '''Will make a state path against this matcher's expression.
+
+           The path provided must follow a basic dot-notation path containing
+           one or more dots '.'. Ex: 'foo', 'foo.bar'.
+
+           Return True if there is a match, otherwise False.
+        '''
         # Bug out if path is None or is '' or if path is not a string.
         if path is None or not path or not isinstance(path, basestring):
             return False
@@ -170,49 +166,41 @@ class StatePathMatcher(EventDispatcher):
         # traversal of the tokens by firing on the head.
         return self._chain.match()
 
-    """ @private """
     def _pop(self):
         self._last_popped = self._stack.pop() if self._stack else None
         return self._last_popped
 
-""" @private @class
-
-  Base class used to represent a token the expression
-"""
 class _Token(EventDispatcher):
-    """
-      The last part the token represents, which is either a valid state
-      name or representation of a state
-    """
+    '''Base class used to represent a token the expression.'''
+
     last_part = StringProperty(None)
+    '''The last part the token represents, which is either a valid state
+       name or representation of a state
+    '''
 
-    """ The state path matcher that owns this token """
     owning_matcher = ObjectProperty(None)
+    '''The state path matcher that owns this token.'''
 
-    """ The next token in the matching chain """
     next_token = ObjectProperty(None)
+    '''The next token in the matching chain.'''
 
     def __init__(self, token_type):
-        """ The type of this token """
         self.token_type = token_type
-
         super(_Token, self).__init__()
 
-    """
-      Used to match against what is currently on the owning_matcher's
-      current path stack
-    """
     def match(self):  #pragma: no cover
+        '''Used to match against what is currently on the owning_matcher's
+           current path stack
+        '''
         raise NotImplementedError
 
-""" @private @class
-
-  Represents a basic name of a state in the expression. Ex 'foo'.
-
-  A match is true if the matcher's current path stack is popped and the
-  result matches this token's value.
-"""
 class _BasicToken(_Token):
+    '''Represents a basic name of a state in the expression. Ex 'foo'.
+
+       A match is true if the matcher's current path stack is popped and the
+       result matches this token's value.
+    '''
+
     value = StringProperty(None)
 
     def __init__(self, value):
@@ -239,16 +227,15 @@ class _BasicToken(_Token):
         # self.value matches part, but if there are other parts, try to match them.
         return self.next_token.match() if self.next_token else True
 
-""" @private @class
-
-  Represents an expanding path based on the use of the '<start>~<end>' syntax.
-  <start> represents the start and <end> represents the end.
-
-  A match is True if the matcher's current path stack is first popped to match
-  <end> and eventually is popped to match <start>. If neither <end> nor <start>
-  are satisfied then False is returned.
-"""
 class _ExpandToken(_Token):
+    '''Represents an expanding path based on the use of the '<start>~<end>'
+       syntax.  <start> represents the start and <end> represents the end.
+
+       A match is True if the matcher's current path stack is first popped to
+       match <end> and eventually is popped to match <start>. If neither <end>
+       nor <start> are satisfied then False is returned.
+    '''
+
     start = StringProperty(None)
     end = StringProperty(None)
 
@@ -275,16 +262,15 @@ class _ExpandToken(_Token):
 
         return False
 
-""" @private @class
-
-  Represents a this token, which is used to represent the owning_matcher's
-  `state` property.
-
-  A match is true if the last path part popped from the owning_matcher's
-  current path stack is an immediate substate of the state this
-  token represents.
-"""
 class _ThisToken(_Token):
+    '''Represents a this token, which is used to represent the owning_matcher's
+       `state` property.
+
+       A match is true if the last path part popped from the owning_matcher's
+       current path stack is an immediate substate of the state this token
+       represents.
+    '''
+
     def __init__(self):
         self.last_part = 'self'
 

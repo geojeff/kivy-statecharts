@@ -14,7 +14,7 @@ from kivy.core.window import Window
 from kivy.graphics import Color, Ellipse
 from kivy.uix.scatter import ScatterPlane
 from kivy.uix.switch import Switch
-from kivy.config import Config 
+from kivy.config import Config
 
 from kivy_statecharts.system.state import State
 from kivy_statecharts.system.statechart import StatechartManager
@@ -44,7 +44,7 @@ class Thruster(Widget):
 
 
 # Thruster data reference dict -- [region][thruster_group][thruster_id] = thruster instance
-# 
+#
 thrusters = { 'forward':   {  1: { 'F1F': None, 'F2F': None, 'F3F': None },
                               2: { 'F1L': None, 'F3L': None },
                               3: { 'F2R': None, 'F4R': None },
@@ -75,12 +75,12 @@ class ThrusterGroup(Button):
 
     # For pulsation, we alternate between the original size and the pulsation size.
     alternator = BooleanProperty(False)
-    
+
     # The pulsation is the amount of size (radius) increase over the normal size. When off,
     # a thruster's pulsation is zero, and it paints as normal. Since we pulsate relative
     # to size, which starts at (10, 10), let 10 be the base for pulsation too.
     pulsation = NumericProperty(10)
-    
+
     def __init__(self, **kwargs):
         # For labels, this is not needed, but we are a Button, so set transparency to 0.
         kwargs['background_color'] = [1,1,1,0]
@@ -194,15 +194,15 @@ class ThrustersGridView(BoxLayout):
 
 class ForwardThrustersView(BoxLayout):
     pass
- 
+
 
 class AftLeftThrustersView(BoxLayout):
     pass
- 
+
 
 class AftRightThrustersView(BoxLayout):
     pass
- 
+
 
 class MotionControlWidget(Widget):
     statechart = ObjectProperty(None)
@@ -229,7 +229,6 @@ class TranslationalMotionControl(MotionControlWidget):
 
 
 class ShuttleControlView(Widget):
-    app = ObjectProperty(None)
     background_image = ObjectProperty(None)
 
     thrusters_list_view = ObjectProperty(None)
@@ -261,7 +260,7 @@ class ShuttleControlView(Widget):
     pitch_minus = ObjectProperty(None)
     roll_plus = ObjectProperty(None)
     roll_minus = ObjectProperty(None)
-    
+
     # Translational motion controls:
     translate_x_plus = ObjectProperty(None)
     translate_x_minus = ObjectProperty(None)
@@ -270,9 +269,8 @@ class ShuttleControlView(Widget):
     translate_z_plus = ObjectProperty(None)
     translate_z_minus = ObjectProperty(None)
 
-    def __init__(self, app, **kwargs):
-        self.app = app
-        super(ShuttleControlView, self).__init__(**kwargs) 
+    def __init__(self, **kwargs):
+        super(ShuttleControlView, self).__init__(**kwargs)
         #self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         #self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
@@ -287,7 +285,7 @@ class ShuttleControlView(Widget):
         print ' - modifiers are %r' % modifiers
 
         if keycode[1] == 's':
-            self.app.statechart.send_event('pulsate')
+            App.get_running_app().statechart.send_event('pulsate')
         elif keycode[1] == 'escape':
             # Keycode is composed of an integer + a string
             # If we hit escape, release the keyboard
@@ -312,17 +310,17 @@ class ShuttleControlView(Widget):
             group_number += 1
 
     def set_statechart_in_motion_controls(self, statechart):
-        controls = { 'yaw_plus': self.yaw_plus, 
-                     'yaw_minus': self.yaw_minus, 
-                     'pitch_plus': self.pitch_plus, 
-                     'pitch_minus': self.pitch_minus, 
-                     'roll_plus': self.roll_plus, 
-                     'roll_minus': self.roll_minus, 
-                     'translate_x_plus': self.translate_x_plus, 
-                     'translate_x_minus': self.translate_x_minus, 
-                     'translate_y_plus': self.translate_y_plus, 
-                     'translate_y_minus': self.translate_y_minus, 
-                     'translate_z_plus': self.translate_z_plus, 
+        controls = { 'yaw_plus': self.yaw_plus,
+                     'yaw_minus': self.yaw_minus,
+                     'pitch_plus': self.pitch_plus,
+                     'pitch_minus': self.pitch_minus,
+                     'roll_plus': self.roll_plus,
+                     'roll_minus': self.roll_minus,
+                     'translate_x_plus': self.translate_x_plus,
+                     'translate_x_minus': self.translate_x_minus,
+                     'translate_y_plus': self.translate_y_plus,
+                     'translate_y_minus': self.translate_y_minus,
+                     'translate_z_plus': self.translate_z_plus,
                      'translate_z_minus': self.translate_z_minus }
 
         for control_id in controls:
@@ -330,7 +328,7 @@ class ShuttleControlView(Widget):
             setattr(controls[control_id], 'statechart', statechart)
 
     def thruster_mode_control_changed(self):
-        if self.thruster_control_mode_switch.active_norm_pos: 
+        if self.thruster_control_mode_switch.active_norm_pos:
             self.thruster_control_mode = 'increasing'
         else:
             self.thruster_control_mode = 'decreasing'
@@ -339,7 +337,7 @@ class ShuttleControlView(Widget):
         # Pulsate thruster_groups by their pulsate amounts.
         for thruster_group in (self.thruster_group_1, self.thruster_group_2, self.thruster_group_3, self.thruster_group_4, self.thruster_group_5, self.thruster_group_6, self.thruster_group_7, self.thruster_group_8, self.thruster_group_9, self.thruster_group_10, self.thruster_group_11, self.thruster_group_12, self.thruster_group_13, self.thruster_group_14):
             thruster_group.pulsate()
-        
+
 
 #######################################################
 #
@@ -364,11 +362,13 @@ Factory.register("Viewport", Viewport)
 #  Application Statechart
 #
 class AppStatechart(StatechartManager):
-    def __init__(self, app, **kw):
-        self.app = app
-        self.trace = True
-        self.root_state_class = self.RootState
-        super(AppStatechart, self).__init__(**kw)
+    app = ObjectProperty(None)
+
+    def __init__(self, app, **kwargs):
+        kwargs['app'] = app
+        kwargs['trace'] = True
+        kwargs['root_state_class'] = self.RootState
+        super(AppStatechart, self).__init__(**kwargs)
 
     ###########################
     # RootState of statechart
@@ -377,7 +377,7 @@ class AppStatechart(StatechartManager):
         def __init__(self, **kwargs):
             kwargs['initial_substate_key'] = 'ShowingThrusterControls'
             super(AppStatechart.RootState, self).__init__(**kwargs)
-        
+
         def enter_state(self, context=None):
             print 'RootState/enter_state'
             # Initialize list items, which are dynamically created via the kv machinery.
@@ -392,13 +392,13 @@ class AppStatechart(StatechartManager):
             self.thruster_ids_sorted = sorted(thruster_ids)
             self.statechart.app.root.main_view.thrusters_list_view.items = \
                     [{ 'thruster_id': t_id, 'pulsation': '0' } for t_id in self.thruster_ids_sorted]
-    
+
             # A sorted list of thruster ids is needed for setting grid items.
             #
             region_widgets = { 'forward': self.statechart.app.root.main_view.thrusters_grid_view.forward_thrusters,
                                'aft-left': self.statechart.app.root.main_view.thrusters_grid_view.aft_left_thrusters,
                                'aft-right': self.statechart.app.root.main_view.thrusters_grid_view.aft_right_thrusters }
-    
+
             # Create the 44 thruster data objects, setting them in the global reference data dict.
             #
             for region in thrusters:
@@ -407,11 +407,11 @@ class AppStatechart(StatechartManager):
                         grid_label = getattr(region_widgets[region], thruster_id.lower())
                         list_label = self.statechart.app.root.main_view.thrusters_list_view.children[self.thruster_ids_sorted.index(thruster_id)]
                         thrusters[region][group_id][thruster_id] = Thruster(thruster_id, group_id, grid_label, list_label)
-    
+
             self.statechart.app.root.main_view.initialize_thruster_groups(pulsation=10, statechart=self.statechart)
             self.statechart.app.root.main_view.set_statechart_in_motion_controls(self.statechart)
             Clock.schedule_interval(self.statechart.app.root.main_view.update, 1.0 / 60.0)
-                            
+
         def exit_state(self, context=None):
             print 'RootState/exit_state'
 
@@ -420,10 +420,10 @@ class AppStatechart(StatechartManager):
         #
         class ShowingThrusterControls(State):
             substates_are_concurrent = True
-        
+
             def enter_state(self, context=None):
                 print 'ShowingThrusterControls/enter_state'
-                        
+
             def exit_state(self, context=None):
                 print 'ShowingThrusterControls/exit_state'
 
@@ -651,7 +651,7 @@ class AppStatechart(StatechartManager):
 
 #################
 #
-#  Application 
+#  Application
 #
 class ShuttleControlApp(App):
     statechart = ObjectProperty(None)
@@ -671,7 +671,7 @@ class ShuttleControlApp(App):
 
         # Create the main view, and add it to the viewport.
         #
-        self.root.main_view = ShuttleControlView(app=self)
+        self.root.main_view = ShuttleControlView()
         self.root.add_widget(self.root.main_view)
 
         return self.root
@@ -690,6 +690,4 @@ if __name__ in ('__android__', '__main__'):
     Config.set('graphics', 'height', '774')
     Config.write()
 
-    app = ShuttleControlApp()
-    app.run()
-
+    ShuttleControlApp().run()

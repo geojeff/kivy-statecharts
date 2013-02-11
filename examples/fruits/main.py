@@ -25,18 +25,16 @@ from fixtures import fruit_data
 class AppStatechart(StatechartManager):
     app = ObjectProperty(None)
 
-    def __init__(self, **kw):
-        self.trace = True
-        self.root_state_class = self.RootState
-
-        self.categories = sorted(fruit_categories.keys())
+    def __init__(self, **kwargs):
+        kwargs['trace'] = True
+        kwargs['root_state_class'] = self.RootState
 
         self.create_searchable_data()
-
         self.create_adapters()
 
-        super(AppStatechart, self).__init__(**kw)
+        super(AppStatechart, self).__init__(**kwargs)
 
+    @classmethod
     def create_searchable_data(self):
         properties = ['Calories', 'Calories from Fat', 'Total Fat',
                       'Sodium', 'Potassium', 'Total Carbo-hydrate',
@@ -59,60 +57,63 @@ class AppStatechart(StatechartManager):
             for prop in properties:
                 self.data[fruit][prop] = fruit_data[fruit][prop]
 
+    @classmethod
     def create_adapters(self):
-        self.list_item_args_converter = \
+        list_item_args_converter = \
                 lambda row_index, rec: {'text': rec['name'],
                                         'size_hint_y': None,
                                         'height': 25}
 
+        categories = sorted(fruit_categories.keys())
+
         self.fruit_categories_dict_adapter = DictAdapter(
-                sorted_keys=self.categories,
+                sorted_keys=categories,
                 data=fruit_categories,
-                args_converter=self.list_item_args_converter,
+                args_converter=list_item_args_converter,
                 selection_mode='single',
                 allow_empty_selection=False,
                 cls=ListItemButton)
 
-        fruits = fruit_categories[self.categories[0]]['fruits']
+        fruits = fruit_categories[categories[0]]['fruits']
 
         self.fruits_dict_adapter = DictAdapter(
                 sorted_keys=fruits,
                 data=fruit_data,
-                args_converter=self.list_item_args_converter,
+                args_converter=list_item_args_converter,
                 selection_mode='single',
                 allow_empty_selection=False,
                 cls=ListItemButton)
 
-    # State classes are declared in their own files in states package, e.g.
-    # states/showing_lists/ShowingListsScreen. They are imported above, so are
-    # available by their class names, e.g. ShowingListsScreen.
+    # In this example, state classes are declared in their own files in states
+    # package, e.g.  states/showing_lists/ShowingListsScreen. They are imported
+    # above, so are available by their class names, e.g. ShowingListsScreen.
     #
     # They need to be declared here in RootState, in one of several ways. You
-    # may prefer to use an __init__() method and kwargs for some reason, as
-    # shown in the commented-out block below. Or, you may prefer to declare
-    # them in the shorter fashion used below.
-    #
-    # If we were to have more deeply nested substates, we would declare them in
-    # the same fashion to build a hierarchy.
+    # may prefer to use an __init__() method and kwargs as shown here, or you
+    # may declare them in shorter fashion:
     #
     # class RootState(State):
-    #     def __init__(self, **kwargs):
-    #         kwargs['initial_substate_key'] = 'ShowingListsScreen'
+    #     initial_substate_key = 'ShowingListsScreen'
     #
-    #        kwargs['ShowingListsScreen'] = ShowingListsScreen
-    #        kwargs['ShowingSearchScreen'] = ShowingSearchScreen
-    #        kwargs['ShowingDataScreen'] = ShowingDataScreen
-    #        kwargs['ShowingDetailScreen'] = ShowingDetailScreen
+    #     ShowingListsScreen = ShowingListsScreen
+    #     ShowingSearchScreen = ShowingSearchScreen
+    #     ShowingDataScreen = ShowingDataScreen
+    #     ShowingDetailScreen = ShowingDetailScreen
     #
-    #        super(RootState, self).__init__(**kwargs)
+    # Regardless of state declaration style, if we were to have more deeply
+    # nested substates, we would declare them in the same fashion to build a
+    # hierarchy.
     #
     class RootState(State):
-        initial_substate_key = 'ShowingListsScreen'
+        def __init__(self, **kwargs):
+            kwargs['initial_substate_key'] = 'ShowingListsScreen'
 
-        ShowingListsScreen = ShowingListsScreen
-        ShowingSearchScreen = ShowingSearchScreen
-        ShowingDataScreen = ShowingDataScreen
-        ShowingDetailScreen = ShowingDetailScreen
+            kwargs['ShowingListsScreen'] = ShowingListsScreen
+            kwargs['ShowingSearchScreen'] = ShowingSearchScreen
+            kwargs['ShowingDataScreen'] = ShowingDataScreen
+            kwargs['ShowingDetailScreen'] = ShowingDetailScreen
+
+            super(AppStatechart.RootState, self).__init__(**kwargs)
 
 
 class FruitsApp(App):
