@@ -47,7 +47,7 @@ it, and inside kivy, do::
     
 Clone the kivy-statecharts repo::
 
-    git clone https://github.com/geojeff/kivy-statecharts.git
+    git clone https://github.com/kivy/kivy-statecharts.git
 
     python setup develop
 
@@ -108,7 +108,7 @@ As of April 2012, most tests were ported.
 .. _Original Ki repo: https://github.com/frozenCanuck/ki
 .. _SC.Statechart repo: https://github.com/sproutcore/sproutcore/tree/master/frameworks/statechart
 .. _Find out more about Kivy: http://kivy.org
-.. _GitHub repository: https://github.com/geojeff/kivy_statecharts
+.. _GitHub repository: https://github.com/kivy/kivy_statecharts
 .. _gitflow: https://github.com/nvie/gitflow
 .. _A successful Git branching model: http://nvie.com/posts/a-successful-git-branching-model/
 .. _nose: http://readthedocs.org/docs/nose/en/latest/
