@@ -1400,7 +1400,8 @@ class AppStatechart(StatechartManager):
                                         self.keep_playing_level()
 
                                 def reset_level(self, *args):
-                                    self.go_to_state('ResettingLevel')
+                                    #self.go_to_state('ResettingLevel')
+                                    self.go_to_state('ShowingGameScreen')
 
                                 def keep_playing_level(self, *args):
                                     self.go_to_state('ShowingBackground')
