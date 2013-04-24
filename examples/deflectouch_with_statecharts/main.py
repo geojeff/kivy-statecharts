@@ -45,7 +45,7 @@ kivy.require('1.0.9')
 
 from kivy.config import Config
 # for making screenshots with F12:
-Config.set('modules', 'keybinding', '')
+#Config.set('modules', 'keybinding', '')
 #Config.set('modules', 'inspector', '')
 
 from kivy.app import App
@@ -168,7 +168,6 @@ class Tank(Widget):
         else:
             # if the user wants only to drag the tank up and down, let him do it!
             self.y += touch.dy
-            pass
 
 
 #
