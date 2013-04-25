@@ -832,7 +832,8 @@ class AppStatechart(StatechartManager):
 
                                 # in the lowermost row there is also stored the value for the maximum stock
                                 for x in range(LEVEL_WIDTH):
-                                    # Original deflectouch has x,0 here. [TODO] Explanation?
+                                    # Original deflectouch has x,0 here, but Kivy changed a fundamental thing about
+                                    # images -- it used to flip images, but now it only flips the gl co-ordinates.
                                     color = self.parent_state.parent_state.level_image.read_pixel(x, LEVEL_HEIGHT)
                                     color = [int(c) for c in color]
                                     if len(color) > 3:
