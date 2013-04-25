@@ -59,7 +59,10 @@ from kivy.vector import Vector
 from kivy.graphics.transformation import Matrix
 from kivy.graphics import Line, Color
 
-from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+from kivy.properties import ObjectProperty
+from kivy.properties import StringProperty
+from kivy.properties import NumericProperty
+from kivy.properties import ListProperty
 
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
@@ -674,7 +677,10 @@ class AppStatechart(StatechartManager):
 
                     # try to load the level image
                     try:
-                        self.level_image = kivy.core.image.Image.load('levels/level%02d.png' % level, keep_data=True)
+                        # per https://github.com/stocyr/Deflectouch/commit/18d4cc2d98b922d932af9febc4fd9cb5d2fc3ee7,
+                        # app directory added to path.
+                        #self.level_image = kivy.core.image.Image.load('levels/level%02d.png' % level, keep_data=True)
+                        self.level_image = kivy.core.image.Image.load(self.statechart.app.directory + '/levels/level%02d.png' % level, keep_data=True)
                     except Exception, e:
                         error_text = 'Unable to load Level %d!\n\nReason: %s' % (level, e)
                         Popup(title='Level loading error:', content=Label(text=error_text, font_size=18), size_hint=(0.3, 0.2)).open()
@@ -825,7 +831,8 @@ class AppStatechart(StatechartManager):
 
                                 # in the lowermost row there is also stored the value for the maximum stock
                                 for x in range(LEVEL_WIDTH):
-                                    color = self.parent_state.parent_state.level_image.read_pixel(x, 0)
+                                    # Original deflectouch has x,0 here. [TODO] Explanation?
+                                    color = self.parent_state.parent_state.level_image.read_pixel(x, LEVEL_HEIGHT)
                                     color = [int(c) for c in color]
                                     if len(color) > 3:
                                         # if there was transparency stored in the image, cut it.
@@ -893,6 +900,8 @@ class AppStatechart(StatechartManager):
                         # WaitingForTouches
                         #
                         class WaitingForTouches(State):
+                            touches = ListProperty([])
+
                             def __init__(self, **kwargs):
                                 super(AppStatechart.
                                       RootState.
@@ -911,17 +920,21 @@ class AppStatechart(StatechartManager):
                             @State.event_handler(['background_touch_down', 'background_touch_up'])
                             def analyze_touches(self, event, touch, context):
                                 print 'analyze_touches'
-                                ud = touch.ud
+                                user_data = touch.ud
 
                                 # if a bullet has been fired and is flying now, don't allow ANY change!
                                 if self.statechart.app.bullet is None:
                                     # if i didn't wanted to move / scale a deflector and but rather create a new one:
                                     # search for other 'lonely' touches
                                     creating_new_deflector = False
-                                    for search_touch in EventLoop.touches[:]:
+                                    #for search_touch in EventLoop.touches[:]:
+                                    # Not sure why, but EventLoop.touches is getting reset, so making a
+                                    # local self.touches ListProperty to contain touches.
+                                    for search_touch in self.touches:
                                         if 'lonely' in search_touch.ud:
                                             print 'lonely'
-                                            del search_touch.ud['lonely']
+                                            self.touches.remove(search_touch)
+                                            #del search_touch.ud['lonely']
                                             # so here we have a second touch: try to create a deflector:
                                             if self.statechart.app.new_deflectors_allowed is True:
                                                 length = Vector(search_touch.pos).distance(touch.pos)
@@ -939,7 +952,8 @@ class AppStatechart(StatechartManager):
                                         self.go_to_state('CreatingDeflector')
                                     else:
                                         # no second touch was found: tag the current one as a 'lonely' touch
-                                        ud['lonely'] = True
+                                        touch.ud['lonely'] = True
+                                        self.touches.append(touch)
                                         self.statechart.app.sound['no_deflector'].play()
 
                             def deflector_touch_down(self, deflector, context):
