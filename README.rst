@@ -1,5 +1,5 @@
 ================
-kivy_statecharts
+kivy-statecharts
 ================
 
 This is an extension to the Kivy framework that adds a system for programming
@@ -16,38 +16,56 @@ SC.Statechart was used as the basis for this port to Python.
 
 `Find out more about Kivy`_
 
-Setting up kivy_statecharts
+Setting up kivy-statecharts
 ===========================
 
-A virtual environment works well for Kivy and kivy_statecharts development.
+A virtual environment works well for Kivy and kivy-statecharts development.
 Using the virtualenvwrapper framework is a good approach. After installing the
-base system prerequisites for Kivy:
+base system prerequisites for Kivy, clone kivy-statecharts locally, then add
+the path to your PYTHONPATH. This can be done on the command line as described
+in the answers here:
 
-    pip install kivy_statecharts (when available on PyPI)
+Setting up kivy-statecharts for Development
+===========================================
 
-NOTE: Until kivy_statecharts is on PyPI, do clone and setup as below:
+If you are debugging or adding features to kivy-statecharts, here is one way to
+work with it. Make a `virtualenv`_ for doing kivy-statechart work::
 
-If you are debugging or adding features to kivy_statecharts, here is one way
-to work with it. Make a virtualenv for doing kivy-statechart work. Here are
-steps using the virtualenvwrapper system::
+    virtualenv kivy_statecharts
+
+    cd kivy_statecharts
+
+    source bin/activate
+
+Also, here are steps using the `virtualenvwrapper`_ system, which is a nice way
+to work, because you can switch between virtualenvs easily::
 
     mkvirtualenv kivy_statecharts
     
     cdvirtualenv
 
-You can check the paths for python, pip and other things in bin, and perhaps
-issue this command to ensure you are working properly in the virtualenv::
-
     workon kivy_statecharts
-    
+
+Either way, whether by using virtualenv directly, or by using
+virtualenvwrapper, you now have a kivy_statecharts virtualenv, and it should be
+active. For Unix systems, to make sure that you have it activated, you can
+check which python is active with::
+
+    which python
+
+and you should see the path to the python in your virtualenv, not to the system
+Python interpreter.
+
 Do steps to install kivy; if using master, install dependencies, then git clone
 it, and inside kivy, do::
 
     python setup.py develop
-    
+
 Clone the kivy-statecharts repo::
 
     git clone https://github.com/kivy/kivy-statecharts.git
+
+    cd kivy_statecharts
 
     python setup develop
 
@@ -55,27 +73,30 @@ Clone the kivy-statecharts repo::
 
 Be warned: This addon is in alpha state. Use it at your own risk.
 
-Using kivy_statecharts
+Using kivy-statecharts
 ======================
 
-For now, source Sphinx docs are in the docs directory.
+Source Sphinx docs are in the docs directory.
 
 See the examples.
 
-Work in progress
-================
+Status
+======
 
-``kivy_statecharts`` is considered alpha software, not yet suitable for use in
-production environments.  The current state of the project is in no way feature
-complete nor API stable.  If you really want to use it in your project(s), make
-sure to pin the exact version in your requirements.  Not doing so will likely
-break your project when future releases become available.
+``kivy-statecharts`` is perhaps becoming suitable for use in production
+environments, judging by a good set of tests, but not yet by any known apps in
+the wild (as of April, 2013).  A proper release program will be started in
+Summer 2013 so that, to use, you can make sure to pin the exact version in your
+requirements. It is expected that releases, although they will start with an
+alpha designation, will soon move to beta status. The main reason for the
+present status is that despite a full set of tests, there aren't yet enough
+examples covering fuller treatments of some of the features and uses.
 
 Development
 ===========
 
-Contributions to ``kivy_statecharts`` are very welcome.
-Just clone its `GitHub repository`_ and submit your contributions as pull requests.
+Contributions to ``kivy-statecharts`` are very welcome.  Just clone its `GitHub
+repository`_ and submit your contributions as pull requests.
 
 Note that all development is done on the ``develop`` branch. ``master`` is reserved
 for "production-ready state".  Therefore, make sure to always base development work
@@ -89,26 +110,29 @@ Testing
 
 |build status|_
 
-``kivy_statecharts`` has 100% test coverage. Use nosetests or py.test.
+``kivy-statecharts`` has 100% test coverage. Use `nose`_ or `py.test`_.
 
 Please make sure that you add tests for new features and that all tests pass before
 submitting pull requests.  Running the test suite is as easy as running ``py.test``
 from the source directory. Presently, both py.test and nosetests work. Run
 ``python setup.py dev`` to have all the test requirements installed in your virtualenv.
 
-
 Unit tests have previously been done with `nose`_.  In the kivy_statechart directory,
 run:
 
     nosetests
 
-As of April 2012, most tests were ported.
+As of April 2012, most tests were ported from the original javascript version.
 
 
 .. _Original Ki repo: https://github.com/frozenCanuck/ki
 .. _SC.Statechart repo: https://github.com/sproutcore/sproutcore/tree/master/frameworks/statechart
 .. _Find out more about Kivy: http://kivy.org
-.. _GitHub repository: https://github.com/kivy/kivy_statecharts
+.. _GitHub repository: https://github.com/kivy/kivy-statecharts
 .. _gitflow: https://github.com/nvie/gitflow
 .. _A successful Git branching model: http://nvie.com/posts/a-successful-git-branching-model/
 .. _nose: http://readthedocs.org/docs/nose/en/latest/
+.. _py.test: http://pytest.org/latest/
+.. _Stackoverflow question about PYTHONPATH: http://stackoverflow.com/questions/4580101/python-add-pythonpath-during-command-line-module-run.
+.. _virtualenv: https://pypi.python.org/pypi/virtualenv
+.. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
