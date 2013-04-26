@@ -20,10 +20,31 @@ Setting up kivy-statecharts
 ===========================
 
 A virtual environment works well for Kivy and kivy-statecharts development.
-Using the virtualenvwrapper framework is a good approach. After installing the
-base system prerequisites for Kivy, clone kivy-statecharts locally, then add
-the path to your PYTHONPATH. This can be done on the command line as described
-in the answers here:
+But if you have Kivy already running locally and wish to take a quick look at
+kivy-statecharts, clone kivy-statecharts and cd to its examples directory, and
+to the hello_world example. If you simply run python main.py, kivy-statecharts
+will not be found, because it is not on PYTHONPATH.  You can augment paths on
+PYTHONPATH on the command line as described in the answers for this
+`Stackoverflow question about PYTHONPATH`_. So the following should bring up
+the hello_world example app::
+
+    PYTHONPATH=/path/to/kivy_statecharts python main.py
+
+The hello_world app appears to do nothing, but if you type letters for "hello
+world", (h, e, l, o, w, r, d), you will see buttons with these letters appear
+in random locations. If you click or touch any button, even more random buttons
+will appear. When you look at the `hello_world example app code`_, you will see
+one real state in a simple statechart. There are bindings to fire action events
+to the statechart with h, e, l, o, w, r, and d keyboard entries, and for the
+same events to be fire when buttons are clicked. The action events correspond
+to methods of the single state in the statechart. We would say that the current
+state has action methods that handle the keyboard action events. A statechart
+is an organization structure holding states with such actions and helper
+methods.
+
+From the hello_world example app, you can move to the Balls example app, and to
+the more involved examples from there. deflectouch_with_statecharts is the most
+complete example so far.
 
 Setting up kivy-statecharts for Development
 ===========================================
@@ -131,8 +152,9 @@ As of April 2012, most tests were ported from the original javascript version.
 .. _GitHub repository: https://github.com/kivy/kivy-statecharts
 .. _gitflow: https://github.com/nvie/gitflow
 .. _A successful Git branching model: http://nvie.com/posts/a-successful-git-branching-model/
+.. _hello_world example app code: https://github.com/kivy/kivy-statecharts/blob/master/examples/hello_world/main.py
 .. _nose: http://readthedocs.org/docs/nose/en/latest/
 .. _py.test: http://pytest.org/latest/
-.. _Stackoverflow question about PYTHONPATH: http://stackoverflow.com/questions/4580101/python-add-pythonpath-during-command-line-module-run.
+.. _Stackoverflow question about PYTHONPATH: http://stackoverflow.com/questions/4580101/python-add-pythonpath-during-command-line-module-run
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
