@@ -123,7 +123,7 @@ class ThrusterGroup(Button):
 #  User Interface components.
 #
 
-# Viewport is from wiki.kivy.org snippets
+# Viewport is modified from wiki.kivy.org snippets.
 #
 class Viewport(ScatterPlane):
     def __init__(self, **kwargs):
@@ -140,18 +140,10 @@ class Viewport(ScatterPlane):
         self.fit_to_window()
 
     def fit_to_window(self, *args):
-        if self.width < self.height: #portrait
-            if Window.width < Window.height: #so is window
-                self.scale = Window.width/float(self.width)
-            else: #window is landscape..so rotate viewport
-                self.scale = Window.height/float(self.width)
-                self.rotation = -90
-        else: #landscape
-            if Window.width > Window.height: #so is window
-                self.scale = Window.width/float(self.width)
-            else: #window is portrait..so rotate viewport
-                self.scale = Window.height/float(self.width)
-                self.rotation = -90
+        if Window.width < Window.height: #so is window
+            self.scale = Window.width/float(self.width)
+        else: #window is landscape..so rotate viewport
+            self.scale = (float(Window.height) - (float(Window.height) * 0.1))/float(self.width)
 
         self.center = Window.center
         for c in self.children:
