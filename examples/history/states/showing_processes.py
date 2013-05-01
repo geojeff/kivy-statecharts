@@ -6,6 +6,7 @@ from kivy.uix.treeview import TreeView
 from kivy.uix.treeview import TreeViewNode
 
 from kivy.properties import DictProperty
+from kivy.properties import StringProperty
 
 from kivy_statecharts.system.state import State
 
@@ -24,11 +25,14 @@ class ShowingProcessesScreen(State):
 
     history_labels = DictProperty({})
 
+    history_traversal_method = StringProperty('shallow')
+
     def enter_state(self, context=None):
 
         if not 'Processes' in self.statechart.app.sm.screen_names:
 
             # Convenience references:
+
             self.app = self.statechart.app
 
             view = BoxLayout(orientation='vertical', spacing=10)
@@ -42,9 +46,26 @@ class ShowingProcessesScreen(State):
             label = Label(text='Processes', color=[.8, .8, .8, .8], bold=True)
             toolbar.add_widget(label)
 
-            # Process A toolbar
-
             view.add_widget(toolbar)
+
+            # Radio buttons for shallow vs. deep history state traversal.
+
+            history_traversal_buttons = BoxLayout(size_hint=(1.0, None), height=30)
+            shallow_button = ToggleButton(text='Shallow (non-recursive)',
+                                          group='history state traversal')
+            deep_button = ToggleButton(text='Deep (recursive)',
+                                       group='history state traversal')
+            history_traversal_buttons.add_widget(shallow_button)
+            history_traversal_buttons.add_widget(deep_button)
+
+            shallow_button.bind(on_press=self.update_history_traversal_method)
+            deep_button.bind(on_press=self.update_history_traversal_method)
+
+            shallow_button.state = 'down'
+
+            view.add_widget(history_traversal_buttons)
+
+            # Process A toolbar
 
             view.add_widget(Label(
                 text=('Process A Hierarchy -- Click buttons to call '
@@ -97,8 +118,7 @@ class ShowingProcessesScreen(State):
 
             # History labels (for each state in tree)
 
-            history_labels_list = BoxLayout(orientation='vertical',
-                    pos_hint={'x': 1.0, 'y': .2})
+            history_labels_list = BoxLayout(orientation='vertical')
             self.populate_history_labels_list(
                     history_labels_list, self.statechart.get_state('A'))
             self.populate_history_labels_list(
@@ -107,25 +127,15 @@ class ShowingProcessesScreen(State):
 
             # Help text
 
-            lower_panel.add_widget(Label(text="""The state hierarchies for
-Processes A and B are shown
-at left. Along the side, in
-parentheses, are the history
-states of each state. Click
-on a state directly to
-simulate performing steps in
-the process.
+            help_text = BoxLayout(orientation='vertical', size_hint=(1.0, 1.0))
+            help_text.add_widget(Label(text="The state hierarchies for Processes A and B are shown at left. Along the side, in parentheses, are the history states of each state. Click on a state directly to simulate performing steps in the process."))
+            help_text.add_widget(Label(text="Click the history buttons in the toolbars above to go to the history state of a state. If a state doesn't yet have a history state, it will simply be visited."))
+            help_text.add_widget(Label(text="View the terminal console to follow the action, and see current state."""))
+            #help_text.add_widget(Label(text="The state hierarchies for Processes A and B are shown at left. Along the side, in parentheses, are the history states of each state. Click on a state directly to simulate performing steps in the process.", halign='justify'))
+            #help_text.add_widget(Label(text="Click the history buttons in the toolbars above to go to the history state of a state. If a state doesn't yet have a history state, it will simply be visited.", halign='justify'))
+            #help_text.add_widget(Label(text="View the terminal console to follow the action, and see current state.""", halign='justify'))
 
-Click the history buttons
-in the toolbars above to go
-to the history state of a
-state. If a state doesn't
-yet have a history state,
-it will simply be visited.
-
-View the terminal console to
-follow the action, and see
-current state."""))
+            lower_panel.add_widget(help_text)
 
             view.add_widget(lower_panel)
 
@@ -193,7 +203,19 @@ current state."""))
     def history_button_clicked(self, *args):
         target_state = args[0].text
 
+        recursive = \
+                False if self.history_traversal_method == 'shallow' else True
+
         self.statechart.go_to_history_state(
                 target_state,
-                from_current_state=self.statechart.current_states[-1],
-                recursive=False)
+                # Comments say that from_current_state is needed (probably)
+                # when there are concurrent states. Otherwise, not.
+                #from_current_state=self.statechart.current_states[-1],
+                from_current_state=None,
+                recursive=recursive)
+
+    def update_history_traversal_method(self, *args):
+        if args[0].text.startswith('Shallow'):
+            self.history_traversal_method = 'shallow'
+        else:
+            self.history_traversal_method = 'deep'
