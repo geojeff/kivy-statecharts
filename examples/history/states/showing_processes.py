@@ -5,6 +5,7 @@ from kivy.uix.button import Button
 from kivy.uix.treeview import TreeView
 from kivy.uix.treeview import TreeViewNode
 
+from kivy.properties import BooleanProperty
 from kivy.properties import DictProperty
 from kivy.properties import StringProperty
 
@@ -19,6 +20,28 @@ class TreeViewToggleButton(ToggleButton, TreeViewNode):
 
 class TreeViewLabel(Label, TreeViewNode):
     pass
+
+
+class StatesTreeView(TreeView):
+
+    allow_collapse = BooleanProperty(False)
+
+    def __init__(self, **kwargs):
+        super(StatesTreeView, self).__init__(**kwargs)
+
+    def toggle_node(self, node):
+        '''Toggle the state of the node (open/collapse).
+        '''
+        node.is_open = not node.is_open
+        if node.is_open:
+            if self.load_func and not node.is_loaded:
+                self._do_node_load(node)
+            self.dispatch('on_node_expand', node)
+        else:
+            if self.allow_collapse:
+                self.dispatch('on_node_collapse', node)
+
+        self._trigger_layout()
 
 
 class ShowingProcessesScreen(State):
@@ -103,7 +126,7 @@ class ShowingProcessesScreen(State):
 
             # State tree
 
-            tree_view = TreeView(
+            tree_view = StatesTreeView(
                     root_options=dict(text='Steps in Processes A and B'),
                     hide_root=True,
                     indent_level=40)
@@ -128,12 +151,9 @@ class ShowingProcessesScreen(State):
             # Help text
 
             help_text = BoxLayout(orientation='vertical', size_hint=(1.0, 1.0))
-            help_text.add_widget(Label(text="The state hierarchies for Processes A and B are shown at left. Along the side, in parentheses, are the history states of each state. Click on a state directly to simulate performing steps in the process."))
-            help_text.add_widget(Label(text="Click the history buttons in the toolbars above to go to the history state of a state. If a state doesn't yet have a history state, it will simply be visited."))
-            help_text.add_widget(Label(text="View the terminal console to follow the action, and see current state."""))
-            #help_text.add_widget(Label(text="The state hierarchies for Processes A and B are shown at left. Along the side, in parentheses, are the history states of each state. Click on a state directly to simulate performing steps in the process.", halign='justify'))
-            #help_text.add_widget(Label(text="Click the history buttons in the toolbars above to go to the history state of a state. If a state doesn't yet have a history state, it will simply be visited.", halign='justify'))
-            #help_text.add_widget(Label(text="View the terminal console to follow the action, and see current state.""", halign='justify'))
+            help_text.add_widget(Label(text="The state hierarchies for Processes A and B are shown at left. Along the side, in parentheses, are the history states of each state. Click on a state directly to simulate performing steps in the process.", halign='justify', text_size=(200, 160)))
+            help_text.add_widget(Label(text="Click the history buttons in the toolbars above to go to the history state of a state. If a state doesn't yet have a history state, it will simply be visited.", halign='justify', text_size=(200, 120)))
+            help_text.add_widget(Label(text="View the terminal console to follow the action, and see current state.""", halign='justify', text_size=(200, 80)))
 
             lower_panel.add_widget(help_text)
 
