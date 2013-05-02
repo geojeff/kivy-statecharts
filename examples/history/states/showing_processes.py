@@ -1,3 +1,4 @@
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
@@ -32,6 +33,8 @@ class StatesTreeView(TreeView):
     def toggle_node(self, node):
         '''Toggle the state of the node (open/collapse).
         '''
+        if not self.allow_collapse and node.is_open:
+            return
         node.is_open = not node.is_open
         if node.is_open:
             if self.load_func and not node.is_loaded:
@@ -141,7 +144,7 @@ class ShowingProcessesScreen(State):
 
             # History labels (for each state in tree)
 
-            history_labels_list = BoxLayout(orientation='vertical')
+            history_labels_list = GridLayout(cols=1)
             self.populate_history_labels_list(
                     history_labels_list, self.statechart.get_state('A'))
             self.populate_history_labels_list(
