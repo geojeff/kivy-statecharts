@@ -125,10 +125,18 @@ class ShowingProcessesScreen(State):
 
             # Lower panel for the state tree, history labels, and help text.
 
-            lower_panel = BoxLayout()
+            lower_panel = GridLayout(cols=3,
+                                     padding=[20, 0, 20, 0],
+                                     spacing=20,
+                                     minimum=200)
 
             # State tree
 
+            tree_view_panel = GridLayout(cols=1)
+            tree_view_panel.add_widget(Label(text='Statechart',
+                                             size_hint=(None, None),
+                                             width=30,
+                                             height=30))
             tree_view = StatesTreeView(
                     root_options=dict(text='Steps in Processes A and B'),
                     hide_root=True,
@@ -140,11 +148,16 @@ class ShowingProcessesScreen(State):
             self.populate_tree_view(
                     tree_view, None, self.statechart.get_state('B'))
 
-            lower_panel.add_widget(tree_view)
+            tree_view_panel.add_widget(tree_view)
+            lower_panel.add_widget(tree_view_panel)
 
             # History labels (for each state in tree)
 
             history_labels_list = GridLayout(cols=1)
+            history_labels_list.add_widget(Label(text='History States',
+                                                 size_hint=(None, None),
+                                                 width=30,
+                                                 height=30))
             self.populate_history_labels_list(
                     history_labels_list, self.statechart.get_state('A'))
             self.populate_history_labels_list(
@@ -153,10 +166,14 @@ class ShowingProcessesScreen(State):
 
             # Help text
 
-            help_text = BoxLayout(orientation='vertical', size_hint=(1.0, 1.0))
-            help_text.add_widget(Label(text="The state hierarchies for Processes A and B are shown at left. Along the side, in parentheses, are the history states of each state. Click on a state directly to simulate performing steps in the process.", halign='justify', text_size=(200, 160)))
-            help_text.add_widget(Label(text="Click the history buttons in the toolbars above to go to the history state of a state. If a state doesn't yet have a history state, it will simply be visited.", halign='justify', text_size=(200, 120)))
-            help_text.add_widget(Label(text="View the terminal console to follow the action, and see current state.""", halign='justify', text_size=(200, 80)))
+            #help_text = BoxLayout(orientation='vertical', size_hint=(1.0, 1.0))
+            help_text = GridLayout(cols=1)
+            help_text.add_widget(self.make_help_label("The state hierarchies for Processes A and B are shown at left. Along the side, in parentheses, are the history states of each state. Click on a state directly to simulate performing steps in the process."))
+            #help_label = Label(text="The state hierarchies for Processes A and B are shown at left. Along the side, in parentheses, are the history states of each state. Click on a state directly to simulate performing steps in the process.", halign='justify')
+            #help_text.add_widget(Label(text="The state hierarchies for Processes A and B are shown at left. Along the side, in parentheses, are the history states of each state. Click on a state directly to simulate performing steps in the process.", halign='justify', text_size=(200, 160)))
+            help_text.add_widget(self.make_help_label("Click the history buttons in the toolbars above to go to the history state of a state. If a state doesn't yet have a history state, it will simply be visited."))
+            #help_text.add_widget(Label(text="Click the history buttons in the toolbars above to go to the history state of a state. If a state doesn't yet have a history state, it will simply be visited.", halign='justify', text_size=(200, 120)))
+            help_text.add_widget(self.make_help_label("View the terminal console to follow the action, and see current state."))
 
             lower_panel.add_widget(help_text)
 
@@ -173,6 +190,11 @@ class ShowingProcessesScreen(State):
 
     def exit_state(self, context=None):
         pass
+
+    def make_help_label(self, text):
+        help_label = Label(text=text, halign='justify')
+        help_label.bind(size=help_label.setter('text_size'))
+        return help_label
 
     def populate_tree_view(self, tree_view, parent, state):
 
