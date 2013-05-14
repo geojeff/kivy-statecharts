@@ -45,7 +45,7 @@ kivy.require('1.0.9')
 
 from kivy.config import Config
 # for making screenshots with F12:
-Config.set('modules', 'keybinding', '')
+#Config.set('modules', 'keybinding', '')
 #Config.set('modules', 'inspector', '')
 
 from kivy.app import App
@@ -59,7 +59,10 @@ from kivy.vector import Vector
 from kivy.graphics.transformation import Matrix
 from kivy.graphics import Line, Color
 
-from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+from kivy.properties import ObjectProperty
+from kivy.properties import StringProperty
+from kivy.properties import NumericProperty
+from kivy.properties import ListProperty
 
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
@@ -168,7 +171,6 @@ class Tank(Widget):
         else:
             # if the user wants only to drag the tank up and down, let him do it!
             self.y += touch.dy
-            pass
 
 
 #
@@ -278,6 +280,7 @@ class Deflector(Scatter):
 
     def on_touch_down(self, touch):
         self.statechart.send_event('deflector_touch_down')
+
         return super(Deflector, self).on_touch_down(touch)
 
     def on_touch_up(self, touch):
@@ -675,7 +678,10 @@ class AppStatechart(StatechartManager):
 
                     # try to load the level image
                     try:
-                        self.level_image = kivy.core.image.Image.load('levels/level%02d.png' % level, keep_data=True)
+                        # per https://github.com/stocyr/Deflectouch/commit/18d4cc2d98b922d932af9febc4fd9cb5d2fc3ee7,
+                        # app directory added to path.
+                        #self.level_image = kivy.core.image.Image.load('levels/level%02d.png' % level, keep_data=True)
+                        self.level_image = kivy.core.image.Image.load(self.statechart.app.directory + '/levels/level%02d.png' % level, keep_data=True)
                     except Exception, e:
                         error_text = 'Unable to load Level %d!\n\nReason: %s' % (level, e)
                         Popup(title='Level loading error:', content=Label(text=error_text, font_size=18), size_hint=(0.3, 0.2)).open()
@@ -826,7 +832,9 @@ class AppStatechart(StatechartManager):
 
                                 # in the lowermost row there is also stored the value for the maximum stock
                                 for x in range(LEVEL_WIDTH):
-                                    color = self.parent_state.parent_state.level_image.read_pixel(x, 0)
+                                    # Original deflectouch has x,0 here, but Kivy changed a fundamental thing about
+                                    # images -- it used to flip images, but now it only flips the gl co-ordinates.
+                                    color = self.parent_state.parent_state.level_image.read_pixel(x, LEVEL_HEIGHT)
                                     color = [int(c) for c in color]
                                     if len(color) > 3:
                                         # if there was transparency stored in the image, cut it.
@@ -843,6 +851,32 @@ class AppStatechart(StatechartManager):
 
                                 self.statechart.app.game_screen.add_widget(self.statechart.app.stockbar)
 
+                        def exit_state(self, context=None):
+                            print 'ShowingStockbar/exit_state'
+
+                        # WaitingForTouches
+                        #
+                        class WaitingForTouches(State):
+                            touches = ListProperty([])
+
+                            def __init__(self, **kwargs):
+                                super(AppStatechart.
+                                      RootState.
+                                      ShowingGameScreen.
+                                      ShowingLevel.
+                                      ShowingBackground.
+                                      ShowingStockbar.
+                                      WaitingForTouches, self).__init__(**kwargs)
+
+                            def enter_state(self, context=None):
+                                print 'WaitingForTouches/enter_state'
+
+                                self.recalculate_stockbar()
+
+                            def exit_state(self, context=None):
+                                print 'WaitingForTouches/exit_state'
+
+                            def recalculate_stockbar(self):
                                 # done every time a deflector size is changing
                                 # first sum up all the deflectors on screen
                                 length_sum = 0
@@ -886,43 +920,24 @@ class AppStatechart(StatechartManager):
 
                                     self.statechart.app.current_deflector_and_vector = None
 
-                                self.go_to_state('WaitingForTouches')
-
-                        def exit_state(self, context=None):
-                            print 'ShowingStockbar/exit_state'
-
-                        # WaitingForTouches
-                        #
-                        class WaitingForTouches(State):
-                            def __init__(self, **kwargs):
-                                super(AppStatechart.
-                                      RootState.
-                                      ShowingGameScreen.
-                                      ShowingLevel.
-                                      ShowingBackground.
-                                      ShowingStockbar.
-                                      WaitingForTouches, self).__init__(**kwargs)
-
-                            def enter_state(self, context=None):
-                                print 'WaitingForTouches/enter_state'
-
-                            def exit_state(self, context=None):
-                                print 'WaitingForTouches/exit_state'
-
                             @State.event_handler(['background_touch_down', 'background_touch_up'])
                             def analyze_touches(self, event, touch, context):
                                 print 'analyze_touches'
-                                ud = touch.ud
+                                user_data = touch.ud
 
                                 # if a bullet has been fired and is flying now, don't allow ANY change!
                                 if self.statechart.app.bullet is None:
                                     # if i didn't wanted to move / scale a deflector and but rather create a new one:
                                     # search for other 'lonely' touches
                                     creating_new_deflector = False
-                                    for search_touch in EventLoop.touches[:]:
+                                    #for search_touch in EventLoop.touches[:]:
+                                    # Not sure why, but EventLoop.touches is getting reset, so making a
+                                    # local self.touches ListProperty to contain touches.
+                                    for search_touch in self.touches:
                                         if 'lonely' in search_touch.ud:
                                             print 'lonely'
-                                            del search_touch.ud['lonely']
+                                            self.touches.remove(search_touch)
+                                            #del search_touch.ud['lonely']
                                             # so here we have a second touch: try to create a deflector:
                                             if self.statechart.app.new_deflectors_allowed is True:
                                                 length = Vector(search_touch.pos).distance(touch.pos)
@@ -940,8 +955,32 @@ class AppStatechart(StatechartManager):
                                         self.go_to_state('CreatingDeflector')
                                     else:
                                         # no second touch was found: tag the current one as a 'lonely' touch
-                                        ud['lonely'] = True
+                                        touch.ud['lonely'] = True
+                                        self.touches.append(touch)
                                         self.statechart.app.sound['no_deflector'].play()
+
+                            def resize_deflector(self, deflector, size):
+                                print 'resize_deflector'
+
+                                # problem: if the points are resized (scatter resized them, kv-rule resized them back),
+                                # their center isn't on the touch point anymore.
+                                deflector.point1.pos = deflector.point_pos_origin[0] + (40 - size[0])/2, deflector.point_pos_origin[1] + (40 - size[0])/2
+                                deflector.point2.pos = deflector.point_pos_origin[2] + (40 - size[0])/2, deflector.point_pos_origin[3] + (40 - size[0])/2
+
+                                # feedback to the stockbar: reducing of the deflector material stock:
+                                #deflector.length = Vector(deflector.touch1.pos).distance(deflector.touch2.pos)
+                                print 'deflector.length_origin', deflector.length_origin
+                                print 'deflector.scale', deflector.scale
+                                deflector.length = deflector.length_origin * deflector.scale
+
+                                deflector_point1 = Vector(deflector.to_parent(deflector.point1.center[0], deflector.point1.center[1]))
+                                deflector_point2 = Vector(deflector.to_parent(deflector.point2.center[0], deflector.point2.center[1]))
+
+                                deflector_vector = Vector(deflector_point2 - deflector_point1)
+
+                                self.statechart.app.current_deflector_and_vector = (deflector, deflector_vector)
+
+                                self.recalculate_stockbar()
 
                             def deflector_touch_down(self, deflector, context):
                                 print 'deflector_touch_down'
@@ -953,9 +992,13 @@ class AppStatechart(StatechartManager):
                                 if self.statechart.app.sound['deflector_touch_up'].status != 'play':
                                     self.statechart.app.sound['deflector_touch_up'].play()
 
+                                print 'deflector.length', deflector.length
+                                print 'MIN_DEFLECTOR_LENGTH', MIN_DEFLECTOR_LENGTH
                                 if deflector.length < MIN_DEFLECTOR_LENGTH and deflector.parent != None:
                                     self.statechart.app.current_deflector_and_vector = (deflector, None)
                                     self.statechart.go_to_state('DeletingDeflector')
+
+                                self.go_to_state('ShowingStockbar')
 
                 # CreatingDeflector (transient)
                 #
@@ -993,36 +1036,6 @@ class AppStatechart(StatechartManager):
                     def exit_state(self, context=None):
                         print 'CreatingDeflector/exit_state'
 
-                # ResizingDeflector (transient)
-                #
-                class ResizingDeflector(State):
-                    def __init__(self, **kwargs):
-                        super(AppStatechart.
-                              RootState.
-                              ShowingGameScreen.
-                              ShowingLevel.
-                              ResizingDeflector, self).__init__(**kwargs)
-
-                    def enter_state(self, context=None):
-                        print 'ResizingDeflector/enter_state'
-                        self.deflector,self.deflector_vector = self.statechart.app.current_deflector_and_vector
-
-                    def exit_state(self, context=None):
-                        print 'ResizingDeflector/exit_state'
-
-                    def resize_deflector(self, deflector, size):
-                        print 'resize_deflector'
-
-                        # problem: if the points are resized (scatter resized them, kv-rule resized them back),
-                        # their center isn't on the touch point anymore.
-                        deflector.point1.pos = deflector.point_pos_origin[0] + (40 - size[0])/2, deflector.point_pos_origin[1] + (40 - size[0])/2
-                        deflector.point2.pos = deflector.point_pos_origin[2] + (40 - size[0])/2, deflector.point_pos_origin[3] + (40 - size[0])/2
-
-                        # feedback to the stockbar: reducing of the deflector material stock:
-                        #deflector.length = Vector(deflector.touch1.pos).distance(deflector.touch2.pos)
-                        deflector.length = deflector.length_origin * deflector.scale
-
-                        self.go_to_state('ShowingBackground')
 
                 # DeletingDeflector (transient)
                 #
@@ -1401,7 +1414,8 @@ class AppStatechart(StatechartManager):
                                         self.keep_playing_level()
 
                                 def reset_level(self, *args):
-                                    self.go_to_state('ResettingLevel')
+                                    #self.go_to_state('ResettingLevel')
+                                    self.go_to_state('ShowingGameScreen')
 
                                 def keep_playing_level(self, *args):
                                     self.go_to_state('ShowingBackground')

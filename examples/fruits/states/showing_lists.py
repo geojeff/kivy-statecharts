@@ -94,7 +94,7 @@ class ShowingListsScreen(State):
             self.statechart.fruits_dict_adapter.data = {}
             return
 
-        key = str(fruit_categories_adapter.selection[0])
+        key = fruit_categories_adapter.selection[0].text
         category = fruit_categories[key]
         self.statechart.fruits_dict_adapter.sorted_keys = category['fruits']
 
@@ -107,7 +107,7 @@ class ShowingListsScreen(State):
             if type(selected_object) is str:
                 self.detail_view.fruit_name = selected_object
             else:
-                self.detail_view.fruit_name = str(selected_object)
+                self.detail_view.fruit_name = selected_object.text
 
             self.detail_view.redraw()
 

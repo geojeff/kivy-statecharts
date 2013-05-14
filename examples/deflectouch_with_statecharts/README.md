@@ -9,7 +9,30 @@ See Cyril Stoller's Deflectouch repo for the original code:
 
     https://github.com/stocyr/Deflectouch
 
-As of July, 2012, this port is a work-in-progress ...
+As of April, 2013, this port is still a work-in-progress ...
+
+But it is providing the most complete example of using kivy-statecharts. There
+are new smaller examples you should take a look at first, then come back to
+this one perhaps.
+
+To start playing around with deflectouch_with_statecharts, delete the 
+deflectouch.ini file, which is created during game play and saves settings,
+including your current game level. If you need to set a given game level, note
+that the completed game levels are simply marked in the .ini file as 1s, in an
+array of 0s.
+
+If you delete the deflectouch.ini file to start fresh, you will see a help
+panel on first run. You can also click a button for Help.
+
+deflectouch_with_statecharts has been developed on Mac osx. To run it here,
+the [input] setting in ~/.kivy/config.ini is set to touchpad = mactouch. For
+other platforms, please consult the Kivy docs.
+
+In the extended discussion below about kivy-statecharts, please keep in mind
+that the statechart diagram and the code structure are an attempt to follow
+suggestions in books and in other similar frameworks, but need significant
+revision.  This will get sorted out as development of kivy-statecharts
+continues.
 
 Review Notes About Porting to Statechart Version
 ------------------------------------------------
@@ -32,6 +55,9 @@ as autonomous user interface elements. Deflector still has code that
 can be moved to the statechart. As the original widgets were pared
 down, separate source files were collapsed to main.py, with the kv
 file remaining largely unmodified.
+
+Statechart Drawing
+------------------
 
 The statechart drawing changed quite a bit in an incremental fashion,
 with refactoring happening as two books about statecharts on hand
@@ -69,6 +95,9 @@ on this project has been to "reverse engineer" an existing app, after
 initial fits and starts, the process became more streamlined, as
 described.
 
+Programming with kivy-statecharts
+---------------------------------
+
 Several aspects of statecharts and of a treatment in Python were
 examined along the way. A statechart is hierarchical, and there is
 more than one way to arrange states in an app. As development 
@@ -102,8 +131,12 @@ move control directly to another state.
 yEd Operation
 =============
 
+[Note: BlockDiag is an alternative way to draw statecharts, but needs some
+work. Look at other examples to check on progress experimenting with
+BlockDiag.]
+
 The statechart drawing was made with yEd, a free cross-platform tool.
-The program was used on MAC OS X, in this project.
+The program has been used on MAC OS X, so far.
 
 yEd is a very capable program dedicated to the task of drawing diagrams
 like statecharts, although there is no (yet) dedicated palette for
