@@ -1,7 +1,5 @@
-from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.widget import Widget
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -64,16 +62,19 @@ class ShowingProcessesScreen(State):
             self.app = self.statechart.app
 
             view = GridLayout(cols=1, spacing=20)
-            #view = BoxLayout(orientation='vertical', spacing=10)
 
-            toolbar = BoxLayout(size_hint=(1.0, None), height=50)
+            toolbar = BoxLayout(size_hint=(1.0, None), height=30)
 
-            button = Button(text='Main')
+            button = ToggleButton(text='Main', group='screen manager buttons')
             button.bind(on_press=self.go_to_main)
             toolbar.add_widget(button)
 
-            label = Label(text='Processes', color=[.8, .8, .8, .8], bold=True)
-            toolbar.add_widget(label)
+            button = ToggleButton(text='Processes',
+                                  color=[1.0, 1.0, 1.0, .9],
+                                  bold=True,
+                                  group='screen manager buttons')
+            button.state = 'down'
+            toolbar.add_widget(button)
 
             view.add_widget(toolbar)
 
@@ -108,8 +109,8 @@ class ShowingProcessesScreen(State):
             buttons_box = GridLayout(
                     rows=2, cols=2, size_hint=(1.0, None), height=90)
             buttons_box.add_widget(Label(
-                text='Click buttons to call go_to_history_state():',
-                size_hint=(1.0, None), height=30))
+                    text='Click buttons to call go_to_history_state():',
+                    size_hint=(1.0, None), height=30))
             buttons_box.add_widget(Label(text=''))
 
             buttons_box.add_widget(Label(text=''))

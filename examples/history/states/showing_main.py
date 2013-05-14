@@ -1,6 +1,8 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.scrollview import ScrollView
 
 from kivy_statecharts.system.state import State
 
@@ -17,13 +19,19 @@ class ShowingMainScreen(State):
 
             view = BoxLayout(orientation='vertical', spacing=10)
 
-            toolbar = BoxLayout(size_hint=(1.0, None), height=50)
+            toolbar = BoxLayout(size_hint=(1.0, None), height=30)
 
-            label = Label(text='Main', color=[.8, .8, .8, .8], bold=True)
-            toolbar.add_widget(label)
+            button = ToggleButton(text='Main',
+                                  color=[1.0, 1.0, 1.0, .9],
+                                  bold=True,
+                                  group='screen manager buttons')
+            button.state = 'down'
+            toolbar.add_widget(button)
 
-            button = Button(text='Processes')
+            button = ToggleButton(
+                    text='Processes', group='screen manager buttons')
             button.bind(on_press=self.go_to_processes)
+
             toolbar.add_widget(button)
 
             view.add_widget(toolbar)
@@ -70,7 +78,11 @@ This example illustrates [b]history states[/b]:
     process), or a more complex return path determined by analysis of partial
     results or conditions."""
 
-            view.add_widget(Label(text=history_state_description, markup=True))
+            scrollview = ScrollView()
+            scrollview.add_widget(
+                    Label(text=history_state_description, markup=True))
+
+            view.add_widget(scrollview)
 
             screen = Screen(name='Main')
             screen.add_widget(view)
