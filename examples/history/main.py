@@ -15,7 +15,7 @@ from states.showing_processes import ShowingProcessesScreen
 
 # NOTE: The only thing that happens on entry or exit of a state is the toggling
 #       of the button represening the state. Toggle buttons have their own
-#       state property, which is either 'normal' or 'down' (don't confust that
+#       state property, which is either 'normal' or 'down' (don't confuse that
 #       with the use of the term state for the statechart).
 
 class AppStatechart(StatechartManager):

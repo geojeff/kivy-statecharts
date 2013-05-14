@@ -1,11 +1,16 @@
+from kivy.uix.anchorlayout import AnchorLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.widget import Widget
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.treeview import TreeView
 from kivy.uix.treeview import TreeViewNode
 
+from kivy.properties import BooleanProperty
 from kivy.properties import DictProperty
+from kivy.properties import StringProperty
 
 from kivy_statecharts.system.state import State
 
@@ -20,18 +25,46 @@ class TreeViewLabel(Label, TreeViewNode):
     pass
 
 
+class StatesTreeView(TreeView):
+
+    allow_collapse = BooleanProperty(False)
+
+    def __init__(self, **kwargs):
+        super(StatesTreeView, self).__init__(**kwargs)
+
+    def toggle_node(self, node):
+        '''Toggle the state of the node (open/collapse).
+        '''
+        if not self.allow_collapse and node.is_open:
+            return
+        node.is_open = not node.is_open
+        if node.is_open:
+            if self.load_func and not node.is_loaded:
+                self._do_node_load(node)
+            self.dispatch('on_node_expand', node)
+        else:
+            if self.allow_collapse:
+                self.dispatch('on_node_collapse', node)
+
+        self._trigger_layout()
+
+
 class ShowingProcessesScreen(State):
 
     history_labels = DictProperty({})
+
+    history_traversal_method = StringProperty('shallow')
 
     def enter_state(self, context=None):
 
         if not 'Processes' in self.statechart.app.sm.screen_names:
 
             # Convenience references:
+
             self.app = self.statechart.app
 
-            view = BoxLayout(orientation='vertical', spacing=10)
+            view = GridLayout(cols=1, spacing=20)
+            #view = BoxLayout(orientation='vertical', spacing=10)
 
             toolbar = BoxLayout(size_hint=(1.0, None), height=50)
 
@@ -42,47 +75,75 @@ class ShowingProcessesScreen(State):
             label = Label(text='Processes', color=[.8, .8, .8, .8], bold=True)
             toolbar.add_widget(label)
 
-            # Process A toolbar
-
             view.add_widget(toolbar)
 
-            view.add_widget(Label(
-                text=('Process A Hierarchy -- Click buttons to call '
-                      'go_to_history_state(A,... calls:'),
+            # Radio buttons for shallow vs. deep history state traversal.
+
+            history_traversal_toolbar = BoxLayout(
+                    size_hint=(1.0, None), height=40)
+            history_traversal_toolbar.add_widget(
+                    Label(text="History Traversal Method:"))
+            shallow_button = ToggleButton(
+                    text='Shallow (non-recursive)',
+                    size_hint=(1.0, None),
+                    height=30,
+                    group='history state traversal')
+            deep_button = ToggleButton(
+                    text='Deep (recursive)',
+                    size_hint=(1.0, None),
+                    height=30,
+                    group='history state traversal')
+            history_traversal_toolbar.add_widget(shallow_button)
+            history_traversal_toolbar.add_widget(deep_button)
+
+            shallow_button.bind(on_press=self.update_history_traversal_method)
+            deep_button.bind(on_press=self.update_history_traversal_method)
+
+            shallow_button.state = 'down'
+
+            view.add_widget(history_traversal_toolbar)
+
+            # go_to_history_state buttons
+
+            buttons_box = GridLayout(
+                    rows=2, cols=2, size_hint=(1.0, None), height=90)
+            buttons_box.add_widget(Label(
+                text='Click buttons to call go_to_history_state():',
                 size_hint=(1.0, None), height=30))
+            buttons_box.add_widget(Label(text=''))
 
-            history_toolbar = BoxLayout(size_hint=(1.0, None), height=50)
-
-            for state_name in ['A', 'C', 'G', 'H', 'D', 'I', 'J']:
-                button = Button(text=state_name)
+            buttons_box.add_widget(Label(text=''))
+            go_to_buttons_grid = GridLayout(
+                    cols=7, size_hint=(1.0, None), height=60, spacing=10)
+            for state_name in ['A', 'C', 'G', 'H', 'D', 'I', 'J',
+                               'B', 'E', 'K', 'L', 'F', 'M', 'N']:
+                button = Button(text=state_name,
+                                size_hint=(None, None),
+                                size=(35, 30))
                 button.bind(on_press=self.history_button_clicked)
-                history_toolbar.add_widget(button)
+                go_to_buttons_grid.add_widget(button)
 
-            view.add_widget(history_toolbar)
+            buttons_box.add_widget(go_to_buttons_grid)
 
-            # Process B toolbar
-
-            view.add_widget(Label(
-                text=('Process B Hierarchy -- Click buttons to '
-                      'call go_to_history_state(B,... calls:'),
-                size_hint=(1.0, None), height=30))
-
-            history_toolbar = BoxLayout(size_hint=(1.0, None), height=50)
-
-            for state_name in ['B', 'E', 'K', 'L', 'F', 'M', 'N']:
-                button = Button(text=state_name)
-                button.bind(on_press=self.history_button_clicked)
-                history_toolbar.add_widget(button)
-
-            view.add_widget(history_toolbar)
+            view.add_widget(buttons_box)
 
             # Lower panel for the state tree, history labels, and help text.
 
-            lower_panel = BoxLayout()
+            lower_panel = GridLayout(cols=3,
+                                     padding=[20, 0, 20, 0],
+                                     size_hint=(1.0, None),
+                                     height=480,
+                                     spacing=20,
+                                     minimum=200)
 
             # State tree
 
-            tree_view = TreeView(
+            tree_view_panel = GridLayout(cols=1)
+            tree_view_panel.add_widget(Label(text='Statechart',
+                                             size_hint=(None, None),
+                                             width=30,
+                                             height=30))
+            tree_view = StatesTreeView(
                     root_options=dict(text='Steps in Processes A and B'),
                     hide_root=True,
                     indent_level=40)
@@ -93,12 +154,16 @@ class ShowingProcessesScreen(State):
             self.populate_tree_view(
                     tree_view, None, self.statechart.get_state('B'))
 
-            lower_panel.add_widget(tree_view)
+            tree_view_panel.add_widget(tree_view)
+            lower_panel.add_widget(tree_view_panel)
 
             # History labels (for each state in tree)
 
-            history_labels_list = BoxLayout(orientation='vertical',
-                    pos_hint={'x': 1.0, 'y': .2})
+            history_labels_list = GridLayout(cols=1)
+            history_labels_list.add_widget(Label(text='History States',
+                                                 size_hint=(None, None),
+                                                 width=30,
+                                                 height=30))
             self.populate_history_labels_list(
                     history_labels_list, self.statechart.get_state('A'))
             self.populate_history_labels_list(
@@ -107,25 +172,27 @@ class ShowingProcessesScreen(State):
 
             # Help text
 
-            lower_panel.add_widget(Label(text="""The state hierarchies for
-Processes A and B are shown
-at left. Along the side, in
-parentheses, are the history
-states of each state. Click
-on a state directly to
-simulate performing steps in
-the process.
+            help_text_panel = GridLayout(cols=1)
+            help_text_panel.add_widget(Label(text="Instructions"))
 
-Click the history buttons
-in the toolbars above to go
-to the history state of a
-state. If a state doesn't
-yet have a history state,
-it will simply be visited.
+            help_text = GridLayout(
+                    cols=1, size_hint=(1.0, None), height=450)
 
-View the terminal console to
-follow the action, and see
-current state."""))
+            help_text.add_widget(self.make_justified_label(
+                ("The state hierarchies for Processes A and B are shown at "
+                 "left. Along the side, in parentheses, are the history "
+                 "states of each state. Click on a state directly to "
+                 "simulate performing steps in the process."), 'justify'))
+            help_text.add_widget(self.make_justified_label(
+                ("Click the history buttons in the toolbars above to go to "
+                 "the history state of a state. If a state doesn't yet have "
+                 "a history state, it will simply be visited."), 'justify'))
+            help_text.add_widget(self.make_justified_label(
+                ("View the terminal console to follow the action, and see "
+                 "current state."), 'justify'))
+            help_text_panel.add_widget(help_text)
+
+            lower_panel.add_widget(help_text_panel)
 
             view.add_widget(lower_panel)
 
@@ -141,17 +208,25 @@ current state."""))
     def exit_state(self, context=None):
         pass
 
+    def make_justified_label(self, text, justification):
+        help_label = Label(text=text, halign=justification)
+        # Bind size of rendered label to text_size, for justification.
+        help_label.bind(size=help_label.setter('text_size'))
+        return help_label
+
     def populate_tree_view(self, tree_view, parent, state):
 
+        state_name = state.__class__.__name__
+
         if parent is None:
-            button = TreeViewToggleButton(text=state.__class__.__name__,
+            button = TreeViewToggleButton(text=state_name,
                                     size_hint=(None, None),
                                     width=30,
                                     height=30,
                                     is_open=True)
             tree_node = tree_view.add_node(button)
         else:
-            button = TreeViewToggleButton(text=state.__class__.__name__,
+            button = TreeViewToggleButton(text=state_name,
                                     size_hint=(None, None),
                                     width=30,
                                     height=30,
@@ -159,7 +234,7 @@ current state."""))
             tree_node = tree_view.add_node(button, parent)
 
         button.bind(on_press=self.state_button_clicked)
-        self.statechart.app.state_toggle_buttons[state.__class__.__name__] = button
+        self.statechart.app.state_toggle_buttons[state_name] = button
 
         for substate in state.substates:
             self.populate_tree_view(tree_view, tree_node, substate)
@@ -193,7 +268,19 @@ current state."""))
     def history_button_clicked(self, *args):
         target_state = args[0].text
 
+        recursive = \
+                False if self.history_traversal_method == 'shallow' else True
+
         self.statechart.go_to_history_state(
                 target_state,
-                from_current_state=self.statechart.current_states[-1],
-                recursive=False)
+                # Comments say that from_current_state is needed (probably)
+                # when there are concurrent states. Otherwise, not.
+                #from_current_state=self.statechart.current_states[-1],
+                from_current_state=None,
+                recursive=recursive)
+
+    def update_history_traversal_method(self, *args):
+        if args[0].text.startswith('Shallow'):
+            self.history_traversal_method = 'shallow'
+        else:
+            self.history_traversal_method = 'deep'
