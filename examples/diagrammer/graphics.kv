@@ -1,0 +1,64 @@
+<LabeledImageShape>:
+
+    id: lis
+    label: label
+    shape: shape
+    pos: self.pos
+    
+    FloatLayout:
+    
+        Image:
+            id: shape
+            source: None if self.source=='' else self.source
+            pos: lis.pos
+        Label:
+            id: label
+            pos: lis.pos[0] + lis.label_offset[0], lis.pos[1] + lis.label_offset[1]
+            size_hint_y: None
+            height: self.texture_size[1]
+        Scatter:
+            do_scale: False
+            do_translation: False
+            do_rotation: False
+            auto_bring_to_front: False
+            size_hint: None, None
+            size: lis.height, lis.width
+            pos: lis.pos
+
+<LabeledVectorShape>:
+
+    id: lvs
+    label: label
+    points: self.points
+    pos: self.pos
+
+    FloatLayout:
+        id: layout
+
+        canvas:
+            Color: 
+                rgba: lvs.fill_color
+            Triangle:
+                points: lvs.points
+            Color: 
+                rgba: lvs.stroke_color
+            Line:
+                id: perimeter
+                points: lvs.points
+                width: lvs.stroke_width
+                joint: 'round'
+                close: True
+        Label:
+            id: label
+            pos: lvs.pos[0] + lvs.label_offset[0], lvs.pos[1] + lvs.label_offset[1]
+            size_hint_y: None
+            height: self.texture_size[1]
+        Scatter:
+            do_scale: False
+            do_translation: False
+            do_rotation: False
+            auto_bring_to_front: False
+            size_hint: None, None
+            size: lvs.height, lvs.width
+            pos: lvs.pos
+
