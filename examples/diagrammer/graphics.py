@@ -15,11 +15,37 @@ from kivy.lang import Builder
 Builder.load_file(str(os.path.join(os.path.dirname(__file__), 'graphics.kv')))
 
 def cartesian_distance(x1, y1, x2, y2):
-    '''Cartesian distance formula'''
+    '''Cartesian distance formula
+    From ftp://lnnr.lummi-nsn.gov/GIS_Scripts/CreatePointsAlongALine/DivideLine.py
+
+    which has a print line with:
+
+      "A Two-Bit Algorithms product
+
+      Copyright 2011 Gerry Gabrisch
+
+      gerry@gabrisch.us"
+
+      (Code link: ftp://lnnr.lummi-nsn.gov/GIS_Scripts/)
+    '''
+
     return float(math.pow(((math.pow((x2-x1),2)) + (math.pow((y2 - y1),2))),.5))
 
 def cartesian_to_polar(xy1, xy2):
-    '''Given coordinate pairs as two lists or tuples, return the polar
+    '''
+    From ftp://lnnr.lummi-nsn.gov/GIS_Scripts/CreatePointsAlongALine/DivideLine.py
+
+    which has a print line with:
+
+      "A Two-Bit Algorithms product
+
+      Copyright 2011 Gerry Gabrisch
+
+      gerry@gabrisch.us"
+
+    (Code link: ftp://lnnr.lummi-nsn.gov/GIS_Scripts/)
+
+    Given coordinate pairs as two lists or tuples, return the polar
     coordinates with theta in radians. Values are in true radians along the
     unit-circle, for example, 3.14 and not -0 like a regular python
     return.'''
@@ -50,7 +76,20 @@ def cartesian_to_polar(xy1, xy2):
         print"Error in cartesian_to_polar()"
 
 def polar_to_cartesian(polarcoords):
-    '''A tuple, or list, of polar values(distance, theta in radians)are
+    '''
+    From ftp://lnnr.lummi-nsn.gov/GIS_Scripts/CreatePointsAlongALine/DivideLine.py
+
+    which has a print line with:
+
+      "A Two-Bit Algorithms product
+
+      Copyright 2011 Gerry Gabrisch
+
+      gerry@gabrisch.us"
+
+    (Code link: ftp://lnnr.lummi-nsn.gov/GIS_Scripts/)
+
+    A tuple, or list, of polar values(distance, theta in radians)are
     converted to cartesian coords'''
     r = polarcoords[0]
     theta = polarcoords[1]
@@ -329,6 +368,7 @@ class LabeledVectorShape(LabeledShape):
 
         # A Two-Bit Algorithms product\n\nCopyright\ 2011 Gerry Gabrisch\n\ngerry@gabrisch.us"
         # http://forums.arcgis.com/threads/9118-Placing-points-automatically-along-line-based-on-length-attribute
+        # (Code link: ftp://lnnr.lummi-nsn.gov/GIS_Scripts/)
 
         step_distance = float(step_distance)
 
