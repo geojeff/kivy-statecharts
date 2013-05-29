@@ -67,8 +67,8 @@ class DiagrammerApp(App):
         self.statechart = AppStatechart(app=self)
         self.statechart.init_statechart()
 	
-	def on_stop(self):
-		print '\nThanks using DiagrammerApp\n'
+    def on_stop(self):
+        print '\nThanks using DiagrammerApp\n'
 
 
 if __name__ in ('__main__'):
