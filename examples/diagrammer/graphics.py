@@ -142,16 +142,21 @@ class Shape(Widget):
 class ConnectedShape(Shape):
 
     connection_points = ListProperty([])
+    connections = ListProperty([])
 
     def __init__(self, **kwargs):
 
         super(ConnectedShape, self).__init__(**kwargs)
 
-    def generate_connection_points(self, step_distance):
+    def generate_connection_points(self, step_distance=10):
         pass
 
     def find_connection_point(self, shape):
         pass
+
+    def move_connections(self, dx, dy):
+        for connection in self.connections:
+            connection.move_with_shape(self, dx, dy)
 
 
 class LabeledShape(ConnectedShape):
@@ -355,7 +360,7 @@ class LabeledVectorShape(LabeledShape):
 
         return (max_x - min_x) / 2., (max_y - min_y) / 2.
 
-    def generate_connection_points(self, step_distance):
+    def generate_connection_points(self, step_distance=10):
         poly = self.points
 
         n = len(poly)
@@ -424,11 +429,13 @@ class LabeledVectorShape(LabeledShape):
         minimum, other_closest_line_segment = shape.closest_line_segment(self.pos[0], self.pos[1])
         other_first_point = (other_closest_line_segment[0], other_closest_line_segment[1])
         print 'sacp', shape.segments_and_connection_points
-        other_closest_connection_points = shape.segments_and_connection_points[other_first_point]
+        if other_first_point in shape.segments_and_connection_points:
+            other_closest_connection_points = shape.segments_and_connection_points[other_first_point]
 
         minimum, this_closest_line_segment = self.closest_line_segment(other_first_point[0], other_first_point[1])
         this_first_point = (this_closest_line_segment[0], this_closest_line_segment[1])
-        this_closest_connection_points = self.segments_and_connection_points[this_first_point]
+        if this_first_point in self.segments_and_connection_points:
+            this_closest_connection_points = self.segments_and_connection_points[this_first_point]
 
         connection_distances_and_connection_points = {}
         for other_point in shape.connection_points[other_closest_connection_points[0]:other_closest_connection_points[1]]:
