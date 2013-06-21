@@ -2,6 +2,8 @@ import os
 import math
 
 from kivy.uix.widget import Widget
+from kivy.uix.button import Button
+from kivy.uix.listview import SelectableView
 from kivy.properties import DictProperty
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
@@ -13,6 +15,8 @@ from kivy.graphics import Color, Ellipse, Line, Rectangle
 from kivy.lang import Builder
 
 Builder.load_file(str(os.path.join(os.path.dirname(__file__), 'graphics.kv')))
+
+# Abbreviation used in this file: cp == connection point
 
 def cartesian_distance(x1, y1, x2, y2):
     '''Cartesian distance formula
@@ -116,7 +120,7 @@ class ConnectionPoint(Widget):
         shape.connect(self)
 
 
-class Shape(Widget):
+class Shape(SelectableView, Widget):
 
     shape = ObjectProperty()
 
@@ -129,14 +133,36 @@ class Shape(Widget):
     width = NumericProperty(10.0)
     height = NumericProperty(10.0)
 
+    edit_button = ObjectProperty(None)
+
     def __init__(self, **kwargs):
 
         super(Shape, self).__init__(**kwargs)
 
         self.size_hint = (None, None)
 
+        self.bind(is_selected=self.selection_changed)
+
+    def selection_changed(self, *args):
+
+        if self.is_selected:
+
+            c = self.center()
+
+            self.edit_button = Button(
+                    pos=(c[0]+5, c[1]-5),
+                    size=(10, 10),
+                    text='E')
+
+            self.add_widget(self.edit_button)
+
+        else:
+
+            self.remove_widget(self.edit_button)
+
     def center(self):
         pass
+        #return self.x + (self.width / 2.0), self.y + (self.height / 2.0)
 
 
 class ConnectedShape(Shape):
@@ -151,12 +177,12 @@ class ConnectedShape(Shape):
     def generate_connection_points(self, step_distance=10):
         pass
 
-    def find_connection_point(self, shape):
+    def find_connection(self, shape):
         pass
 
-    def move_connections(self, dx, dy):
+    def adjust_connections(self, dx, dy):
         for connection in self.connections:
-            connection.move_with_shape(self, dx, dy)
+            connection.adjust(self, dx, dy)
 
 
 class LabeledShape(ConnectedShape):
@@ -241,7 +267,7 @@ class LabeledShape(ConnectedShape):
 class LabeledVectorShape(LabeledShape):
     points = ListProperty([])
     shape = ListProperty([])
-    segments_and_connection_points = DictProperty({})
+    cp_slices_for_edges = ListProperty([])
 
     def __init__(self, **kwargs):
         super(LabeledVectorShape, self).__init__(**kwargs)
@@ -301,7 +327,7 @@ class LabeledVectorShape(LabeledShape):
 
         return False
 
-    def closest_line_segment(self, x, y):
+    def closest_edge(self, x, y):
         x, y = self.to_local(x, y)
         poly = self.points
 
@@ -309,7 +335,9 @@ class LabeledVectorShape(LabeledShape):
         p1x = poly[0]
         p1y = poly[1]
 
-        minimum_and_line = [100000, (0, 0)]
+        # edge here is the index into poly.
+
+        minimum_and_edge = [100000, 0]
 
         for i in xrange(2, n + 2, 2):
             p2x = poly[i % n]
@@ -317,11 +345,11 @@ class LabeledVectorShape(LabeledShape):
 
             dist = self.dist(p1x, p1y, p2x, p2y, x, y)
             print '        possible distance', dist, p1x, p1y, '-->', p2x, p2y
-            if dist < minimum_and_line[0]:
-                minimum_and_line = [dist, (p1x, p1y, p2x, p2y)]
+            if dist < minimum_and_edge[0]:
+                minimum_and_edge = [dist, i]
             p1x, p1y = p2x, p2y
 
-        return minimum_and_line
+        return minimum_and_edge
 
     def point_inside_polygon(self, x, y, poly):
         '''Taken from http://www.ariel.com.au/a/python-point-int-poly.html
@@ -353,12 +381,15 @@ class LabeledVectorShape(LabeledShape):
         return self.point_inside_polygon(x, y, self.points)
 
     def center(self):
-        min_x = min([pt.x for pt in self.points])
-        max_x = max([pt.x for pt in self.points])
-        min_y = min([pt.y for pt in self.points])
-        max_y = max([pt.y for pt in self.points])
+        x_points = self.points[::2]
+        y_points = self.points[1::2]
 
-        return (max_x - min_x) / 2., (max_y - min_y) / 2.
+        min_x = min(x_points)
+        max_x = max(x_points)
+        min_y = min(y_points)
+        max_y = max(y_points)
+
+        return self.pos[0] + ((110./100.) * ((max_x - min_x) / 2.)), self.pos[1] + (110./100.) * ((max_y - min_y) / 2.)
 
     def generate_connection_points(self, step_distance=10):
         poly = self.points
@@ -390,17 +421,26 @@ class LabeledVectorShape(LabeledShape):
 
             if distance_along_line == step_distance:
 
+                # If the line segment is short, matching exactly the
+                # step_distance, we only need to store the start and end of the
+                # line segment as a single point (there is only one connection
+                # point -- the end of the line segment, which we add first).
+
                 self.connection_points.append([x2,y2])
-                self.segments_and_connection_points[(x1, y1)] = (len(self.connection_points) - 1, len(self.connection_points) - 1)
+                self.cp_slices_for_edges.append((len(self.connection_points) - 1, len(self.connection_points) - 1))
                 distance_remaining.append(0)
 
             elif distance_along_line > step_distance:
+
+                # If the line segment is longer than step_distance, there are
+                # connection points along the line segment. We create these
+                # points and set the start and end indices.
 
                 number_of_divisions = int(distance_along_line/step_distance)
                 distance_remaining.append((distance_along_line - (number_of_divisions * step_distance)))
                 polarcoord = cartesian_to_polar((x1, y1), (x2, y2))
 
-                connection_points_start_index = len(self.connection_points)
+                cps_start_index = len(self.connection_points)
 
                 counter2 = 1
                 while counter2 <= number_of_divisions:
@@ -411,11 +451,15 @@ class LabeledVectorShape(LabeledShape):
                     self.connection_points.append([x1 + adjustment[0], y1 + adjustment[1]])
                     counter2 += 1
 
-                connection_points_end_index = len(self.connection_points) - 1
+                cps_end_index = len(self.connection_points) - 1
 
-                self.segments_and_connection_points[(x1, y1)] = (connection_points_start_index, connection_points_end_index)
+                self.cp_slices_for_edges.append((cps_start_index, cps_end_index))
 
             elif distance_along_line < step_distance:
+
+                # If the distance along the line segment is shorter than the
+                # step_distance, store the short remainder distance for use in
+                # the next line segment's calculations.
 
                 if len(distance_remaining) < 1:
                     distance_remaining.append(distance_along_line)
@@ -424,27 +468,25 @@ class LabeledVectorShape(LabeledShape):
 
             x1, y1 = x2, y2
 
-    def find_connection(self, shape):
+    def closest_cp_to_center_line(self, shape2):
+        '''Return the index of the closest cp to the center line between self
+        and shape2.
+        '''
 
-        minimum, other_closest_line_segment = shape.closest_line_segment(self.pos[0], self.pos[1])
-        other_first_point = (other_closest_line_segment[0], other_closest_line_segment[1])
-        print 'sacp', shape.segments_and_connection_points
-        if other_first_point in shape.segments_and_connection_points:
-            other_closest_connection_points = shape.segments_and_connection_points[other_first_point]
+        center1 = self.center()
+        center2 = shape2.center()
 
-        minimum, this_closest_line_segment = self.closest_line_segment(other_first_point[0], other_first_point[1])
-        this_first_point = (this_closest_line_segment[0], this_closest_line_segment[1])
-        if this_first_point in self.segments_and_connection_points:
-            this_closest_connection_points = self.segments_and_connection_points[this_first_point]
+        min_distance = 100000.
 
-        connection_distances_and_connection_points = {}
-        for other_point in shape.connection_points[other_closest_connection_points[0]:other_closest_connection_points[1]]:
-            for this_point in self.connection_points[this_closest_connection_points[0]:this_closest_connection_points[1]]:
-                distance = cartesian_distance(other_point[0], other_point[1], this_point[0], this_point[1])
-                connection_distances_and_connection_points[distance] = (other_point, this_point)
+        for i, cp in enumerate(self.connection_points):
 
-        min_distance = min(connection_distances_and_connection_points.keys())
-        return connection_distances_and_connection_points[min_distance]
+            dist = self.dist(center1[0], center1[1], center2[0], center2[1], cp[0], cp[1])
+
+            if dist < min_distance:
+                min_distance = dist
+                closest_cp = i
+
+        return closest_cp
 
         #for point in self.connection_points:
         #    if (point.pos[0] < shape.label.pos[0] and
@@ -452,6 +494,14 @@ class LabeledVectorShape(LabeledShape):
         #        point.pos[1] < shape.label.pos[1] and
         #        point.pos[1] > shape.label.pos[1] + shape.label.texture.size[1]):
         #        print point
+
+    def draw_connection_points(self):
+        for cp in self.connection_points:
+            Line(circle=(cp[0], cp[1], 5))
+
+    def draw_connection_point(self, index):
+        cp = self.connection_points[index]
+        Line(circle=(cp[0], cp[1], 5))
 
 
 class TriangleLVS(LabeledVectorShape):

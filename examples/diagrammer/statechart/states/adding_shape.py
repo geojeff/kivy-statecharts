@@ -87,7 +87,7 @@ class AddingShape(State):
 
         touch = self.statechart.app.touch
 
-        with self.statechart.app.drawing_area.canvas.after:
+        with self.statechart.app.drawing_area.canvas.before:
             Color(1, 1, 0)
             d = 100.
             #RectangleLIS(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d),
@@ -106,26 +106,13 @@ class AddingShape(State):
 
             shape.generate_connection_points(10)
 
-#            for cp in shape.connection_points:
-#                Line(circle=(cp[0], cp[1], 5))
-
             self.statechart.app.shapes.append(shape)
-
-#            line = Line(points=touch.pos, width=4)
-#
-#            if len(self.statechart.app.points):
-#                line.points += self.statechart.app.points[-1]
 
             self.statechart.app.points.append(touch.pos)
 
-            self.statechart.app.selected_shape = shape
+            self.statechart.app.current_shape = shape
+
+            self.go_to_state('ShowingDrawingArea')
 
     def exit_state(self, context=None):
         pass
-
-    @State.event_handler(['drawing_area_touch_up', ])
-    def handle_touch(self, event, touch, context):
-
-        # event == 'drawing_area_touch_up':
-
-        self.go_to_state('ShowingDrawingArea')

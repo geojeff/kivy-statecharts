@@ -51,8 +51,8 @@ class DiagrammerApp(App):
     shapes = ListProperty()
     connections = ListProperty()
 
-    selected_shape = ObjectProperty(None, allownone=True)
-    touch = ObjectProperty(None, allownone=True)
+    current_shape = ObjectProperty(None, allownone=True)
+    current_connection = ObjectProperty(None, allownone=True)
 
     def build(self):
 

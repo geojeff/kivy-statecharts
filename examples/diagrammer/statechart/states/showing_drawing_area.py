@@ -14,7 +14,7 @@ from kivy.uix.image import Image
 from waiting_for_touches import WaitingForTouches
 from adding_shape import AddingShape
 from moving_shape import MovingShape
-from connecting_shapes import ConnectingShapes
+from adding_connection import AddingConnection
 
 
 class DrawingArea(Image):
@@ -25,14 +25,15 @@ class DrawingArea(Image):
 
         if self.collide_point(*touch.pos):
             self.statechart.send_event('drawing_area_touch_down', touch)
-        else:
-            return super(DrawingArea, self).on_touch_down(touch)
+
+        return super(DrawingArea, self).on_touch_down(touch)
 
     def on_touch_move(self, touch):
 
         if self.collide_point(*touch.pos):
             self.statechart.send_event('drawing_area_touch_move', touch)
-        #return super(DrawingArea, self).on_touch_move(touch)
+
+        return super(DrawingArea, self).on_touch_move(touch)
 
     def on_touch_up(self, touch):
 
@@ -48,7 +49,7 @@ class ShowingDrawingArea(State):
         kwargs['WaitingForTouches'] = WaitingForTouches
         kwargs['AddingShape'] = AddingShape
         kwargs['MovingShape'] = MovingShape
-        kwargs['ConnectingShapes'] = ConnectingShapes
+        kwargs['AddingConnection'] = AddingConnection
         super(ShowingDrawingArea, self).__init__(**kwargs)
 
     def enter_state(self, context=None):

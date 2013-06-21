@@ -20,10 +20,13 @@ class MovingShape(State):
 
         if event == 'drawing_area_touch_move':
 
-            self.statechart.app.selected_shape.x += touch.dx
-            self.statechart.app.selected_shape.y += touch.dy
-            self.statechart.app.selected_shape.recalculate_points()
-            self.statechart.app.selected_shape.move_connections(touch.dx, touch.dy)
+            self.statechart.app.current_shape.x += touch.dx
+            self.statechart.app.current_shape.y += touch.dy
+            self.statechart.app.current_shape.recalculate_points()
+            for cp in self.statechart.app.current_shape.connection_points:
+                cp[0] += touch.dx
+                cp[1] += touch.dy
+            self.statechart.app.current_shape.adjust_connections(touch.dx, touch.dy)
 
         elif event == 'drawing_area_touch_up':
 

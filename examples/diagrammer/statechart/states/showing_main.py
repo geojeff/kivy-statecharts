@@ -40,13 +40,13 @@ class ShowingMainScreen(State):
             state_diagram_description = """
 This example app helps with [b]drawing a statechart[/b]:
 
-    A statechart diagram consists of shapes linked by connectors, showing the
+    A statechart diagram consists of shapes linked by connections, showing the
     flow of action in an app.
 
         Individual states have primary shapes, such as triangles and
         rectangles.
 
-        Connectors includ lines...
+        Connections include lines...
 
     State action methods are normal Python methods, with a signature for acting
     as proper statechart actions, servicing the events sent to the statechart.
