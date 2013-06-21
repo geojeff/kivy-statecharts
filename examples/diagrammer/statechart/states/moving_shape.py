@@ -15,7 +15,8 @@ class MovingShape(State):
     def exit_state(self, context=None):
         pass
 
-    @State.event_handler(['drawing_area_touch_move', 'drawing_area_touch_up', ])
+    @State.event_handler(['drawing_area_touch_move',
+                          'drawing_area_touch_up', ])
     def handle_touch(self, event, touch, context):
 
         if event == 'drawing_area_touch_move':
@@ -26,7 +27,8 @@ class MovingShape(State):
             for cp in self.statechart.app.current_shape.connection_points:
                 cp[0] += touch.dx
                 cp[1] += touch.dy
-            self.statechart.app.current_shape.adjust_connections(touch.dx, touch.dy)
+            self.statechart.app.current_shape.adjust_connections(touch.dx,
+                                                                 touch.dy)
 
         elif event == 'drawing_area_touch_up':
 

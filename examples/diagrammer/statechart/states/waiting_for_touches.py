@@ -9,7 +9,9 @@ class WaitingForTouches(State):
     def __init__(self, **kwargs):
         super(WaitingForTouches, self).__init__(**kwargs)
 
-    @State.event_handler(['drawing_area_touch_down', 'drawing_area_touch_move', 'drawing_area_touch_up'])
+    @State.event_handler(['drawing_area_touch_down',
+                          'drawing_area_touch_move',
+                          'drawing_area_touch_up'])
     def handle_touch(self, event, touch, context):
 
         if event == 'drawing_area_touch_down':
@@ -18,7 +20,6 @@ class WaitingForTouches(State):
 
         elif event == 'drawing_area_touch_move':
 
-            print 'touch', touch.pos, 'shapes = ', len(self.statechart.app.shapes)
             for shape in reversed(self.statechart.app.shapes):
                 if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
                     print 'move on polygon edge', shape.canvas
@@ -33,7 +34,6 @@ class WaitingForTouches(State):
                     self.statechart.app.current_shape = shape
                     dispatched = True
                     self.statechart.go_to_state('AddingConnection')
-
 
         elif event == 'drawing_area_touch_up':
 

@@ -1,6 +1,6 @@
 from kivy_statecharts.system.state import State
 
-from kivy.graphics import Color, Line
+from kivy.graphics import Color
 
 from graphics import RectangleLIS
 from graphics import TriangleLIS

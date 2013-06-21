@@ -14,8 +14,8 @@ class ConnectionLVS(LabeledVectorShape):
     shape = ListProperty([.9, .9])
     shape1 = ObjectProperty(None)
     shape2 = ObjectProperty(None)
-    shape1_connection_point_index = NumericProperty()
-    shape2_connection_point_index = NumericProperty()
+    shape1_cp_index = NumericProperty()
+    shape2_cp_index = NumericProperty()
 
     def __init__(self, **kwargs):
 
@@ -26,17 +26,21 @@ class ConnectionLVS(LabeledVectorShape):
         else:
             self.label.text = 'unknown'
 
-        self.points.append(self.shape1.connection_points[self.shape1_connection_point_index][0])
-        self.points.append(self.shape1.connection_points[self.shape1_connection_point_index][1])
-        self.points.append(self.shape2.connection_points[self.shape2_connection_point_index][0])
-        self.points.append(self.shape2.connection_points[self.shape2_connection_point_index][1])
+        self.points.append(
+                self.shape1.connection_points[self.shape1_cp_index][0])
+        self.points.append(
+                self.shape1.connection_points[self.shape1_cp_index][1])
+        self.points.append(
+                self.shape2.connection_points[self.shape2_cp_index][0])
+        self.points.append(
+                self.shape2.connection_points[self.shape2_cp_index][1])
 
     def on_touch_down(self, touch):
         print 'connection touch', touch.pos
         return super(LabeledVectorShape, self).on_touch_down(touch)
 
     def adjust(self, shape, dx, dy):
-        connection_point1 = self.shape1.connection_points[self.shape1_connection_point_index]
+        connection_point1 = self.shape1.connection_points[self.shape1_cp_index]
         self.pos[0] = connection_point1[0]
         self.pos[1] = connection_point1[1]
 
@@ -47,7 +51,7 @@ class ConnectionLVS(LabeledVectorShape):
         self.points[0] = self.pos[0]
         self.points[1] = self.pos[1]
 
-        connection_point2 = self.shape2.connection_points[self.shape2_connection_point_index]
+        connection_point2 = self.shape2.connection_points[self.shape2_cp_index]
 
         self.width = connection_point2[0] - connection_point1[0]
         self.height = connection_point2[1] - connection_point1[1]
@@ -65,21 +69,23 @@ class ConnectionLVS(LabeledVectorShape):
         self.points[1] = self.pos[1] + int(float(self.size[1]) * self.shape[1])
 
     def connection_point1(self):
-        return self.shape1.connection_points[self.shape1_connection_point_index]
+        return self.shape1.connection_points[self.shape1_cp_index]
 
     def connection_point2(self):
-        return self.shape2.connection_points[self.shape2_connection_point_index]
+        return self.shape2.connection_points[self.shape2_cp_index]
 
     def bump_connection_point1(self):
 
-        old_connection_point = self.shape1.connection_points[self.shape1_connection_point_index]
+        old_connection_point = \
+                self.shape1.connection_points[self.shape1_cp_index]
 
-        if self.shape1_connection_point_index < len(self.shape1.connection_points) - 1:
-            self.shape1_connection_point_index += 1
+        if self.shape1_cp_index < len(self.shape1.connection_points) - 1:
+            self.shape1_cp_index += 1
         else:
-            self.shape1_connection_point_index = 0
+            self.shape1_cp_index = 0
 
-        new_connection_point = self.shape1.connection_points[self.shape1_connection_point_index]
+        new_connection_point = \
+                self.shape1.connection_points[self.shape1_cp_index]
 
         dx = new_connection_point[0] - old_connection_point[0]
         dy = new_connection_point[1] - old_connection_point[1]
@@ -88,14 +94,16 @@ class ConnectionLVS(LabeledVectorShape):
 
     def bump_connection_point2(self):
 
-        old_connection_point = self.shape2.connection_points[self.shape2_connection_point_index]
+        old_connection_point = \
+                self.shape2.connection_points[self.shape2_cp_index]
 
-        if self.shape2_connection_point_index < len(self.shape2.connection_points) - 1:
-            self.shape2_connection_point_index += 1
+        if self.shape2_cp_index < len(self.shape2.connection_points) - 1:
+            self.shape2_cp_index += 1
         else:
-            self.shape2_connection_point_index = 0
+            self.shape2_cp_index = 0
 
-        new_connection_point = self.shape2.connection_points[self.shape2_connection_point_index]
+        new_connection_point = \
+                self.shape2.connection_points[self.shape2_cp_index]
 
         dx = new_connection_point[0] - old_connection_point[0]
         dy = new_connection_point[1] - old_connection_point[1]
@@ -127,7 +135,8 @@ class AddingConnection(State):
     def exit_state(self, context=None):
         pass
 
-    @State.event_handler(['drawing_area_touch_up', 'drawing_area_touch_move', ])
+    @State.event_handler(['drawing_area_touch_up',
+                          'drawing_area_touch_move', ])
     def handle_touch(self, event, touch, context):
 
         if event == 'drawing_area_touch_up':
@@ -153,8 +162,8 @@ class AddingConnection(State):
                     break
 
             if target_shape_for_connection:
-                connection_point = self.connect(self.statechart.app.current_shape,
-                                                target_shape_for_connection)
+                self.connect(self.statechart.app.current_shape,
+                             target_shape_for_connection)
 
                 self.statechart.app.current_shape = target_shape_for_connection
 
@@ -195,8 +204,6 @@ class AddingConnection(State):
         point1 = shape1.connection_points[point1_index]
         point2 = shape2.connection_points[point2_index]
 
-        points = [point1[0], point1[1], point2[0], point2[1]]
-
         width = point2[0] - point1[0]
         height = point2[1] - point2[1]
 
@@ -205,8 +212,8 @@ class AddingConnection(State):
             connection = ConnectionLVS(
                     shape1=shape1,
                     shape2=shape2,
-                    shape1_connection_point_index = point1_index,
-                    shape2_connection_point_index = point2_index,
+                    shape1_cp_index=point1_index,
+                    shape2_cp_index=point2_index,
                     pos=point1,
                     size=(width, height),
                     x=point1[0],

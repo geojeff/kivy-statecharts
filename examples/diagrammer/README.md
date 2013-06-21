@@ -1,6 +1,14 @@
 Diagrammer
 ==========
 
+NOTE: git-flow is being used for development, so work progresses on the
+      develop branch, not on master. Releases on master will be started soon,
+      but you will need to pay attention to master vs. develop branches. To
+      play along or get involved, fork and clone your version, switch to the
+      develop branch, and run 'python main.py' in the diagrammer directory.
+      Communicate on #irc, and for development, learn about git-flow. We can
+      collaborate on feature branches for larger needs.
+
 Diagrammer is a Kivy app to draw statecharts, and perhaps other types of
 diagrams later. Development started Summer 2013 and may progress with
 substantial rapid changes, because the coding styles and conventions for both
@@ -21,10 +29,11 @@ window is actually the drawing area. You can do this:
 4) Touch and drag in the center of one rectangle to the center of another.
 4a) On touch up, bubbles will appear on either end of the connection. 
 4b) In a given bubble, touch and drag within the Drag button to move the
-connection point for the end (dragging out of the drag button will terminate
-the move, presently).
+    connection point for the end (dragging out of the drag button will
+    terminate the move, presently -- needs event handling in state for
+    drawing_area).
 4c) Repeat drag ops on the Drag button, for now to drag the given connection
-point further, clockwise (too jerky and skips for now).
+    point further, clockwise (too jerky and skips for now).
 4d) Once the connection point is ok, touch Accept.
 5) You can add more triangles and connections.
 6) You can move triangles with connections, and the connections will adjust.

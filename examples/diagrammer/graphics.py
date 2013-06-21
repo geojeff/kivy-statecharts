@@ -10,7 +10,7 @@ from kivy.properties import NumericProperty
 from kivy.properties import OptionProperty
 from kivy.properties import ObjectProperty
 
-from kivy.graphics import Color, Ellipse, Line, Rectangle
+from kivy.graphics import Line
 
 from kivy.lang import Builder
 
@@ -18,9 +18,12 @@ Builder.load_file(str(os.path.join(os.path.dirname(__file__), 'graphics.kv')))
 
 # Abbreviation used in this file: cp == connection point
 
+
 def cartesian_distance(x1, y1, x2, y2):
     '''Cartesian distance formula
-    From ftp://lnnr.lummi-nsn.gov/GIS_Scripts/CreatePointsAlongALine/DivideLine.py
+    From:
+
+      ftp://lnnr.lummi-nsn.gov/GIS_Scripts/CreatePointsAlongALine/DivideLine.py
 
     which has a print line with:
 
@@ -33,11 +36,15 @@ def cartesian_distance(x1, y1, x2, y2):
       (Code link: ftp://lnnr.lummi-nsn.gov/GIS_Scripts/)
     '''
 
-    return float(math.pow(((math.pow((x2-x1),2)) + (math.pow((y2 - y1),2))),.5))
+    return float(math.pow(((math.pow((x2 - x1), 2)) +
+                 (math.pow((y2 - y1), 2))), .5))
+
 
 def cartesian_to_polar(xy1, xy2):
     '''
-    From ftp://lnnr.lummi-nsn.gov/GIS_Scripts/CreatePointsAlongALine/DivideLine.py
+    From:
+
+      ftp://lnnr.lummi-nsn.gov/GIS_Scripts/CreatePointsAlongALine/DivideLine.py
 
     which has a print line with:
 
@@ -54,23 +61,25 @@ def cartesian_to_polar(xy1, xy2):
     unit-circle, for example, 3.14 and not -0 like a regular python
     return.'''
     try:
-        x1, y1, x2, y2 = float(xy1[0]), float(xy1[1]), float(xy2[0]), float(xy2[1])
+        x1, y1, x2, y2 = \
+                float(xy1[0]), float(xy1[1]), float(xy2[0]), float(xy2[1])
         xdistance, ydistance = x2 - x1, y2 - y1
-        distance = math.pow(((math.pow((x2 - x1),2)) + (math.pow((y2 - y1),2))),.5)
+        distance = math.pow(((math.pow((x2 - x1), 2)) +
+                            (math.pow((y2 - y1), 2))), .5)
         if xdistance == 0:
             if y2 > y1:
-                theta = math.pi/2
+                theta = math.pi / 2
             else:
-                theta = (3*math.pi)/2
+                theta = (3 * math.pi) / 2
         elif ydistance == 0:
             if x2 > x1:
                 theta = 0
             else:
                 theta = math.pi
         else:
-            theta = math.atan(ydistance/xdistance)
+            theta = math.atan(ydistance / xdistance)
             if xdistance > 0 and ydistance < 0:
-                theta = 2*math.pi + theta
+                theta = 2 * math.pi + theta
             if xdistance < 0 and ydistance > 0:
                 theta = math.pi + theta
             if xdistance < 0 and ydistance < 0:
@@ -79,9 +88,12 @@ def cartesian_to_polar(xy1, xy2):
     except:
         print"Error in cartesian_to_polar()"
 
+
 def polar_to_cartesian(polarcoords):
     '''
-    From ftp://lnnr.lummi-nsn.gov/GIS_Scripts/CreatePointsAlongALine/DivideLine.py
+    From:
+
+      ftp://lnnr.lummi-nsn.gov/GIS_Scripts/CreatePointsAlongALine/DivideLine.py
 
     which has a print line with:
 
@@ -150,7 +162,7 @@ class Shape(SelectableView, Widget):
             c = self.center()
 
             self.edit_button = Button(
-                    pos=(c[0]+5, c[1]-5),
+                    pos=(c[0] + 5, c[1] - 5),
                     size=(10, 10),
                     text='E')
 
@@ -254,14 +266,17 @@ class LabeledShape(ConnectedShape):
             self.label.valign = valign
 
             if halign == 'left':
-                self.label_offset = [self.size[0] * x_multiplier,
-                                     self.size[1] * y_multiplier]
+                self.label_offset = [
+                        self.size[0] * x_multiplier,
+                        self.size[1] * y_multiplier]
             elif halign == 'center':
-                self.label_offset = [(self.size[0] * x_multiplier) - int(self.width / 2.),
-                                     self.size[1] * y_multiplier]
+                self.label_offset = [
+                        (self.size[0] * x_multiplier) - int(self.width / 2.),
+                        self.size[1] * y_multiplier]
             elif halign == 'right':
-                self.label_offset = [(self.size[0] * x_multiplier) - self.width,
-                                     self.size[1] * y_multiplier]
+                self.label_offset = [
+                        (self.size[0] * x_multiplier) - self.width,
+                        self.size[1] * y_multiplier]
 
 
 class LabeledVectorShape(LabeledShape):
@@ -277,14 +292,15 @@ class LabeledVectorShape(LabeledShape):
     def recalculate_points(self, *args):
         pass
 
-    # http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-    def dist(self, x1, y1, x2, y2, x3, y3): # x3,y3 is the point
+    # http://stackoverflow.com/...
+    #   questions/849211/shortest-distance-between-a-point-and-a-line-segment
+    def dist(self, x1, y1, x2, y2, x3, y3):  # x3,y3 is the point
         px = x2 - x1
         py = y2 - y1
 
         something = px * px + py * py
 
-        u =  ((x3 - x1) * px + (y3 - y1) * py) / float(something)
+        u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
 
         if u > 1:
             u = 1
@@ -368,7 +384,8 @@ class LabeledVectorShape(LabeledShape):
                 if y <= max(p1y, p2y):
                     if x <= max(p1x, p2x):
                         if p1y != p2y:
-                            xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                            xinters = \
+                                    (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
                         if p1x == p2x or x <= xinters:
                             inside = not inside
 
@@ -389,7 +406,9 @@ class LabeledVectorShape(LabeledShape):
         min_y = min(y_points)
         max_y = max(y_points)
 
-        return self.pos[0] + ((110./100.) * ((max_x - min_x) / 2.)), self.pos[1] + (110./100.) * ((max_y - min_y) / 2.)
+        # TODO: For now there is a 10% shape reduction factor to reverse.
+        return (self.pos[0] + ((110. / 100.) * ((max_x - min_x) / 2.)),
+                self.pos[1] + ((110. / 100.) * ((max_y - min_y) / 2.)))
 
     def generate_connection_points(self, step_distance=10):
         poly = self.points
@@ -402,8 +421,14 @@ class LabeledVectorShape(LabeledShape):
 
         distance_remaining = []
 
-        # A Two-Bit Algorithms product\n\nCopyright\ 2011 Gerry Gabrisch\n\ngerry@gabrisch.us"
-        # http://forums.arcgis.com/threads/9118-Placing-points-automatically-along-line-based-on-length-attribute
+        # Reference:
+        #
+        # A Two-Bit Algorithms product
+        # Copyright 2011 Gerry Gabrisch
+        # gerry@gabrisch.us"
+        #
+        # http://forums.arcgis.com/threads/9118- ...
+        #   Placing-points-automatically-along-line-based-on-length-attribute
         # (Code link: ftp://lnnr.lummi-nsn.gov/GIS_Scripts/)
 
         step_distance = float(step_distance)
@@ -415,7 +440,8 @@ class LabeledVectorShape(LabeledShape):
             y2 = poly[(i + 1) % n]
 
             try:
-                distance_along_line = cartesian_distance(x1, y1, x2, y2) + distance_remaining[counter-1]
+                distance_along_line = cartesian_distance(x1, y1, x2, y2) + \
+                                      distance_remaining[counter - 1]
             except:
                 distance_along_line = cartesian_distance(x1, y1, x2, y2)
 
@@ -426,8 +452,10 @@ class LabeledVectorShape(LabeledShape):
                 # line segment as a single point (there is only one connection
                 # point -- the end of the line segment, which we add first).
 
-                self.connection_points.append([x2,y2])
-                self.cp_slices_for_edges.append((len(self.connection_points) - 1, len(self.connection_points) - 1))
+                self.connection_points.append([x2, y2])
+                self.cp_slices_for_edges.append(
+                        (len(self.connection_points) - 1,
+                         len(self.connection_points) - 1))
                 distance_remaining.append(0)
 
             elif distance_along_line > step_distance:
@@ -436,24 +464,32 @@ class LabeledVectorShape(LabeledShape):
                 # connection points along the line segment. We create these
                 # points and set the start and end indices.
 
-                number_of_divisions = int(distance_along_line/step_distance)
-                distance_remaining.append((distance_along_line - (number_of_divisions * step_distance)))
+                number_divisions = int(distance_along_line / step_distance)
+                distance_remaining.append(
+                    distance_along_line - (number_divisions * step_distance))
                 polarcoord = cartesian_to_polar((x1, y1), (x2, y2))
 
                 cps_start_index = len(self.connection_points)
 
                 counter2 = 1
-                while counter2 <= number_of_divisions:
+                while counter2 <= number_divisions:
                     if len(distance_remaining) > 1:
-                        adjustment = polar_to_cartesian([((step_distance * counter2) - distance_remaining[counter-1]), polarcoord[1]])
+                        adjustment = polar_to_cartesian([
+                            ((step_distance * counter2) -
+                                    distance_remaining[counter - 1]),
+                            polarcoord[1]])
                     else:
-                        adjustment = polar_to_cartesian([((step_distance * counter2)), polarcoord[1]])
-                    self.connection_points.append([x1 + adjustment[0], y1 + adjustment[1]])
+                        adjustment = polar_to_cartesian([
+                            ((step_distance * counter2)),
+                            polarcoord[1]])
+                    self.connection_points.append(
+                            [x1 + adjustment[0], y1 + adjustment[1]])
                     counter2 += 1
 
                 cps_end_index = len(self.connection_points) - 1
 
-                self.cp_slices_for_edges.append((cps_start_index, cps_end_index))
+                self.cp_slices_for_edges.append(
+                        (cps_start_index, cps_end_index))
 
             elif distance_along_line < step_distance:
 
@@ -480,7 +516,9 @@ class LabeledVectorShape(LabeledShape):
 
         for i, cp in enumerate(self.connection_points):
 
-            dist = self.dist(center1[0], center1[1], center2[0], center2[1], cp[0], cp[1])
+            dist = self.dist(
+                    center1[0], center1[1], center2[0], center2[1],
+                    cp[0], cp[1])
 
             if dist < min_distance:
                 min_distance = dist
@@ -489,10 +527,14 @@ class LabeledVectorShape(LabeledShape):
         return closest_cp
 
         #for point in self.connection_points:
-        #    if (point.pos[0] < shape.label.pos[0] and
-        #        point.pos[0] > shape.label.pos[0] + shape.label.texture.size[0] and
-        #        point.pos[1] < shape.label.pos[1] and
-        #        point.pos[1] > shape.label.pos[1] + shape.label.texture.size[1]):
+        #    if (point.pos[0]
+        #          < shape.label.pos[0] and
+        #        point.pos[0]
+        #          > shape.label.pos[0] + shape.label.texture.size[0] and
+        #        point.pos[1]
+        #          < shape.label.pos[1] and
+        #        point.pos[1]
+        #          > shape.label.pos[1] + shape.label.texture.size[1]):
         #        print point
 
     def draw_connection_points(self):
@@ -505,7 +547,7 @@ class LabeledVectorShape(LabeledShape):
 
 
 class TriangleLVS(LabeledVectorShape):
-    points = ListProperty([0]*6)
+    points = ListProperty([0] * 6)
     shape = ListProperty([.1, .1, .5, .9, .9, .1])
 
     def __init__(self, **kwargs):

@@ -1,11 +1,9 @@
 from kivy_statecharts.system.state import State
 
-from kivy.graphics import Color, Ellipse, Line, Rectangle
+from kivy.graphics import Color
 from kivy.lang import Builder
-from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.bubble import Bubble
-from kivy.uix.bubble import BubbleButton
 from kivy.properties import BooleanProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
@@ -153,18 +151,18 @@ class AdjustingConnection(State):
         if event == 'drag_connection_point1':
             dragging_op = self.dragging_op1
             bubble = self.connection_bubble1
-            old_index = connection.shape1_connection_point_index
+            old_index = connection.shape1_cp_index
             connection.bump_connection_point1()
             shape = connection.shape1
-            new_index = connection.shape1_connection_point_index
+            new_index = connection.shape1_cp_index
             point = connection.connection_point1()
         else:
             dragging_op = self.dragging_op2
             bubble = self.connection_bubble2
-            old_index = connection.shape2_connection_point_index
+            old_index = connection.shape2_cp_index
             connection.bump_connection_point2()
             shape = connection.shape2
-            new_index = connection.shape2_connection_point_index
+            new_index = connection.shape2_cp_index
             point = connection.connection_point2()
 
         if not dragging_op:
