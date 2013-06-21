@@ -1,8 +1,37 @@
-StatechartDiagrammer
-====================
+Diagrammer
+==========
 
-StatechartDiagrammer is a Kivy app to draw statecharts, starting with the use
-of predefined shape images, but hopefully including vector shapes later.
+Diagrammer is a Kivy app to draw statecharts, and perhaps other types of
+diagrams later. Development started Summer 2013 and may progress with
+substantial rapid changes, because the coding styles and conventions for both
+Kivy graphics programming and for the design of statecharts are being
+discovered in the process.
+
+As of June 21, the focus has been on using the triangle vector shape and on a
+nacent system for drawing connections. There is not yet a user interface for
+selecting shapes, connection end point styles (arrowheads, etc.) and the like.
+So far, after the app loads, this has been accomplished:
+
+After app loads, you see a blank rectangle display, but the full area of the
+window is actually the drawing area. You can do this:
+
+1) Touch (or click) once to draw a triangle shape.
+2) Touch again in another area to draw a second shape.
+3) Touch the perimeter of a triangle and drag to move it.
+4) Touch and drag in the center of one rectangle to the center of another.
+4a) On touch up, bubbles will appear on either end of the connection. 
+4b) In a given bubble, touch and drag within the Drag button to move the
+connection point for the end (dragging out of the drag button will terminate
+the move, presently).
+4c) Repeat drag ops on the Drag button, for now to drag the given connection
+point further, clockwise (too jerky and skips for now).
+4d) Once the connection point is ok, touch Accept.
+5) You can add more triangles and connections.
+6) You can move triangles with connections, and the connections will adjust.
+
+That's it for now. Of course, there is quite a few things to improve in the
+existing functionality, and there will need to be user interface elements
+added, new states to support them, etc.
 
 Early Inspirations and Help
 ---------------------------
