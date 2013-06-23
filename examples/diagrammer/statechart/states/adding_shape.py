@@ -87,6 +87,18 @@ class AddingShape(State):
 
         touch = self.statechart.app.touch
 
+        # TODO: Finish other shapes.
+        if self.statechart.app.drawing_mode == 'state_triangle':
+            shape_cls = StateTriangleLVS
+        elif self.statechart.app.drawing_mode == 'state_rectangle':
+            shape_cls = StateTriangleLVS
+        elif self.statechart.app.drawing_mode == 'state_pentagon':
+            shape_cls = StateTriangleLVS
+        elif self.statechart.app.drawing_mode == 'state_ellipse':
+            shape_cls = StateTriangleLVS
+        else:
+            shape_cls = StateTriangleLVS
+
         with self.statechart.app.drawing_area.canvas.before:
             Color(1, 1, 0)
             d = 100.
@@ -94,10 +106,10 @@ class AddingShape(State):
                     #x=touch.x, y=touch.y, width=100.0, height=100.0,
                     #line_color=[1.0, .3, .2, .5], fill_color=[.4, .4, .4, .4])
             #Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
-            shape = StateTriangleLVS(pos=(touch.x - d / 2, touch.y - d / 2),
-                                     size=(d, d),
+            shape = shape_cls(pos=(touch.x - d / 2, touch.y - d / 2),
+                              size=(d, d),
                     x=touch.x, y=touch.y, width=200.0, height=200.0,
-                    state="Triangle State",
+                    state="State",
                     label_placement='constrained', label_containment='inside',
                     label_anchor='left_middle', stroke_width=5.0,
                     stroke_color=[.2, .9, .2, .8], fill_color=[.4, .4, .4, .4])

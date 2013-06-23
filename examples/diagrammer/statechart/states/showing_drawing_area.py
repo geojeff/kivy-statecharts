@@ -18,20 +18,19 @@ from adding_shape import AddingShape
 from moving_shape import MovingShape
 from adding_connection import AddingConnection
 
-# The context menu is modified from qua-non's context menu:
+# The drawing menu is modified from qua-non's context menu:
 #
 #     http://wiki.kivy.org/Contextual%20Menus
 #
 Builder.load_string('''
-[MenuButton@ActionButton]
+[MenuButton@ToggleButton]
     background_down: 'atlas://data/images/defaulttheme/bubble_btn'
     background_normal: 'atlas://data/images/defaulttheme/bubble_btn_pressed'
     group: 'drawing_menu_root'
-    on_release: app.statechart.send_event(self.action, self, None)
+    on_release: app.statechart.send_event('show_submenu', self, None)
     size_hint: ctx.size_hint if hasattr(ctx, 'size_hint') else (1, 1)
     width: ctx.width if hasattr(ctx, 'width') else 1
     text: ctx.text
-    action: ctx.action
     Image:
         source: 'atlas://data/images/defaulttheme/tree_closed'
         size: (20, 20)
@@ -60,38 +59,27 @@ Builder.load_string('''
                         size_hint: (None, 1)
                         width: 100
                         text: 'Select'
-                        action: 'show_select_submenu'
                     MenuButton:
                         size_hint: (None, 1)
                         width: 100
                         text: 'Text'
-                        action: 'show_text_submenu'
                     MenuButton:
                         size_hint: (None, 1)
                         width: 100
                         text: 'Line'
-                        action: 'show_line_submenu'
                     MenuButton:
                         size_hint: (None, 1)
                         width: 100
                         text: 'Shape'
-                        action: 'show_shape_submenu'
                     MenuButton:
                         size_hint: (None, 1)
                         width: 100
                         text: 'State'
-                        action: 'show_state_submenu'
 ''')
 
 
-class ActionButton(ToggleButton):
-
-    action = StringProperty('')
-
-
 class DrawingMenu(Bubble):
-
-    statechart = ObjectProperty(None)
+    pass
 
 
 class DrawingArea(Image):

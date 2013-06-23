@@ -15,15 +15,20 @@ substantial rapid changes, because the coding styles and conventions for both
 Kivy graphics programming and for the design of statecharts are being
 discovered in the process.
 
-As of June 21, the focus has been on using the triangle vector shape and on a
-nacent system for drawing connections. There is not yet a user interface for
-selecting shapes, connection end point styles (arrowheads, etc.) and the like.
-So far, after the app loads, this has been accomplished:
+The focus has been on using the triangle vector shape and on a nacent system
+for drawing connections. There is the start of a user interface for selecting
+shapes, but only the triangle shape is done. There is nothing for selecting
+connection end point styles (arrowheads, etc.) and the like. So far, after the
+app loads, this has been accomplished:
 
-After app loads, you see a blank rectangle display, but the full area of the
-window is actually the drawing area. You can do this:
+After app loads, you see a blank rectangle display on the right for the drawing
+area, but the full area of the window is actually now the drawing area. You can
+do this:
 
-1) Touch (or click) once to draw a triangle shape.
+0) If you want, try out the menu to select the State menu, and the Triangle
+choice in the submenu, but presently the Triangle is hard-coded.
+
+1) Touch (or click) once in the drawing area to draw a triangle shape.
 
 2) Touch again in another area to draw a second shape.
 
@@ -47,7 +52,7 @@ window is actually the drawing area. You can do this:
 
 6) You can move triangles with connections, and the connections will adjust.
 
-Of course, there is quite a few things to improve in the existing
+Of course, there are quite a few things to improve in the existing
 functionality, and there will need to be user interface elements added, new
 states to support them, etc.
 

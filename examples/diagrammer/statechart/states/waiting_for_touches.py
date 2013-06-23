@@ -16,116 +16,121 @@ Builder.load_string('''
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('select_menu_back', self, None)
+        on_release: app.statechart.send_event('hide_submenu', self, 'select')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Pick'
-            on_release: app.statechart.send_event('select_menu_pick', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'select_pick')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Marquee'
-            on_release: app.statechart.send_event('select_menu_marquee', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'select_marquee')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Node'
-            on_release: app.statechart.send_event('select_menu_node', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'select_node')
 
 <TextSubmenu>:
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('text_menu_back', self, None)
+        on_release: app.statechart.send_event('hide_submenu', self, 'text')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Large'
-            on_release: app.statechart.send_event('text_menu_large', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'text_large')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Medium'
-            on_release: app.statechart.send_event('text_menu_medium', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'text_medium')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Small'
-            on_release: app.statechart.send_event('text_menu_small', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'text_small')
 
 <LineSubmenu>:
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('line_menu_back', self, None)
+        on_release: app.statechart.send_event('hide_submenu', self, 'line')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Straight'
-            on_release: app.statechart.send_event('line_menu_straight', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'line_straight')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Arc'
-            on_release: app.statechart.send_event('line_menu_arc', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'line_arc')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Bezier'
-            on_release: app.statechart.send_event('line_menu_bezier', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'line_bezier')
 
 <ShapeSubmenu>:
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('shape_menu_back', self, None)
+        on_release: app.statechart.send_event('hide_submenu', self, 'shape')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Rectangle'
-            on_release: app.statechart.send_event('shape_menu_rectangle', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'shape_rectangle')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Ellipse'
-            on_release: app.statechart.send_event('shape_menu_ellipse', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'shape_ellipse')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Polygon'
-            on_release: app.statechart.send_event('shape_menu_polygon', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'shape_polygon')
 
 <StateSubmenu>:
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('state_menu_back', self, None)
+        on_release: app.statechart.send_event('hide_submenu', self, 'state')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
+            text: 'Triangle'
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'state_triangle')
+        Button:
+            size_hint: (None, 1)
+            width: 85
             text: 'Rectangle'
-            on_release: app.statechart.send_event('state_menu_rectangle', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'state_rectangle')
+        Button:
+            size_hint: (None, 1)
+            width: 85
+            text: 'Pentagon'
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'state_pentagon')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Ellipse'
-            on_release: app.statechart.send_event('state_menu_ellipse', self, None)
-        Button:
-            size_hint: (None, 1)
-            width: 85
-            text: 'Polygon'
-            on_release: app.statechart.send_event('state_menu_polygon', self, None)
+            on_release: app.statechart.send_event('set_drawing_mode', self, 'state_ellipse')
 ''')
 
 
@@ -159,11 +164,11 @@ class WaitingForTouches(State):
 
     def enter_state(self, context=None):
 
-        self.menu_actions_and_submenus = {'show_select_submenu': SelectSubmenu(),
-                                          'show_text_submenu': TextSubmenu(),
-                                          'show_line_submenu': LineSubmenu(),
-                                          'show_shape_submenu': ShapeSubmenu(),
-                                          'show_state_submenu': StateSubmenu()}
+        self.menus_and_submenus = {'select': SelectSubmenu(),
+                                   'text': TextSubmenu(),
+                                   'line': LineSubmenu(),
+                                   'shape': ShapeSubmenu(),
+                                   'state': StateSubmenu()}
 
     def exit_state(self, context=None):
         pass
@@ -229,41 +234,22 @@ class WaitingForTouches(State):
 
         Animation(scroll_x=1, d=.5).start(scrollview)
 
-    @State.event_handler(['show_select_submenu',
-                          'select_menu_pick',
-                          'select_menu_marquee',
-                          'select_menu_node',
-                          'select_menu_back',
-                          'show_text_submenu',
-                          'text_menu_large',
-                          'text_menu_medium',
-                          'text_menu_small',
-                          'text_menu_back',
-                          'show_line_submenu',
-                          'line_menu_straight',
-                          'line_menu_arc',
-                          'line_menu_bezier',
-                          'line_menu_back',
-                          'show_shape_submenu',
-                          'shape_menu_rectangle',
-                          'shape_menu_ellipse',
-                          'shape_menu_polygon',
-                          'shape_menu_back',
-                          'show_state_submenu',
-                          'state_menu_rectangle',
-                          'state_menu_ellipse',
-                          'state_menu_polygon',
-                          'state_menu_back'])
+    @State.event_handler(['show_submenu',
+                          'hide_submenu',
+                          'set_drawing_mode'])
     def handle_menu_touch(self, event, context, arg):
 
-        if event.endswith('_submenu'):
+        if event == 'show_submenu':
 
-            self.swap_in_submenu(context, self.menu_actions_and_submenus[event])
+            menu = context.text.lower()
+            self.swap_in_submenu(context, self.menus_and_submenus[menu])
 
-        elif event.endswith('back'):
+        elif event == 'hide_submenu':
 
+            # context.parent.parent.parent is the scrollview.
             Animation(scroll_x=0, d=.5).start(context.parent.parent.parent)
 
         else:
 
             print context.text + ' selected'
+            self.statechart.app.drawing_mode = arg

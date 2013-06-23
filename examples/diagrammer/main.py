@@ -5,6 +5,7 @@ from kivy.app import App
 
 from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
+from kivy.properties import OptionProperty
 
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.gridlayout import GridLayout
@@ -53,6 +54,24 @@ class DiagrammerApp(App):
 
     current_shape = ObjectProperty(None, allownone=True)
     current_connection = ObjectProperty(None, allownone=True)
+
+    drawing_mode = OptionProperty('select_pick',
+                                   options=('select_pick',
+                                            'select_marquee',
+                                            'select_node',
+                                            'text_large',
+                                            'text_medium',
+                                            'text_small',
+                                            'line_straight',
+                                            'line_arc',
+                                            'line_bezier',
+                                            'shape_rectangle',
+                                            'shape_ellipse',
+                                            'shape_polygon',
+                                            'state_triangle',
+                                            'state_rectangle',
+                                            'state_pentagon',
+                                            'state_ellipse'))
 
     def build(self):
 
