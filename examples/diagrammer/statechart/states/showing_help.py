@@ -7,14 +7,14 @@ from kivy.uix.screenmanager import Screen
 from kivy_statecharts.system.state import State
 
 
-class ShowingMainScreen(State):
+class ShowingHelpScreen(State):
 
     def __init__(self, **kwargs):
-        super(ShowingMainScreen, self).__init__(**kwargs)
+        super(ShowingHelpScreen, self).__init__(**kwargs)
 
     def enter_state(self, context=None):
 
-        if not 'Main' in self.statechart.app.screen_manager.screen_names:
+        if not 'Help' in self.statechart.app.screen_manager.screen_names:
 
             self.app = self.statechart.app
 
@@ -22,7 +22,7 @@ class ShowingMainScreen(State):
 
             toolbar = BoxLayout(size_hint=(1.0, None), height=30)
 
-            button = ToggleButton(text='Main',
+            button = ToggleButton(text='Help',
                                   color=[1.0, 1.0, 1.0, .9],
                                   bold=True,
                                   group='screen manager buttons')
@@ -60,13 +60,13 @@ This example app helps with [b]drawing a statechart[/b]:
 
             view.add_widget(scrollview)
 
-            screen = Screen(name='Main')
+            screen = Screen(name='Help')
             screen.add_widget(view)
 
             self.app.screen_manager.add_widget(screen)
 
-        if self.app.screen_manager.current != 'Main':
-            self.app.screen_manager.current = 'Main'
+        if self.app.screen_manager.current != 'Help':
+            self.app.screen_manager.current = 'Help'
 
     def exit_state(self, context=None):
         pass

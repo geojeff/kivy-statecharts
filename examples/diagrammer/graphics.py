@@ -28,9 +28,7 @@ def cartesian_distance(x1, y1, x2, y2):
     which has a print line with:
 
       "A Two-Bit Algorithms product
-
       Copyright 2011 Gerry Gabrisch
-
       gerry@gabrisch.us"
 
       (Code link: ftp://lnnr.lummi-nsn.gov/GIS_Scripts/)
@@ -49,9 +47,7 @@ def cartesian_to_polar(xy1, xy2):
     which has a print line with:
 
       "A Two-Bit Algorithms product
-
       Copyright 2011 Gerry Gabrisch
-
       gerry@gabrisch.us"
 
     (Code link: ftp://lnnr.lummi-nsn.gov/GIS_Scripts/)
@@ -98,9 +94,7 @@ def polar_to_cartesian(polarcoords):
     which has a print line with:
 
       "A Two-Bit Algorithms product
-
       Copyright 2011 Gerry Gabrisch
-
       gerry@gabrisch.us"
 
     (Code link: ftp://lnnr.lummi-nsn.gov/GIS_Scripts/)
@@ -280,6 +274,7 @@ class LabeledShape(ConnectedShape):
 
 
 class LabeledVectorShape(LabeledShape):
+
     points = ListProperty([])
     shape = ListProperty([])
     cp_slices_for_edges = ListProperty([])

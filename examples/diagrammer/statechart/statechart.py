@@ -3,7 +3,7 @@ from kivy.properties import ObjectProperty
 from kivy_statecharts.system.state import State
 from kivy_statecharts.system.statechart import StatechartManager
 
-from states.showing_main import ShowingMainScreen
+from states.showing_help import ShowingHelpScreen
 from states.showing_drawing_area import ShowingDrawingArea
 
 
@@ -18,7 +18,7 @@ class AppStatechart(StatechartManager):
 
     class RootState(State):
         def __init__(self, **kwargs):
-            kwargs['initial_substate_key'] = 'ShowingMainScreen'
-            kwargs['ShowingMainScreen'] = ShowingMainScreen
+            kwargs['initial_substate_key'] = 'ShowingHelpScreen'
+            kwargs['ShowingHelpScreen'] = ShowingHelpScreen
             kwargs['ShowingDrawingArea'] = ShowingDrawingArea
             super(AppStatechart.RootState, self).__init__(**kwargs)
