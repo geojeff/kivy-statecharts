@@ -1,5 +1,6 @@
 import os
 import math
+from itertools import chain, izip
 
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
@@ -17,6 +18,10 @@ from kivy.lang import Builder
 Builder.load_file(str(os.path.join(os.path.dirname(__file__), 'graphics.kv')))
 
 # Abbreviation used in this file: cp == connection point
+
+# TODO: Why use .1 margins on the unit cell for shape unit coordinates? The
+#       margin for shapes can be handled in the drawing, eh? (And would not
+#       be hard-coded, hey).
 
 
 def cartesian_distance(x1, y1, x2, y2):
@@ -276,13 +281,28 @@ class LabeledShape(ConnectedShape):
 class LabeledVectorShape(LabeledShape):
 
     points = ListProperty([])
-    shape = ListProperty([])
+    unit_circle_points = ListProperty([])
     cp_slices_for_edges = ListProperty([])
 
     def __init__(self, **kwargs):
         super(LabeledVectorShape, self).__init__(**kwargs)
 
         self.bind(size=self.recalculate_points)
+
+    def shift_unit_circle_points_to_origin(self):
+
+        x_values = self.unit_circle_points[::2]
+        y_values = self.unit_circle_points[1::2]
+
+        min_x = min(x_values)
+        min_y = min(y_values)
+
+        min_x = 0 if min_x > 0 else min_x * -1.
+
+        min_y = 0 if min_y > 0 else min_y * -1.
+
+        return list(chain.from_iterable(izip([x + min_x for x in x_values],
+                                             [y + min_y for y in y_values])))
 
     def recalculate_points(self, *args):
         pass
@@ -393,17 +413,16 @@ class LabeledVectorShape(LabeledShape):
         return self.point_inside_polygon(x, y, self.points)
 
     def center(self):
-        x_points = self.points[::2]
-        y_points = self.points[1::2]
+        x_values = self.points[::2]
+        y_values = self.points[1::2]
 
-        min_x = min(x_points)
-        max_x = max(x_points)
-        min_y = min(y_points)
-        max_y = max(y_points)
+        min_x = min(x_values)
+        max_x = max(x_values)
+        min_y = min(y_values)
+        max_y = max(y_values)
 
-        # TODO: For now there is a 10% shape reduction factor to reverse.
-        return (self.pos[0] + ((110. / 100.) * ((max_x - min_x) / 2.)),
-                self.pos[1] + ((110. / 100.) * ((max_y - min_y) / 2.)))
+        return (self.pos[0] + ((max_x - min_x) / 2.),
+                self.pos[1] + ((max_y - min_y) / 2.))
 
     def generate_connection_points(self, step_distance=10):
         poly = self.points
@@ -541,25 +560,6 @@ class LabeledVectorShape(LabeledShape):
         Line(circle=(cp[0], cp[1], 5))
 
 
-class TriangleLVS(LabeledVectorShape):
-    points = ListProperty([0] * 6)
-    shape = ListProperty([.1, .1, .5, .9, .9, .1])
-
-    def __init__(self, **kwargs):
-        super(TriangleLVS, self).__init__(**kwargs)
-
-        self.recalculate_points()
-
-    def recalculate_points(self, *args):
-
-        self.points[0] = self.pos[0] + int(float(self.size[0]) * self.shape[0])
-        self.points[1] = self.pos[1] + int(float(self.size[1]) * self.shape[1])
-        self.points[2] = self.pos[0] + int(float(self.size[0]) * self.shape[2])
-        self.points[3] = self.pos[1] + int(float(self.size[1]) * self.shape[3])
-        self.points[4] = self.pos[0] + int(float(self.size[0]) * self.shape[4])
-        self.points[5] = self.pos[1] + int(float(self.size[1]) * self.shape[5])
-
-
 class ConnectionLVS(LabeledVectorShape):
     shape = ListProperty([.9, .9])
     shape1 = ObjectProperty(None)
@@ -659,6 +659,89 @@ class ConnectionLVS(LabeledVectorShape):
         dy = new_connection_point[1] - old_connection_point[1]
 
         self.adjust(self.shape2, dx, dy)
+
+
+class TriangleLVS(LabeledVectorShape):
+    points = ListProperty([0] * 6)
+    unit_circle_points = ListProperty([0, 1., .866, -.5, -.866, -.5])
+
+    def __init__(self, **kwargs):
+        super(TriangleLVS, self).__init__(**kwargs)
+
+        self.recalculate_points()
+
+    def recalculate_points(self, *args):
+
+        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
+
+        self.points[0] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[0])
+        self.points[1] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[1])
+        self.points[2] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[2])
+        self.points[3] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[3])
+        self.points[4] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[4])
+        self.points[5] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[5])
+
+
+class RectangleLVS(LabeledVectorShape):
+    points = ListProperty([0] * 8)
+    unit_circle_points = ListProperty([-.707, .707, .707, .707, .707, -.707, -.707, -.707])
+
+    def __init__(self, **kwargs):
+        super(RectangleLVS, self).__init__(**kwargs)
+
+        self.recalculate_points()
+
+    def recalculate_points(self, *args):
+
+        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
+
+        self.points[0] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[0])
+        self.points[1] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[1])
+        self.points[2] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[2])
+        self.points[3] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[3])
+        self.points[4] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[4])
+        self.points[5] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[5])
+        self.points[6] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[6])
+        self.points[7] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[7])
+
+
+class PentagonLVS(LabeledVectorShape):
+    points = ListProperty([0] * 10)
+
+    # For pentagon vertex coordinates calculation, see:
+    #
+    #     http://www2.mae.ufl.edu/~uhk/NSIDED-POLYGONS.pdf
+    #
+    unit_circle_points = ListProperty([0,
+                          1.,
+                          math.sqrt(2. + 1.618033989) / 2.,
+                          (1.618033989 - 1.) / 2.,
+                          math.sqrt(3. - 1.818033989) / 2.,
+                          (-1.618033989) / 2.,
+                          (math.sqrt(3. - 1.818033989) / 2.) * -1.,
+                          ((-1.618033989) / 2.),
+                          (math.sqrt(2. + 1.618033989) / 2.) * -1,
+                          (1.618033989 - 1.) / 2.])
+
+    def __init__(self, **kwargs):
+        super(PentagonLVS, self).__init__(**kwargs)
+
+        self.recalculate_points()
+
+    def recalculate_points(self, *args):
+
+        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
+
+        self.points[0] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[0])
+        self.points[1] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[1])
+        self.points[2] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[2])
+        self.points[3] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[3])
+        self.points[4] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[4])
+        self.points[5] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[5])
+        self.points[6] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[6])
+        self.points[7] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[7])
+        self.points[8] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[8])
+        self.points[9] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[9])
 
 
 class LabeledImageShape(LabeledShape):
