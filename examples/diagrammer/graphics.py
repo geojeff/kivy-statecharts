@@ -1,15 +1,16 @@
 import os
 import math
+import operator
 from itertools import chain, izip
 
 from kivy.uix.widget import Widget
-from kivy.uix.button import Button
 from kivy.uix.listview import SelectableView
-from kivy.properties import DictProperty
+
+from kivy.properties import AliasProperty
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
-from kivy.properties import OptionProperty
 from kivy.properties import ObjectProperty
+from kivy.properties import StringProperty
 
 from kivy.graphics import Line
 
@@ -18,10 +19,6 @@ from kivy.lang import Builder
 Builder.load_file(str(os.path.join(os.path.dirname(__file__), 'graphics.kv')))
 
 # Abbreviation used in this file: cp == connection point
-
-# TODO: Why use .1 margins on the unit cell for shape unit coordinates? The
-#       margin for shapes can be handled in the drawing, eh? (And would not
-#       be hard-coded, hey).
 
 
 def cartesian_distance(x1, y1, x2, y2):
@@ -133,8 +130,6 @@ class ConnectionPoint(Widget):
 
 class Shape(SelectableView, Widget):
 
-    shape = ObjectProperty()
-
     stroke_width = NumericProperty(2.0)
     stroke_color = ListProperty([0, 0, 0, 0])
     fill_color = ListProperty([0, 0, 0, 0])
@@ -144,7 +139,7 @@ class Shape(SelectableView, Widget):
     width = NumericProperty(10.0)
     height = NumericProperty(10.0)
 
-    edit_button = ObjectProperty(None)
+    #edit_button = ObjectProperty(None)
 
     def __init__(self, **kwargs):
 
@@ -156,20 +151,26 @@ class Shape(SelectableView, Widget):
 
     def selection_changed(self, *args):
 
-        if self.is_selected:
+        pass
 
-            c = self.center()
-
-            self.edit_button = Button(
-                    pos=(c[0] + 5, c[1] - 5),
-                    size=(10, 10),
-                    text='E')
-
-            self.add_widget(self.edit_button)
-
-        else:
-
-            self.remove_widget(self.edit_button)
+#        if self.is_selected:
+#
+#            c = self.center()
+#
+#            self.edit_button = Button(
+#                    pos=(c[0] + 5, c[1] - 5),
+#                    size=(10, 10),
+#                    text='E')
+#
+#            self.edit_button.bind(
+#                on_release=
+#                App.get_running_app().statechart.send_event('edit_shape'))
+#
+#            self.add_widget(self.edit_button)
+#
+#        else:
+#
+#            self.remove_widget(self.edit_button)
 
     def center(self):
         pass
@@ -198,84 +199,85 @@ class ConnectedShape(Shape):
 
 class LabeledShape(ConnectedShape):
 
-    label = ObjectProperty()
+    label_anchor_layout_x = NumericProperty(1)
+    label_anchor_layout_y = NumericProperty(1)
 
-    label_placement = OptionProperty('constrained',
-                                     options=('freeform', 'constrained'))
+    def get_label_anchor_layout_size(self):
 
-    # label_containment is either ``inside`` or ``outside`` the element.
-    label_containment = OptionProperty('inside', options=('inside', 'outside'))
+        return (self.label_anchor_layout_x * self.width,
+                self.label_anchor_layout_y * self.height)
 
-    # label_anchor is the anchor position chosen from the available set of
-    # locations in the inside_label_anchor_points or
-    # outside_label_anchor_points dicts.
-    label_anchor = OptionProperty('center', options=('center', 'top_middle',
-        'bottom_middle', 'left_middle', 'right_middle', 'nw_corner',
-        'ne_corner', 'se_corner', 'sw_corner'))
+    def set_label_anchor_layout_size(self, value):
 
-    # label_anchor_points is a list of texture locations specific to the given
-    # shape used. For example, if a triangular shape is used, this list would
-    # be set to appropriate (x, y, halign, valign) values within the unit
-    # texture space, for each of the possible label locations. There are two
-    # sets, one for locations inside the shape, one for those outside.
-    label_data = DictProperty({
-        'in_center': (0.5, 0.5, 'center', 'middle'),
-        'in_top_middle': (0.5, 0.5, 'center', 'middle'),
-        'in_bottom_middle': (0.5, 0.5, 'center', 'middle'),
-        'in_left_middle': (0.5, 0.5, 'center', 'middle'),
-        'in_right_middle': (0.5, 0.5, 'center', 'middle'),
-        'in_nw_corner': (0.5, 0.5, 'center', 'middle'),
-        'in_ne_corner': (0.5, 0.5, 'center', 'middle'),
-        'in_se_corner': (0.5, 0.5, 'center', 'middle'),
-        'in_sw_corner': (0.5, 0.5, 'center', 'middle'),
+        min_width_allowed = .5 * self.width
+        min_height_allowed = .5 * self.height
+        max_width_allowed = 2. * self.width
+        max_height_allowed = 2. * self.height
 
-        'out_center': (0.5, 0.5, 'center', 'middle'),
-        'out_top_middle': (0.5, 0.5, 'center', 'middle'),
-        'out_bottom_middle': (0.5, 0.5, 'center', 'middle'),
-        'out_left_middle': (0.5, 0.5, 'center', 'middle'),
-        'out_right_middle': (0.5, 0.5, 'center', 'middle'),
-        'out_nw_corner': (0.5, 0.5, 'center', 'middle'),
-        'out_ne_corner': (0.5, 0.5, 'center', 'middle'),
-        'out_se_corner': (0.5, 0.5, 'center', 'middle'),
-        'out_sw_corner': (0.5, 0.5, 'center', 'middle')})
+        if value[0] < min_width_allowed:
+            value[0] = min_width_allowed
+        elif value[0] > max_width_allowed:
+            value[0] = max_width_allowed
 
-    label_offset = ListProperty([0.0, 0.0])
+        if value[1] < min_height_allowed:
+            value[1] = min_height_allowed
+        elif value[1] > max_height_allowed:
+            value[1] = max_height_allowed
+
+        self.label_anchor_layout_x = self.width / value[0]
+        self.label_anchor_layout_y = self.height / value[1]
+
+    def get_label_anchor_layout_pos(self):
+
+        size = self.label_anchor_layout_size
+
+        pos_change_x = 0
+        pos_change_y = 0
+
+        if size[0] > self.width:
+            margin = size[0] - self.width
+            pos_change_x = (margin / 2.) * -.1
+
+        if size[1] > self.height:
+            margin = size[1] - self.height
+            pos_change_y = (margin / 2.) * -.1
+
+        return tuple(map(operator.add, self.pos, (pos_change_x, pos_change_y)))
+
+    def set_label_anchor_layout_pos(self, value):
+
+        pos_difference = tuple(map(operator.sub, self.pos, value))
+
+        self.label_anchor_layout_x = self.width / self.width + pos_difference[0]
+        self.label_anchor_layout_y = self.height / self.width + pos_difference[0]
+
+    label_anchor_layout_pos = \
+            AliasProperty(get_label_anchor_layout_pos,
+                          set_label_anchor_layout_pos,
+                          bind=('label_anchor_layout_x',
+                                'label_anchor_layout_y'))
+
+    label_anchor_layout_size = \
+            AliasProperty(get_label_anchor_layout_size,
+                          set_label_anchor_layout_size,
+                          bind=('label_anchor_layout_x',
+                                'label_anchor_layout_y'))
+
+    label_text = StringProperty('')
+    label_anchor_x = StringProperty('center')
+    label_anchor_y = StringProperty('center')
+    label_halign = StringProperty('center')
+    label_valign = StringProperty('middle')
 
     def __init__(self, **kwargs):
 
         super(LabeledShape, self).__init__(**kwargs)
 
-        if 'label' in kwargs:
-            self.label.text = kwargs['label']
+        if not 'label_anchor_layout_pos' in kwargs:
+            self.label_anchor_layout_pos = self.pos
 
-        if self.label_placement == 'freeform':
-            if 'label_offset' in kwargs:
-                self.label_offset = kwargs['label_offset']
-            else:
-                self.label_offset = [0.0, 0.0]
-        else:
-            label_key = "{0}{1}".format(
-                    'in_' if self.label_containment == 'inside' else 'out_',
-                    self.label_anchor)
-
-            x_multiplier, y_multiplier, halign, valign = \
-                    self.label_data[label_key]
-
-            self.label.halign = halign
-            self.label.valign = valign
-
-            if halign == 'left':
-                self.label_offset = [
-                        self.size[0] * x_multiplier,
-                        self.size[1] * y_multiplier]
-            elif halign == 'center':
-                self.label_offset = [
-                        (self.size[0] * x_multiplier) - int(self.width / 2.),
-                        self.size[1] * y_multiplier]
-            elif halign == 'right':
-                self.label_offset = [
-                        (self.size[0] * x_multiplier) - self.width,
-                        self.size[1] * y_multiplier]
+        if not 'label_anchor_layout_size' in kwargs:
+            self.label_anchor_layout_size = self.size
 
 
 class LabeledVectorShape(LabeledShape):
@@ -298,11 +300,19 @@ class LabeledVectorShape(LabeledShape):
         min_y = min(y_values)
 
         min_x = 0 if min_x > 0 else min_x * -1.
-
         min_y = 0 if min_y > 0 else min_y * -1.
 
-        return list(chain.from_iterable(izip([x + min_x for x in x_values],
-                                             [y + min_y for y in y_values])))
+        # Shift from unit circle to origin.
+        x_values_pos = [x + min_x for x in x_values]
+        y_values_pos = [y + min_y for y in y_values]
+
+        max_x = max(x_values_pos)
+        max_y = max(y_values_pos)
+
+        # Normalize to max value 1.
+        return list(
+                chain.from_iterable(izip([x / max_x for x in x_values_pos],
+                                         [y / max_y for y in y_values_pos])))
 
     def recalculate_points(self, *args):
         pass
@@ -674,17 +684,21 @@ class TriangleLVS(LabeledVectorShape):
 
         self.unit_circle_points = self.shift_unit_circle_points_to_origin()
 
-        self.points[0] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[0])
-        self.points[1] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[1])
-        self.points[2] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[2])
-        self.points[3] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[3])
-        self.points[4] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[4])
-        self.points[5] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[5])
+        w = self.size[0]
+        h = self.size[1]
+
+        self.points[0] = self.pos[0] + w * self.unit_circle_points[0]
+        self.points[1] = self.pos[1] + h * self.unit_circle_points[1]
+        self.points[2] = self.pos[0] + w * self.unit_circle_points[2]
+        self.points[3] = self.pos[1] + h * self.unit_circle_points[3]
+        self.points[4] = self.pos[0] + w * self.unit_circle_points[4]
+        self.points[5] = self.pos[1] + h * self.unit_circle_points[5]
 
 
 class RectangleLVS(LabeledVectorShape):
     points = ListProperty([0] * 8)
-    unit_circle_points = ListProperty([-.707, .707, .707, .707, .707, -.707, -.707, -.707])
+    unit_circle_points = ListProperty(
+            [-.707, .707, .707, .707, .707, -.707, -.707, -.707])
 
     def __init__(self, **kwargs):
         super(RectangleLVS, self).__init__(**kwargs)
@@ -695,14 +709,17 @@ class RectangleLVS(LabeledVectorShape):
 
         self.unit_circle_points = self.shift_unit_circle_points_to_origin()
 
-        self.points[0] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[0])
-        self.points[1] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[1])
-        self.points[2] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[2])
-        self.points[3] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[3])
-        self.points[4] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[4])
-        self.points[5] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[5])
-        self.points[6] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[6])
-        self.points[7] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[7])
+        w = self.size[0]
+        h = self.size[1]
+
+        self.points[0] = self.pos[0] + w * self.unit_circle_points[0]
+        self.points[1] = self.pos[1] + h * self.unit_circle_points[1]
+        self.points[2] = self.pos[0] + w * self.unit_circle_points[2]
+        self.points[3] = self.pos[1] + h * self.unit_circle_points[3]
+        self.points[4] = self.pos[0] + w * self.unit_circle_points[4]
+        self.points[5] = self.pos[1] + h * self.unit_circle_points[5]
+        self.points[6] = self.pos[0] + w * self.unit_circle_points[6]
+        self.points[7] = self.pos[1] + h * self.unit_circle_points[7]
 
 
 class PentagonLVS(LabeledVectorShape):
@@ -732,16 +749,19 @@ class PentagonLVS(LabeledVectorShape):
 
         self.unit_circle_points = self.shift_unit_circle_points_to_origin()
 
-        self.points[0] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[0])
-        self.points[1] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[1])
-        self.points[2] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[2])
-        self.points[3] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[3])
-        self.points[4] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[4])
-        self.points[5] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[5])
-        self.points[6] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[6])
-        self.points[7] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[7])
-        self.points[8] = self.pos[0] + int(float(self.size[0]) * self.unit_circle_points[8])
-        self.points[9] = self.pos[1] + int(float(self.size[1]) * self.unit_circle_points[9])
+        w = self.size[0]
+        h = self.size[1]
+
+        self.points[0] = self.pos[0] + w * self.unit_circle_points[0]
+        self.points[1] = self.pos[1] + h * self.unit_circle_points[1]
+        self.points[2] = self.pos[0] + w * self.unit_circle_points[2]
+        self.points[3] = self.pos[1] + h * self.unit_circle_points[3]
+        self.points[4] = self.pos[0] + w * self.unit_circle_points[4]
+        self.points[5] = self.pos[1] + h * self.unit_circle_points[5]
+        self.points[6] = self.pos[0] + w * self.unit_circle_points[6]
+        self.points[7] = self.pos[1] + h * self.unit_circle_points[7]
+        self.points[8] = self.pos[0] + w * self.unit_circle_points[8]
+        self.points[9] = self.pos[1] + h * self.unit_circle_points[9]
 
 
 class LabeledImageShape(LabeledShape):

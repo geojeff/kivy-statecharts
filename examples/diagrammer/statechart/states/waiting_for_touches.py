@@ -16,7 +16,7 @@ Builder.load_string('''
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_submenu', self, 'select')
+        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'select')
     BoxLayout:
         orientation: 'vertical'
         Button:
@@ -39,7 +39,7 @@ Builder.load_string('''
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_submenu', self, 'text')
+        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'text')
     BoxLayout:
         orientation: 'vertical'
         Button:
@@ -62,7 +62,7 @@ Builder.load_string('''
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_submenu', self, 'line')
+        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'line')
     BoxLayout:
         orientation: 'vertical'
         Button:
@@ -85,7 +85,7 @@ Builder.load_string('''
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_submenu', self, 'shape')
+        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'shape')
     BoxLayout:
         orientation: 'vertical'
         Button:
@@ -108,7 +108,7 @@ Builder.load_string('''
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_submenu', self, 'state')
+        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'state')
     BoxLayout:
         orientation: 'vertical'
         Button:
@@ -217,34 +217,18 @@ class WaitingForTouches(State):
             if not dispatched:
                 self.statechart.go_to_state('AddingShape')
 
-    def swap_in_submenu(self, context, submenu):
-
-        drawing_menu = context.parent.parent.parent.parent
-        scrollview = context.parent.parent.parent
-        boxlayout = context.parent.parent
-
-        # Add the submenu to the BoxLayout in the menu scrollview. First check
-        # to see if a submenu is present, and remove it, before adding the
-        # submenu to swap in.
-
-        if len(boxlayout.children) == 2:
-            boxlayout.remove_widget(boxlayout.children[0])
-
-        boxlayout.add_widget(submenu)
-
-        Animation(scroll_x=1, d=.5).start(scrollview)
-
-    @State.event_handler(['show_submenu',
-                          'hide_submenu',
+    @State.event_handler(['show_drawing_submenu',
+                          'hide_drawing_submenu',
                           'set_drawing_mode'])
     def handle_menu_touch(self, event, context, arg):
 
-        if event == 'show_submenu':
+        if event == 'show_drawing_submenu':
 
             menu = context.text.lower()
-            self.swap_in_submenu(context, self.menus_and_submenus[menu])
+            self.statechart.app.swap_in_submenu(
+                    context, self.menus_and_submenus[menu])
 
-        elif event == 'hide_submenu':
+        elif event == 'hide_drawing_submenu':
 
             # context.parent.parent.parent is the scrollview.
             Animation(scroll_x=0, d=.5).start(context.parent.parent.parent)

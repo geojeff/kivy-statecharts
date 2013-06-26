@@ -39,15 +39,15 @@ class AddingShape(State):
                     #line_color=[1.0, .3, .2, .5], fill_color=[.4, .4, .4, .4])
             #Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
             shape = shape_cls(
-                    pos=(touch.x - d / 2, touch.y - d / 2),
+                    #pos=(touch.x - d / 2, touch.y - d / 2),
+                    pos=(touch.x, touch.y),
                     size=(d, d),
-                    x=touch.x, y=touch.y, width=200.0, height=200.0,
-                    state_name="State",
-                    label_placement='constrained', label_containment='inside',
-                    label_anchor='left_middle', stroke_width=5.0,
+                    #x=touch.x, y=touch.y, width=100.0, height=100.0,
+                    label_text="Some State",
+                    label_anchor_x='left',
+                    label_anchor_y='bottom',
+                    stroke_width=5.0,
                     stroke_color=[.2, .9, .2, .8], fill_color=[.4, .4, .4, .4])
-
-            print 'shape added at', shape.pos, shape.points
 
             shape.generate_connection_points(10)
 

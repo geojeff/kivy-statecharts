@@ -16,6 +16,7 @@ from kivy_statecharts.system.state import State
 from waiting_for_touches import WaitingForTouches
 from adding_shape import AddingShape
 from moving_shape import MovingShape
+from editing_shape import EditingShape
 from adding_connection import AddingConnection
 
 # The drawing menu is modified from qua-non's context menu:
@@ -27,7 +28,7 @@ Builder.load_string('''
     background_down: 'atlas://data/images/defaulttheme/bubble_btn'
     background_normal: 'atlas://data/images/defaulttheme/bubble_btn_pressed'
     group: 'drawing_menu_root'
-    on_release: app.statechart.send_event('show_submenu', self, None)
+    on_release: app.statechart.send_event('show_drawing_submenu', self, None)
     size_hint: ctx.size_hint if hasattr(ctx, 'size_hint') else (1, 1)
     width: ctx.width if hasattr(ctx, 'width') else 1
     text: ctx.text
@@ -115,6 +116,7 @@ class ShowingDrawingArea(State):
         kwargs['WaitingForTouches'] = WaitingForTouches
         kwargs['AddingShape'] = AddingShape
         kwargs['MovingShape'] = MovingShape
+        kwargs['EditingShape'] = EditingShape
         kwargs['AddingConnection'] = AddingConnection
         super(ShowingDrawingArea, self).__init__(**kwargs)
 

@@ -31,13 +31,13 @@
     label: label
     points: self.points
     pos: self.pos
+    size: self.size
 
     FloatLayout:
         id: layout
-
         canvas:
-            Color: 
-                rgba: lvs.fill_color
+#            Color: 
+#                rgba: lvs.fill_color
 #            Triangle:
 #                points: lvs.points
             Color: 
@@ -48,11 +48,29 @@
                 width: lvs.stroke_width
                 joint: 'round'
                 close: True
-        Label:
-            id: label
-            pos: lvs.pos[0] + lvs.label_offset[0], lvs.pos[1] + lvs.label_offset[1]
-            size_hint_y: None
-            height: self.texture_size[1]
+        AnchorLayout:
+            pos: lvs.label_anchor_layout_pos
+            #pos_hint: {'center_x':.5, 'center_y':.5}
+            anchor_x: lvs.label_anchor_x
+            anchor_y: lvs.label_anchor_y
+            size_hint: None, None
+            size: lvs.label_anchor_layout_size
+#            canvas:
+#                Color:
+#                    rgba: .1, .3, .1, .51
+#                Rectangle:
+#                    size: self.size
+#                    pos: self.pos
+            Label:
+                id: label
+                #pos_hint: None, None
+                pos: self.pos
+                text: lvs.label_text
+                size_hint: None, None
+                size: 50, 30
+                #size: lvs.size
+                halign: lvs.label_halign
+                valign: lvs.label_valign
         Scatter:
             do_scale: False
             do_translation: False
@@ -61,4 +79,3 @@
             size_hint: None, None
             size: lvs.height, lvs.width
             pos: lvs.pos
-
