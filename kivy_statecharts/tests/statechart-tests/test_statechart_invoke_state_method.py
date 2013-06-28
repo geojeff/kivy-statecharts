@@ -20,7 +20,7 @@ class TestState(State):
     return_value = NumericProperty(None)
     arg1 = StringProperty(None)
     arg2 = StringProperty(None)
-      
+
     def __init__(self, **kwargs):
         self.bind(test_invoked_count=self._test_invoked_countChanged)
         super(TestState, self).__init__(**kwargs)
@@ -40,7 +40,7 @@ class TestState(State):
         setattr(self, 'arg2', arg2)
         setattr(self, 'test_invoked_count', getattr(self, 'test_invoked_count') + 1)
         return self.return_value if self.return_value else None
-      
+
 class RootStateExample_1(TestState):
     def __init__(self, **kwargs):
         kwargs['initial_substate_key'] = 'A'
@@ -173,7 +173,7 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         root_state_2 = statechart_2.root_state_instance
         state_C = statechart_2.get_state('C')
         state_D = statechart_2.get_state('D')
-        
+
     # invoke method test1
     def test_invoke_method_test1_statechart_1(self):
         result = statechart_1.invoke_state_method('test1')
@@ -346,7 +346,7 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         msg = ("Cannot to goto state B. Z is not a "
                "recognized current state in "
                "the statechart.")
-        self.assertEqual(str(cm.exception), msg) 
+        self.assertEqual(str(cm.exception), msg)
 
     def test_invoke_method_resume_go_to_state_when_not_suspended(self):
         statechart_3 = Statechart_3()
@@ -355,7 +355,7 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         with self.assertRaises(Exception) as cm:
             statechart_3.resume_go_to_state()
         msg = ("Cannot resume goto state since it has not been suspended.")
-        self.assertEqual(str(cm.exception), msg) 
+        self.assertEqual(str(cm.exception), msg)
 
     def test_invoke_method_go_to_history_state_before_init_statechart_called(self):
         statechart_3 = Statechart_3()
@@ -393,8 +393,6 @@ class StatechartInvokeStateMethodTestCase(unittest.TestCase):
         statechart_3.name = 'Number 3'
         details = statechart_3.details()
         self.assertTrue(type(details) == dict)
-        details = statechart_3._list_to_string('key', [], 2)
-        self.assertEqual(details, "  key: []")
 
     def test_invoke_method_details_when_there_are_go_to_actions(self):
         EXIT_STATE = 0
