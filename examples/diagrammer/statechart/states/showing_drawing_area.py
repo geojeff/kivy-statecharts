@@ -9,7 +9,6 @@ from kivy.uix.widget import Widget
 from kivy.lang import Builder
 
 from kivy.properties import ObjectProperty
-from kivy.properties import StringProperty
 
 from kivy_statecharts.system.state import State
 

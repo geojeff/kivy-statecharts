@@ -1,12 +1,9 @@
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
 from kivy.uix.label import Label
 
 from kivy.animation import Animation
 
 from kivy.lang import Builder
-
-from kivy.properties import ObjectProperty
 
 from kivy_statecharts.system.state import State
 
@@ -17,121 +14,142 @@ Builder.load_string('''
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'select')
+        on_release: app.statechart.send_event( \
+                'hide_drawing_submenu', self, 'select')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Pick'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'select_pick')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'select_pick')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Marquee'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'select_marquee')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'select_marquee')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Node'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'select_node')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'select_node')
 
 <TextSubmenu>:
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'text')
+        on_release: app.statechart.send_event( \
+                'hide_drawing_submenu', self, 'text')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Large'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'text_large')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'text_large')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Medium'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'text_medium')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'text_medium')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Small'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'text_small')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'text_small')
 
 <LineSubmenu>:
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'line')
+        on_release: app.statechart.send_event( \
+                'hide_drawing_submenu', self, 'line')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Straight'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'line_straight')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'line_straight')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Arc'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'line_arc')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'line_arc')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Bezier'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'line_bezier')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'line_bezier')
 
 <ShapeSubmenu>:
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'shape')
+        on_release: app.statechart.send_event( \
+                'hide_drawing_submenu', self, 'shape')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Rectangle'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'shape_rectangle')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'shape_rectangle')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Ellipse'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'shape_ellipse')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'shape_ellipse')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Polygon'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'shape_polygon')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'shape_polygon')
 
 <StateSubmenu>:
     Button:
         text: '<'
         size_hint: (.15, 1)
-        on_release: app.statechart.send_event('hide_drawing_submenu', self, 'state')
+        on_release: app.statechart.send_event( \
+                'hide_drawing_submenu', self, 'state')
     BoxLayout:
         orientation: 'vertical'
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Triangle'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'state_triangle')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'state_triangle')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Rectangle'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'state_rectangle')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'state_rectangle')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Pentagon'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'state_pentagon')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'state_pentagon')
         Button:
             size_hint: (None, 1)
             width: 85
             text: 'Ellipse'
-            on_release: app.statechart.send_event('set_drawing_mode', self, 'state_ellipse')
+            on_release: app.statechart.send_event( \
+                    'set_drawing_mode', self, 'state_ellipse')
 ''')
 
 
@@ -224,7 +242,8 @@ class WaitingForTouches(State):
                             label = c
                             break
                     self.statechart.app.current_label = label
-                    self.statechart.app.current_anchored_label = shape.children[0]
+                    self.statechart.app.current_anchored_label = \
+                            shape.children[0]
                     shape.select()
                     dispatched = True
                     self.statechart.go_to_state('EditingShape')

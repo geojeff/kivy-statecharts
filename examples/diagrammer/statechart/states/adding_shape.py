@@ -4,8 +4,6 @@ from kivy.graphics import Color
 
 from kivy.uix.label import Label
 
-from graphics import AnchoredLabel
-
 from state_graphics import StateTriangleLVS
 from state_graphics import StateRectangleLVS
 from state_graphics import StatePentagonLVS

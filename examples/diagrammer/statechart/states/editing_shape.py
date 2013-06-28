@@ -1,28 +1,16 @@
 from kivy_statecharts.system.state import State
 
-from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.floatlayout import FloatLayout
 
 from kivy.animation import Animation
 
-from kivy.graphics import Color
-
 from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
-from kivy.properties import OptionProperty
 
 from kivy.uix.bubble import Bubble
 
-from state_graphics import StateTriangleLVS
-from state_graphics import StateRectangleLVS
-from state_graphics import StatePentagonLVS
-
 from kivy.lang import Builder
-
-from graphics import AnchoredLabel
 
 
 Builder.load_string('''
@@ -94,7 +82,8 @@ Builder.load_string('''
     StackLayout:
         orientation: 'tb-lr'
         #size_hint_y: None if root.width < root.height else 1
-        #height: sp(99 + 33 + 2 + 99 + 33 + 150 + 99) if root.width < root.height else self.height
+        #height: sp(99 + 33 + 2 + 99 + 33 + 150 + 99) \
+        #       if root.width < root.height else self.height
         BoxLayout:
             size_hint_y: None if root.width < root.height else 0.125
             #size_hint_x: .5 if root.width < root.height else 1
@@ -245,18 +234,24 @@ Builder.load_string('''
                     size_hint: None, None
                     size: 99, 99
                     value: app.current_label.pos[0]
-                    on_value: app.statechart.send_event('set_x', float(args[1]))
-                    min: app.current_shape.pos[0] - app.current_shape.width
-                    max: app.current_shape.pos[0] + app.current_shape.width * 1.2
+                    on_value: app.statechart.send_event( \
+                            'set_x', float(args[1]))
+                    min: app.current_shape.pos[0] - \
+                            app.current_shape.width
+                    max: app.current_shape.pos[0] + \
+                            app.current_shape.width * 1.2
 
                 Slider:
                     orientation: 'vertical'
                     size_hint: None, None
                     size: 90, 90
                     value: app.current_label.pos[1]
-                    on_value: app.statechart.send_event('set_y', float(args[1]))
-                    min: app.current_shape.pos[1] - app.current_shape.height
-                    max: app.current_shape.pos[1] + app.current_shape.height * 1.2
+                    on_value: app.statechart.send_event( \
+                            'set_y', float(args[1]))
+                    min: app.current_shape.pos[1] - \
+                            app.current_shape.height
+                    max: app.current_shape.pos[1] + \
+                            app.current_shape.height * 1.2
 
 <EditingShapeFillSubmenu>:
     Button:
@@ -341,7 +336,8 @@ class EditingShape(State):
 
         self.edit_menu = EditingShapeMenu()
         self.statechart.app.drawing_area.add_widget(self.edit_menu)
-        self.edit_menu.pos = self.shape.pos[0]+ self.shape.width, self.shape.pos[1]
+        self.edit_menu.pos = self.shape.pos[0] + \
+                self.shape.width, self.shape.pos[1]
 
     def exit_state(self, context=None):
         pass
@@ -363,15 +359,15 @@ class EditingShape(State):
         NW, N, NE, W, C, E, SW, S, SE.'''
 
         spots = {
-                'NW': { 'x_offset_factor': 0,  'y_offset_factor': 1},
-                'N':  { 'x_offset_factor': .5, 'y_offset_factor': 1},
-                'NE': { 'x_offset_factor': 1,  'y_offset_factor': 1},
-                'W':  { 'x_offset_factor': 0,  'y_offset_factor': .5},
-                'C':  { 'x_offset_factor': .5, 'y_offset_factor': .5},
-                'E':  { 'x_offset_factor': 1,  'y_offset_factor': .5},
-                'SW': { 'x_offset_factor': 0,  'y_offset_factor': 0},
-                'S':  { 'x_offset_factor': .5, 'y_offset_factor': 0},
-                'SE': { 'x_offset_factor': 1,  'y_offset_factor': 0}}
+                'NW': {'x_offset_factor': 0,  'y_offset_factor': 1},
+                'N':  {'x_offset_factor': .5, 'y_offset_factor': 1},
+                'NE': {'x_offset_factor': 1,  'y_offset_factor': 1},
+                'W':  {'x_offset_factor': 0,  'y_offset_factor': .5},
+                'C':  {'x_offset_factor': .5, 'y_offset_factor': .5},
+                'E':  {'x_offset_factor': 1,  'y_offset_factor': .5},
+                'SW': {'x_offset_factor': 0,  'y_offset_factor': 0},
+                'S':  {'x_offset_factor': .5, 'y_offset_factor': 0},
+                'SE': {'x_offset_factor': 1,  'y_offset_factor': 0}}
 
         self.statechart.app.current_label.pos = (
                 self.statechart.app.current_shape.pos[0] +
