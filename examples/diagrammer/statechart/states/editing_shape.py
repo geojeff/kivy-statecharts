@@ -332,7 +332,7 @@ class EditingShape(State):
             'fill': EditingShapeFillSubmenu(statechart=self.statechart),
             'stroke': EditingShapeStrokeSubmenu(statechart=self.statechart),
             'scale': None,
-            'connect': None}
+            'connections': None}
 
         self.edit_menu = EditingShapeMenu()
         self.statechart.app.drawing_area.add_widget(self.edit_menu)
@@ -417,8 +417,11 @@ class EditingShape(State):
                      'show_editing_shape_submenu']:
 
             menu_name = context.text.lower()
-            self.statechart.app.swap_in_submenu(
-                    context, self.menus_and_submenus[menu_name])
+
+            # TODO: Write scale and connections widgets.
+            if not menu_name in ['scale', 'connections']:
+                self.statechart.app.swap_in_submenu(
+                        context, self.menus_and_submenus[menu_name])
 
         elif event in ['hide_editing_shape_submenu',
                        'hide_editing_shape_submenu']:
