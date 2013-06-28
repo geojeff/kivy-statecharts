@@ -2,6 +2,10 @@ from kivy_statecharts.system.state import State
 
 from kivy.graphics import Color
 
+from kivy.uix.label import Label
+
+from graphics import AnchoredLabel
+
 from state_graphics import StateTriangleLVS
 from state_graphics import StateRectangleLVS
 from state_graphics import StatePentagonLVS
@@ -43,11 +47,17 @@ class AddingShape(State):
                     pos=(touch.x, touch.y),
                     size=(d, d),
                     #x=touch.x, y=touch.y, width=100.0, height=100.0,
-                    label_text="Some State",
-                    label_anchor_x='left',
-                    label_anchor_y='bottom',
                     stroke_width=5.0,
                     stroke_color=[.2, .9, .2, .8], fill_color=[.4, .4, .4, .4])
+
+            label = Label(text="Some State", pos=shape.pos)
+            shape.add_widget(label)
+
+            #shape.add_widget(AnchoredLabel(
+            #        anchor_widget=shape,
+            #        text="Some State",
+            #        label_anchor_x='left',
+            #        label_anchor_y='bottom'))
 
             shape.generate_connection_points(10)
 

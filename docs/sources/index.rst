@@ -835,7 +835,7 @@ treatment.
 For learning about "adapters/controllers" and terminology, we can read
 blog posts by Michael Cohen (nick: frozencanuck), the original author of
 the statecharts framework ported here from SproutCore. It will help you
-to realize that SproutCore is based on Cocoa. In Cocoa, we see
+to appreciate that SproutCore is based on Cocoa. In Cocoa, we see
 differentation between coordinating vs. mediating controllers.
 
 Mediating controllers are a bit lower-level than coordinating controllers.
@@ -851,6 +851,12 @@ Cohen in an important `blog post
 The upshot of the blog post is that the higher level logic blocks in
 controllers will often "turn into brutish monsters containing many if-else or
 switch-case statements" to be able to manage application state.
+
+Kivy also now has adapters, so we have another term to examine. Adapters, as
+described in this `article <http://en.wikipedia.org/wiki/Model–view–adapter/>`_,
+have a more "linear" relationship to data and views. An adapter serves more
+directly to "service" a view, to help create the view or its child views, by
+interacting with data as needed.
 
 Summary
 -------

@@ -4,7 +4,7 @@ from kivy.uix.bubble import Bubble
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
-from kivy.uix.image import Image
+from kivy.uix.widget import Widget
 
 from kivy.lang import Builder
 
@@ -24,6 +24,14 @@ from adding_connection import AddingConnection
 #     http://wiki.kivy.org/Contextual%20Menus
 #
 Builder.load_string('''
+<DrawingArea>:
+    canvas:
+        Color:
+            rgba: .3, .3, .3, .3
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
 [MenuButton@ToggleButton]
     background_down: 'atlas://data/images/defaulttheme/bubble_btn'
     background_normal: 'atlas://data/images/defaulttheme/bubble_btn_pressed'
@@ -83,7 +91,7 @@ class DrawingMenu(Bubble):
     pass
 
 
-class DrawingArea(Image):
+class DrawingArea(Widget):
 
     statechart = ObjectProperty(None)
 
@@ -151,8 +159,7 @@ class ShowingDrawingArea(State):
             drawing_view.add_widget(self.statechart.app.drawing_menu)
 
             self.statechart.app.drawing_area = DrawingArea(
-                    statechart=self.statechart,
-                    source='design/images/rect.png')
+                    statechart=self.statechart)
 
             drawing_view.add_widget(self.statechart.app.drawing_area)
 

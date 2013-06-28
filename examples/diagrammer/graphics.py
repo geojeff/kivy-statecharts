@@ -4,7 +4,10 @@ import operator
 from itertools import chain, izip
 
 from kivy.uix.widget import Widget
+from kivy.uix.label import Label
 from kivy.uix.listview import SelectableView
+
+from kivy.uix.anchorlayout import AnchorLayout
 
 from kivy.properties import AliasProperty
 from kivy.properties import ListProperty
@@ -197,22 +200,23 @@ class ConnectedShape(Shape):
             connection.adjust(self, dx, dy)
 
 
-class LabeledShape(ConnectedShape):
+class AnchoredLabel(AnchorLayout):
 
+    anchor_widget = ObjectProperty
     label_anchor_layout_x = NumericProperty(1)
     label_anchor_layout_y = NumericProperty(1)
 
     def get_label_anchor_layout_size(self):
 
-        return (self.label_anchor_layout_x * self.width,
-                self.label_anchor_layout_y * self.height)
+        return (self.label_anchor_layout_x * self.anchor_widget.width,
+                self.label_anchor_layout_y * self.anchor_widget.height)
 
     def set_label_anchor_layout_size(self, value):
 
-        min_width_allowed = .5 * self.width
-        min_height_allowed = .5 * self.height
-        max_width_allowed = 2. * self.width
-        max_height_allowed = 2. * self.height
+        min_width_allowed = .5 * self.anchor_widget.width
+        min_height_allowed = .5 * self.anchor_widget.height
+        max_width_allowed = 2. * self.anchor_widget.width
+        max_height_allowed = 2. * self.anchor_widget.height
 
         if value[0] < min_width_allowed:
             value[0] = min_width_allowed
@@ -224,8 +228,8 @@ class LabeledShape(ConnectedShape):
         elif value[1] > max_height_allowed:
             value[1] = max_height_allowed
 
-        self.label_anchor_layout_x = self.width / value[0]
-        self.label_anchor_layout_y = self.height / value[1]
+        self.label_anchor_layout_x = self.anchor_widget.width / value[0]
+        self.label_anchor_layout_y = self.anchor_widget.height / value[1]
 
     def get_label_anchor_layout_pos(self):
 
@@ -234,22 +238,22 @@ class LabeledShape(ConnectedShape):
         pos_change_x = 0
         pos_change_y = 0
 
-        if size[0] > self.width:
-            margin = size[0] - self.width
+        if size[0] > self.anchor_widget.width:
+            margin = size[0] - self.anchor_widget.width
             pos_change_x = (margin / 2.) * -.1
 
-        if size[1] > self.height:
-            margin = size[1] - self.height
+        if size[1] > self.anchor_widget.height:
+            margin = size[1] - self.anchor_widget.height
             pos_change_y = (margin / 2.) * -.1
 
-        return tuple(map(operator.add, self.pos, (pos_change_x, pos_change_y)))
+        return tuple(map(operator.add, self.anchor_widget.pos, (pos_change_x, pos_change_y)))
 
     def set_label_anchor_layout_pos(self, value):
 
-        pos_difference = tuple(map(operator.sub, self.pos, value))
+        pos_difference = tuple(map(operator.sub, self.anchor_widget.pos, value))
 
-        self.label_anchor_layout_x = self.width / self.width + pos_difference[0]
-        self.label_anchor_layout_y = self.height / self.width + pos_difference[0]
+        self.label_anchor_layout_x = self.anchor_widget.width / self.anchor_widget.width + pos_difference[0]
+        self.label_anchor_layout_y = self.anchor_widget.height / self.anchor_widget.width + pos_difference[0]
 
     label_anchor_layout_pos = \
             AliasProperty(get_label_anchor_layout_pos,
@@ -263,24 +267,22 @@ class LabeledShape(ConnectedShape):
                           bind=('label_anchor_layout_x',
                                 'label_anchor_layout_y'))
 
-    label_text = StringProperty('')
     label_anchor_x = StringProperty('center')
     label_anchor_y = StringProperty('center')
-    label_halign = StringProperty('center')
-    label_valign = StringProperty('middle')
 
     def __init__(self, **kwargs):
 
-        super(LabeledShape, self).__init__(**kwargs)
+        self.anchor_widget = kwargs['anchor_widget']
 
-        if not 'label_anchor_layout_pos' in kwargs:
-            self.label_anchor_layout_pos = self.pos
+        super(AnchoredLabel, self).__init__(**kwargs)
 
-        if not 'label_anchor_layout_size' in kwargs:
-            self.label_anchor_layout_size = self.size
+        self.label_anchor_layout_pos = self.anchor_widget.pos
+        self.label_anchor_layout_size = self.anchor_widget.size
+
+        self.label.text = kwargs['text']
 
 
-class LabeledVectorShape(LabeledShape):
+class LabeledVectorShape(ConnectedShape):
 
     points = ListProperty([])
     unit_circle_points = ListProperty([])
@@ -361,7 +363,7 @@ class LabeledVectorShape(LabeledShape):
             p2y = poly[(i + 1) % n]
 
             dist = self.dist(p1x, p1y, p2x, p2y, x, y)
-            print '    distance', dist, p1x, p1y, '-->', p2x, p2y
+            #print '    distance', dist, p1x, p1y, '-->', p2x, p2y
             if dist < min_dist:
                 return True
             p1x, p1y = p2x, p2y
@@ -385,7 +387,7 @@ class LabeledVectorShape(LabeledShape):
             p2y = poly[(i + 1) % n]
 
             dist = self.dist(p1x, p1y, p2x, p2y, x, y)
-            print '        possible distance', dist, p1x, p1y, '-->', p2x, p2y
+            #print '        possible distance', dist, p1x, p1y, '-->', p2x, p2y
             if dist < minimum_and_edge[0]:
                 minimum_and_edge = [dist, i]
             p1x, p1y = p2x, p2y
@@ -596,7 +598,6 @@ class ConnectionLVS(LabeledVectorShape):
                 self.shape2.connection_points[self.shape2_cp_index][1])
 
     def on_touch_down(self, touch):
-        print 'connection touch', touch.pos
         return super(LabeledVectorShape, self).on_touch_down(touch)
 
     def adjust(self, shape, dx, dy):
@@ -764,7 +765,7 @@ class PentagonLVS(LabeledVectorShape):
         self.points[9] = self.pos[1] + h * self.unit_circle_points[9]
 
 
-class LabeledImageShape(LabeledShape):
+class LabeledImageShape(ConnectedShape):
     def __init__(self, **kwargs):
         super(LabeledImageShape, self).__init__(**kwargs)
 

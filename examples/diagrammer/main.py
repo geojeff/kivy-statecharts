@@ -55,6 +55,7 @@ class DiagrammerApp(App):
     connections = ListProperty()
 
     current_shape = ObjectProperty(None, allownone=True)
+    current_label = ObjectProperty(None, allownone=True)
     current_connection = ObjectProperty(None, allownone=True)
 
     drawing_mode = OptionProperty('select_pick',

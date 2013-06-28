@@ -1,5 +1,6 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.label import Label
 
 from kivy.animation import Animation
 
@@ -186,16 +187,25 @@ class WaitingForTouches(State):
 
             for shape in reversed(self.statechart.app.shapes):
                 if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
-                    print 'move on polygon edge', shape.canvas
                     dist, line = shape.closest_edge(touch.pos[0],
                                                     touch.pos[1])
-                    print 'closest line segment', dist, line
                     self.statechart.app.current_shape = shape
+                    label = None
+                    for c in shape.children:
+                        if isinstance(c, Label):
+                            label = c
+                            break
+                    self.statechart.app.current_label = label
                     dispatched = True
                     self.statechart.go_to_state('MovingShape')
                 elif shape.collide_point(*touch.pos):
-                    print 'move on shape internal area', shape.canvas
                     self.statechart.app.current_shape = shape
+                    label = None
+                    for c in shape.children:
+                        if isinstance(c, Label):
+                            label = c
+                            break
+                    self.statechart.app.current_label = label
                     dispatched = True
                     self.statechart.go_to_state('AddingConnection')
 
@@ -205,11 +215,16 @@ class WaitingForTouches(State):
 
             for shape in reversed(self.statechart.app.shapes):
                 if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
-                    print 'polygon touched', shape.canvas
                     dist, line = shape.closest_edge(touch.pos[0],
                                                     touch.pos[1])
-                    print 'closest line segment', dist, line
                     self.statechart.app.current_shape = shape
+                    label = None
+                    for c in shape.children:
+                        if isinstance(c, Label):
+                            label = c
+                            break
+                    self.statechart.app.current_label = label
+                    self.statechart.app.current_anchored_label = shape.children[0]
                     shape.select()
                     dispatched = True
                     self.statechart.go_to_state('EditingShape')
@@ -235,5 +250,4 @@ class WaitingForTouches(State):
 
         else:
 
-            print context.text + ' selected'
             self.statechart.app.drawing_mode = arg
