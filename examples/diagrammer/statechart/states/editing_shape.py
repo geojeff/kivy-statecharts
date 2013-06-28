@@ -2,6 +2,7 @@ from kivy_statecharts.system.state import State
 
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 
 from kivy.animation import Animation
 
@@ -35,7 +36,6 @@ Builder.load_string('''
 <EditingShapeMenu>
     size_hint: None, None
     size: 380, 580
-    pos: (5, 50)
     padding: 5
     background_color: .2, .9, 1, .7
     background_image: 'atlas://data/images/defaulttheme/button_pressed'
@@ -284,6 +284,7 @@ Builder.load_string('''
 
         ColorPicker:
             color: app.current_shape.fill_color
+            on_color: app.statechart.send_event('fill_color_changed', self.color)
 
         Button:
             size_hint_y: None if root.width < root.height else 0.125
@@ -313,6 +314,7 @@ Builder.load_string('''
 
         ColorPicker:
             color: app.current_shape.stroke_color
+            on_color: app.statechart.send_event('stroke_color_changed', self.color)
 
         Button:
             size_hint_y: None if root.width < root.height else 0.125
@@ -336,7 +338,7 @@ class EditingShapeStrokeSubmenu(BoxLayout):
     statechart = ObjectProperty(None)
 
 
-class EditingShapeMenu(Bubble):
+class EditingShapeMenu(BoxLayout):
     pass
 
 
@@ -352,7 +354,7 @@ class EditingShape(State):
     '''
     '''
 
-    edit_menu = ObjectProperty(None)
+    editing_shape_menu = ObjectProperty(None)
 
     shape = ObjectProperty(None)
     labels = ListProperty([])
@@ -374,15 +376,20 @@ class EditingShape(State):
             'scale': None,
             'connections': None}
 
-        self.edit_menu = EditingShapeMenu()
-        self.statechart.app.drawing_area.add_widget(self.edit_menu)
-        self.edit_menu.pos = self.shape.pos[0] + \
-                self.shape.width, self.shape.pos[1]
+        if not self.editing_shape_menu:
+            self.editing_shape_menu = Popup(
+                    size_hint=(None, None),
+                    size=(400, 640),
+                    attach_to=self.statechart.app.drawing_area,
+                    title='Editing Shape',
+                    content=EditingShapeMenu())
+
+        self.editing_shape_menu.open()
 
     def exit_state(self, context=None):
         '''Tear down current widgets associated with this state.'''
 
-        self.statechart.app.drawing_area.remove_widget(self.edit_menu)
+        self.editing_shape_menu.dismiss()
 
     def shape_label_selected(self, adapter, *args):
 
@@ -395,6 +402,14 @@ class EditingShape(State):
         binding to fire this action on_text_validate.'''
 
         self.statechart.app.current_label.text = text
+
+    def fill_color_changed(self, color, *args):
+
+        self.statechart.app.current_shape.fill_color = color
+
+    def stroke_color_changed(self, color, *args):
+
+        self.statechart.app.current_shape.stroke_color = color
 
     def do_quick_spot(self, spot, *args):
         '''Change the pos of the label to one of the following "spots":
