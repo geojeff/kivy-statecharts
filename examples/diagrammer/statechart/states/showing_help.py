@@ -39,35 +39,44 @@ class ShowingHelpScreen(State):
 
             state_diagram_description = """
 After app loads, you see a blank rectangle display on the right for the drawing
-area, but the full area of the window is actually now the drawing area. You can
-do this:
+area. Various parts of the app are under construction and development, so
+please discuss in #kivy for current status if you really want to kick the
+tires.
 
-0) If you want, try out the menu to select the State menu, and the Triangle
-choice in the submenu, but presently the Triangle is hard-coded.
+In the main drawing menu (Select, Text, Line, Shape, State), only the State
+menu has functionality so far. You can try this:
 
-1) Touch (or click) once in the drawing area to draw a triangle shape.
+Drawing Shapes
 
-2) Touch again in another area to draw a second shape.
+- Try out the menu to select the State menu to select different shapes to
+   draw. Ellipse isn't implemented yet -- you'll get Triangle.
 
-3) Touch the perimeter of a triangle and drag to move it.
+- Touch (or click) once in the drawing area to draw a triangle shape.
+  Touch again in another area to draw a second shape.
 
-4) Touch and drag in the center of one rectangle to the center of another.
+- Touch the perimeter of a triangle and drag to move it.
 
-4a) On touch up, bubbles will appear on either end of the connection.
+- Touch and drag in the center of one rectangle to the center of another.
 
-4b) In a given bubble, touch and drag within the Drag button to move the
-    connection point for the end (dragging out of the drag button will
-    terminate the move, presently -- needs event handling in state for
-    drawing_area).
+Drawing Connections
 
-4c) Repeat drag ops on the Drag button, for now to drag the given connection
-    point further, clockwise (too jerky and skips for now).
+- On touch up, bubbles will appear on either end of the connection.  In a given
+  bubble, touch and drag within the Drag button to move the connection point
+  for the end (dragging out of the drag button will terminate the move,
+  presently -- needs event handling in state for drawing_area -- and a better
+  way of doing this generally). Repeat drag ops on the Drag button, for now to
+  drag the given connection point further, clockwise (too jerky and skips for
+  now). Once the connection point is ok, touch Accept.
 
-4d) Once the connection point is ok, touch Accept.
+Connectedness
 
-5) You can add more triangles and connections.
+You can add more triangles and connections. You can move triangles with
+connections, and the connections will adjust.
 
-6) You can move triangles with connections, and the connections will adjust."""
+Shape Properties
+
+- Touch and release on a shape's perimeter to edit its properties. For now
+this is a popup, but it rather obscures what you need to see."""
 
             scrollview = ScrollView()
             scrollview.add_widget(
