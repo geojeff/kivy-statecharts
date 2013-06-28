@@ -583,10 +583,10 @@ class ConnectionLVS(LabeledVectorShape):
 
         super(LabeledVectorShape, self).__init__(**kwargs)
 
-        if 'text' in kwargs:
-            self.label.text = kwargs['text']
-        else:
-            self.label.text = 'unknown'
+        #if 'text' in kwargs:
+            #self.label.text = kwargs['text']
+        #else:
+            #self.label.text = 'unknown'
 
         self.points.append(
                 self.shape1.connection_points[self.shape1_cp_index][0])
