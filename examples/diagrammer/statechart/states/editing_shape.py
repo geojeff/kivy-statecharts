@@ -34,7 +34,7 @@ Builder.load_string('''
 
 <EditingShapeMenu>
     size_hint: None, None
-    size: 380, 550
+    size: 380, 580
     pos: (5, 50)
     padding: 5
     background_color: .2, .9, 1, .7
@@ -253,6 +253,16 @@ Builder.load_string('''
                     max: app.current_shape.pos[1] + \
                             app.current_shape.height * 1.2
 
+        BoxLayout:
+            size_hint_y: None if root.width < root.height else 0.125
+            #size_hint_x: .5 if root.width < root.height else 1
+            height: '33sp' if root.width < root.height else self.height
+            spacing: '2sp'
+
+            Button:
+                text: 'Done'
+                on_release: app.statechart.send_event('done')
+
 <EditingShapeFillSubmenu>:
     Button:
         text: '<'
@@ -261,11 +271,26 @@ Builder.load_string('''
         width: 25
         on_release: app.statechart.send_event( \
                 'hide_editing_shape_submenu', self, 'state')
-    ColorPicker:
-        pos: self.pos
-        size_hint: None, None
-        size: 350, 210
-        color: app.current_shape.fill_color
+
+    BoxLayout:
+        spacing: '2sp'
+        orientation: 'vertical'
+
+        Label:
+            size_hint_y: None if root.width < root.height else 0.125
+            #size_hint_x: .5 if root.width < root.height else 1
+            height: '33sp' if root.width < root.height else self.height
+            text: 'Fill Color'
+
+        ColorPicker:
+            color: app.current_shape.fill_color
+
+        Button:
+            size_hint_y: None if root.width < root.height else 0.125
+            #size_hint_x: .5 if root.width < root.height else 1
+            height: '33sp' if root.width < root.height else self.height
+            text: 'Done'
+            on_release: app.statechart.send_event('done')
 
 <EditingShapeStrokeSubmenu>:
     Button:
@@ -275,11 +300,26 @@ Builder.load_string('''
         width: 25
         on_release: app.statechart.send_event( \
                 'hide_editing_shape_submenu', self, 'state')
-    ColorPicker:
-        pos: self.pos
-        size_hint: None, None
-        size: 350, 210
-        color: app.current_shape.stroke_color
+
+    BoxLayout:
+        spacing: '2sp'
+        orientation: 'vertical'
+
+        Label:
+            size_hint_y: None if root.width < root.height else 0.125
+            #size_hint_x: .5 if root.width < root.height else 1
+            height: '33sp' if root.width < root.height else self.height
+            text: 'Fill Color'
+
+        ColorPicker:
+            color: app.current_shape.stroke_color
+
+        Button:
+            size_hint_y: None if root.width < root.height else 0.125
+            #size_hint_x: .5 if root.width < root.height else 1
+            height: '33sp' if root.width < root.height else self.height
+            text: 'Done'
+            on_release: app.statechart.send_event('done')
 ''')
 
 
@@ -312,7 +352,7 @@ class EditingShape(State):
     '''
     '''
 
-    edit_panel = ObjectProperty(None)
+    edit_menu = ObjectProperty(None)
 
     shape = ObjectProperty(None)
     labels = ListProperty([])
@@ -340,7 +380,9 @@ class EditingShape(State):
                 self.shape.width, self.shape.pos[1]
 
     def exit_state(self, context=None):
-        pass
+        '''Tear down current widgets associated with this state.'''
+
+        self.statechart.app.drawing_area.remove_widget(self.edit_menu)
 
     def shape_label_selected(self, adapter, *args):
 
@@ -403,6 +445,10 @@ class EditingShape(State):
 
         self.statechart.app.current_label.valign = text
 
+    def done(self, *args):
+
+        self.statechart.go_to_state('WaitingForTouches')
+
     @State.event_handler(['drawing_area_touch_down',
                           'drawing_area_touch_move',
                           'drawing_area_touch_up',
@@ -418,10 +464,11 @@ class EditingShape(State):
 
             menu_name = context.text.lower()
 
+            submenu = self.menus_and_submenus[menu_name]
+
             # TODO: Write scale and connections widgets.
             if not menu_name in ['scale', 'connections']:
-                self.statechart.app.swap_in_submenu(
-                        context, self.menus_and_submenus[menu_name])
+                self.statechart.app.swap_in_submenu(context, submenu)
 
         elif event in ['hide_editing_shape_submenu',
                        'hide_editing_shape_submenu']:

@@ -77,7 +77,7 @@ class AddingConnection(State):
 
         if event == 'drawing_area_touch_move':
 
-            self.draw_realtime_line(Color(1.0, 1.0, 0.0), touch)
+            self.draw_realtime_line(Color(1.0, 1.0, 0.0, 1.0), touch)
 
     def draw_realtime_line(self, color, touch):
 
