@@ -1,5 +1,7 @@
 from kivy_statecharts.system.state import State
 
+from kivy.uix.label import Label
+
 
 class MovingShape(State):
     '''The MovingShape state is a transient state -- after moving the shape,
@@ -21,14 +23,24 @@ class MovingShape(State):
 
         if event == 'drawing_area_touch_move':
 
-            self.statechart.app.current_shape.x += touch.dx
-            self.statechart.app.current_shape.y += touch.dy
-            self.statechart.app.current_shape.recalculate_points()
-            for cp in self.statechart.app.current_shape.connection_points:
+            shape = self.statechart.app.current_shape
+
+            shape.x += touch.dx
+            shape.y += touch.dy
+
+            labels = [c for c in shape.children if isinstance(c, Label)]
+
+            for label in labels:
+                label.x += touch.dx
+                label.y += touch.dy
+
+            shape.recalculate_points()
+
+            for cp in shape.connection_points:
                 cp[0] += touch.dx
                 cp[1] += touch.dy
-            self.statechart.app.current_shape.adjust_connections(touch.dx,
-                                                                 touch.dy)
+
+            shape.adjust_connections(touch.dx, touch.dy)
 
         elif event == 'drawing_area_touch_up':
 
