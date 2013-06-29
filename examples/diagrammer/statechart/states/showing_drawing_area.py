@@ -1,6 +1,7 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.bubble import Bubble
+from kivy.uix.bubble import BubbleButton
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
@@ -54,7 +55,7 @@ Builder.load_string('''
         y: self.parent.y + (self.parent.height/2) - (self.height/2)
         x: self.parent.x + (self.parent.width - self.width)
 
-[DrawingMenuPolygonButton@ToggleButton]:
+[DrawingMenuPolygonButton@BubbleButton]:
 
     background_down: 'atlas://data/images/defaulttheme/bubble_btn'
     background_normal: 'atlas://data/images/defaulttheme/bubble_btn_pressed'
@@ -82,6 +83,7 @@ Builder.load_string('''
                             for i in xrange(ctx.sides)]))
             indices: range(ctx.sides)
             mode: 'triangle_fan'
+
     Scatter:
         do_scale: False
         do_translation: False
@@ -156,6 +158,12 @@ Builder.load_string('''
                 id: drawing_area
 
 <SelectSubmenu>:
+    size_hint: (None, None)
+    size: (60, 180)
+    pos_hint: {'center_x': .5, 'y': .6}
+    size_hint: (None, None)
+    size: (60, 180)
+    pos_hint: {'center_x': .5, 'y': .6}
     arrow_pos: 'left_mid'
     orientation: 'vertical'
 
@@ -188,6 +196,9 @@ Builder.load_string('''
 
 
 <TextSubmenu>:
+    size_hint: (None, None)
+    size: (60, 180)
+    pos_hint: {'center_x': .5, 'y': .6}
     arrow_pos: 'left_mid'
     orientation: 'vertical'
 
@@ -219,6 +230,9 @@ Builder.load_string('''
         action: 'set_drawing_mode_text_small'
 
 <LineSubmenu>:
+    size_hint: (None, None)
+    size: (60, 180)
+    pos_hint: {'center_x': .5, 'y': .6}
     arrow_pos: 'left_mid'
     orientation: 'vertical'
 
@@ -247,6 +261,9 @@ Builder.load_string('''
         action: 'set_drawing_mode_line_bezier'
 
 <ShapeSubmenu>:
+    size_hint: (None, None)
+    size: (60, 180)
+    pos_hint: {'center_x': .5, 'y': .6}
     arrow_pos: 'left_mid'
     orientation: 'vertical'
 
@@ -275,6 +292,9 @@ Builder.load_string('''
         action: 'set_drawing_mode_shape_polygon'
 
 <StateSubmenu>:
+    size_hint: (None, None)
+    size: (60, 180)
+    pos_hint: {'center_x': .5, 'y': .6}
     arrow_pos: 'left_mid'
     orientation: 'vertical'
 
@@ -408,7 +428,8 @@ class ShowingDrawingArea(State):
 
             self.submenu = self.menus_and_submenus[event[21:]]
 
-            self.submenu.pos = context.center
+            self.submenu.pos = [context.center[0],
+                                context.center[1] - self.submenu.height / 2]
 
             self.drawing_area.add_widget(self.submenu)
 
