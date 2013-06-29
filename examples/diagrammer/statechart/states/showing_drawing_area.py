@@ -161,9 +161,6 @@ Builder.load_string('''
     size_hint: (None, None)
     size: (60, 180)
     pos_hint: {'center_x': .5, 'y': .6}
-    size_hint: (None, None)
-    size: (60, 180)
-    pos_hint: {'center_x': .5, 'y': .6}
     arrow_pos: 'left_mid'
     orientation: 'vertical'
 
@@ -293,8 +290,10 @@ Builder.load_string('''
 
 <StateSubmenu>:
     size_hint: (None, None)
-    size: (60, 180)
+    size: (60, 60 * 3 + 12)
     pos_hint: {'center_x': .5, 'y': .6}
+    background_color: .2, .9, 1, .7
+    background_image: 'atlas://data/images/defaulttheme/button_pressed'
     arrow_pos: 'left_mid'
     orientation: 'vertical'
 
@@ -430,6 +429,8 @@ class ShowingDrawingArea(State):
 
             self.submenu.pos = [context.center[0],
                                 context.center[1] - self.submenu.height / 2]
+
+            self.submenu.arrow_pos = 'left_mid'
 
             self.drawing_area.add_widget(self.submenu)
 
