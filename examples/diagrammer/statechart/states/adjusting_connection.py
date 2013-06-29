@@ -94,8 +94,10 @@ class ConnectionBubble(Bubble):
 class AdjustingConnection(State):
     '''The AdjustingConnection state shows bubbles on either end of a
     provisional connection, allowing for dragging to the desired connection
-    point. Upon finalization, or cancelling, we go back to WaitingForTouches.
+    point. Upon finalization, or cancelling, we go back to ShowingDrawingArea.
     '''
+
+    drawing_area = ObjectProperty(None, allownone=True)
 
     connection_bubble1 = ObjectProperty(None, allownone=True)
     connection_bubble2 = ObjectProperty(None, allownone=True)
@@ -107,6 +109,9 @@ class AdjustingConnection(State):
         super(AdjustingConnection, self).__init__(**kwargs)
 
     def enter_state(self, context=None):
+
+        self.drawing_area = \
+                self.statechart.app.screen_manager.current_screen.drawing_area
 
         point1 = self.statechart.app.connections[-1].connection_point1()
         point2 = self.statechart.app.connections[-1].connection_point2()
@@ -123,7 +128,7 @@ class AdjustingConnection(State):
         self.connection_bubble1.add_widget(ConnectionPointAcceptButton(
                 self.statechart, 'accept_connection_point1', text='Accept'))
 
-        self.statechart.app.drawing_area.add_widget(self.connection_bubble1)
+        self.drawing_area.add_widget(self.connection_bubble1)
 
         self.connection_bubble2 = ConnectionBubble(
                 pos=(point2[0] - 75, point2[1]),
@@ -137,7 +142,7 @@ class AdjustingConnection(State):
         self.connection_bubble2.add_widget(ConnectionPointAcceptButton(
                 self.statechart, 'accept_connection_point2', text='Accept'))
 
-        self.statechart.app.drawing_area.add_widget(self.connection_bubble2)
+        self.drawing_area.add_widget(self.connection_bubble2)
 
     def exit_state(self, context=None):
         pass
@@ -168,7 +173,7 @@ class AdjustingConnection(State):
         if not dragging_op:
             dragging_op = True
 
-        with self.statechart.app.drawing_area.canvas.before:
+        with self.drawing_area.canvas.before:
 
             # Draw connection_points.
             Color(1, 1, 0)
@@ -186,21 +191,21 @@ class AdjustingConnection(State):
 
         connection = self.statechart.app.connections[-1]
 
-        self.statechart.app.drawing_area.remove_widget(connection.shape1)
-        self.statechart.app.drawing_area.remove_widget(self.connection_bubble1)
+        self.drawing_area.remove_widget(connection.shape1)
+        self.drawing_area.remove_widget(self.connection_bubble1)
         self.connection_bubble1 = None
         self.dragging_op1 = False
 
         # TODO: Need a better way to clear -- perhaps call clear() on after?
         #       Perhaps then it won't be necessary to remove/add the shape.
 
-        with self.statechart.app.drawing_area.canvas.before:
+        with self.drawing_area.canvas.before:
 
             # Draw connection_points.
             Color(0, 0, 0)
             connection.shape1.draw_connection_points()
 
-        self.statechart.app.drawing_area.add_widget(connection.shape1)
+        self.drawing_area.add_widget(connection.shape1)
 
         if not self.connection_bubble2:
             self.go_to_state('ShowingDrawingArea')
@@ -209,21 +214,21 @@ class AdjustingConnection(State):
 
         connection = self.statechart.app.connections[-1]
 
-        self.statechart.app.drawing_area.remove_widget(connection.shape2)
-        self.statechart.app.drawing_area.remove_widget(self.connection_bubble2)
+        self.drawing_area.remove_widget(connection.shape2)
+        self.drawing_area.remove_widget(self.connection_bubble2)
         self.connection_bubble2 = None
         self.dragging_op2 = False
 
         # TODO: Need a better way to clear -- perhaps call clear() on after?
         #       Perhaps then it won't be necessary to remove/add the shape.
 
-        with self.statechart.app.drawing_area.canvas.before:
+        with self.drawing_area.canvas.before:
 
             # Draw connection_points.
             Color(0, 0, 0)
             connection.shape2.draw_connection_points()
 
-        self.statechart.app.drawing_area.add_widget(connection.shape2)
+        self.drawing_area.add_widget(connection.shape2)
 
         if not self.connection_bubble1:
             self.go_to_state('ShowingDrawingArea')

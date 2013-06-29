@@ -88,22 +88,6 @@ class DiagrammerApp(App):
         self.statechart = AppStatechart(app=self)
         self.statechart.init_statechart()
 
-    def swap_in_submenu(self, context, submenu):
-
-        scrollview = context.parent.parent.parent
-        boxlayout = context.parent.parent
-
-        # Add the submenu to the BoxLayout in the menu scrollview. First check
-        # to see if a submenu is present, and remove it, before adding the
-        # submenu to swap in.
-
-        if len(boxlayout.children) == 2:
-            boxlayout.remove_widget(boxlayout.children[0])
-
-        boxlayout.add_widget(submenu)
-
-        Animation(scroll_x=1, d=.5).start(scrollview)
-
 
 if __name__ in ('__main__'):
     DiagrammerApp().run()

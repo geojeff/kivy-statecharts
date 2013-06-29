@@ -15,42 +15,12 @@ substantial rapid changes, because the coding styles and conventions for both
 Kivy graphics programming and for the design of statecharts are being
 discovered in the process.
 
-The focus has been on using the triangle vector shape and on a nacent system
+The focus has been on using the vector shape and on a nacent system
 for drawing connections. There is the start of a user interface for selecting
-shapes, but only the triangle shape is done. There is nothing for selecting
-connection end point styles (arrowheads, etc.) and the like. So far, after the
-app loads, this has been accomplished:
+shapes. There is nothing for selecting
+connection end point styles (arrowheads, etc.) and the like.
 
-After app loads, you see a blank rectangle display on the right for the drawing
-area, but the full area of the window is actually now the drawing area. You can
-do this:
-
-0) If you want, try out the menu to select the State menu, and the Triangle
-choice in the submenu, but presently the Triangle is hard-coded.
-
-1) Touch (or click) once in the drawing area to draw a triangle shape.
-
-2) Touch again in another area to draw a second shape.
-
-3) Touch the perimeter of a triangle and drag to move it.
-
-4) Touch and drag in the center of one rectangle to the center of another.
-
-4a) On touch up, bubbles will appear on either end of the connection. 
-
-4b) In a given bubble, touch and drag within the Drag button to move the
-    connection point for the end (dragging out of the drag button will
-    terminate the move, presently -- needs event handling in state for
-    drawing_area).
-
-4c) Repeat drag ops on the Drag button, for now to drag the given connection
-    point further, clockwise (too jerky and skips for now).
-
-4d) Once the connection point is ok, touch Accept.
-
-5) You can add more triangles and connections.
-
-6) You can move triangles with connections, and the connections will adjust.
+See the help screen for current status of functionality.
 
 Of course, there are quite a few things to improve in the existing
 functionality, and there will need to be user interface elements added, new

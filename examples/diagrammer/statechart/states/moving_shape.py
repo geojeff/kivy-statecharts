@@ -5,8 +5,7 @@ from kivy.uix.label import Label
 
 class MovingShape(State):
     '''The MovingShape state is a transient state -- after moving the shape,
-    there is an immediate transition back to the ShowingDrawingArea state, and
-    its substate, WaitingForTouches.'''
+    there is an immediate transition back to the ShowingDrawingArea state.'''
 
     def __init__(self, **kwargs):
         super(MovingShape, self).__init__(**kwargs)

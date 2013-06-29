@@ -14,10 +14,11 @@ class AddingConnection(State):
     '''The AddingConnection state is a transient state -- after connecting the
     shape, if there is a shape found on mouse-up, a working connection is made
     and bubbles appear on each end for dragging / accepting connection points,
-    after a transition to AdjustingConnection, which handles finalization.
-    If there is no shape found on mouse-up, there is an immediate
-    transition back to the ShowingDrawingArea state, and its substate,
-    WaitingForTouches.'''
+    after a transition to AdjustingConnection, which handles finalization.  If
+    there is no shape found on mouse-up, there is an immediate transition back
+    to the ShowingDrawingArea state.'''
+
+    drawing_area = ObjectProperty(None, allownone=True)
 
     realtime_line = ObjectProperty(None, allownone=True)
 
@@ -29,7 +30,8 @@ class AddingConnection(State):
         super(AddingConnection, self).__init__(**kwargs)
 
     def enter_state(self, context=None):
-        pass
+        self.drawing_area = \
+                self.statechart.app.screen_manager.current_screen.drawing_area
 
     def exit_state(self, context=None):
         pass
@@ -66,7 +68,7 @@ class AddingConnection(State):
 
                 self.statechart.app.current_shape = target_shape_for_connection
 
-                with self.statechart.app.drawing_area.canvas.before:
+                with self.drawing_area.canvas.before:
                     self.realtime_line.points = []
 
                 self.realtime_line = None
@@ -77,11 +79,11 @@ class AddingConnection(State):
 
         if event == 'drawing_area_touch_move':
 
-            self.draw_realtime_line(Color(1.0, 1.0, 0.0, 1.0), touch)
+            self.draw_realtime_line([1.0, 1.0, 0.0, 0.0], touch)
 
     def draw_realtime_line(self, color, touch):
 
-        with self.statechart.app.drawing_area.canvas.before:
+        with self.drawing_area.canvas.before:
 
             color = color
 
@@ -106,7 +108,7 @@ class AddingConnection(State):
         width = point2[0] - point1[0]
         height = point2[1] - point2[1]
 
-        with self.statechart.app.drawing_area.canvas.before:
+        with self.drawing_area.canvas.before:
             Color(1, 1, 0)
             connection = ConnectionLVS(
                     shape1=shape1,

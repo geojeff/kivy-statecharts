@@ -1,3 +1,5 @@
+from math import cos, sin, pi
+
 from kivy_statecharts.system.state import State
 
 from kivy.uix.label import Label
@@ -13,6 +15,7 @@ from kivy.uix.bubble import Bubble
 
 from kivy.lang import Builder
 
+from kivy.graphics import Mesh
 
 Builder.load_string('''
 #:import ListItemButton kivy.uix.listview.ListItemButton
@@ -364,6 +367,9 @@ class EditingShape(State):
 
     def enter_state(self, context=None):
 
+        drawing_area = \
+                self.statechart.app.screen_manager.current_screen.drawing_area
+
         self.shape = self.statechart.app.current_shape
 
         self.labels = [c for c in self.shape.children if isinstance(c, Label)]
@@ -380,7 +386,7 @@ class EditingShape(State):
             self.editing_shape_menu = Popup(
                     size_hint=(None, None),
                     size=(400, 640),
-                    attach_to=self.statechart.app.drawing_area,
+                    attach_to=drawing_area,
                     title='Editing Shape',
                     content=EditingShapeMenu())
 
@@ -462,7 +468,23 @@ class EditingShape(State):
 
     def done(self, *args):
 
-        self.statechart.go_to_state('WaitingForTouches')
+        self.statechart.go_to_state('ShowingDrawingArea')
+
+    def swap_in_submenu(self, context, submenu):
+
+        scrollview = context.parent.parent.parent
+        boxlayout = context.parent.parent
+
+        # Add the submenu to the BoxLayout in the menu scrollview. First check
+        # to see if a submenu is present, and remove it, before adding the
+        # submenu to swap in.
+
+        if len(boxlayout.children) == 2:
+            boxlayout.remove_widget(boxlayout.children[0])
+
+        boxlayout.add_widget(submenu)
+
+        Animation(scroll_x=1, d=.5).start(scrollview)
 
     @State.event_handler(['drawing_area_touch_down',
                           'drawing_area_touch_move',
@@ -483,7 +505,7 @@ class EditingShape(State):
 
             # TODO: Write scale and connections widgets.
             if not menu_name in ['scale', 'connections']:
-                self.statechart.app.swap_in_submenu(context, submenu)
+                self.swap_in_submenu(context, submenu)
 
         elif event in ['hide_editing_shape_submenu',
                        'hide_editing_shape_submenu']:

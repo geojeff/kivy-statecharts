@@ -41,20 +41,20 @@ class ShowingHelpScreen(State):
 After app loads, you see a blank rectangle display on the right for the drawing
 area. Various parts of the app are under construction and development, so
 please discuss in #kivy for current status if you really want to kick the
-tires.
+tires. NOTE: N.I.Y. = Not Implemented Yet, when you see it in the UI.
 
-In the main drawing menu (Select, Text, Line, Shape, State), only the State
-menu has functionality so far. You can try this:
+In the main drawing menu, only the State menu has functionality so far
+(Triangle, Rectangle, Pentagon). You can try this:
 
 Drawing Shapes
 
 - Try out the menu to select the State menu to select different shapes to
-   draw. Ellipse isn't implemented yet -- you'll get Triangle.
+   draw.
 
-- Touch (or click) once in the drawing area to draw a triangle shape.
+- Touch (or click) once in the drawing area to draw a shape.
   Touch again in another area to draw a second shape.
 
-- Touch the perimeter of a triangle and drag to move it.
+- Touch the perimeter of a shape and drag to move it.
 
 - Touch and drag in the center of one rectangle to the center of another.
 
@@ -68,9 +68,9 @@ Drawing Connections
   drag the given connection point further, clockwise (too jerky and skips for
   now). Once the connection point is ok, touch Accept.
 
-Connectedness
+Connecting Shapes
 
-You can add more triangles and connections. You can move triangles with
+You can add more shapes and connections. You can move shapes with
 connections, and the connections will adjust.
 
 Shape Properties

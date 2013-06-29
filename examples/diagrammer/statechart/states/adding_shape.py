@@ -11,8 +11,7 @@ from state_graphics import StatePentagonLVS
 
 class AddingShape(State):
     '''The AddingShape state is a transient state -- after adding the shape,
-    there is an immediate transition back to the ShowingDrawingArea state, and
-    its substate, WaitingForTouches.'''
+    there is an immediate transition back to the ShowingDrawingArea state.'''
 
     def __init__(self, **kwargs):
         super(AddingShape, self).__init__(**kwargs)
@@ -33,7 +32,10 @@ class AddingShape(State):
         else:
             shape_cls = StateTriangleLVS
 
-        with self.statechart.app.drawing_area.canvas.before:
+        drawing_area = \
+                self.statechart.app.screen_manager.current_screen.drawing_area
+
+        with drawing_area.canvas.before:
             Color(1, 1, 0)
             d = 100.
             #RectangleLIS(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d),
