@@ -5,7 +5,7 @@ from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import NumericProperty
 
-from graphics import ConnectionLVS
+from graphics import ConnectionVectorShape
 
 from adjusting_connection import AdjustingConnection
 
@@ -110,7 +110,7 @@ class AddingConnection(State):
 
         with self.drawing_area.canvas.before:
             Color(1, 1, 0)
-            connection = ConnectionLVS(
+            connection = ConnectionVectorShape(
                     shape1=shape1,
                     shape2=shape2,
                     shape1_cp_index=point1_index,

@@ -1,24 +1,22 @@
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 
-from graphics import RectangleLIS
-from graphics import TriangleLIS
-from graphics import TriangleLVS
-from graphics import RectangleLVS
-from graphics import PentagonLVS
+from graphics import RectangleImageShape
+from graphics import TriangleImageShape
+from graphics import PolygonVectorShape
 
 
-class StateRectangleLIS(RectangleLIS):
+class StateRectangleImageShape(RectangleImageShape):
 
     def __init__(self, **kwargs):
 
-        super(StateRectangleLIS, self).__init__(**kwargs)
+        super(StateRectangleImageShape, self).__init__(**kwargs)
 
         if 'state' in kwargs:
             self.label.text = kwargs['state']
 
 
-class StateTriangleLIS(TriangleLIS):
+class StateTriangleImageShape(TriangleImageShape):
 
     def __init__(self, **kwargs):
 
@@ -42,7 +40,7 @@ class StateTriangleLIS(TriangleLIS):
         self.label_data['out_se_corner'] = (0.0, 0.1, 'right', 'middle')
         self.label_data['out_sw_corner'] = (1.0, 0.1, 'left', 'middle')
 
-        super(StateTriangleLIS, self).__init__(**kwargs)
+        super(StateTriangleImageShape, self).__init__(**kwargs)
 
 class StateShape(object):
 
@@ -53,30 +51,36 @@ class StateShape(object):
         super(StateShape, self).__init__(**kwargs)
 
 
-class StateTriangleLVS(StateShape, TriangleLVS):
+class StateTriangleVectorShape(StateShape, PolygonVectorShape):
 
     def __init__(self, **kwargs):
 
-        super(StateTriangleLVS, self).__init__(**kwargs)
+        kwargs['sides'] = 3
+
+        super(StateTriangleVectorShape, self).__init__(**kwargs)
 
 
-class StateRectangleLVS(StateShape, RectangleLVS):
-
-    def __init__(self, **kwargs):
-
-        super(StateRectangleLVS, self).__init__(**kwargs)
-
-
-class StatePentagonLVS(StateShape, PentagonLVS):
+class StateRectangleVectorShape(StateShape, PolygonVectorShape):
 
     def __init__(self, **kwargs):
 
-        super(StatePentagonLVS, self).__init__(**kwargs)
+        kwargs['sides'] = 3
+
+        super(StateRectangleVectorShape, self).__init__(**kwargs)
+
+
+class StatePentagonVectorShape(StateShape, PolygonVectorShape):
+
+    def __init__(self, **kwargs):
+
+        kwargs['sides'] = 3
+
+        super(StatePentagonVectorShape, self).__init__(**kwargs)
 
 
 #    def on_touch_down(self, touch):
 #        print 'triangle touch', touch.pos
-#        return super(StateTriangleLVS, self).on_touch_down(touch)
+#        return super(StateTriangleVectorShape, self).on_touch_down(touch)
 #        if self.collide_point(touch.pos[0], touch.pos[1]):
 #            for i, p in enumerate(zip(self.statechart.app.points[::2],
 #                                      self.statechart.app.points[1::2])):

@@ -1,10 +1,10 @@
 import os
 import math
 import operator
+import itertools
 from itertools import chain, izip
 
 from kivy.uix.widget import Widget
-from kivy.uix.label import Label
 from kivy.uix.listview import SelectableView
 
 from kivy.uix.anchorlayout import AnchorLayout
@@ -22,6 +22,12 @@ from kivy.lang import Builder
 Builder.load_file(str(os.path.join(os.path.dirname(__file__), 'graphics.kv')))
 
 # Abbreviation used in this file: cp == connection point
+
+
+def pairwise(iterable):
+
+    iterator = iter(iterable)
+    return izip(iterator, iterator)
 
 
 def cartesian_distance(x1, y1, x2, y2):
@@ -246,14 +252,20 @@ class AnchoredLabel(AnchorLayout):
             margin = size[1] - self.anchor_widget.height
             pos_change_y = (margin / 2.) * -.1
 
-        return tuple(map(operator.add, self.anchor_widget.pos, (pos_change_x, pos_change_y)))
+        return tuple(map(operator.add, self.anchor_widget.pos, (pos_change_x,
+                                                                pos_change_y)))
 
     def set_label_anchor_layout_pos(self, value):
 
-        pos_difference = tuple(map(operator.sub, self.anchor_widget.pos, value))
+        pos_difference = tuple(map(
+            operator.sub, self.anchor_widget.pos, value))
 
-        self.label_anchor_layout_x = self.anchor_widget.width / self.anchor_widget.width + pos_difference[0]
-        self.label_anchor_layout_y = self.anchor_widget.height / self.anchor_widget.width + pos_difference[0]
+        self.label_anchor_layout_x = \
+            self.anchor_widget.width / self.anchor_widget.width \
+            + pos_difference[0]
+        self.label_anchor_layout_y = \
+            self.anchor_widget.height / self.anchor_widget.width \
+            + pos_difference[0]
 
     label_anchor_layout_pos = \
             AliasProperty(get_label_anchor_layout_pos,
@@ -282,14 +294,14 @@ class AnchoredLabel(AnchorLayout):
         self.label.text = kwargs['text']
 
 
-class LabeledVectorShape(ConnectedShape):
+class VectorShape(ConnectedShape):
 
     points = ListProperty([])
     unit_circle_points = ListProperty([])
     cp_slices_for_edges = ListProperty([])
 
     def __init__(self, **kwargs):
-        super(LabeledVectorShape, self).__init__(**kwargs)
+        super(VectorShape, self).__init__(**kwargs)
 
         self.bind(size=self.recalculate_points)
 
@@ -304,7 +316,7 @@ class LabeledVectorShape(ConnectedShape):
         min_x = 0 if min_x > 0 else min_x * -1.
         min_y = 0 if min_y > 0 else min_y * -1.
 
-        # Shift from unit circle to origin.
+        # Shift from unit circle to pos.
         x_values_pos = [x + min_x for x in x_values]
         y_values_pos = [y + min_y for y in y_values]
 
@@ -571,8 +583,16 @@ class LabeledVectorShape(ConnectedShape):
         cp = self.connection_points[index]
         Line(circle=(cp[0], cp[1], 5))
 
+    def vertices(self):
+        '''Return vertices for Mesh.'''
+        pass
 
-class ConnectionLVS(LabeledVectorShape):
+    def indices(self):
+        '''Return indices for Mesh.'''
+        pass
+
+
+class ConnectionVectorShape(VectorShape):
     shape = ListProperty([.9, .9])
     shape1 = ObjectProperty(None)
     shape2 = ObjectProperty(None)
@@ -581,7 +601,7 @@ class ConnectionLVS(LabeledVectorShape):
 
     def __init__(self, **kwargs):
 
-        super(LabeledVectorShape, self).__init__(**kwargs)
+        super(ConnectionVectorShape, self).__init__(**kwargs)
 
         #if 'text' in kwargs:
             #self.label.text = kwargs['text']
@@ -598,7 +618,7 @@ class ConnectionLVS(LabeledVectorShape):
                 self.shape2.connection_points[self.shape2_cp_index][1])
 
     def on_touch_down(self, touch):
-        return super(LabeledVectorShape, self).on_touch_down(touch)
+        return super(VectorShape, self).on_touch_down(touch)
 
     def adjust(self, shape, dx, dy):
         connection_point1 = self.shape1.connection_points[self.shape1_cp_index]
@@ -672,18 +692,71 @@ class ConnectionLVS(LabeledVectorShape):
         self.adjust(self.shape2, dx, dy)
 
 
-class TriangleLVS(LabeledVectorShape):
-    points = ListProperty([0] * 6)
-    unit_circle_points = ListProperty([0, 1., .866, -.5, -.866, -.5])
+class PolygonVectorShape(VectorShape):
+
+    origin = ListProperty([0.0, 0.0])
+    radius = NumericProperty(10)
+    sides = NumericProperty(3)
 
     def __init__(self, **kwargs):
-        super(TriangleLVS, self).__init__(**kwargs)
+        super(PolygonVectorShape, self).__init__(**kwargs)
+
+        self.points = [0] * (self.sides * 2)
+
+        self.unit_circle_points = self.vertices()
 
         self.recalculate_points()
 
     def recalculate_points(self, *args):
 
+        w = self.size[0]
+        h = self.size[1]
+        origin_x = self.origin[0]
+        origin_y = self.origin[1]
+
+        i = 0
+        for x, y, mult_x, mult_y in zip(pairwise(self.points),
+                                        pairwise(self.unit_circle_points)):
+            self.points[i] = origin_x + w * mult_x
+            self.points[i + 1] = origin_y + h * mult_y
+            i += 2
+
+    def vertices(self, origin=None):
+        '''Return vertices for Mesh.'''
+
+        if not origin:
+            origin = self.origin
+
+        return list(itertools.chain(*[
+                       ((self.origin[0])
+                            + math.cos(i * ((2 * math.pi) / self.sides))
+                                * self.radius,
+                        (self.origin[1])
+                            + math.sin(i * ((2 * math.pi) / self.sides))
+                                * self.radius,
+                        math.cos(i * ((2 * math.pi) / self.sides)),
+                        math.sin(i * ((2 * math.pi) / self.sides)))
+                            for i in xrange(self.sides)]))
+
+    def indices(self):
+        '''Return indices for Mesh.'''
+
+        return range(self.sides)
+
+
+class TriangleVectorShapePrecalculated(VectorShape):
+
+    points = ListProperty([0] * 6)
+    unit_circle_points = ListProperty([0, 1., .866, -.5, -.866, -.5])
+
+    def __init__(self, **kwargs):
+        super(TriangleVectorShapePrecalculated, self).__init__(**kwargs)
+
         self.unit_circle_points = self.shift_unit_circle_points_to_origin()
+
+        self.recalculate_points()
+
+    def recalculate_points(self, *args):
 
         w = self.size[0]
         h = self.size[1]
@@ -696,19 +769,20 @@ class TriangleLVS(LabeledVectorShape):
         self.points[5] = self.pos[1] + h * self.unit_circle_points[5]
 
 
-class RectangleLVS(LabeledVectorShape):
+class RectangleVectorShapePrecalculated(VectorShape):
+
     points = ListProperty([0] * 8)
     unit_circle_points = ListProperty(
             [-.707, .707, .707, .707, .707, -.707, -.707, -.707])
 
     def __init__(self, **kwargs):
-        super(RectangleLVS, self).__init__(**kwargs)
+        super(RectangleVectorShapePrecalculated, self).__init__(**kwargs)
+
+        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
 
         self.recalculate_points()
 
     def recalculate_points(self, *args):
-
-        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
 
         w = self.size[0]
         h = self.size[1]
@@ -723,7 +797,8 @@ class RectangleLVS(LabeledVectorShape):
         self.points[7] = self.pos[1] + h * self.unit_circle_points[7]
 
 
-class PentagonLVS(LabeledVectorShape):
+class PentagonVectorShapePrecalculated(VectorShape):
+
     points = ListProperty([0] * 10)
 
     # For pentagon vertex coordinates calculation, see:
@@ -742,13 +817,13 @@ class PentagonLVS(LabeledVectorShape):
                           (1.618033989 - 1.) / 2.])
 
     def __init__(self, **kwargs):
-        super(PentagonLVS, self).__init__(**kwargs)
+        super(PentagonVectorShapePrecalculated, self).__init__(**kwargs)
+
+        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
 
         self.recalculate_points()
 
     def recalculate_points(self, *args):
-
-        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
 
         w = self.size[0]
         h = self.size[1]
@@ -773,30 +848,30 @@ class LabeledImageShape(ConnectedShape):
             self.shape.source = kwargs['shape']
 
 
-class RectangleLIS(LabeledImageShape):
+class RectangleImageShape(LabeledImageShape):
     pass
 
 
-class CircleLIS(LabeledImageShape):
+class CircleImageShape(LabeledImageShape):
 
     radius = NumericProperty(5.0)
 
     def __init__(self, **kwargs):
 
-        super(CircleLIS, self).__init__(**kwargs)
+        super(CircleImageShape, self).__init__(**kwargs)
 
         if 'radius' in kwargs:
             self.radius = kwargs['radius']
 
 
-class PointLIS(CircleLIS):
+class PointImageShape(CircleImageShape):
 
     def __init__(self, **kwargs):
 
         if not 'radius' in kwargs:
             kwargs['radius'] = 0.0
 
-        super(PointLIS, self).__init__(**kwargs)
+        super(PointImageShape, self).__init__(**kwargs)
 
         if 'x' in kwargs:
             self.x = kwargs['x']
@@ -805,14 +880,14 @@ class PointLIS(CircleLIS):
             self.y = kwargs['y']
 
 
-class LineLIS(LabeledImageShape):
+class LineImageShape(LabeledImageShape):
 
     x1 = NumericProperty(0.0)
     y1 = NumericProperty(0.0)
 
     def __init__(self, **kwargs):
 
-        super(LineLIS, self).__init__(**kwargs)
+        super(LineImageShape, self).__init__(**kwargs)
 
         if 'x1' in kwargs:
             self.x1 = kwargs['x1']
@@ -820,14 +895,14 @@ class LineLIS(LabeledImageShape):
             self.y1 = kwargs['y1']
 
 
-class TriangleLIS(LineLIS):
+class TriangleImageShape(LineImageShape):
 
     x2 = NumericProperty(0.0)
     y2 = NumericProperty(0.0)
 
     def __init__(self, **kwargs):
 
-        super(TriangleLIS, self).__init__(**kwargs)
+        super(TriangleImageShape, self).__init__(**kwargs)
 
         if 'x2' in kwargs:
             self.x2 = kwargs['x2']
@@ -835,14 +910,14 @@ class TriangleLIS(LineLIS):
             self.y2 = kwargs['y2']
 
 
-class DiamondLIS(LineLIS):
+class DiamondImageShape(LineImageShape):
 
     x3 = NumericProperty(0.0)
     y3 = NumericProperty(0.0)
 
     def __init__(self, **kwargs):
 
-        super(DiamondLIS, self).__init__(**kwargs)
+        super(DiamondImageShape, self).__init__(**kwargs)
 
         if 'x3' in kwargs:
             self.x3 = kwargs['x3']
@@ -850,14 +925,14 @@ class DiamondLIS(LineLIS):
             self.y3 = kwargs['y3']
 
 
-class PentagonLIS(DiamondLIS):
+class PentagonImageShape(DiamondImageShape):
 
     x4 = NumericProperty(0.0)
     y4 = NumericProperty(0.0)
 
     def __init__(self, **kwargs):
 
-        super(DiamondLIS, self).__init__(**kwargs)
+        super(DiamondImageShape, self).__init__(**kwargs)
 
         if 'x4' in kwargs:
             self.x4 = kwargs['x4']
@@ -865,14 +940,14 @@ class PentagonLIS(DiamondLIS):
             self.y4 = kwargs['y4']
 
 
-class HexagonLIS(PentagonLIS):
+class HexagonImageShape(PentagonImageShape):
 
     x5 = NumericProperty(0.0)
     y5 = NumericProperty(0.0)
 
     def __init__(self, **kwargs):
 
-        super(HexagonLIS, self).__init__(**kwargs)
+        super(HexagonImageShape, self).__init__(**kwargs)
 
         if 'x5' in kwargs:
             self.x5 = kwargs['x5']

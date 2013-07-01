@@ -55,26 +55,29 @@ class DiagrammerApp(App):
     connections = ListProperty()
 
     current_shape = ObjectProperty(None, allownone=True)
+    current_state_shape = ObjectProperty(None, allownone=True)
     current_label = ObjectProperty(None, allownone=True)
     current_connection = ObjectProperty(None, allownone=True)
 
     drawing_mode = OptionProperty('select_pick',
-                                   options=('select_pick',
-                                            'select_marquee',
-                                            'select_node',
-                                            'text_large',
-                                            'text_medium',
-                                            'text_small',
-                                            'line_straight',
-                                            'line_arc',
-                                            'line_bezier',
-                                            'shape_rectangle',
-                                            'shape_ellipse',
-                                            'shape_polygon',
-                                            'state_triangle',
-                                            'state_rectangle',
-                                            'state_pentagon',
-                                            'state_ellipse'))
+                                  options=('select_pick',
+                                           'select_marquee',
+                                           'select_node',
+                                           'text_large',
+                                           'text_medium',
+                                           'text_small',
+                                           'line_straight',
+                                           'line_arc',
+                                           'line_bezier',
+                                           'shape_rectangle',
+                                           'shape_ellipse',
+                                           'shape_polygon',
+                                           'state_triangle',
+                                           'state_rectangle',
+                                           'state_pentagon',
+                                           'state_ellipse'))
+
+    state_drawing_mode_adapter = ObjectProperty(None)
 
     def build(self):
 

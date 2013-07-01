@@ -42,9 +42,9 @@
         size: self.size
         #size: root.anchor_widget.size
 
-<LabeledVectorShape>:
+<VectorShape>:
 
-    id: lvs
+    id: vs
     #label: label
     points: self.points
     pos: self.pos
@@ -54,15 +54,15 @@
         id: layout
         canvas:
 #            Color: 
-#                rgba: lvs.fill_color
+#                rgba: vs.fill_color
 #            Triangle:
-#                points: lvs.points
+#                points: vs.points
             Color: 
-                rgba: lvs.stroke_color
+                rgba: vs.stroke_color
             Line:
                 id: perimeter
-                points: lvs.points
-                width: lvs.stroke_width
+                points: vs.points
+                width: vs.stroke_width
                 joint: 'round'
                 close: True
         Scatter:
@@ -71,5 +71,5 @@
             do_rotation: False
             auto_bring_to_front: False
             size_hint: None, None
-            size: lvs.height, lvs.width
-            pos: lvs.pos
+            size: vs.height, vs.width
+            pos: vs.pos

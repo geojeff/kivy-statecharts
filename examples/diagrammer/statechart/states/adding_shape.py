@@ -4,9 +4,9 @@ from kivy.graphics import Color
 
 from kivy.uix.label import Label
 
-from state_graphics import StateTriangleLVS
-from state_graphics import StateRectangleLVS
-from state_graphics import StatePentagonLVS
+from state_graphics import StateTriangleVectorShape
+from state_graphics import StateRectangleVectorShape
+from state_graphics import StatePentagonVectorShape
 
 
 class AddingShape(State):
@@ -22,15 +22,15 @@ class AddingShape(State):
 
         # TODO: Finish other shapes.
         if self.statechart.app.drawing_mode == 'state_triangle':
-            shape_cls = StateTriangleLVS
+            shape_cls = StateTriangleVectorShape
         elif self.statechart.app.drawing_mode == 'state_rectangle':
-            shape_cls = StateRectangleLVS
+            shape_cls = StateRectangleVectorShape
         elif self.statechart.app.drawing_mode == 'state_pentagon':
-            shape_cls = StatePentagonLVS
+            shape_cls = StatePentagonVectorShape
         elif self.statechart.app.drawing_mode == 'state_ellipse':
-            shape_cls = StateTriangleLVS
+            shape_cls = StateTriangleVectorShape
         else:
-            shape_cls = StateTriangleLVS
+            shape_cls = StateTriangleVectorShape
 
         drawing_area = \
                 self.statechart.app.screen_manager.current_screen.drawing_area
@@ -38,7 +38,7 @@ class AddingShape(State):
         with drawing_area.canvas.before:
             Color(1, 1, 0)
             d = 100.
-            #RectangleLIS(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d),
+            #RectangleImageShape(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d),
                     #x=touch.x, y=touch.y, width=100.0, height=100.0,
                     #line_color=[1.0, .3, .2, .5], fill_color=[.4, .4, .4, .4])
             #Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))

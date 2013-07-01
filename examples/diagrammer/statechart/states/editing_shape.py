@@ -104,7 +104,7 @@ Builder.load_string('''
                         size: self.size
                         pos: self.pos
                 adapter:
-                    ListAdapter(data=[l for l in root.labels], \
+                    ListAdapter(data=root.labels, \
                             cls=ListItemButton, \
                             args_converter=lambda rowindex, obj: { \
                                         'text': obj.text, \
