@@ -21,13 +21,16 @@ class AddingShape(State):
         touch = self.statechart.app.touch
 
         # TODO: Finish other shapes.
-        if self.statechart.app.drawing_mode == 'state_triangle':
+
+        mode = self.statechart.app.state_drawing_mode_adapter.mode
+
+        if mode == 'state_triangle':
             shape_cls = StateTriangleVectorShape
-        elif self.statechart.app.drawing_mode == 'state_rectangle':
+        elif mode == 'state_rectangle':
             shape_cls = StateRectangleVectorShape
-        elif self.statechart.app.drawing_mode == 'state_pentagon':
+        elif mode == 'state_pentagon':
             shape_cls = StatePentagonVectorShape
-        elif self.statechart.app.drawing_mode == 'state_ellipse':
+        elif mode == 'state_ellipse':
             shape_cls = StateTriangleVectorShape
         else:
             shape_cls = StateTriangleVectorShape

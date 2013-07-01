@@ -1,8 +1,4 @@
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.bubble import Bubble
-from kivy.uix.bubble import BubbleButton
-from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
@@ -10,6 +6,7 @@ from kivy.uix.widget import Widget
 from kivy.lang import Builder
 
 from kivy.properties import ObjectProperty
+from kivy.properties import DictProperty
 
 from kivy_statecharts.system.state import State
 
@@ -295,7 +292,8 @@ Builder.load_string('''
         action: 'set_drawing_mode_shape_polygon'
 
 <StateSubmenu>:
-    size_hint: (None, None)
+    # TODO: size is hard-coded.
+    size_hint: None, None
     size: (60, 60 * 3 + 12)
     pos_hint: {'center_x': .5, 'y': .6}
     #background_color: .2, .9, 1, .7
@@ -346,6 +344,8 @@ class ShowingDrawingArea(State):
 
     drawing_area = ObjectProperty(None)
 
+    menus_and_submenus = DictProperty({})
+
     def __init__(self, **kwargs):
 
         kwargs['AddingShape'] = AddingShape
@@ -369,11 +369,12 @@ class ShowingDrawingArea(State):
         self.drawing_area = \
                 self.statechart.app.screen_manager.current_screen.drawing_area
 
-        self.menus_and_submenus = {'select': SelectSubmenu(),
-                                   'text': TextSubmenu(),
-                                   'line': LineSubmenu(),
-                                   'shape': ShapeSubmenu(),
-                                   'state': StateSubmenu()}
+        if not self.menus_and_submenus:
+            self.menus_and_submenus = {'select': SelectSubmenu(),
+                                       'text': TextSubmenu(),
+                                       'line': LineSubmenu(),
+                                       'shape': ShapeSubmenu(),
+                                       'state': StateSubmenu()}
 
     def exit_state(self, context=None):
         pass
@@ -391,46 +392,23 @@ class ShowingDrawingArea(State):
 
     @State.event_handler(['show_drawing_submenu_select',
                           'show_drawing_submenu_text',
-                          'show_drawing_submenu_state',
-                          'set_drawing_mode_select_pick',
-                          'set_drawing_mode_select_marquee',
-                          'set_drawing_mode_select_node',
-                          'set_drawing_mode_text_large',
-                          'set_drawing_mode_text_medium',
-                          'set_drawing_mode_text_small',
-                          'set_drawing_mode_line_straight',
-                          'set_drawing_mode_line_arc',
-                          'set_drawing_mode_line_bezier',
-                          'set_drawing_mode_shape_rectangle',
-                          'set_drawing_mode_shape_ellipse',
-                          'set_drawing_mode_shape_polygon',
-                          'set_drawing_mode_state_triangle',
-                          'set_drawing_mode_state_rectangle',
-                          'set_drawing_mode_state_pentagon'])
+                          'show_drawing_submenu_state',])
     def handle_menu_touch(self, event, context, arg):
 
-        if event.startswith('show_drawing_submenu'):
+        self.submenu = self.menus_and_submenus[event[21:]]
 
-            self.submenu = self.menus_and_submenus[event[21:]]
+        self.submenu.pos = [context.center[0],
+                            context.center[1] - self.submenu.height / 2]
 
-            self.submenu.pos = [context.center[0],
-                                context.center[1] - self.submenu.height / 2]
+        self.submenu.arrow_pos = 'left_mid'
 
-            self.submenu.arrow_pos = 'left_mid'
+        self.drawing_area.add_widget(self.submenu)
 
-            self.drawing_area.add_widget(self.submenu)
+    def state_drawing_mode_changed(self, adapter, *args):
 
-        else:
+        self.drawing_area.remove_widget(self.submenu)
 
-            self.statechart.app.drawing_mode = event[17:]
-
-            self.drawing_area.remove_widget(self.submenu)
-
-            self.submenu = None
-
-
-    def exit_state(self, context=None):
-        pass
+        self.submenu = None
 
     @State.event_handler(['drawing_area_touch_down',
                           'drawing_area_touch_move',

@@ -82,6 +82,7 @@ class DiagrammerApp(App):
     def build(self):
 
         self.screen_manager = ScreenManager()
+
         return self.screen_manager
 
         self.root = MainScreen(app=self)

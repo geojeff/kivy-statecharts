@@ -53,10 +53,12 @@
     FloatLayout:
         id: layout
         canvas:
-#            Color: 
-#                rgba: vs.fill_color
-#            Triangle:
-#                points: vs.points
+            Color: 
+                rgba: vs.fill_color
+            Mesh:
+                vertices: vs.vertices(origin=vs.center)
+                indices: vs.indices()
+                mode: 'triangle_fan'
             Color: 
                 rgba: vs.stroke_color
             Line:

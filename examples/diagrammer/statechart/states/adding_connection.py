@@ -88,7 +88,7 @@ class AddingConnection(State):
             color = color
 
             if not self.realtime_line:
-                self.center1 = list(self.statechart.app.current_shape.center())
+                self.center1 = list(self.statechart.app.current_shape.center)
                 self.realtime_line = Line(
                         points=self.center1,
                         dash_offset=10,

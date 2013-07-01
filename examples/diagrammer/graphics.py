@@ -181,8 +181,8 @@ class Shape(SelectableView, Widget):
 #
 #            self.remove_widget(self.edit_button)
 
-    def center(self):
-        pass
+#    def center(self):
+#        pass
         #return self.x + (self.width / 2.0), self.y + (self.height / 2.0)
 
 
@@ -436,17 +436,17 @@ class VectorShape(ConnectedShape):
         x, y = self.to_local(x, y)
         return self.point_inside_polygon(x, y, self.points)
 
-    def center(self):
-        x_values = self.points[::2]
-        y_values = self.points[1::2]
-
-        min_x = min(x_values)
-        max_x = max(x_values)
-        min_y = min(y_values)
-        max_y = max(y_values)
-
-        return (self.pos[0] + ((max_x - min_x) / 2.),
-                self.pos[1] + ((max_y - min_y) / 2.))
+#    def center(self):
+#        x_values = self.points[::2]
+#        y_values = self.points[1::2]
+#
+#        min_x = min(x_values)
+#        max_x = max(x_values)
+#        min_y = min(y_values)
+#        max_y = max(y_values)
+#
+#        return (self.pos[0] + ((max_x - min_x) / 2.),
+#                self.pos[1] + ((max_y - min_y) / 2.))
 
     def generate_connection_points(self, step_distance=10):
         poly = self.points
@@ -547,8 +547,8 @@ class VectorShape(ConnectedShape):
         and shape2.
         '''
 
-        center1 = self.center()
-        center2 = shape2.center()
+        center1 = self.center
+        center2 = shape2.center
 
         min_distance = 100000.
 
@@ -583,7 +583,7 @@ class VectorShape(ConnectedShape):
         cp = self.connection_points[index]
         Line(circle=(cp[0], cp[1], 5))
 
-    def vertices(self):
+    def vertices(self, origin=None):
         '''Return vertices for Mesh.'''
         pass
 
@@ -643,11 +643,31 @@ class ConnectionVectorShape(VectorShape):
         self.size = (self.width, self.height)
 
     def recalculate_points(self, *args):
+        pass
 
-        # needed?
+        # TODO: This was present before the refactor to PolygonVectorShape and
+        #       the use of vertices /indices. The line was incorrectly being
+        #       shortened dramatically on one end. So, if needed, this is now
+        #       wrong.
 
-        self.points[0] = self.pos[0] + int(float(self.size[0]) * self.shape[0])
-        self.points[1] = self.pos[1] + int(float(self.size[1]) * self.shape[1])
+        #self.points[0] = self.pos[0] + int(float(self.size[0]) * self.shape[0])
+        #self.points[1] = self.pos[1] + int(float(self.size[1]) * self.shape[1])
+
+    def vertices(self, origin=None, for_perimeter=False):
+        '''For now, just return the two end points. See comment in indices().
+        '''
+
+        return self.points
+
+    def indices(self):
+        '''Return indices for Mesh.
+
+        TODO: Now we treat the connection as a line, but it could be a polygon
+              such as a line with width (fill possible) and with arrowheads on
+              one end or the other. For now, just make the Mesh happy.
+        '''
+
+        return range(2)
 
     def connection_point1(self):
         return self.shape1.connection_points[self.shape1_cp_index]
@@ -693,9 +713,13 @@ class ConnectionVectorShape(VectorShape):
 
 
 class PolygonVectorShape(VectorShape):
+    '''The points list is recalculated if size changes (see superclass), so it
+    may be used when efficiency is a concern. If the vertices() method is
+    called directly, with an origin given as some pos, the vertices will be
+    calculated freshly.'''
 
     origin = ListProperty([0.0, 0.0])
-    radius = NumericProperty(10)
+    radius = NumericProperty(50)
     sides = NumericProperty(3)
 
     def __init__(self, **kwargs):
@@ -703,253 +727,74 @@ class PolygonVectorShape(VectorShape):
 
         self.points = [0] * (self.sides * 2)
 
-        self.unit_circle_points = self.vertices()
-
         self.recalculate_points()
 
     def recalculate_points(self, *args):
 
+        self.unit_circle_points = self.vertices(for_perimeter=True)
+
+        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
+
         w = self.size[0]
         h = self.size[1]
-        origin_x = self.origin[0]
-        origin_y = self.origin[1]
+        pos_x = self.pos[0]
+        pos_y = self.pos[1]
 
-        i = 0
-        for x, y, mult_x, mult_y in zip(pairwise(self.points),
-                                        pairwise(self.unit_circle_points)):
-            self.points[i] = origin_x + w * mult_x
-            self.points[i + 1] = origin_y + h * mult_y
-            i += 2
+        x_mult_values = self.unit_circle_points[::2]
+        y_mult_values = self.unit_circle_points[1::2]
 
-    def vertices(self, origin=None):
-        '''Return vertices for Mesh.'''
+        self.points = list(
+                chain.from_iterable(izip(
+                    [pos_x + w * mult_x for mult_x in x_mult_values],
+                    [pos_y + h * mult_y for mult_y in y_mult_values])))
+
+        x_values = self.points[::2]
+        y_values = self.points[1::2]
+
+        print 'w=', max(x_values) - min(x_values)
+        print 'h=', max(y_values) - min(y_values)
+
+    def vertices(self, origin=None, for_perimeter=False):
+        '''Return vertices for perimeter or Mesh.'''
 
         if not origin:
             origin = self.origin
 
-        return list(itertools.chain(*[
-                       ((self.origin[0])
-                            + math.cos(i * ((2 * math.pi) / self.sides))
-                                * self.radius,
-                        (self.origin[1])
-                            + math.sin(i * ((2 * math.pi) / self.sides))
-                                * self.radius,
-                        math.cos(i * ((2 * math.pi) / self.sides)),
-                        math.sin(i * ((2 * math.pi) / self.sides)))
-                            for i in xrange(self.sides)]))
+        if for_perimeter:
+
+            radius = 1
+
+            return list(itertools.chain(*[
+                            (radius * math.cos(2 * math.pi * i / self.sides),
+                             radius * math.sin(2 * math.pi * i / self.sides))
+                                for i in range(self.sides)]))
+        else:
+
+            vertices = list(itertools.chain(*[
+                           ((origin[0])
+                                + math.cos(i * ((2 * math.pi) / self.sides))
+                                    * self.radius,
+                            (origin[1])
+                                + math.sin(i * ((2 * math.pi) / self.sides))
+                                    * self.radius,
+                            math.cos(i * ((2 * math.pi) / self.sides)),
+                            math.sin(i * ((2 * math.pi) / self.sides)))
+                                for i in xrange(self.sides)]))
+
+            # TODO: Resolve the mismatch between vertices and points (fill not
+            # full size, or points spread too large).
+
+            #x_values1 = vertices[::2]
+            #x_values = x_values1[::2]
+            #y_values1 = vertices[1::2]
+            #y_values = y_values1[::2]
+
+            #print 'wv=', max(x_values) - min(x_values)
+            #print 'hv=', max(y_values) - min(y_values)
+
+            return vertices
 
     def indices(self):
         '''Return indices for Mesh.'''
 
         return range(self.sides)
-
-
-class TriangleVectorShapePrecalculated(VectorShape):
-
-    points = ListProperty([0] * 6)
-    unit_circle_points = ListProperty([0, 1., .866, -.5, -.866, -.5])
-
-    def __init__(self, **kwargs):
-        super(TriangleVectorShapePrecalculated, self).__init__(**kwargs)
-
-        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
-
-        self.recalculate_points()
-
-    def recalculate_points(self, *args):
-
-        w = self.size[0]
-        h = self.size[1]
-
-        self.points[0] = self.pos[0] + w * self.unit_circle_points[0]
-        self.points[1] = self.pos[1] + h * self.unit_circle_points[1]
-        self.points[2] = self.pos[0] + w * self.unit_circle_points[2]
-        self.points[3] = self.pos[1] + h * self.unit_circle_points[3]
-        self.points[4] = self.pos[0] + w * self.unit_circle_points[4]
-        self.points[5] = self.pos[1] + h * self.unit_circle_points[5]
-
-
-class RectangleVectorShapePrecalculated(VectorShape):
-
-    points = ListProperty([0] * 8)
-    unit_circle_points = ListProperty(
-            [-.707, .707, .707, .707, .707, -.707, -.707, -.707])
-
-    def __init__(self, **kwargs):
-        super(RectangleVectorShapePrecalculated, self).__init__(**kwargs)
-
-        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
-
-        self.recalculate_points()
-
-    def recalculate_points(self, *args):
-
-        w = self.size[0]
-        h = self.size[1]
-
-        self.points[0] = self.pos[0] + w * self.unit_circle_points[0]
-        self.points[1] = self.pos[1] + h * self.unit_circle_points[1]
-        self.points[2] = self.pos[0] + w * self.unit_circle_points[2]
-        self.points[3] = self.pos[1] + h * self.unit_circle_points[3]
-        self.points[4] = self.pos[0] + w * self.unit_circle_points[4]
-        self.points[5] = self.pos[1] + h * self.unit_circle_points[5]
-        self.points[6] = self.pos[0] + w * self.unit_circle_points[6]
-        self.points[7] = self.pos[1] + h * self.unit_circle_points[7]
-
-
-class PentagonVectorShapePrecalculated(VectorShape):
-
-    points = ListProperty([0] * 10)
-
-    # For pentagon vertex coordinates calculation, see:
-    #
-    #     http://www2.mae.ufl.edu/~uhk/NSIDED-POLYGONS.pdf
-    #
-    unit_circle_points = ListProperty([0,
-                          1.,
-                          math.sqrt(2. + 1.618033989) / 2.,
-                          (1.618033989 - 1.) / 2.,
-                          math.sqrt(3. - 1.818033989) / 2.,
-                          (-1.618033989) / 2.,
-                          (math.sqrt(3. - 1.818033989) / 2.) * -1.,
-                          ((-1.618033989) / 2.),
-                          (math.sqrt(2. + 1.618033989) / 2.) * -1,
-                          (1.618033989 - 1.) / 2.])
-
-    def __init__(self, **kwargs):
-        super(PentagonVectorShapePrecalculated, self).__init__(**kwargs)
-
-        self.unit_circle_points = self.shift_unit_circle_points_to_origin()
-
-        self.recalculate_points()
-
-    def recalculate_points(self, *args):
-
-        w = self.size[0]
-        h = self.size[1]
-
-        self.points[0] = self.pos[0] + w * self.unit_circle_points[0]
-        self.points[1] = self.pos[1] + h * self.unit_circle_points[1]
-        self.points[2] = self.pos[0] + w * self.unit_circle_points[2]
-        self.points[3] = self.pos[1] + h * self.unit_circle_points[3]
-        self.points[4] = self.pos[0] + w * self.unit_circle_points[4]
-        self.points[5] = self.pos[1] + h * self.unit_circle_points[5]
-        self.points[6] = self.pos[0] + w * self.unit_circle_points[6]
-        self.points[7] = self.pos[1] + h * self.unit_circle_points[7]
-        self.points[8] = self.pos[0] + w * self.unit_circle_points[8]
-        self.points[9] = self.pos[1] + h * self.unit_circle_points[9]
-
-
-class LabeledImageShape(ConnectedShape):
-    def __init__(self, **kwargs):
-        super(LabeledImageShape, self).__init__(**kwargs)
-
-        if 'shape' in kwargs:
-            self.shape.source = kwargs['shape']
-
-
-class RectangleImageShape(LabeledImageShape):
-    pass
-
-
-class CircleImageShape(LabeledImageShape):
-
-    radius = NumericProperty(5.0)
-
-    def __init__(self, **kwargs):
-
-        super(CircleImageShape, self).__init__(**kwargs)
-
-        if 'radius' in kwargs:
-            self.radius = kwargs['radius']
-
-
-class PointImageShape(CircleImageShape):
-
-    def __init__(self, **kwargs):
-
-        if not 'radius' in kwargs:
-            kwargs['radius'] = 0.0
-
-        super(PointImageShape, self).__init__(**kwargs)
-
-        if 'x' in kwargs:
-            self.x = kwargs['x']
-
-        if 'y' in kwargs:
-            self.y = kwargs['y']
-
-
-class LineImageShape(LabeledImageShape):
-
-    x1 = NumericProperty(0.0)
-    y1 = NumericProperty(0.0)
-
-    def __init__(self, **kwargs):
-
-        super(LineImageShape, self).__init__(**kwargs)
-
-        if 'x1' in kwargs:
-            self.x1 = kwargs['x1']
-        if 'y1' in kwargs:
-            self.y1 = kwargs['y1']
-
-
-class TriangleImageShape(LineImageShape):
-
-    x2 = NumericProperty(0.0)
-    y2 = NumericProperty(0.0)
-
-    def __init__(self, **kwargs):
-
-        super(TriangleImageShape, self).__init__(**kwargs)
-
-        if 'x2' in kwargs:
-            self.x2 = kwargs['x2']
-        if 'y2' in kwargs:
-            self.y2 = kwargs['y2']
-
-
-class DiamondImageShape(LineImageShape):
-
-    x3 = NumericProperty(0.0)
-    y3 = NumericProperty(0.0)
-
-    def __init__(self, **kwargs):
-
-        super(DiamondImageShape, self).__init__(**kwargs)
-
-        if 'x3' in kwargs:
-            self.x3 = kwargs['x3']
-        if 'y3' in kwargs:
-            self.y3 = kwargs['y3']
-
-
-class PentagonImageShape(DiamondImageShape):
-
-    x4 = NumericProperty(0.0)
-    y4 = NumericProperty(0.0)
-
-    def __init__(self, **kwargs):
-
-        super(DiamondImageShape, self).__init__(**kwargs)
-
-        if 'x4' in kwargs:
-            self.x4 = kwargs['x4']
-        if 'y4' in kwargs:
-            self.y4 = kwargs['y4']
-
-
-class HexagonImageShape(PentagonImageShape):
-
-    x5 = NumericProperty(0.0)
-    y5 = NumericProperty(0.0)
-
-    def __init__(self, **kwargs):
-
-        super(HexagonImageShape, self).__init__(**kwargs)
-
-        if 'x5' in kwargs:
-            self.x5 = kwargs['x5']
-        if 'y5' in kwargs:
-            self.y5 = kwargs['y5']
