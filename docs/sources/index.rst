@@ -96,6 +96,13 @@ examples have drawings made with ``yEd``, a free diagram editor, or with the
 ``blockdiag`` python library. Some developers may have available commercial
 tools such as ``OmniGraffle``, which is capable of drawing statecharts.
 
+Look in the examples directory for a work-in-progress app called diagrammer
+that aspires to make statechart diagrams, and may prove viable for other
+drawing uses, for diagram generation from code, and for code generation from
+a statechart diagram. As of Summer 2013, this app is getting the development
+attention, for finding code layout, programming idioms, and structure that
+define a set of best practices.
+
 Regardless of methods used, the process of statechart construction is easy to
 start by laying out what needs to happen as the app loads, and user interaction
 begins.  As each user interface component and user action is envisioned, it is
@@ -114,13 +121,14 @@ from the statechart, and test cases made to cover each item in the table.
 States
 ======
 
-In a typical case, there is a state for each major user interface element, and
-there may be substates for smaller elements. A state is coded as a normal
-Python class, a subclass of the State class. Each state has an enter_state()
-method and an exit_state() method. The given user interface element is
-constructed or refreshed by code in the enter_state() method, and the opposite,
-either bringing down or hiding, is defined in code of the exit_state() method.
-This makes for a very clean design.
+In a typical case, there is a state for each major user interface element or
+activity, and there may be substates for smaller elements. A state is coded as
+a normal Python class, a subclass of the State class. Each state has an
+enter_state() method and an exit_state() method. The given user interface
+element involved in the activity is constructed or refreshed by code in the
+enter_state() method, and the opposite, either bringing down or hiding, is
+defined in code of the exit_state() method.  This makes for a very clean
+design.
 
 A state can have nothing to do with the user interface, however, and the same
 arrangement of code applies. Any initialization or setup code needed for the
@@ -832,11 +840,11 @@ Regardless of terminology used for controllers, bindings, adapters, and the
 like, Kivy is a strongly "reactive" system, so is very amenable to statechart
 treatment.
 
-For learning about "adapters/controllers" and terminology, we can read
-blog posts by Michael Cohen (nick: frozencanuck), the original author of
-the statecharts framework ported here from SproutCore. It will help you
-to appreciate that SproutCore is based on Cocoa. In Cocoa, we see
-differentation between coordinating vs. mediating controllers.
+For learning about "adapters/controllers" and terminology, we can read blog and
+mailing list posts by Michael Cohen (nick: frozencanuck), the original author
+of the statecharts framework ported here from SproutCore. It will help you to
+appreciate that SproutCore is based on Cocoa. In Cocoa, we see differentation
+between coordinating vs. mediating controllers.
 
 Mediating controllers are a bit lower-level than coordinating controllers.
 Mediating controllers have some sort of backing content, usually data models
@@ -847,16 +855,42 @@ Coordinating controllers are more general than mediating controllers, and
 contain broader level application logic. Differences between these types of
 controllers are subtle and can be confused, a subject addressed by Michael
 Cohen in an important `blog post
-<http://frozencanuck.wordpress.com/2011/03/09/sproutcore-statecharts-vs-controllers/>`_.
-The upshot of the blog post is that the higher level logic blocks in
+<http://frozencanuck.wordpress.com/2011/03/09/sproutcore-statecharts-vs-controllers/>`_
+and this succinct `mailing list post <https://groups.google.com/forum/#!msg/sproutcore/dn1HN8Wtwf8/U3qDW_bb9QkJ/>`_.
+The upshot of discussion is that the higher level logic blocks in
 controllers will often "turn into brutish monsters containing many if-else or
-switch-case statements" to be able to manage application state.
+switch-case statements" to be able to manage application state. Statecharts
+fix the problem of over-stuffed controllers, perhaps with "spagetti code,"
+and adds clean logic to the system, offering structure to better coordinate
+an application.
 
 Kivy also now has adapters, so we have another term to examine. Adapters, as
 described in this `article <http://en.wikipedia.org/wiki/Model–view–adapter/>`_,
 have a more "linear" relationship to data and views. An adapter serves more
 directly to "service" a view, to help create the view or its child views, by
-interacting with data as needed.
+interacting with data as needed. Kivy gets its adapter system, in part, from
+Adroid, although it has some aspects, for selection especially, that come from
+Cocoa / SproutCore. Where you have read above about the term "controller," you
+can mostly do direct substitution for the term adapter. We may settle on a
+split in Kivy, where we have a "controller layer" that consists, as of Summer
+2013, of:
+
+* controllers - Should be kept lean and mean; do not create and cache views;
+  stick to the roles of mediating to data, selection, and filtering.
+
+* adapters - Very similar to controllers, but doing a view servicing job for
+  some collection view, such as the ListView widget. This servicing includes
+  caching views so that scrolling and other intensive filtering of data item
+  views it more efficient.
+
+* statecharts - (One or more) Contains states in a hierarchy, with code for
+  the main application logic; Code can become substantial, in contrast to the
+  restricted scope of the leaner controllers and adapters. Coordinates the
+  loading of data into controllers and adapters when needed, and does
+  construction, management, and destruction of user interface elements as user
+  action dictates.
+
+Please follow development of the diagrammer app to see how it pans out!
 
 Summary
 -------

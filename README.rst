@@ -43,8 +43,8 @@ is an organization structure holding states with such actions and helper
 methods.
 
 From the hello_world example app, you can move to the Balls example app, and to
-the more involved examples from there. deflectouch_with_statecharts is the most
-complete example so far.
+the more involved examples from there. diagrammer is the most representative of
+best practices, as of Summer 2013.
 
 Setting up kivy-statecharts for Development
 ===========================================
