@@ -98,4 +98,4 @@ this is a popup, but it rather obscures what you need to see."""
         pass
 
     def go_to_drawing_area(self, *args):
-        self.go_to_state('ShowingDrawingArea')
+        self.go_to_state('ShowingDrawingScreen')

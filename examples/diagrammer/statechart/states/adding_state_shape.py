@@ -15,7 +15,7 @@ from state_graphics import StatePentagonVectorShape
 
 class AddingStateShape(State):
     '''The AddingStateShape state is a transient state -- after adding the
-    shape, there is an immediate transition back to the ShowingDrawingArea
+    shape, there is an immediate transition back to the ShowingDrawingScreen
     state.
     '''
 
@@ -75,7 +75,7 @@ class AddingStateShape(State):
 
             self.app.points.append(touch.pos)
 
-            self.go_to_state('ShowingDrawingArea')
+            self.go_to_state('ShowingDrawingScreen')
 
     def exit_state(self, context=None):
         pass

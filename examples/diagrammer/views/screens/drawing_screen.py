@@ -4,10 +4,10 @@ from kivy.lang import Builder
 
 
 Builder.load_string('''
-#:import DrawingMenu views.drawing_menus.DrawingMenu
-#:import DrawingArea views.drawing_area.DrawingArea
+#:import DrawingMenu views.screens.drawing_menus.DrawingMenu
+#:import DrawingArea views.screens.drawing_area.DrawingArea
 
-<DrawingAreaScreen>
+<DrawingScreen>
     drawing_menu: drawing_menu
     drawing_area: drawing_area
 
@@ -41,5 +41,5 @@ Builder.load_string('''
 ''')
 
 
-class DrawingAreaScreen(Screen):
+class DrawingScreen(Screen):
     pass

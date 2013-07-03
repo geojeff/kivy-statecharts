@@ -7,7 +7,7 @@ from kivy.uix.label import Label
 
 class MovingStateShape(State):
     '''The MovingStateShape state is a transient state -- after moving the shape,
-    there is an immediate transition back to the ShowingDrawingArea state.'''
+    there is an immediate transition back to the ShowingDrawingScreen state.'''
 
     def __init__(self, **kwargs):
         super(MovingStateShape, self).__init__(**kwargs)
@@ -47,4 +47,4 @@ class MovingStateShape(State):
 
         elif event == 'drawing_area_touch_up':
 
-            self.go_to_state('ShowingDrawingArea')
+            self.go_to_state('ShowingDrawingScreen')

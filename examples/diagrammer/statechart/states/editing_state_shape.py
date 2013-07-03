@@ -472,7 +472,7 @@ class EditingStateShape(State):
 
     def done(self, *args):
 
-        self.statechart.go_to_state('ShowingDrawingArea')
+        self.statechart.go_to_state('ShowingDrawingScreen')
 
     def swap_in_submenu(self, context, submenu):
 

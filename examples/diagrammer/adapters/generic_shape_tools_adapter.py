@@ -3,7 +3,7 @@ from kivy.properties import OptionProperty
 
 from kivy.adapters.dictadapter import DictAdapter
 
-from views.shape_bubble_button import ShapeBubbleButton
+from views.buttons.shape_bubble_button import ShapeBubbleButton
 
 from graphics import PolygonVectorShape
 

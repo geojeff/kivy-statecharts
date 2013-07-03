@@ -5,7 +5,7 @@ from kivy_statecharts.system.statechart import StatechartManager
 
 from states.starting_up import StartingUp
 from states.showing_help import ShowingHelpScreen
-from states.showing_drawing_area import ShowingDrawingArea
+from states.showing_drawing_area import ShowingDrawingScreen
 
 
 class AppStatechart(StatechartManager):
@@ -22,5 +22,5 @@ class AppStatechart(StatechartManager):
             kwargs['initial_substate_key'] = 'StartingUp'
             kwargs['StartingUp'] = StartingUp
             kwargs['ShowingHelpScreen'] = ShowingHelpScreen
-            kwargs['ShowingDrawingArea'] = ShowingDrawingArea
+            kwargs['ShowingDrawingScreen'] = ShowingDrawingScreen
             super(AppStatechart.RootState, self).__init__(**kwargs)

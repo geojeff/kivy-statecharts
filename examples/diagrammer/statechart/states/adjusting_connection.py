@@ -96,7 +96,7 @@ class ConnectionBubble(Bubble):
 class AdjustingConnection(State):
     '''The AdjustingConnection state shows bubbles on either end of a
     provisional connection, allowing for dragging to the desired connection
-    point. Upon finalization, or cancelling, we go back to ShowingDrawingArea.
+    point. Upon finalization, or cancelling, we go back to ShowingDrawingScreen.
     '''
 
     drawing_area = ObjectProperty(None, allownone=True)
@@ -212,7 +212,7 @@ class AdjustingConnection(State):
         self.drawing_area.add_widget(connection.shape1)
 
         if not self.connection_bubble2:
-            self.go_to_state('ShowingDrawingArea')
+            self.go_to_state('ShowingDrawingScreen')
 
     def accept_connection_point2(self, *args):
 
@@ -235,7 +235,7 @@ class AdjustingConnection(State):
         self.drawing_area.add_widget(connection.shape2)
 
         if not self.connection_bubble1:
-            self.go_to_state('ShowingDrawingArea')
+            self.go_to_state('ShowingDrawingScreen')
 
     # Consume drawing_area touch events while this state is current.
     @State.event_handler(['drawing_area_touch_down',

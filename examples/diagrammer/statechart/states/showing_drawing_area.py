@@ -12,12 +12,12 @@ from moving_state_shape import MovingStateShape
 from editing_state_shape import EditingStateShape
 from adding_connection import AddingConnection
 
-from views.drawing_area_screen import DrawingAreaScreen
-from views.drawing_menus import GenericShapeSubmenu
-from views.drawing_menus import StateShapeSubmenu
+from views.screens.drawing_screen import DrawingScreen
+from views.screens.drawing_menus import GenericShapeSubmenu
+from views.screens.drawing_menus import StateShapeSubmenu
 
 
-class ShowingDrawingArea(State):
+class ShowingDrawingScreen(State):
 
     drawing_menu = ObjectProperty(None)
     drawing_area = ObjectProperty(None)
@@ -33,7 +33,7 @@ class ShowingDrawingArea(State):
         kwargs['EditingStateShape'] = EditingStateShape
         kwargs['AddingConnection'] = AddingConnection
 
-        super(ShowingDrawingArea, self).__init__(**kwargs)
+        super(ShowingDrawingScreen, self).__init__(**kwargs)
 
         self.app = App.get_running_app()
 
@@ -43,7 +43,7 @@ class ShowingDrawingArea(State):
                 in self.app.screen_manager.screen_names):
 
             self.app.screen_manager.add_widget(
-                    DrawingAreaScreen(name='DrawingArea'))
+                    DrawingScreen(name='DrawingArea'))
 
         if self.app.screen_manager.current != 'DrawingArea':
             self.app.screen_manager.current = 'DrawingArea'

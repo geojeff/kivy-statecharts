@@ -18,7 +18,7 @@ class AddingConnection(State):
     and bubbles self.appear on each end for dragging / accepting connection points,
     after a transition to AdjustingConnection, which handles finalization.  If
     there is no shape found on mouse-up, there is an immediate transition back
-    to the ShowingDrawingArea state.'''
+    to the ShowingDrawingScreen state.'''
 
     drawing_area = ObjectProperty(None, allownone=True)
 
@@ -79,7 +79,7 @@ class AddingConnection(State):
 
                 self.go_to_state('AdjustingConnection')
             else:
-                self.go_to_state('ShowingDrawingArea')
+                self.go_to_state('ShowingDrawingScreen')
 
         if event == 'drawing_area_touch_move':
 
