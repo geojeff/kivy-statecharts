@@ -9,7 +9,6 @@ from states.showing_drawing_area import ShowingDrawingScreen
 
 
 class AppStatechart(StatechartManager):
-    app = ObjectProperty(None)
 
     def __init__(self, **kwargs):
         kwargs['trace'] = True

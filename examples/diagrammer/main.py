@@ -11,8 +11,6 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
 
-from kivy.animation import Animation
-
 from statechart.statechart import AppStatechart
 
 
@@ -50,10 +48,12 @@ class DiagrammerApp(App):
 
     drawing_area = ObjectProperty(None, allownone=True)
 
+    # TODO: Move these into list controllers.
     points = ListProperty()
     shapes = ListProperty()
     connections = ListProperty()
 
+    # TODO: Move these into object controllers.
     current_label = ObjectProperty(None, allownone=True)
     current_connection = ObjectProperty(None, allownone=True)
 
@@ -80,11 +80,8 @@ class DiagrammerApp(App):
 
         return self.screen_manager
 
-        self.root = MainScreen(app=self)
-        self.main_screen = self.root
-
     def on_start(self):
-        self.statechart = AppStatechart(app=self)
+        self.statechart = AppStatechart()
         self.statechart.init_statechart()
 
 

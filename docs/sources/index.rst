@@ -890,6 +890,12 @@ split in Kivy, where we have a "controller layer" that consists, as of Summer
   construction, management, and destruction of user interface elements as user
   action dictates.
 
+* Widgets, which are essentially views primarily, contain Kivy properties,
+  which act as mediating controllers. This is copacetic. However, with the
+  proper use of controllers, adapters, and states in statecharts, the amount of
+  code in widgets for performing "coordinating controller" "application logic"
+  is minimized.
+
 Please follow development of the diagrammer app to see how it pans out!
 
 Summary
