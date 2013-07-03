@@ -1,3 +1,5 @@
+from kivy.app import App
+
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.togglebutton import ToggleButton
@@ -12,11 +14,11 @@ class ShowingHelpScreen(State):
     def __init__(self, **kwargs):
         super(ShowingHelpScreen, self).__init__(**kwargs)
 
+        self.app = App.get_running_app()
+
     def enter_state(self, context=None):
 
-        if not 'Help' in self.statechart.app.screen_manager.screen_names:
-
-            self.app = self.statechart.app
+        if not 'Help' in self.app.screen_manager.screen_names:
 
             view = BoxLayout(orientation='vertical', spacing=10)
 

@@ -1,3 +1,5 @@
+from kivy.app import App
+
 from math import cos, sin, pi
 
 from kivy_statecharts.system.state import State
@@ -21,7 +23,7 @@ Builder.load_string('''
 #:import ListItemButton kivy.uix.listview.ListItemButton
 #:import ListAdapter kivy.adapters.listadapter.ListAdapter
 
-[EditingShapeMenuButton@ToggleButton]
+[EditingStateShapeMenuButton@ToggleButton]
     background_down: 'atlas://data/images/defaulttheme/bubble_btn'
     background_normal: 'atlas://data/images/defaulttheme/bubble_btn_pressed'
     group: 'editing_shape_menu_root'
@@ -36,7 +38,7 @@ Builder.load_string('''
         y: self.parent.y + (self.parent.height/2) - (self.height/2)
         x: self.parent.x + (self.parent.width - self.width)
 
-<EditingShapeMenu>
+<EditingStateShapeMenu>
     size_hint: None, None
     size: 380, 580
     padding: 5
@@ -51,15 +53,15 @@ Builder.load_string('''
                 width: root.width * 2 - 40
                 BoxLayout:
                     orientation: 'vertical'
-                    EditingShapeMenuButton:
+                    EditingStateShapeMenuButton:
                         text: 'Labels'
-                    EditingShapeMenuButton:
+                    EditingStateShapeMenuButton:
                         text: 'Fill'
-                    EditingShapeMenuButton:
+                    EditingStateShapeMenuButton:
                         text: 'Stroke'
-                    EditingShapeMenuButton:
+                    EditingStateShapeMenuButton:
                         text: 'Scale'
-                    EditingShapeMenuButton:
+                    EditingStateShapeMenuButton:
                         text: 'Connections'
 
 [AnchorButton@ToggleButton]
@@ -72,7 +74,7 @@ Builder.load_string('''
     size: 40, 40
     text: ctx.text
 
-<EditingShapeLabelsSubmenu>:
+<EditingStateShapeLabelsSubmenu>:
     spacing: '5sp'
 
     Button:
@@ -266,7 +268,7 @@ Builder.load_string('''
                 text: 'Done'
                 on_release: app.statechart.send_event('done')
 
-<EditingShapeFillSubmenu>:
+<EditingStateShapeFillSubmenu>:
     Button:
         text: '<'
         #size_hint: (.15, 1)
@@ -296,7 +298,7 @@ Builder.load_string('''
             text: 'Done'
             on_release: app.statechart.send_event('done')
 
-<EditingShapeStrokeSubmenu>:
+<EditingStateShapeStrokeSubmenu>:
     Button:
         text: '<'
         #size_hint: (.15, 1)
@@ -328,20 +330,20 @@ Builder.load_string('''
 ''')
 
 
-class EditingShapeLabelsSubmenu(BoxLayout):
+class EditingStateShapeLabelsSubmenu(BoxLayout):
     statechart = ObjectProperty(None)
     labels = ListProperty([])
 
 
-class EditingShapeFillSubmenu(BoxLayout):
+class EditingStateShapeFillSubmenu(BoxLayout):
     statechart = ObjectProperty(None)
 
 
-class EditingShapeStrokeSubmenu(BoxLayout):
+class EditingStateShapeStrokeSubmenu(BoxLayout):
     statechart = ObjectProperty(None)
 
 
-class EditingShapeMenu(BoxLayout):
+class EditingStateShapeMenu(BoxLayout):
     pass
 
 
@@ -353,7 +355,7 @@ class Selector(BoxLayout):
     grid = ObjectProperty(None)
 
 
-class EditingShape(State):
+class EditingStateShape(State):
     '''
     '''
 
@@ -363,22 +365,24 @@ class EditingShape(State):
     labels = ListProperty([])
 
     def __init__(self, **kwargs):
-        super(EditingShape, self).__init__(**kwargs)
+        super(EditingStateShape, self).__init__(**kwargs)
+
+        self.app = App.get_running_app()
 
     def enter_state(self, context=None):
 
         drawing_area = \
-                self.statechart.app.screen_manager.current_screen.drawing_area
+                self.app.screen_manager.current_screen.drawing_area
 
-        self.shape = self.statechart.app.current_shape
+        self.shape = self.app.current_shape
 
         self.labels = [c for c in self.shape.children if isinstance(c, Label)]
 
         self.menus_and_submenus = {
-            'labels': EditingShapeLabelsSubmenu(statechart=self.statechart,
+            'labels': EditingStateShapeLabelsSubmenu(statechart=self.statechart,
                                                 labels=self.labels),
-            'fill': EditingShapeFillSubmenu(statechart=self.statechart),
-            'stroke': EditingShapeStrokeSubmenu(statechart=self.statechart),
+            'fill': EditingStateShapeFillSubmenu(statechart=self.statechart),
+            'stroke': EditingStateShapeStrokeSubmenu(statechart=self.statechart),
             'scale': None,
             'connections': None}
 
@@ -388,7 +392,7 @@ class EditingShape(State):
                     size=(400, 640),
                     attach_to=drawing_area,
                     title='Editing Shape',
-                    content=EditingShapeMenu())
+                    content=EditingStateShapeMenu())
 
         self.editing_shape_menu.open()
 
@@ -401,21 +405,21 @@ class EditingShape(State):
 
         # TODO: Why is this guard condition needed?
         if adapter:
-            self.statechart.app.current_label = adapter.selection[0]
+            self.app.current_label = adapter.selection[0]
 
     def shape_label_edited(self, text, *args):
         '''An action method associated with the text input. There is a
         binding to fire this action on_text_validate.'''
 
-        self.statechart.app.current_label.text = text
+        self.app.current_label.text = text
 
     def fill_color_changed(self, color, *args):
 
-        self.statechart.app.current_shape.fill_color = color
+        self.app.current_shape.fill_color = color
 
     def stroke_color_changed(self, color, *args):
 
-        self.statechart.app.current_shape.stroke_color = color
+        self.app.current_shape.stroke_color = color
 
     def do_quick_spot(self, spot, *args):
         '''Change the pos of the label to one of the following "spots":
@@ -432,39 +436,39 @@ class EditingShape(State):
                 'S':  {'x_offset_factor': .5, 'y_offset_factor': 0},
                 'SE': {'x_offset_factor': 1,  'y_offset_factor': 0}}
 
-        self.statechart.app.current_label.pos = (
-                self.statechart.app.current_shape.pos[0] +
+        self.app.current_label.pos = (
+                self.app.current_shape.pos[0] +
                     spots[spot]['x_offset_factor']
-                        * self.statechart.app.current_shape.size[0],
-                self.statechart.app.current_shape.pos[1] +
+                        * self.app.current_shape.size[0],
+                self.app.current_shape.pos[1] +
                     spots[spot]['y_offset_factor']
-                        * self.statechart.app.current_shape.size[1])
+                        * self.app.current_shape.size[1])
 
     def set_x(self, x, *args):
         '''Set the x value of the label from the slider.'''
 
-        self.statechart.app.current_label.pos = (
+        self.app.current_label.pos = (
                 x,
-                self.statechart.app.current_shape.pos[1])
+                self.app.current_shape.pos[1])
 
     def set_y(self, y, *args):
         '''Set the y value of the label from the slider.'''
 
-        self.statechart.app.current_label.pos = (
-                self.statechart.app.current_shape.pos[0],
+        self.app.current_label.pos = (
+                self.app.current_shape.pos[0],
                 y)
 
     def shape_label_halign_edited(self, text, *args):
         '''An action method associated with the halign spinner,
         bound to fire this action on_text.'''
 
-        self.statechart.app.current_label.halign = text
+        self.app.current_label.halign = text
 
     def shape_label_valign_edited(self, text, *args):
         '''An action method associated with the valign spinner,
         bound to fire this action on_text.'''
 
-        self.statechart.app.current_label.valign = text
+        self.app.current_label.valign = text
 
     def done(self, *args):
 

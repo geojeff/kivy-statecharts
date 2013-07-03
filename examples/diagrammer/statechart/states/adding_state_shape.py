@@ -1,3 +1,7 @@
+import copy
+
+from kivy.app import App
+
 from kivy_statecharts.system.state import State
 
 from kivy.graphics import Color
@@ -9,38 +13,42 @@ from state_graphics import StateRectangleVectorShape
 from state_graphics import StatePentagonVectorShape
 
 
-class AddingShape(State):
-    '''The AddingShape state is a transient state -- after adding the shape,
-    there is an immediate transition back to the ShowingDrawingArea state.'''
+class AddingStateShape(State):
+    '''The AddingStateShape state is a transient state -- after adding the
+    shape, there is an immediate transition back to the ShowingDrawingArea
+    state.
+    '''
 
     def __init__(self, **kwargs):
-        super(AddingShape, self).__init__(**kwargs)
+        super(AddingStateShape, self).__init__(**kwargs)
+
+        self.app = App.get_running_app()
 
     def enter_state(self, context=None):
 
-        touch = self.statechart.app.touch
+        touch = self.app.touch
 
         # TODO: Finish other shapes.
 
-        mode = self.statechart.app.state_drawing_mode_adapter.mode
-
-        if mode == 'state_triangle':
-            shape_cls = StateTriangleVectorShape
-        elif mode == 'state_rectangle':
-            shape_cls = StateRectangleVectorShape
-        elif mode == 'state_pentagon':
-            shape_cls = StatePentagonVectorShape
-        elif mode == 'state_ellipse':
-            shape_cls = StateTriangleVectorShape
-        else:
-            shape_cls = StateTriangleVectorShape
-
         drawing_area = \
-                self.statechart.app.screen_manager.current_screen.drawing_area
+                self.app.screen_manager.current_screen.drawing_area
+
+        shape_cls = self.app.state_shape_tools_adapter.current_shape.__class__
+        radius = self.app.state_shape_tools_adapter.current_shape.radius
+        sides = self.app.state_shape_tools_adapter.current_shape.sides
 
         with drawing_area.canvas.before:
             Color(1, 1, 0)
             d = 100.
+            #shape = copy.deepcopy(self.app.state_shape_tools_adapter.current_shape)
+            #shape.pos = (touch.x, touch.y)
+            #shape.size = (d, d)
+            #shape.stroke_width = 5.0
+            #shape.stroke_color = [.2, .9, .2, .8]
+            #shape.fill_color = [.4, .4, .4, .4]
+            #shape.add_widget(Label(text="Some State", pos=shape.pos))
+            #shape.recalculate_points()
+
             #RectangleImageShape(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d),
                     #x=touch.x, y=touch.y, width=100.0, height=100.0,
                     #line_color=[1.0, .3, .2, .5], fill_color=[.4, .4, .4, .4])
@@ -49,12 +57,11 @@ class AddingShape(State):
                     #pos=(touch.x - d / 2, touch.y - d / 2),
                     pos=(touch.x, touch.y),
                     size=(d, d),
+                    radius=radius,
+                    sides=sides,
                     #x=touch.x, y=touch.y, width=100.0, height=100.0,
                     stroke_width=5.0,
                     stroke_color=[.2, .9, .2, .8], fill_color=[.4, .4, .4, .4])
-
-            label = Label(text="Some State", pos=shape.pos)
-            shape.add_widget(label)
 
             #shape.add_widget(AnchoredLabel(
             #        anchor_widget=shape,
@@ -64,11 +71,9 @@ class AddingShape(State):
 
             shape.generate_connection_points(10)
 
-            self.statechart.app.shapes.append(shape)
+            self.app.shapes.append(shape)
 
-            self.statechart.app.points.append(touch.pos)
-
-            self.statechart.app.current_shape = shape
+            self.app.points.append(touch.pos)
 
             self.go_to_state('ShowingDrawingArea')
 

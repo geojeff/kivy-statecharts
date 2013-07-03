@@ -1,380 +1,65 @@
-from kivy.uix.bubble import Bubble
-from kivy.uix.label import Label
-from kivy.uix.screenmanager import Screen
-from kivy.uix.widget import Widget
+from kivy.app import App
 
-from kivy.lang import Builder
+from kivy.uix.label import Label
 
 from kivy.properties import ObjectProperty
 from kivy.properties import DictProperty
 
 from kivy_statecharts.system.state import State
 
-from adding_shape import AddingShape
-from moving_shape import MovingShape
-from editing_shape import EditingShape
+from adding_state_shape import AddingStateShape
+from moving_state_shape import MovingStateShape
+from editing_state_shape import EditingStateShape
 from adding_connection import AddingConnection
 
-
-Builder.load_string('''
-#:import math math
-#:import itertools itertools
-#:import Shape graphics.Shape
-
-<DrawingArea>:
-    canvas:
-        Color:
-            rgba: .3, .3, .3, .3
-        Rectangle:
-            size: self.size
-            pos: self.pos
-    on_touch_down: app.statechart.send_event( \
-            'drawing_area_touch_down', args[1]) \
-            if self.collide_point(*args[1].pos) else None
-    on_touch_move: app.statechart.send_event( \
-            'drawing_area_touch_move', args[1]) \
-            if self.collide_point(*args[1].pos) else None
-    on_touch_up: app.statechart.send_event( \
-            'drawing_area_touch_up', args[1]) \
-            if self.collide_point(*args[1].pos) else None
-
-[MenuButton@ToggleButton]
-    background_down: 'atlas://data/images/defaulttheme/bubble_btn'
-    background_normal: 'atlas://data/images/defaulttheme/bubble_btn_pressed'
-    group: 'drawing_menu_root'
-    on_release: app.statechart.send_event('show_drawing_submenu', self, None)
-    size_hint: ctx.size_hint if hasattr(ctx, 'size_hint') else (1, 1)
-    width: ctx.width if hasattr(ctx, 'width') else 1
-    text: ctx.text
-    Image:
-        source: 'atlas://data/images/defaulttheme/tree_closed'
-        size: (20, 20)
-        y: self.parent.y + (self.parent.height/2) - (self.height/2)
-        x: self.parent.x + (self.parent.width - self.width)
-
-[DrawingMenuPolygonButton@BubbleButton]:
-
-    background_down: 'atlas://data/images/defaulttheme/bubble_btn'
-    background_normal: 'atlas://data/images/defaulttheme/bubble_btn_pressed'
-    group: 'drawing_menu_root'
-    size_hint: ctx.size_hint if hasattr(ctx, 'size_hint') else (1, 1)
-    width: ctx.width if hasattr(ctx, 'width') else 1
-    height: ctx.height if hasattr(ctx, 'height') else 1
-    on_release: app.statechart.send_event( \
-            ctx.action, self, None)
-    action: ctx.action
-    text: ctx.text if hasattr(ctx, 'text') else ''
-    canvas:
-        Color:
-            rgba: 1, 1, 1, 1
-        Mesh:
-            vertices: list(itertools.chain(*[ \
-                       ((self.center[0]) \
-                            + math.cos(i * ((2 * math.pi) / ctx.sides)) \
-                                * ctx.radius, \
-                        (self.center[1]) \
-                            + math.sin(i * ((2 * math.pi) / ctx.sides)) \
-                                * ctx.radius, \
-                        math.cos(i * ((2 * math.pi) / ctx.sides)), \
-                        math.sin(i * ((2 * math.pi) / ctx.sides))) \
-                            for i in xrange(ctx.sides)]))
-            indices: range(ctx.sides)
-            mode: 'triangle_fan'
-    Scatter:
-        do_scale: False
-        do_translation: False
-        do_rotation: False
-        auto_bring_to_front: False
-
-<DrawingMenu>
-    size_hint: None, None
-    size: 70, 200
-    pos_hint: { "center_y": 0.5 }
-    padding: 5
-    background_color: .2, .9, 1, .7
-    background_image: 'atlas://data/images/defaulttheme/button_pressed'
-    orientation: 'vertical'
-
-    # root menu -- See submenus in waiting_for_touches.py.
-    BoxLayout:
-        padding: 5
-        orientation: 'vertical'
-        DrawingMenuPolygonButton:
-            size_hint: None, None
-            width: 60
-            height: 60
-            radius: 20
-            sides: 0
-            text: 'N.I.Y.'
-            action: 'show_drawing_submenu_select'
-        DrawingMenuPolygonButton:
-            size_hint: None, None
-            width: 60
-            height: 60
-            radius: 20
-            sides: 0
-            text: 'N.I.Y.'
-            action: 'show_drawing_submenu_text'
-        #ShapeBubbleButton:
-        #    size_hint: None, None
-        #    width: 60
-        #    height: 60
-        #    radius: 20
-        #    shape: app.current_shape
-        #    action: 'show_drawing_submenu_state'
-        DrawingMenuPolygonButton:
-            size_hint: None, None
-            width: 60
-            height: 60
-            radius: 20
-            sides: 3
-            action: 'show_drawing_submenu_state'
-
-<DrawingAreaScreen>
-    drawing_area: drawing_area
-
-    BoxLayout:
-        orientation: 'vertical'
-        spacing: 2
-
-        BoxLayout:
-            size_hint: 1, None
-            height: 30
-
-            ToggleButton:
-                text: 'Help'
-                group: 'screen manager buttons'
-                on_press: app.statechart.send_event('go_to_help')
-
-            ToggleButton:
-                text: 'Drawing Area'
-                color: [1.0, 1.0, 1.0, .9]
-                bold: True
-                group: 'screen manager buttons'
-                state: 'down'
-
-        BoxLayout:
-
-            DrawingMenu:
-
-            DrawingArea:
-                id: drawing_area
-
-<SelectSubmenu>:
-    size_hint: (None, None)
-    size: (60, 180)
-    pos_hint: {'center_x': .5, 'y': .6}
-    arrow_pos: 'left_mid'
-    orientation: 'vertical'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 0
-        text: 'N.I.Y.'
-        action: 'set_drawing_mode_select_pick'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 0
-        text: 'N.I.Y.'
-        action: 'set_drawing_mode_select_marquee'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 0
-        text: 'N.I.Y.'
-        action: 'set_drawing_mode_select_node'
-
-
-<TextSubmenu>:
-    size_hint: (None, None)
-    size: (60, 180)
-    pos_hint: {'center_x': .5, 'y': .6}
-    arrow_pos: 'left_mid'
-    orientation: 'vertical'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 0
-        text: 'N.I.Y.'
-        action: 'set_drawing_mode_text_large'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 0
-        text: 'N.I.Y.'
-        action: 'set_drawing_mode_text_medium'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 0
-        text: 'N.I.Y.'
-        action: 'set_drawing_mode_text_small'
-
-<LineSubmenu>:
-    size_hint: (None, None)
-    size: (60, 180)
-    pos_hint: {'center_x': .5, 'y': .6}
-    arrow_pos: 'left_mid'
-    orientation: 'vertical'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 3
-        action: 'set_drawing_mode_line_straight'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 3
-        action: 'set_drawing_mode_line_arc'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 3
-        action: 'set_drawing_mode_line_bezier'
-
-<ShapeSubmenu>:
-    size_hint: (None, None)
-    size: (60, 180)
-    pos_hint: {'center_x': .5, 'y': .6}
-    arrow_pos: 'left_mid'
-    orientation: 'vertical'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 3
-        action: 'set_drawing_mode_shape_rectangle'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 3
-        action: 'set_drawing_mode_shape_ellipse'
-
-    DrawingMenuPolygonButton:
-        size_hint: None, None
-        width: 60
-        height: 60
-        radius: 20
-        sides: 3
-        action: 'set_drawing_mode_shape_polygon'
-
-<StateSubmenu>:
-    # TODO: size is hard-coded.
-    size_hint: None, None
-    size: (60, 60 * 3 + 12)
-    pos_hint: {'center_x': .5, 'y': .6}
-    #background_color: .2, .9, 1, .7
-    background_color: .1, .2, .4, 1
-    background_image: 'atlas://data/images/defaulttheme/button_pressed'
-    arrow_pos: 'left_mid'
-    orientation: 'vertical'
-
-    ListView:
-        adapter: app.state_drawing_mode_adapter
-''')
-
-
-class DrawingAreaScreen(Screen):
-    pass
-
-
-class DrawingMenu(Bubble):
-    pass
-
-
-class DrawingArea(Widget):
-
-    pass
-
-
-class SelectSubmenu(Bubble):
-    pass
-
-
-class TextSubmenu(Bubble):
-    pass
-
-
-class LineSubmenu(Bubble):
-    pass
-
-
-class ShapeSubmenu(Bubble):
-    pass
-
-
-class StateSubmenu(Bubble):
-    pass
+from views.drawing_area_screen import DrawingAreaScreen
+from views.drawing_menus import GenericShapeSubmenu
+from views.drawing_menus import StateShapeSubmenu
 
 
 class ShowingDrawingArea(State):
 
+    drawing_menu = ObjectProperty(None)
     drawing_area = ObjectProperty(None)
 
-    menus_and_submenus = DictProperty({})
+    menu_actions_and_submenus = DictProperty({})
+
+    submenu = ObjectProperty(None, allownone=True)
 
     def __init__(self, **kwargs):
 
-        kwargs['AddingShape'] = AddingShape
-        kwargs['MovingShape'] = MovingShape
-        kwargs['EditingShape'] = EditingShape
+        kwargs['AddingStateShape'] = AddingStateShape
+        kwargs['MovingStateShape'] = MovingStateShape
+        kwargs['EditingStateShape'] = EditingStateShape
         kwargs['AddingConnection'] = AddingConnection
 
         super(ShowingDrawingArea, self).__init__(**kwargs)
 
+        self.app = App.get_running_app()
+
     def enter_state(self, context=None):
 
         if (not 'DrawingArea'
-                in self.statechart.app.screen_manager.screen_names):
+                in self.app.screen_manager.screen_names):
 
-            self.statechart.app.screen_manager.add_widget(
+            self.app.screen_manager.add_widget(
                     DrawingAreaScreen(name='DrawingArea'))
 
-        if self.statechart.app.screen_manager.current != 'DrawingArea':
-            self.statechart.app.screen_manager.current = 'DrawingArea'
+        if self.app.screen_manager.current != 'DrawingArea':
+            self.app.screen_manager.current = 'DrawingArea'
 
-        self.drawing_area = \
-                self.statechart.app.screen_manager.current_screen.drawing_area
+        if not self.drawing_menu:
+            self.drawing_menu = \
+                self.app.screen_manager.current_screen.drawing_menu
 
-        if not self.menus_and_submenus:
-            self.menus_and_submenus = {'select': SelectSubmenu(),
-                                       'text': TextSubmenu(),
-                                       'line': LineSubmenu(),
-                                       'shape': ShapeSubmenu(),
-                                       'state': StateSubmenu()}
+        if not self.drawing_area:
+            self.drawing_area = \
+                self.app.screen_manager.current_screen.drawing_area
+
+        if not self.menu_actions_and_submenus:
+            self.menu_actions_and_submenus = {
+                    'show_submenu_generic_shape_tool': GenericShapeSubmenu(),
+                    'show_submenu_state_shape_tool': StateShapeSubmenu()}
 
     def exit_state(self, context=None):
         pass
@@ -390,21 +75,25 @@ class ShowingDrawingArea(State):
 
         self.go_to_state('ShowingHelpScreen')
 
-    @State.event_handler(['show_drawing_submenu_select',
-                          'show_drawing_submenu_text',
-                          'show_drawing_submenu_state',])
+    @State.event_handler(['show_submenu_generic_shape_tool',
+                          'show_submenu_state_shape_tool'])
     def handle_menu_touch(self, event, context, arg):
 
-        self.submenu = self.menus_and_submenus[event[21:]]
+        if not self.submenu:
+            self.submenu = self.menu_actions_and_submenus[event]
 
-        self.submenu.pos = [context.center[0],
-                            context.center[1] - self.submenu.height / 2]
+            self.submenu.pos = [context.center[0],
+                                context.center[1] - self.submenu.height / 2]
 
-        self.submenu.arrow_pos = 'left_mid'
+            self.submenu.arrow_pos = 'left_mid'
 
-        self.drawing_area.add_widget(self.submenu)
+            self.drawing_area.add_widget(self.submenu)
 
-    def state_drawing_mode_changed(self, adapter, *args):
+    @State.event_handler(['generic_shape_tool_changed',
+                          'state_shape_tool_changed'])
+    def handle_tool_menu_touch(self, event, context, arg):
+
+        # Remove the submenu.
 
         self.drawing_area.remove_widget(self.submenu)
 
@@ -433,31 +122,31 @@ class ShowingDrawingArea(State):
 
         if event == 'drawing_area_touch_down':
 
-            self.statechart.app.touch = touch
+            self.app.touch = touch
 
         elif event == 'drawing_area_touch_move':
 
-            for shape in reversed(self.statechart.app.shapes):
+            for shape in reversed(self.app.shapes):
                 if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
                     dist, line = shape.closest_edge(touch.pos[0],
                                                     touch.pos[1])
-                    self.statechart.app.current_shape = shape
+                    self.app.current_shape = shape
                     label = None
                     for c in shape.children:
                         if isinstance(c, Label):
                             label = c
                             break
-                    self.statechart.app.current_label = label
+                    self.app.current_label = label
                     dispatched = True
-                    self.statechart.go_to_state('MovingShape')
+                    self.statechart.go_to_state('MovingStateShape')
                 elif shape.collide_point(*touch.pos):
-                    self.statechart.app.current_shape = shape
+                    self.app.current_shape = shape
                     label = None
                     for c in shape.children:
                         if isinstance(c, Label):
                             label = c
                             break
-                    self.statechart.app.current_label = label
+                    self.app.current_label = label
                     dispatched = True
                     self.statechart.go_to_state('AddingConnection')
 
@@ -465,23 +154,23 @@ class ShowingDrawingArea(State):
 
             dispatched = False
 
-            for shape in reversed(self.statechart.app.shapes):
+            for shape in reversed(self.app.shapes):
                 if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
                     dist, line = shape.closest_edge(touch.pos[0],
                                                     touch.pos[1])
-                    self.statechart.app.current_shape = shape
+                    self.app.current_shape = shape
                     label = None
                     for c in shape.children:
                         if isinstance(c, Label):
                             label = c
                             break
-                    self.statechart.app.current_label = label
-                    self.statechart.app.current_anchored_label = \
+                    self.app.current_label = label
+                    self.app.current_anchored_label = \
                             shape.children[0]
                     shape.select()
                     dispatched = True
-                    self.statechart.go_to_state('EditingShape')
+                    self.statechart.go_to_state('EditingStateShape')
 
             if not dispatched:
-                if hasattr(self.statechart.app, 'touch'):
-                    self.statechart.go_to_state('AddingShape')
+                if hasattr(self.app, 'touch'):
+                    self.statechart.go_to_state('AddingStateShape')

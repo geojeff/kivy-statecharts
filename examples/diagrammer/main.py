@@ -54,12 +54,12 @@ class DiagrammerApp(App):
     shapes = ListProperty()
     connections = ListProperty()
 
-    current_shape = ObjectProperty(None, allownone=True)
-    current_state_shape = ObjectProperty(None, allownone=True)
     current_label = ObjectProperty(None, allownone=True)
     current_connection = ObjectProperty(None, allownone=True)
 
-    drawing_mode = OptionProperty('select_pick',
+    # TODO: Put these into select, text, and line adapters,
+    #       like those for generic_shapes and state_shapes.
+    drawing_tool = OptionProperty('select_pick',
                                   options=('select_pick',
                                            'select_marquee',
                                            'select_node',
@@ -68,16 +68,11 @@ class DiagrammerApp(App):
                                            'text_small',
                                            'line_straight',
                                            'line_arc',
-                                           'line_bezier',
-                                           'shape_rectangle',
-                                           'shape_ellipse',
-                                           'shape_polygon',
-                                           'state_triangle',
-                                           'state_rectangle',
-                                           'state_pentagon',
-                                           'state_ellipse'))
+                                           'line_bezier',))
 
-    state_drawing_mode_adapter = ObjectProperty(None)
+    tools_adapter = ObjectProperty(None)
+    generic_shape_tools_adapter = ObjectProperty(None)
+    state_shape_tools_adapter = ObjectProperty(None)
 
     def build(self):
 

@@ -748,11 +748,14 @@ class PolygonVectorShape(VectorShape):
                     [pos_x + w * mult_x for mult_x in x_mult_values],
                     [pos_y + h * mult_y for mult_y in y_mult_values])))
 
-        x_values = self.points[::2]
-        y_values = self.points[1::2]
+        # TODO: Resolve the mismatch between vertices and points (fill not
+        # full size, or points spread too large).
 
-        print 'w=', max(x_values) - min(x_values)
-        print 'h=', max(y_values) - min(y_values)
+        #x_values = self.points[::2]
+        #y_values = self.points[1::2]
+
+        #print 'w=', max(x_values) - min(x_values)
+        #print 'h=', max(y_values) - min(y_values)
 
     def vertices(self, origin=None, for_perimeter=False):
         '''Return vertices for perimeter or Mesh.'''

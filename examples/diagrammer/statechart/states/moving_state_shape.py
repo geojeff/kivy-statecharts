@@ -1,14 +1,18 @@
+from kivy.app import App
+
 from kivy_statecharts.system.state import State
 
 from kivy.uix.label import Label
 
 
-class MovingShape(State):
-    '''The MovingShape state is a transient state -- after moving the shape,
+class MovingStateShape(State):
+    '''The MovingStateShape state is a transient state -- after moving the shape,
     there is an immediate transition back to the ShowingDrawingArea state.'''
 
     def __init__(self, **kwargs):
-        super(MovingShape, self).__init__(**kwargs)
+        super(MovingStateShape, self).__init__(**kwargs)
+
+        self.app = App.get_running_app()
 
     def enter_state(self, context=None):
         pass
@@ -22,7 +26,7 @@ class MovingShape(State):
 
         if event == 'drawing_area_touch_move':
 
-            shape = self.statechart.app.current_shape
+            shape = self.app.current_shape
 
             shape.x += touch.dx
             shape.y += touch.dy

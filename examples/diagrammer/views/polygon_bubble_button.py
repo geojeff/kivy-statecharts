@@ -1,27 +1,36 @@
 from kivy.lang import Builder
-from kivy.uix.bubble import BubbleButton
-from kivy.uix.listview import ListItemButton
-from kivy.properties import ObjectProperty
-
 
 Builder.load_string('''
-<PolygonBubbleButton>:
+#:import math math
+#:import itertools itertools
+
+[PolygonBubbleButton@BubbleButton]:
 
     background_down: 'atlas://data/images/defaulttheme/bubble_btn'
     background_normal: 'atlas://data/images/defaulttheme/bubble_btn_pressed'
-    group: 'state_drawing_menu_root'
-    size_hint: self.size_hint if hasattr(self, 'size_hint') else (1, 1)
-    width: self.width if hasattr(self, 'width') else 1
-    height: self.height if hasattr(self, 'height') else 1
+    group: 'drawing_menu_root'
+    size_hint: ctx.size_hint if hasattr(ctx, 'size_hint') else (1, 1)
+    width: ctx.width if hasattr(ctx, 'width') else 1
+    height: ctx.height if hasattr(ctx, 'height') else 1
     on_release: app.statechart.send_event( \
-            self.action, self, None) if hasattr(self, 'action') else None
-    text: self.text if hasattr(self, 'text') else ''
+            ctx.action, self, None)
+    action: ctx.action
+    text: ctx.text if hasattr(ctx, 'text') else ''
     canvas:
         Color:
             rgba: 1, 1, 1, 1
         Mesh:
-            vertices: self.shape.vertices(origin=self.center)
-            indices: self.shape.indices()
+            vertices: list(itertools.chain(*[ \
+                       ((self.center[0]) \
+                            + math.cos(i * ((2 * math.pi) / ctx.sides)) \
+                                * ctx.radius, \
+                        (self.center[1]) \
+                            + math.sin(i * ((2 * math.pi) / ctx.sides)) \
+                                * ctx.radius, \
+                        math.cos(i * ((2 * math.pi) / ctx.sides)), \
+                        math.sin(i * ((2 * math.pi) / ctx.sides))) \
+                            for i in xrange(ctx.sides)]))
+            indices: range(ctx.sides)
             mode: 'triangle_fan'
     Scatter:
         do_scale: False
@@ -29,20 +38,3 @@ Builder.load_string('''
         do_rotation: False
         auto_bring_to_front: False
 ''')
-
-
-class PolygonBubbleButton(BubbleButton, ListItemButton):
-
-    shape = ObjectProperty(None)
-
-    def __init__(self, **kwargs):
-
-        self.shape = kwargs['shape_cls'](radius=kwargs['radius'],
-                                         sides=kwargs['sides'])
-
-        self.value = kwargs['value']
-
-        if 'action' in kwargs:
-            self.action = kwargs['action']
-
-        super(PolygonBubbleButton, self).__init__(**kwargs)

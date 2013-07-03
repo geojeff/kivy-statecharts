@@ -1,3 +1,5 @@
+from kivy.app import App
+
 from kivy_statecharts.system.state import State
 
 from kivy.graphics import Color
@@ -110,11 +112,13 @@ class AdjustingConnection(State):
 
     def enter_state(self, context=None):
 
-        self.drawing_area = \
-                self.statechart.app.screen_manager.current_screen.drawing_area
+        self.app = App.get_running_app()
 
-        point1 = self.statechart.app.connections[-1].connection_point1()
-        point2 = self.statechart.app.connections[-1].connection_point2()
+        self.drawing_area = \
+                self.app.screen_manager.current_screen.drawing_area
+
+        point1 = self.app.connections[-1].connection_point1()
+        point2 = self.app.connections[-1].connection_point2()
 
         self.connection_bubble1 = ConnectionBubble(
                 pos=(point1[0] - 75, point1[1]),
@@ -151,7 +155,7 @@ class AdjustingConnection(State):
                           'drag_connection_point2', ])
     def drag_connection_point(self, event, touch, context):
 
-        connection = self.statechart.app.connections[-1]
+        connection = self.app.connections[-1]
 
         if event == 'drag_connection_point1':
             dragging_op = self.dragging_op1
@@ -189,7 +193,7 @@ class AdjustingConnection(State):
 
     def accept_connection_point1(self, *args):
 
-        connection = self.statechart.app.connections[-1]
+        connection = self.app.connections[-1]
 
         self.drawing_area.remove_widget(connection.shape1)
         self.drawing_area.remove_widget(self.connection_bubble1)
@@ -212,7 +216,7 @@ class AdjustingConnection(State):
 
     def accept_connection_point2(self, *args):
 
-        connection = self.statechart.app.connections[-1]
+        connection = self.app.connections[-1]
 
         self.drawing_area.remove_widget(connection.shape2)
         self.drawing_area.remove_widget(self.connection_bubble2)
