@@ -876,7 +876,11 @@ split in Kivy, where we have a "controller layer" that consists, as of Summer
 2013, of:
 
 * controllers - Should be kept lean and mean; do not create and cache views;
-  stick to the roles of mediating to data, selection, and filtering.
+  stick to the roles of mediating to data, selection, and filtering. May
+  contain raw data record type items, views, such as shapes in a graphical
+  application, etc., but the management of the items is by external control.
+  The API is the same as the Kivy property wrapped, with the addition of
+  filtering methods, AliasProperty "computed property" interfaces, etc.
 
 * adapters - Very similar to controllers, but doing a view servicing job for
   some collection view, such as the ListView widget. This servicing includes

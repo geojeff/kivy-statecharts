@@ -13,6 +13,11 @@ from kivy.uix.floatlayout import FloatLayout
 
 from statechart.statechart import AppStatechart
 
+from controllers.shapes_controller import ShapesController
+from controllers.connections_controller import ConnectionsController
+from controllers.current_shape_controller import CurrentShapeController
+from controllers.current_connection_controller import CurrentConnectionController
+
 
 class RootWidget(GridLayout):
 
@@ -48,28 +53,19 @@ class DiagrammerApp(App):
 
     drawing_area = ObjectProperty(None, allownone=True)
 
-    # TODO: Move these into list controllers.
-    points = ListProperty()
-    shapes = ListProperty()
-    connections = ListProperty()
+    # List controllers mediate for a list of data and offer filtering, and
+    # a place to have alias properties and the like.
+    shapes_controller = ObjectProperty(None)
+    connections_controller = ObjectProperty(None)
 
-    # TODO: Move these into object controllers.
-    current_label = ObjectProperty(None, allownone=True)
-    current_connection = ObjectProperty(None, allownone=True)
+    # Object controllers mediate for a single data item, providing a place for
+    # establishing bindings to other controllers/properties, especially to the
+    # single selection of an associated list controller. Object controllers may
+    # also contain transformation methods of the content item.
+    current_shape_controller = ObjectProperty(None)
+    current_connection_controller = ObjectProperty(None)
 
-    # TODO: Put these into select, text, and line adapters,
-    #       like those for generic_shapes and state_shapes.
-    drawing_tool = OptionProperty('select_pick',
-                                  options=('select_pick',
-                                           'select_marquee',
-                                           'select_node',
-                                           'text_large',
-                                           'text_medium',
-                                           'text_small',
-                                           'line_straight',
-                                           'line_arc',
-                                           'line_bezier',))
-
+    # Adapters mediate data and create/cache views for parent collection views.
     tools_adapter = ObjectProperty(None)
     generic_shape_tools_adapter = ObjectProperty(None)
     state_shape_tools_adapter = ObjectProperty(None)

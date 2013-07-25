@@ -71,9 +71,12 @@ class AddingStateShape(State):
 
             shape.generate_connection_points(10)
 
-            self.app.shapes.append(shape)
+            self.app.shapes_controller.content.append(shape)
 
-            self.app.points.append(touch.pos)
+            self.app.shapes_controller.handle_selection(shape)
+
+            print self.app.current_shape_controller.content
+            print self.app.shapes_controller.selection
 
             self.go_to_state('ShowingDrawingScreen')
 

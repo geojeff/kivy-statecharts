@@ -51,13 +51,13 @@ class AddingConnection(State):
             # Switch the order of these loops, and add condition to only do the
             # polygon search if successful?
 
-            for shape in reversed(self.app.shapes):
+            for shape in reversed(self.app.shapes_controller.content):
                 if shape.collide_point(*touch.pos):
                     print 'shape touched', shape.canvas
                     target_shape_for_connection = shape
                     break
 
-            for shape in reversed(self.app.shapes):
+            for shape in reversed(self.app.shapes_controller.content):
                 if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
                     print 'polygon touched', shape.canvas
                     dist, line = shape.closest_line_segment(touch.pos[0],
@@ -133,8 +133,8 @@ class AddingConnection(State):
                     stroke_color=[.2, .9, .2, .8],
                     fill_color=[.4, .4, .4, .4])
 
-            self.app.connections.append(connection)
-            self.app.current_connection = connection
+            self.app.connections_controller.content.append(connection)
+            self.app.connections_controller.handle_selection(connection)
 
             shape1.connections.append(connection)
             shape2.connections.append(connection)

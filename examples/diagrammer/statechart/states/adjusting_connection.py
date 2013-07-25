@@ -117,8 +117,8 @@ class AdjustingConnection(State):
         self.drawing_area = \
                 self.app.screen_manager.current_screen.drawing_area
 
-        point1 = self.app.connections[-1].connection_point1()
-        point2 = self.app.connections[-1].connection_point2()
+        point1 = self.app.current_connection_controller.content.connection_point1()
+        point2 = self.app.current_connection_controller.content.connection_point2()
 
         self.connection_bubble1 = ConnectionBubble(
                 pos=(point1[0] - 75, point1[1]),
@@ -155,7 +155,7 @@ class AdjustingConnection(State):
                           'drag_connection_point2', ])
     def drag_connection_point(self, event, touch, context):
 
-        connection = self.app.connections[-1]
+        connection = self.app.connections_controller.content[-1]
 
         if event == 'drag_connection_point1':
             dragging_op = self.dragging_op1
@@ -193,7 +193,7 @@ class AdjustingConnection(State):
 
     def accept_connection_point1(self, *args):
 
-        connection = self.app.connections[-1]
+        connection = self.app.connections_controller.content[-1]
 
         self.drawing_area.remove_widget(connection.shape1)
         self.drawing_area.remove_widget(self.connection_bubble1)
@@ -216,7 +216,7 @@ class AdjustingConnection(State):
 
     def accept_connection_point2(self, *args):
 
-        connection = self.app.connections[-1]
+        connection = self.app.connections_controller.content[-1]
 
         self.drawing_area.remove_widget(connection.shape2)
         self.drawing_area.remove_widget(self.connection_bubble2)
