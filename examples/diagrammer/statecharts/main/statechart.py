@@ -1,11 +1,9 @@
-from kivy.properties import ObjectProperty
-
 from kivy_statecharts.system.state import State
 from kivy_statecharts.system.statechart import StatechartManager
 
-from states.starting_up import StartingUp
-from states.showing_help import ShowingHelpScreen
-from states.showing_drawing_area import ShowingDrawingScreen
+from statecharts.main.states.starting_up import StartingUp
+from statecharts.main.states.showing_help import ShowingHelpScreen
+from statecharts.main.states.showing_drawing_area import ShowingDrawingScreen
 
 
 class AppStatechart(StatechartManager):

@@ -2,9 +2,27 @@
 kivy-statecharts
 ================
 
-This is an extension to the Kivy framework that adds a system for programming
-with statecharts. It is a port of Michael Cohen's Ki framework, which became
-SproutCore.statechart.
+kivy-statecharts offers a high-level approach to using the Kivy system. It is a
+system for programming with statecharts and other elements of design that
+compliments core Kivy. 
+
+kivy-statecharts has goals including:
+
+* Examining software design patterns, such as model-view-controller,
+  model-view-adapter, and others, to see how Kivy programming can be adapted,
+  with statecharts playing a primary role.
+
+* Exploring statecharts programming, providing examples that demonstrate basic
+  app structure, and applications of standard, history, concurrent, and other
+  state usage.
+
+* Describing app structures that exemplify good options for developing large Kivy
+  applications and projects.
+
+kivy-statecharts was started as a port of Michael Cohen's Ki framework, which
+became SproutCore.statechart. The kivy-statecharts project has taken on the
+broad tasks listed above, to become a high-level extension to Kivy that
+includes substantial documentation and code on its own.
 
 `Original Ki repo`_
 https://github.com/frozenCanuck/ki
@@ -92,7 +110,7 @@ Clone the kivy-statecharts repo::
 
     python setup dev (for setting up for testing)
 
-Be warned: This addon is in alpha state. Use it at your own risk.
+Be warned: This project is in alpha state. Use it at your own risk.
 
 Using kivy-statecharts
 ======================

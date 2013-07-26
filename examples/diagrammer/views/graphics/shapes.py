@@ -19,7 +19,7 @@ from kivy.graphics import Line
 
 from kivy.lang import Builder
 
-Builder.load_file(str(os.path.join(os.path.dirname(__file__), 'graphics.kv')))
+Builder.load_file(str(os.path.join(os.path.dirname(__file__), 'shapes.kv')))
 
 # Abbreviation used in this file: cp == connection point
 

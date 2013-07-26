@@ -8,8 +8,6 @@ from kivy.adapters.dictadapter import DictAdapter
 
 from views.buttons.shape_bubble_button import ShapeBubbleButton
 
-from graphics import PolygonVectorShape
-
 
 data = \
     {'generic_shape_tool': {

@@ -11,7 +11,7 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
 
-from statechart.statechart import AppStatechart
+from statecharts.main.statechart import AppStatechart
 
 from controllers.shapes_controller import ShapesController
 from controllers.connections_controller import ConnectionsController

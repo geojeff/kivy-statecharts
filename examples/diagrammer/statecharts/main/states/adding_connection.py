@@ -3,11 +3,9 @@ from kivy.app import App
 from kivy_statecharts.system.state import State
 
 from kivy.graphics import Color, Line
-from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
-from kivy.properties import NumericProperty
 
-from graphics import ConnectionVectorShape
+from views.graphics.shapes import ConnectionVectorShape
 
 from adjusting_connection import AdjustingConnection
 
@@ -15,10 +13,11 @@ from adjusting_connection import AdjustingConnection
 class AddingConnection(State):
     '''The AddingConnection state is a transient state -- after connecting the
     shape, if there is a shape found on mouse-up, a working connection is made
-    and bubbles self.appear on each end for dragging / accepting connection points,
-    after a transition to AdjustingConnection, which handles finalization.  If
-    there is no shape found on mouse-up, there is an immediate transition back
-    to the ShowingDrawingScreen state.'''
+    and bubbles self.appear on each end for dragging / accepting connection
+    points, after a transition to AdjustingConnection, which handles
+    finalization.  If there is no shape found on mouse-up, there is an
+    immediate transition back to the ShowingDrawingScreen state.
+    '''
 
     drawing_area = ObjectProperty(None, allownone=True)
 

@@ -1,16 +1,8 @@
-import copy
-
 from kivy.app import App
 
 from kivy_statecharts.system.state import State
 
 from kivy.graphics import Color
-
-from kivy.uix.label import Label
-
-from state_graphics import StateTriangleVectorShape
-from state_graphics import StateRectangleVectorShape
-from state_graphics import StatePentagonVectorShape
 
 
 class AddingStateShape(State):
@@ -40,7 +32,8 @@ class AddingStateShape(State):
         with drawing_area.canvas.before:
             Color(1, 1, 0)
             d = 100.
-            #shape = copy.deepcopy(self.app.state_shape_tools_adapter.current_shape)
+            #shape = \
+            #  copy.deepcopy(self.app.state_shape_tools_adapter.current_shape)
             #shape.pos = (touch.x, touch.y)
             #shape.size = (d, d)
             #shape.stroke_width = 5.0
@@ -49,7 +42,8 @@ class AddingStateShape(State):
             #shape.add_widget(Label(text="Some State", pos=shape.pos))
             #shape.recalculate_points()
 
-            #RectangleImageShape(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d),
+            #RectangleImageShape(
+            #    pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d),
                     #x=touch.x, y=touch.y, width=100.0, height=100.0,
                     #line_color=[1.0, .3, .2, .5], fill_color=[.4, .4, .4, .4])
             #Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))

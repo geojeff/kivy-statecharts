@@ -96,7 +96,8 @@ class ConnectionBubble(Bubble):
 class AdjustingConnection(State):
     '''The AdjustingConnection state shows bubbles on either end of a
     provisional connection, allowing for dragging to the desired connection
-    point. Upon finalization, or cancelling, we go back to ShowingDrawingScreen.
+    point. Upon finalization, or cancelling, we go back to
+    ShowingDrawingScreen.
     '''
 
     drawing_area = ObjectProperty(None, allownone=True)

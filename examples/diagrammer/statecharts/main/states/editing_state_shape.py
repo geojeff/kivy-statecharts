@@ -1,7 +1,5 @@
 from kivy.app import App
 
-from math import cos, sin, pi
-
 from kivy_statecharts.system.state import State
 
 from kivy.uix.label import Label
@@ -13,11 +11,7 @@ from kivy.animation import Animation
 from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
 
-from kivy.uix.bubble import Bubble
-
 from kivy.lang import Builder
-
-from kivy.graphics import Mesh
 
 Builder.load_string('''
 #:import ListItemButton kivy.uix.listview.ListItemButton
