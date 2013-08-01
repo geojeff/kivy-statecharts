@@ -156,7 +156,7 @@ class AdjustingConnection(State):
                           'drag_connection_point2', ])
     def drag_connection_point(self, event, touch, context):
 
-        connection = self.app.connections_controller.content[-1]
+        connection = self.app.connections_controller.last()
 
         if event == 'drag_connection_point1':
             dragging_op = self.dragging_op1
@@ -194,7 +194,7 @@ class AdjustingConnection(State):
 
     def accept_connection_point1(self, *args):
 
-        connection = self.app.connections_controller.content[-1]
+        connection = self.app.connections_controller.last()
 
         self.drawing_area.remove_widget(connection.shape1)
         self.drawing_area.remove_widget(self.connection_bubble1)
@@ -217,7 +217,7 @@ class AdjustingConnection(State):
 
     def accept_connection_point2(self, *args):
 
-        connection = self.app.connections_controller.content[-1]
+        connection = self.app.connections_controller.last()
 
         self.drawing_area.remove_widget(connection.shape2)
         self.drawing_area.remove_widget(self.connection_bubble2)

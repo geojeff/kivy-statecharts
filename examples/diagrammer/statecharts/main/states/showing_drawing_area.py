@@ -126,7 +126,7 @@ class ShowingDrawingScreen(State):
 
         elif event == 'drawing_area_touch_move':
 
-            for shape in reversed(self.app.shapes_controller.content):
+            for shape in self.app.shapes_controller.reversed():
                 if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
                     dist, line = shape.closest_edge(touch.pos[0],
                                                     touch.pos[1])
@@ -154,7 +154,7 @@ class ShowingDrawingScreen(State):
 
             dispatched = False
 
-            for shape in reversed(self.app.shapes_controller.content):
+            for shape in self.app.shapes_controller.reversed():
                 if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
                     dist, line = shape.closest_edge(touch.pos[0],
                                                     touch.pos[1])

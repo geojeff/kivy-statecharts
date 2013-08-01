@@ -44,5 +44,26 @@ class ListController(Controller, ObjectSelection):
             if value:
                 self.content = [value]
 
+    def all(self):
+        return self.content
+
+    def reversed(self):
+        return reversed(self.content)
+
+    def first(self):
+        return self.content[0]
+
+    def last(self):
+        return self.content[-1]
+
+    def add(self, item):
+        self.content.append(item)
+
+    def delete(self, item):
+            self.content.remove(item)
+
+    def sorted(self):
+        return sorted(self.content)
+
     # TODO: examples of filtering and alias properties. There can
     # also be an order_by or other aid for sorting.
