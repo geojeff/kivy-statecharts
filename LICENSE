@@ -1,20 +1,13 @@
 # =============================================================================
 # Project: kivy-statecharts - A Statechart Framework for Kivy
-# Copyright: ©2010, 2011 Michael Cohen, and contributors.
-# Python Port: Jeff Pittman, ported from SproutCore, SC.Statechart
-# =============================================================================
 #
-# Ported from:
+# Python Port: by Jeff Pittman, ported from SproutCore, SC.Statechart:
 #
 #   https://github.com/sproutcore/sproutcore/tree/master/frameworks/statechart
 #
-# =============================================================================
-# Project:   kivy_statecharts - A Statechart Framework for Kivy
-#
-# Copyright: (c) 2010, 2011 Michael Cohen, and contributors.
-#            Portions @2011 Apple Inc. All rights reserved.
-# License:   Licensed under MIT license -- See note below, about transferring
-#            into Kivy from github.com/geojeff, done February 11, 2013.
+# License:   Licensed under MIT license -- See notes below, about transferring
+#            into Kivy from github.com/geojeff, done February 11, 2013, and
+#            other changes.
 # =============================================================================
 #
 # Note: The similarity between the original name of Michael Cohen's Ki
@@ -27,3 +20,28 @@
 #       perhaps this is fine, but this can be reviewed for making changes
 #       appropriate for living under the Kivy umbrella. The copyright lines
 #       for Jeffrey Gill Pittman (geojeff) was removed on transfer to Kivy.
+#
+# Note: The Kivy Team changed the license of all code to MIT in July 2013, so
+#       the license became:
+
+Copyright (c) 2010, 2011 Michael Cohen, and contributors,
+          Portions @2011 Apple Inc. All rights reserved,
+          2010-2013 Kivy Team and other contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
