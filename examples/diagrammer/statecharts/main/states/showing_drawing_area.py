@@ -126,51 +126,48 @@ class ShowingDrawingScreen(State):
 
         elif event == 'drawing_area_touch_move':
 
+            state_for_dispatch = ''
+
             for shape in self.app.shapes_controller.reversed():
                 if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
                     dist, line = shape.closest_edge(touch.pos[0],
                                                     touch.pos[1])
-                    self.app.current_shape = shape
+                    self.app.shapes_controller.handle_selection(shape)
+                    self.app.moving_shape = shape
                     label = None
                     for c in shape.children:
                         if isinstance(c, Label):
                             label = c
                             break
                     self.app.current_label = label
-                    dispatched = True
-                    self.statechart.go_to_state('MovingStateShape')
+                    state_for_dispatch = 'MovingStateShape'
+                    break
                 elif shape.collide_point(*touch.pos):
-                    self.app.current_shape = shape
-                    label = None
-                    for c in shape.children:
-                        if isinstance(c, Label):
-                            label = c
-                            break
-                    self.app.current_label = label
-                    dispatched = True
-                    self.statechart.go_to_state('AddingConnection')
+                    self.app.shapes_controller.handle_selection(shape)
+                    self.app.connecting_shape = shape
+                    state_for_dispatch = 'AddingConnection'
+                    break
+
+            if state_for_dispatch:
+                self.statechart.go_to_state(state_for_dispatch)
 
         elif event == 'drawing_area_touch_up':
 
-            dispatched = False
+            state_for_dispatch = ''
 
             for shape in self.app.shapes_controller.reversed():
-                if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
-                    dist, line = shape.closest_edge(touch.pos[0],
-                                                    touch.pos[1])
-                    self.app.current_shape = shape
-                    label = None
-                    for c in shape.children:
-                        if isinstance(c, Label):
-                            label = c
-                            break
-                    self.app.current_label = label
-                    self.app.current_anchored_label = \
-                            shape.children[0]
-                    shape.select()
-                    dispatched = True
-                    self.statechart.go_to_state('EditingStateShape')
 
-            if not dispatched:
+                if shape.point_on_polygon(touch.pos[0], touch.pos[1], 10):
+
+                    dist, line = shape.closest_edge(touch.pos[0], touch.pos[1])
+
+                    self.app.shapes_controller.handle_selection(shape)
+
+                    state_for_dispatch = 'EditingStateShape'
+                    break
+
+            if state_for_dispatch:
+                self.statechart.go_to_state(state_for_dispatch)
+            else:
                 if hasattr(self.app, 'touch'):
                     self.statechart.go_to_state('AddingStateShape')

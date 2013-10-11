@@ -47,6 +47,8 @@
     id: vs
     #label: label
     points: self.points
+    vertices: self.vertices
+    indices: self.indices
     pos: self.pos
     size: self.size
 
@@ -56,8 +58,8 @@
             Color: 
                 rgba: vs.fill_color
             Mesh:
-                vertices: vs.vertices(origin=vs.center)
-                indices: vs.indices()
+                vertices: vs.vertices
+                indices: vs.indices
                 mode: 'triangle_fan'
             Color: 
                 rgba: vs.stroke_color

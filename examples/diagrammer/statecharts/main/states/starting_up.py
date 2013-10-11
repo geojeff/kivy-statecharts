@@ -1,16 +1,11 @@
 from kivy.app import App
+from kivy.binding import DataBinding
+from kivy.enums import binding_modes
 
 from kivy_statecharts.system.state import State
 
-from controllers.shapes_controller import ShapesController
-from controllers.current_shape_controller import CurrentShapeController
-from controllers.connections_controller import ConnectionsController
-from controllers.current_connection_controller \
-        import CurrentConnectionController
-
-from adapters.tools_adapter import ToolsAdapter
-from adapters.generic_shape_tools_adapter import GenericShapeToolsAdapter
-from adapters.state_shape_tools_adapter import StateShapeToolsAdapter
+from models.shape_tool import ShapeTool
+from views.graphics.shapes import PolygonVectorShape
 
 
 class StartingUp(State):
@@ -19,39 +14,72 @@ class StartingUp(State):
 
         super(StartingUp, self).__init__(**kwargs)
 
-        self.app = App.get_running_app()
+        self.app = App.app()
 
     def enter_state(self, context=None):
 
-        # Initialize controllers (When shapes are stored in files, there
-        # will be a "LoadingData" state, from which we would come after the
-        # data is loaded -- and we would be setting the shapes, points, and
-        # other data into controllers here).
-        self.app.shapes_controller = ShapesController(
-                selection_mode='single',
-                allow_empty_selection=False)
+        # Initialize controllers.
+        self.app.generic_shape_tools_controller.data = [
+                ShapeTool(
+                    shape=PolygonVectorShape(
+                        tool='generic_shape_triangle',
+                        radius=20,
+                        sides=3,
+                        stroke_width=1.0,
+                        stroke_color=[.2, .9, .2, .8],
+                        fill_color=[.4, .4, .4, 1]),
+                    action='generic_shape_tool_changed'),
+                ShapeTool(
+                    shape=PolygonVectorShape(
+                        tool='generic_shape_rectangle',
+                        radius=20,
+                        sides=4,
+                        stroke_width=1.0,
+                        stroke_color=[.2, .9, .2, .8],
+                        fill_color=[.4, .4, .4, 1]),
+                    action='generic_shape_tool_changed'),
+                ShapeTool(
+                    shape=PolygonVectorShape(
+                        tool='generic_shape_pentagon',
+                        radius=20,
+                        sides=5,
+                        stroke_width=1.0,
+                        stroke_color=[.2, .9, .2, .8],
+                        fill_color=[.4, .4, .4, 1]),
+                    action='generic_shape_tool_changed')]
 
-        self.app.connections_controller = ConnectionsController(
-                selection_mode='multiple')
+        self.app.state_shape_tools_controller.data = [
+            ShapeTool(
+                shape=PolygonVectorShape(
+                    tool='state_shape_triangle',
+                    radius=20,
+                    sides=3,
+                    stroke_width=1.0,
+                    stroke_color=[.2, .9, .2, .8],
+                    fill_color=[.4, .4, .4, 1]),
+                action='state_shape_tool_changed'),
+            ShapeTool(
+                shape=PolygonVectorShape(
+                    tool='state_shape_rectangle',
+                    radius=20,
+                    sides=4,
+                    stroke_width=1.0,
+                    stroke_color=[.2, .9, .2, .8],
+                    fill_color=[.4, .4, .4, 1]),
+                action='state_shape_tool_changed'),
+            ShapeTool(
+                shape=PolygonVectorShape(
+                    tool='state_shape_pentagon',
+                    radius=20,
+                    sides=5,
+                    stroke_width=1.0,
+                    stroke_color=[.2, .9, .2, .8],
+                    fill_color=[.4, .4, .4, 1]),
+                action='state_shape_tool_changed')]
 
-        self.app.current_shape_controller = CurrentShapeController()
-
-        self.app.current_connection_controller = CurrentConnectionController()
-
-        # Set up bindings between object controllers and the selection in their
-        # associated list controllers.
-        self.app.shapes_controller.bind(
-                selection=self.app.current_shape_controller.update)
-
-        self.app.connections_controller.bind(
-                selection=self.app.current_connection_controller.update)
-
-        # Initialize adapters.
-        self.app.generic_shape_tools_adapter = GenericShapeToolsAdapter()
-        self.app.state_shape_tools_adapter = StateShapeToolsAdapter()
-
-        # Do the tool adapter last, because it has bindings to the others.
-        self.app.tools_adapter = ToolsAdapter()
+        self.app.shape_tools_controller.data = [
+                self.app.current_generic_shape_tool_controller.shape_tool_item,
+                self.app.current_state_shape_tool_controller.shape_tool_item]
 
         self.go_to_showing_help()
 

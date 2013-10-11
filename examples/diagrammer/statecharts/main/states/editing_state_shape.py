@@ -15,7 +15,7 @@ from kivy.lang import Builder
 
 Builder.load_string('''
 #:import ListItemButton kivy.uix.listview.ListItemButton
-#:import ListAdapter kivy.adapters.listadapter.ListAdapter
+#:import ListController kivy.controllers.listcontroller.ListController
 
 [EditingStateShapeMenuButton@ToggleButton]
     background_down: 'atlas://data/images/defaulttheme/bubble_btn'
@@ -99,8 +99,8 @@ Builder.load_string('''
                     Rectangle:
                         size: self.size
                         pos: self.pos
-                adapter:
-                    ListAdapter(data=root.labels, \
+                controller:
+                    ListController(data=root.labels, \
                             cls=ListItemButton, \
                             args_converter=lambda rowindex, obj: { \
                                         'text': obj.text, \
@@ -368,7 +368,7 @@ class EditingStateShape(State):
         drawing_area = \
                 self.app.screen_manager.current_screen.drawing_area
 
-        self.shape = self.app.current_shape
+        self.shape = self.app.current_shape_controller.data
 
         self.labels = [c for c in self.shape.children if isinstance(c, Label)]
 
@@ -395,11 +395,11 @@ class EditingStateShape(State):
 
         self.editing_shape_menu.dismiss()
 
-    def shape_label_selected(self, adapter, *args):
+    def shape_label_selected(self, controller, *args):
 
         # TODO: Why is this guard condition needed?
-        if adapter:
-            self.app.current_label = adapter.selection[0]
+        if controller:
+            self.app.current_label = controller.selection[0]
 
     def shape_label_edited(self, text, *args):
         '''An action method associated with the text input. There is a

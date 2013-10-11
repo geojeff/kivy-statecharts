@@ -68,10 +68,11 @@ class AddingConnection(State):
                     break
 
             if target_shape_for_connection:
-                self.connect(self.app.current_shape,
+                self.connect(self.app.connecting_shape,
                              target_shape_for_connection)
 
-                self.app.current_shape = target_shape_for_connection
+                self.app.shapes_controller.handle_selection(
+                        target_shape_for_connection)
 
                 with self.drawing_area.canvas.before:
                     self.realtime_line.points = []
@@ -93,7 +94,7 @@ class AddingConnection(State):
             color = color
 
             if not self.realtime_line:
-                self.center1 = list(self.app.current_shape.center)
+                self.center1 = list(self.app.connecting_shape.center)
                 self.realtime_line = Line(
                         points=self.center1,
                         dash_offset=10,
@@ -136,6 +137,8 @@ class AddingConnection(State):
 
             self.app.connections_controller.add(connection)
             self.app.connections_controller.handle_selection(connection)
+
+            self.app.adjusting_connection = connection
 
             shape1.connections.append(connection)
             shape2.connections.append(connection)

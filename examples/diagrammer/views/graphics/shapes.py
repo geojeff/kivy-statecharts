@@ -156,7 +156,7 @@ class Shape(SelectableView, Widget):
 
         self.size_hint = (None, None)
 
-        self.bind(is_selected=self.selection_changed)
+        self.ksel.bind_to(self.selection_changed)
 
     def selection_changed(self, *args):
 
@@ -297,6 +297,8 @@ class AnchoredLabel(AnchorLayout):
 class VectorShape(ConnectedShape):
 
     points = ListProperty([])
+    vertices = ListProperty([])
+    indices = ListProperty([])
     unit_circle_points = ListProperty([])
     cp_slices_for_edges = ListProperty([])
 
@@ -583,11 +585,11 @@ class VectorShape(ConnectedShape):
         cp = self.connection_points[index]
         Line(circle=(cp[0], cp[1], 5))
 
-    def vertices(self, origin=None):
+    def _vertices(self, origin=None):
         '''Return vertices for Mesh.'''
         pass
 
-    def indices(self):
+    def _indices(self):
         '''Return indices for Mesh.'''
         pass
 
@@ -621,13 +623,15 @@ class ConnectionVectorShape(VectorShape):
         return super(VectorShape, self).on_touch_down(touch)
 
     def adjust(self, shape, dx, dy):
+
         connection_point1 = self.shape1.connection_points[self.shape1_cp_index]
         self.pos[0] = connection_point1[0]
         self.pos[1] = connection_point1[1]
 
-        if shape == self.shape1:
-            self.x += dx
-            self.y += dy
+# This was causing a stutter, and works smoothly without it.
+#        if shape == self.shape1:
+#            self.x += dx
+#            self.y += dy
 
         self.points[0] = self.pos[0]
         self.points[1] = self.pos[1]
@@ -653,13 +657,13 @@ class ConnectionVectorShape(VectorShape):
         #self.points[0] = self.pos[0] + int(float(self.size[0]) * self.shape[0])
         #self.points[1] = self.pos[1] + int(float(self.size[1]) * self.shape[1])
 
-    def vertices(self, origin=None, for_perimeter=False):
+    def _vertices(self, origin=None, for_perimeter=False):
         '''For now, just return the two end points. See comment in indices().
         '''
 
         return self.points
 
-    def indices(self):
+    def _indices(self):
         '''Return indices for Mesh.
 
         TODO: Now we treat the connection as a line, but it could be a polygon
@@ -731,7 +735,7 @@ class PolygonVectorShape(VectorShape):
 
     def recalculate_points(self, *args):
 
-        self.unit_circle_points = self.vertices(for_perimeter=True)
+        self.unit_circle_points = self._vertices(for_perimeter=True)
 
         self.unit_circle_points = self.shift_unit_circle_points_to_origin()
 
@@ -748,16 +752,11 @@ class PolygonVectorShape(VectorShape):
                     [pos_x + w * mult_x for mult_x in x_mult_values],
                     [pos_y + h * mult_y for mult_y in y_mult_values])))
 
-        # TODO: Resolve the mismatch between vertices and points (fill not
-        # full size, or points spread too large).
+        self.vertices = self._vertices(origin=self.center, for_fill=True)
 
-        #x_values = self.points[::2]
-        #y_values = self.points[1::2]
+        self.indices = self._indices()
 
-        #print 'w=', max(x_values) - min(x_values)
-        #print 'h=', max(y_values) - min(y_values)
-
-    def vertices(self, origin=None, for_perimeter=False):
+    def _vertices(self, origin=None, for_perimeter=False, for_fill=False):
         '''Return vertices for perimeter or Mesh.'''
 
         if not origin:
@@ -771,6 +770,17 @@ class PolygonVectorShape(VectorShape):
                             (radius * math.cos(2 * math.pi * i / self.sides),
                              radius * math.sin(2 * math.pi * i / self.sides))
                                 for i in range(self.sides)]))
+        elif for_fill:
+
+            vertices = []
+            for i, (x, y) in enumerate(pairwise(self.points)):
+                vertices.append(x)
+                vertices.append(y)
+                vertices.append(math.cos(i * ((2 * math.pi) / self.sides)))
+                vertices.append(math.sin(i * ((2 * math.pi) / self.sides)))
+
+            return vertices
+
         else:
 
             vertices = list(itertools.chain(*[
@@ -784,20 +794,9 @@ class PolygonVectorShape(VectorShape):
                             math.sin(i * ((2 * math.pi) / self.sides)))
                                 for i in xrange(self.sides)]))
 
-            # TODO: Resolve the mismatch between vertices and points (fill not
-            # full size, or points spread too large).
-
-            #x_values1 = vertices[::2]
-            #x_values = x_values1[::2]
-            #y_values1 = vertices[1::2]
-            #y_values = y_values1[::2]
-
-            #print 'wv=', max(x_values) - min(x_values)
-            #print 'hv=', max(y_values) - min(y_values)
-
             return vertices
 
-    def indices(self):
+    def _indices(self):
         '''Return indices for Mesh.'''
 
         return range(self.sides)

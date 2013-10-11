@@ -1,10 +1,7 @@
-from kivy_statecharts.system.controllers.object_controller \
-        import ObjectController
+from kivy.controllers.objectcontroller import ObjectController
 
 
 class CurrentShapeController(ObjectController):
-
-    # content property holds the data
 
     def __init__(self, **kwargs):
 

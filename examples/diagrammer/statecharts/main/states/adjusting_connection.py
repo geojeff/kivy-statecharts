@@ -118,8 +118,8 @@ class AdjustingConnection(State):
         self.drawing_area = \
                 self.app.screen_manager.current_screen.drawing_area
 
-        point1 = self.app.current_connection_controller.content.connection_point1()
-        point2 = self.app.current_connection_controller.content.connection_point2()
+        point1 = self.app.adjusting_connection.connection_point1()
+        point2 = self.app.adjusting_connection.connection_point2()
 
         self.connection_bubble1 = ConnectionBubble(
                 pos=(point1[0] - 75, point1[1]),

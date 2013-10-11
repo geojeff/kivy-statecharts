@@ -1,8 +1,8 @@
 from kivy.app import App
-
+from kivy.graphics import Color
 from kivy_statecharts.system.state import State
 
-from kivy.graphics import Color
+from views.graphics.shapes import AnchoredLabel
 
 
 class AddingStateShape(State):
@@ -25,15 +25,15 @@ class AddingStateShape(State):
         drawing_area = \
                 self.app.screen_manager.current_screen.drawing_area
 
-        shape_cls = self.app.state_shape_tools_adapter.current_shape.__class__
-        radius = self.app.state_shape_tools_adapter.current_shape.radius
-        sides = self.app.state_shape_tools_adapter.current_shape.sides
+        shape_cls = self.app.current_state_shape_tool_controller.data.shape.__class__
+        radius = self.app.current_state_shape_tool_controller.data.shape.radius
+        sides = self.app.current_state_shape_tool_controller.data.shape.sides
 
         with drawing_area.canvas.before:
             Color(1, 1, 0)
             d = 100.
             #shape = \
-            #  copy.deepcopy(self.app.state_shape_tools_adapter.current_shape)
+            #  copy.deepcopy(self.app.state_shape_tools_controller.current_shape)
             #shape.pos = (touch.x, touch.y)
             #shape.size = (d, d)
             #shape.stroke_width = 5.0
@@ -55,18 +55,18 @@ class AddingStateShape(State):
                     sides=sides,
                     #x=touch.x, y=touch.y, width=100.0, height=100.0,
                     stroke_width=5.0,
-                    stroke_color=[.2, .9, .2, .8], fill_color=[.4, .4, .4, .4])
+                    stroke_color=[.2, .9, .2, .8],
+                    fill_color=[.4, .4, .4, .4])
 
-            #shape.add_widget(AnchoredLabel(
-            #        anchor_widget=shape,
-            #        text="Some State",
-            #        label_anchor_x='left',
-            #        label_anchor_y='bottom'))
+            shape.add_widget(AnchoredLabel(
+                    anchor_widget=shape,
+                    text="Some State",
+                    label_anchor_x='left',
+                    label_anchor_y='bottom'))
 
             shape.generate_connection_points(10)
 
             self.app.shapes_controller.add(shape)
-
             self.app.shapes_controller.handle_selection(shape)
 
             self.go_to_state('ShowingDrawingScreen')

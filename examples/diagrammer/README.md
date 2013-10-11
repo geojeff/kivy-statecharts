@@ -2,7 +2,7 @@ Diagrammer
 ==========
 
 NOTE: diagrammer uses new adapter, selection, list and dict property code in
-      the data_changed_and_selection branch of kivy (Aug. 26, 2013).
+      the data_changed_and_selection branch of kivy (Oct. 11, 2013).
 
 NOTE: git-flow is being used for development, so work progresses on the
       develop branch, not on master. Releases on master will be started soon,

@@ -1,6 +1,7 @@
 from kivy.lang import Builder
 from kivy.uix.bubble import BubbleButton
 from kivy.uix.listview import ListItemButton
+from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 
@@ -22,8 +23,8 @@ Builder.load_string('''
             rgba: self.shape.fill_color
         Mesh:
             #vertices: self.shape.vertices(origin=self.shape.center)
-            vertices: self.shape.vertices(origin=self.center)
-            indices: self.shape.indices()
+            vertices: self.shape._vertices(origin=self.center)
+            indices: self.shape.indices
             mode: 'triangle_fan'
         Color:
             rgba: self.shape.stroke_color
@@ -37,8 +38,8 @@ Builder.load_string('''
 #        Color:
 #            rgba: 1, 1, 1, 1
 #        Mesh:
-#            vertices: self.shape.vertices(origin=self.center)
-#            indices: self.shape.indices()
+#            vertices: self.shape.vertices
+#            indices: self.shape.indices
 #            mode: 'triangle_fan'
     Scatter:
         do_scale: False
@@ -54,12 +55,4 @@ class ShapeBubbleButton(BubbleButton, ListItemButton):
     action = StringProperty('')
 
     def __init__(self, **kwargs):
-
         super(ShapeBubbleButton, self).__init__(**kwargs)
-
-        if 'adapter' in kwargs and kwargs['adapter']:
-            #kwargs['adapter'].bind(current_shape=self.shape_changed)
-            self.bind(shape=kwargs['adapter'].setter('current_shape'))
-
-    #def shape_changed(self, adapter, *args):
-    #    self.shape = adapter.current_shape

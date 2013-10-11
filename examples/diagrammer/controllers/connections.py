@@ -1,13 +1,11 @@
-from kivy_statecharts.system.controllers.list_controller import ListController
+from kivy.controllers.listcontroller import ListController
 
 
 class ConnectionsController(ListController):
 
-    # content property holds the data
-
     # A silly example of the type of filtering that is done by controllers.
     def blue_connections(self):
 
-        return [s for s in self.content if s.fill_color[2] > .5]
+        return [s for s in self.data if s.fill_color[2] > .5]
 
     # See ShapesController for some discussion.

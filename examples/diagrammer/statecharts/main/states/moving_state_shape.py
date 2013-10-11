@@ -28,24 +28,23 @@ class MovingStateShape(State):
 
         if event == 'drawing_area_touch_move':
 
-            shape = self.app.current_shape
+            # TODO: What is the cost of using a local shape var, vs. self.app.ref?
+            self.app.moving_shape.x += touch.dx
+            self.app.moving_shape.y += touch.dy
 
-            shape.x += touch.dx
-            shape.y += touch.dy
+#            labels = [c for c in self.app.moving_shape.children if isinstance(c, Label)]
+#
+#            for label in labels:
+#                label.x += touch.dx
+#                label.y += touch.dy
 
-            labels = [c for c in shape.children if isinstance(c, Label)]
+            self.app.moving_shape.recalculate_points()
 
-            for label in labels:
-                label.x += touch.dx
-                label.y += touch.dy
-
-            shape.recalculate_points()
-
-            for cp in shape.connection_points:
+            for cp in self.app.moving_shape.connection_points:
                 cp[0] += touch.dx
                 cp[1] += touch.dy
 
-            shape.adjust_connections(touch.dx, touch.dy)
+            self.app.moving_shape.adjust_connections(touch.dx, touch.dy)
 
         elif event == 'drawing_area_touch_up':
 
