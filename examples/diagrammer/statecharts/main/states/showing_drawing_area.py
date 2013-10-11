@@ -1,11 +1,9 @@
 from kivy.app import App
-
-from kivy.uix.label import Label
-
 from kivy.properties import ObjectProperty
 from kivy.properties import DictProperty
-
 from kivy_statecharts.system.state import State
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 
 from adding_state_shape import AddingStateShape
 from moving_state_shape import MovingStateShape
@@ -25,6 +23,8 @@ class ShowingDrawingScreen(State):
     menu_actions_and_submenus = DictProperty({})
 
     submenu = ObjectProperty(None, allownone=True)
+
+    no_generic_functionality_message_dialog = ObjectProperty(None)
 
     def __init__(self, **kwargs):
 
@@ -62,7 +62,8 @@ class ShowingDrawingScreen(State):
                     'show_submenu_state_shape_tool': StateShapeSubmenu()}
 
     def exit_state(self, context=None):
-        pass
+        if self.no_generic_functionality_message_dialog:
+            self.no_generic_functionality_message_dialog.dismiss()
 
     def make_justified_label(self, text, justification):
 
@@ -92,6 +93,22 @@ class ShowingDrawingScreen(State):
     @State.event_handler(['generic_shape_tool_changed',
                           'state_shape_tool_changed'])
     def handle_tool_menu_touch(self, event, context, arg):
+
+        drawing_area = \
+                self.app.screen_manager.current_screen.drawing_area
+
+        if event == 'generic_shape_tool_changed':
+            if not self.no_generic_functionality_message_dialog:
+                self.no_generic_functionality_message_dialog = Popup(
+                        size_hint=(None, None),
+                        size=(400, 240),
+                        attach_to=drawing_area,
+                        title='No Generic Shape Functionality Yet',
+                        content=Label(text=('The second main button controls\n'
+                                            'current state shape -- try that,\n'
+                                            'then click in the drawing area.')))
+
+            self.no_generic_functionality_message_dialog.open()
 
         # Remove the submenu.
 

@@ -1,17 +1,14 @@
+from kivy.animation import Animation
 from kivy.app import App
-
-from kivy_statecharts.system.state import State
-
+from kivy.lang import Builder
+from kivy.properties import ListProperty
+from kivy.properties import ObjectProperty
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 
-from kivy.animation import Animation
+from kivy_statecharts.system.state import State
 
-from kivy.properties import ListProperty
-from kivy.properties import ObjectProperty
-
-from kivy.lang import Builder
 
 Builder.load_string('''
 #:import ListItemButton kivy.uix.listview.ListItemButton

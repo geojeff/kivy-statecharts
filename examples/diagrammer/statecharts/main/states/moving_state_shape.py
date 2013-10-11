@@ -32,6 +32,11 @@ class MovingStateShape(State):
             self.app.moving_shape.x += touch.dx
             self.app.moving_shape.y += touch.dy
 
+            # TODO: For now, blindly move all children.
+            for wid in [c for c in self.app.moving_shape.children]:
+                wid.x += touch.dx
+                wid.y += touch.dy
+
 #            labels = [c for c in self.app.moving_shape.children if isinstance(c, Label)]
 #
 #            for label in labels:
